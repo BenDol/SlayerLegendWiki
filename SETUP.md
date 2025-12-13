@@ -132,11 +132,11 @@ Delete and replace the example content:
 ```bash
 # Keep the structure, replace the content
 # Edit these files:
-- content/getting-started/index.md
-- content/getting-started/installation.md
-- content/guides/index.md
-- content/guides/creating-content.md
-- content/reference/index.md
+- public/content/getting-started/index.md
+- public/content/getting-started/installation.md
+- public/content/guides/index.md
+- public/content/guides/creating-content.md
+- public/content/reference/index.md
 ```
 
 #### Add Your Logo (Optional)
@@ -224,7 +224,7 @@ git push
 
 ## 📚 Next Steps
 
-- [Creating Content Guide](content/guides/creating-content.md)
+- [Creating Content Guide](public/content/guides/creating-content.md)
 - [Framework Documentation](https://github.com/BenDol/GithubWiki)
 - [Deployment Guide](https://github.com/BenDol/GithubWiki/blob/main/DEPLOYMENT.md)
 
@@ -304,8 +304,8 @@ theme: {
 
 2. Create directory:
    ```bash
-   mkdir content/tutorials
-   touch content/tutorials/index.md
+   mkdir -p public/content/tutorials
+   touch public/content/tutorials/index.md
    ```
 
 ### Custom Domain

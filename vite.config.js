@@ -11,8 +11,8 @@ export default createWikiConfigSync({
   // Your wiki's base URL (must match GitHub Pages repo name)
   base: '/my-wiki/',
 
-  // Content location (relative to this file)
-  contentPath: './content',
+  // Content location (for build-time @content alias - points to served content)
+  contentPath: './public/content',
 
   // Explicitly use parent project's public directory
   publicDir: './public',

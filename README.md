@@ -66,11 +66,11 @@ Visit `http://localhost:5173` to see your wiki!
 ```
 my-wiki/
 ├── wiki-framework/        # Framework submodule (don't edit!)
-├── content/               # YOUR markdown content
-│   ├── getting-started/
-│   ├── guides/
-│   └── reference/
 ├── public/                # YOUR static assets
+│   ├── content/          # YOUR markdown content
+│   │   ├── getting-started/
+│   │   ├── guides/
+│   │   └── reference/
 │   └── logo.svg
 ├── wiki-config.json      # YOUR wiki configuration
 ├── package.json          # YOUR dependencies
@@ -82,7 +82,7 @@ my-wiki/
 
 ### Create a New Page
 
-1. Create a markdown file in `content/{section}/my-page.md`
+1. Create a markdown file in `public/content/{section}/my-page.md`
 2. Add frontmatter:
 
 ```markdown
@@ -129,13 +129,13 @@ npm run build:search
 2. Create content directory:
 
 ```bash
-mkdir content/my-section
+mkdir -p public/content/my-section
 ```
 
 3. Add an index page:
 
 ```bash
-echo "---\ntitle: My Section\n---\n\n# My Section" > content/my-section/index.md
+echo "---\ntitle: My Section\n---\n\n# My Section" > public/content/my-section/index.md
 ```
 
 ## Updating the Framework

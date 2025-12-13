@@ -12,7 +12,7 @@ This is a **parent wiki project** built using the [GitHub Wiki Framework](https:
 
 ```
 Parent Project (this repo)       Framework Submodule
-├── content/                     wiki-framework/
+├── public/content/              wiki-framework/
 ├── wiki-config.json            ├── src/           # React app
 ├── vite.config.js              ├── scripts/       # Build tools
 ├── main.jsx                    └── vite.config.base.js
@@ -22,7 +22,7 @@ Parent Project (this repo)       Framework Submodule
 ### What Lives Where
 
 **Parent project (edit these):**
-- `content/` - All markdown content (11 sections, 100+ pages)
+- `public/content/` - All markdown content (11 sections, 100+ pages)
 - `public/` - Static assets (images, logos, favicons, etc.)
 - `public/data/` - JSON data files for data-driven pages
 - `src/components/calculators/` - **Game-specific calculator components**
@@ -134,7 +134,7 @@ public/
 
 ### Creating New Pages
 
-1. Create markdown file: `content/{section}/page-name.md`
+1. Create markdown file: `public/content/{section}/page-name.md`
 2. Add frontmatter:
 ```markdown
 ---
@@ -168,8 +168,8 @@ date: 2025-12-12
   ]
 }
 ```
-2. Create directory: `mkdir content/tutorials`
-3. Add index page: `content/tutorials/index.md`
+2. Create directory: `mkdir public/content/tutorials`
+3. Add index page: `public/content/tutorials/index.md`
 
 ## Configuration Files
 
@@ -193,7 +193,7 @@ Must update `base` to match repository name:
 ```javascript
 export default createWikiConfigSync({
   base: '/your-repo-name/',  // Must match GitHub repo for GitHub Pages
-  contentPath: './content',
+  contentPath: './public/content',
 });
 ```
 
