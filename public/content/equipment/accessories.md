@@ -1,8 +1,11 @@
 ---
-title: accessories
-tags: [equipment]
+id: accessories
+title: Accessories
+description: asda sdads asda sda
+tags:
+  - equipment
 category: Equipment
-date: 2025-12-13  
+date: 2025-12-13T00:00:00.000Z
 ---
-# accessories
-Equipment guide
+# Accessories
+Equipment guidea asd asd
