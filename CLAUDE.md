@@ -284,6 +284,46 @@ description: Custom home page content
 Your custom home page content here...
 ```
 
+**Direct Commit Feature:**
+When `features.editRequestCreator.permissions.allowDirectCommit` is enabled, users with write access to the repository can commit directly to the main branch, bypassing the pull request workflow:
+
+- **Default: `false`** - All edits create pull requests (safer, allows review)
+- **When `true`** - Contributors with write access commit directly to main branch
+- Only affects authenticated users with write/admin permissions
+- Users without write access still use the fork/PR workflow
+- Works for both creating/editing pages and deleting pages
+
+**When to enable:**
+- Small teams with trusted contributors
+- Internal wikis where review is not needed
+- Faster workflow for experienced contributors
+
+**When to keep disabled (recommended):**
+- Public wikis with many contributors
+- When you want to review all changes
+- To maintain audit trail through PRs
+- To prevent accidental changes
+
+Example:
+```json
+{
+  "features": {
+    "editRequestCreator": {
+      "permissions": {
+        "requireAuth": true,
+        "fallbackToFork": true,
+        "allowDirectCommit": false
+      }
+    }
+  }
+}
+```
+
+**Behavior:**
+- **allowDirectCommit: false** (default) → Creates PR for review
+- **allowDirectCommit: true** → Contributors commit directly, others create PR
+- Confirmation dialogs update to indicate immediate vs. PR-based changes
+
 ### vite.config.js
 Must update `base` to match repository name:
 ```javascript
