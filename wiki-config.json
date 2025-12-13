@@ -190,6 +190,7 @@
       },
       "anonymous": {
         "enabled": false,
+        "mode": "server",
         "serverEndpoint": "",
         "attributionFormat": "Contributed anonymously via wiki editor"
       },

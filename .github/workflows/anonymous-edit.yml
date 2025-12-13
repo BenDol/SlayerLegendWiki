@@ -1,0 +1,288 @@
+name: Process Anonymous Edit Request
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process-edit:
+    # Only process issues with the wiki:anonymous-edit label
+    if: contains(github.event.issue.labels.*.name, 'wiki:anonymous-edit')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Update status to processing
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const currentLabels = context.payload.issue.labels.map(l => l.name);
+            const statusLabels = ['status:processing', 'status:completed', 'status:failed'];
+            const labelsToKeep = currentLabels.filter(l => !statusLabels.includes(l));
+            const newLabels = [...labelsToKeep, 'status:processing'];
+
+            await github.rest.issues.setLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: newLabels
+            });
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse issue body
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body;
+
+            console.log('Issue body:', body);
+
+            // Extract JSON data from issue body
+            // Expected format: issue body contains JSON between ```json and ```
+            const jsonMatch = body.match(/```json\s*([\s\S]*?)\s*```/);
+
+            if (!jsonMatch) {
+              throw new Error('No JSON data found in issue body');
+            }
+
+            const data = JSON.parse(jsonMatch[1]);
+
+            // Validate required fields
+            if (!data.section || !data.pageId || !data.content || !data.filePath) {
+              throw new Error('Missing required fields in edit request');
+            }
+
+            // Security: prevent path traversal
+            if (data.filePath.includes('..') || data.filePath.startsWith('/')) {
+              throw new Error('Invalid file path (security violation)');
+            }
+
+            console.log('Parsed data:', {
+              section: data.section,
+              pageId: data.pageId,
+              filePath: data.filePath,
+              contentLength: data.content.length
+            });
+
+            return data;
+
+      - name: Create branch and commit
+        id: commit
+        env:
+          EDIT_DATA: ${{ steps.parse.outputs.result }}
+        run: |
+          # Parse the edit data
+          SECTION=$(echo "$EDIT_DATA" | jq -r '.section')
+          PAGE_ID=$(echo "$EDIT_DATA" | jq -r '.pageId')
+          FILE_PATH=$(echo "$EDIT_DATA" | jq -r '.filePath')
+          CONTENT=$(echo "$EDIT_DATA" | jq -r '.content')
+          EDIT_SUMMARY=$(echo "$EDIT_DATA" | jq -r '.editSummary // "Anonymous edit"')
+          TITLE=$(echo "$EDIT_DATA" | jq -r '.metadata.title // .pageId')
+
+          # Generate branch name
+          TIMESTAMP=$(date +%s)
+          BRANCH_NAME="wiki-edit/${SECTION}/${PAGE_ID}-anonymous-${TIMESTAMP}"
+
+          echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+          echo "pr_title=Update ${TITLE}" >> $GITHUB_OUTPUT
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create and checkout new branch
+          git checkout -b "${BRANCH_NAME}"
+
+          # Ensure directory exists
+          mkdir -p "$(dirname "${FILE_PATH}")"
+
+          # Write content to file
+          echo "$CONTENT" > "${FILE_PATH}"
+
+          # Stage and commit
+          git add "${FILE_PATH}"
+          git commit -m "Update ${TITLE}
+
+          ${EDIT_SUMMARY}
+
+          Contributed anonymously via wiki editor"
+
+          # Push branch
+          git push origin "${BRANCH_NAME}"
+
+      - name: Create pull request
+        id: create_pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const editData = ${{ steps.parse.outputs.result }};
+            const branchName = '${{ steps.commit.outputs.branch_name }}';
+            const prTitle = '${{ steps.commit.outputs.pr_title }}';
+
+            // Generate PR body
+            let body = `## Anonymous Page Edit\n\n`;
+            body += `**Page:** ${editData.metadata?.title || editData.pageId}\n`;
+            body += `**Section:** ${editData.section}\n`;
+            body += `**Page ID:** ${editData.pageId}\n\n`;
+
+            if (editData.editSummary) {
+              body += `### Changes\n\n${editData.editSummary}\n\n`;
+            }
+
+            body += `---\n\n`;
+            body += `Contributed anonymously via wiki editor\n\n`;
+            body += `🤖 Generated with [GitHub Wiki Framework](https://github.com/BenDol/GithubWiki)\n\n`;
+            body += `This pull request was created anonymously through the wiki's web editor.\n`;
+            body += `\nRelated issue: #${context.issue.number}`;
+
+            // Create PR
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: prTitle,
+              body: body,
+              head: branchName,
+              base: 'main'
+            });
+
+            console.log('PR created:', pr.html_url);
+
+            // Add comprehensive labels to PR
+            try {
+              // Get section label from issue
+              const issueLabels = context.payload.issue.labels.map(l => l.name);
+              const sectionLabel = issueLabels.find(l => l.startsWith('section:')) || `section:${editData.section}`;
+
+              const prLabels = [
+                'wiki:edit',
+                'anonymous',
+                'documentation',
+                'automated',
+                sectionLabel
+              ];
+
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: prLabels
+              });
+
+              console.log('Labels added to PR:', prLabels.join(', '));
+            } catch (error) {
+              console.log('Could not add labels:', error.message);
+            }
+
+            return {
+              number: pr.number,
+              url: pr.html_url
+            };
+
+      - name: Comment on issue with PR link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prData = ${{ steps.create_pr.outputs.result }};
+
+            const comment = `✅ **Edit request processed successfully!**
+
+            Your anonymous edit has been submitted as a pull request:
+
+            **Pull Request:** #${prData.number}
+            **URL:** ${prData.url}
+
+            The maintainers will review your changes. Once approved and merged, your edits will appear on the wiki.
+
+            Thank you for contributing! 🎉`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+
+      - name: Update status to completed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const currentLabels = context.payload.issue.labels.map(l => l.name);
+            const statusLabels = ['status:processing', 'status:completed', 'status:failed'];
+            const labelsToKeep = currentLabels.filter(l => !statusLabels.includes(l));
+            const newLabels = [...labelsToKeep, 'status:completed'];
+
+            await github.rest.issues.setLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: newLabels
+            });
+
+      - name: Close issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
+
+      - name: Update status to failed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const currentLabels = context.payload.issue.labels.map(l => l.name);
+            const statusLabels = ['status:processing', 'status:completed', 'status:failed'];
+            const labelsToKeep = currentLabels.filter(l => !statusLabels.includes(l));
+            const newLabels = [...labelsToKeep, 'status:failed'];
+
+            await github.rest.issues.setLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: newLabels
+            });
+
+      - name: Comment on error
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `❌ **Failed to process edit request**
+
+            There was an error processing your anonymous edit. This could be due to:
+            - Invalid data format
+            - File path issues
+            - GitHub API errors
+
+            Please check the [workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.
+
+            If this persists, please report it to the maintainers.`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+
+            // Close the issue even on failure
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
