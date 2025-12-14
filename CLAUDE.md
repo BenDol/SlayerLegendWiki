@@ -539,6 +539,70 @@ VITE_WIKI_REPO_NAME=repo-name
 
 The wiki will be live at: `https://username.github.io/repo-name/`
 
+## Label Management
+
+The wiki uses a centralized label management system to ensure all required labels exist before users need them.
+
+**Problem:** Regular users without write access cannot create labels, causing failures when they try to comment on pages or perform other actions requiring labels.
+
+**Solution:** All labels are defined in `.github/labels.json` and automatically synced to the repository via GitHub Actions.
+
+### Label Configuration
+
+**Location:** `.github/labels.json`
+
+This file is the single source of truth for all repository labels used by:
+- Comment system (`wiki-comments`, `wiki:comment`)
+- Pull requests (`wiki-edit`, `documentation`)
+- Section organization (`section:*`)
+- Status tracking (`status:*`)
+- Branch namespacing (`branch:*`)
+
+### Automatic Synchronization
+
+**Workflow:** `.github/workflows/sync-labels.yml`
+
+Labels are automatically synced when:
+1. `.github/labels.json` is modified and pushed
+2. Weekly (every Sunday at 00:00 UTC)
+3. Manually triggered via Actions tab
+
+The workflow:
+- Reads label definitions from `.github/labels.json`
+- Creates missing labels in the repository
+- Updates existing labels if colors/descriptions changed
+- Reports statistics on changes made
+
+### Adding New Labels
+
+When you need to add a new label:
+
+1. **Update `.github/labels.json`:**
+   ```json
+   {
+     "name": "your-new-label",
+     "description": "What this label means",
+     "color": "0075ca"
+   }
+   ```
+
+2. **If used by framework code**, update `wiki-framework/src/services/github/issueLabels.js`:
+   ```javascript
+   export const WIKI_LABELS = {
+     types: [
+       {
+         name: 'your-new-label',
+         description: 'What this label means',
+         color: '0075ca',
+       },
+     ],
+   };
+   ```
+
+3. **Commit and push** - The GitHub Action will automatically create the label
+
+**See `LABELS.md` for complete documentation on the label management system.**
+
 ## Framework Updates
 
 To update the framework version:
@@ -603,7 +667,9 @@ The contributor highscore feature displays a ranked leaderboard of wiki contribu
     "contributorHighscore": {
       "enabled": true,
       "cacheMinutes": 30,
-      "displayLimit": 100
+      "displayLimit": 100,
+      "ignoreRepositoryOwner": false,
+      "ignoreMainContributors": false
     }
   }
 }
@@ -613,6 +679,10 @@ The contributor highscore feature displays a ranked leaderboard of wiki contribu
 - `enabled` - Enable/disable the highscore feature (default: false)
 - `cacheMinutes` - Cache duration in minutes before data refreshes (default: 30)
 - `displayLimit` - Number of contributors to show initially before "Show All" button (default: 100)
+- `ignoreRepositoryOwner` - Exclude the repository owner from the highscore list (default: false)
+- `ignoreMainContributors` - Exclude repository collaborators (users with contributor role) from the highscore list (default: false)
+  - Useful for highlighting community contributions by removing core team members
+  - Only excludes users who have been explicitly added as collaborators to the repository
 
 **Features:**
 - **Podium Display**: Top 3 contributors shown on visual podium with special styling
@@ -620,7 +690,8 @@ The contributor highscore feature displays a ranked leaderboard of wiki contribu
 - **Show More/Less**: Configurable toggle button appears when total contributors exceeds `displayLimit`
 - **Caching**: Results cached to reduce GitHub API calls
 - **Force Refresh**: Repository owners can manually refresh cached data
-- **Scoring**: Based on merged PRs (3x), open PRs (1x), and closed PRs (0.5x)
+- **Scoring**: Based on GitHub commit contributions (uses GitHub API's contributor statistics)
+- **Filtering**: Option to exclude repository owner and/or main contributors from leaderboard
 
 **Access:** Available at `/#/contributor-highscore` route
 

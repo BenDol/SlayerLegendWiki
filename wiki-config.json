@@ -217,7 +217,9 @@
     "contributorHighscore": {
       "enabled": true,
       "cacheMinutes": 30,
-      "displayLimit": 100
+      "displayLimit": 100,
+      "ignoreRepositoryOwner": true,
+      "ignoreMainContributors": false
     }
   },
   "theme": {

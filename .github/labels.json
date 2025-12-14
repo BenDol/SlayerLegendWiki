@@ -1,0 +1,134 @@
+{
+  "labels": [
+    {
+      "name": "wiki:anonymous-edit",
+      "description": "Anonymous wiki edit request - processed automatically",
+      "color": "fbca04"
+    },
+    {
+      "name": "wiki:comment",
+      "description": "Wiki page comment or discussion",
+      "color": "0075ca"
+    },
+    {
+      "name": "wiki:edit",
+      "description": "Wiki edit or content contribution",
+      "color": "7057ff"
+    },
+    {
+      "name": "wiki-comments",
+      "description": "Issue used for collecting page comments",
+      "color": "0075ca"
+    },
+    {
+      "name": "wiki-edit",
+      "description": "Pull request for wiki content edits",
+      "color": "7057ff"
+    },
+    {
+      "name": "section:getting-started",
+      "description": "Getting Started section",
+      "color": "c2e0c6"
+    },
+    {
+      "name": "section:characters",
+      "description": "Characters section",
+      "color": "f9d0c4"
+    },
+    {
+      "name": "section:equipment",
+      "description": "Equipment section",
+      "color": "d4c5f9"
+    },
+    {
+      "name": "section:companions",
+      "description": "Companions section",
+      "color": "fef2c0"
+    },
+    {
+      "name": "section:skills",
+      "description": "Skills section",
+      "color": "bfdadc"
+    },
+    {
+      "name": "section:content",
+      "description": "Content section",
+      "color": "c5def5"
+    },
+    {
+      "name": "section:progression",
+      "description": "Progression section",
+      "color": "f9c5d1"
+    },
+    {
+      "name": "section:resources",
+      "description": "Resources section",
+      "color": "d1f5c5"
+    },
+    {
+      "name": "section:guides",
+      "description": "Guides section",
+      "color": "e6c5f5"
+    },
+    {
+      "name": "section:database",
+      "description": "Database section",
+      "color": "c5e5f5"
+    },
+    {
+      "name": "section:tools",
+      "description": "Tools section",
+      "color": "f5d9c5"
+    },
+    {
+      "name": "section:meta",
+      "description": "Meta section (wiki information and guidelines)",
+      "color": "e0e0e0"
+    },
+    {
+      "name": "status:processing",
+      "description": "Currently being processed by automation",
+      "color": "fbca04"
+    },
+    {
+      "name": "status:completed",
+      "description": "Successfully processed and completed",
+      "color": "0e8a16"
+    },
+    {
+      "name": "status:failed",
+      "description": "Processing failed - needs attention",
+      "color": "d73a4a"
+    },
+    {
+      "name": "anonymous",
+      "description": "Anonymous contribution (no user attribution)",
+      "color": "6f42c1"
+    },
+    {
+      "name": "documentation",
+      "description": "Documentation updates or improvements",
+      "color": "0075ca"
+    },
+    {
+      "name": "automated",
+      "description": "Created and managed by automation",
+      "color": "e99695"
+    },
+    {
+      "name": "branch:main",
+      "description": "Items for main branch namespace",
+      "color": "0e8a16"
+    }
+  ],
+  "branchLabelPattern": {
+    "prefix": "branch:",
+    "description": "Items for {branch} branch namespace",
+    "defaultColor": "bfd4f2",
+    "knownBranches": {
+      "main": "0e8a16",
+      "dev": "0075ca",
+      "staging": "fbca04"
+    }
+  }
+}
