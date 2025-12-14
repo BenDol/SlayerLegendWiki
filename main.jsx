@@ -4,6 +4,10 @@ import App from './wiki-framework/src/App.jsx';
 import ErrorBoundary from './wiki-framework/src/components/common/ErrorBoundary.jsx';
 import './wiki-framework/src/styles/index.css';
 
+// Initialize bot token for comment system (prevents users from closing comment issues)
+import { initializeBotOctokit } from './wiki-framework/src/services/github/api.js';
+initializeBotOctokit();
+
 // Register game-specific content renderers
 import { registerContentProcessor, registerCustomComponents, registerSpellPreview, registerEquipmentPreview } from './wiki-framework/src/utils/contentRendererRegistry.js';
 import { processGameSyntax, getGameComponents, renderSpellPreview, renderEquipmentPreview } from './src/utils/gameContentRenderer.jsx';

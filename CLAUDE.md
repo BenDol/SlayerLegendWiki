@@ -517,7 +517,25 @@ Required for GitHub OAuth features:
 VITE_GITHUB_CLIENT_ID=your_client_id_here
 VITE_WIKI_REPO_OWNER=yourusername
 VITE_WIKI_REPO_NAME=repo-name
+
+# REQUIRED for Comments: Bot token
+# Bot account creates all comment issues (prevents users from closing them)
+# Without this token, comments will be disabled entirely
+VITE_WIKI_BOT_TOKEN=your_bot_token_here
 ```
+
+**Bot Token Setup (REQUIRED for Comments):**
+The bot token is required for the comment system to work. The bot account creates all comment issues, preventing regular users from closing them. Without this token, comments will be completely disabled.
+
+1. Create a bot GitHub account (e.g., `slayerlegend-wiki-bot`)
+2. Add bot as repository collaborator (Write access)
+3. Generate Personal Access Token for bot (`repo` scope)
+4. Add token to `.env.local` as `VITE_WIKI_BOT_TOKEN`
+5. Add token to GitHub Secrets as `WIKI_BOT_TOKEN`
+
+**Note:** Use `WIKI_BOT_TOKEN` (not `GITHUB_BOT_TOKEN`) - GitHub reserves the `GITHUB_*` prefix.
+
+**See `BOT-SETUP.md` for complete setup instructions.**
 
 ## GitHub Pages Deployment
 
