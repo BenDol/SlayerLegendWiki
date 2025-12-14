@@ -1,0 +1,40 @@
+# Netlify Configuration
+[build]
+  # Build command (same as GitHub Actions)
+  command = "npm run build"
+
+  # Output directory (where Vite builds to)
+  publish = "dist"
+
+  # Base directory (repo root)
+  base = "."
+
+[build.environment]
+  # Node version
+  NODE_VERSION = "20"
+
+# Redirect rules for SPA routing (handles React Router)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+  # Except for these paths (API functions)
+  conditions = {path = ["!api/*"]}
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Functions configuration
+[functions]
+  # Directory containing serverless functions
+  directory = "netlify/functions"
+
+  # Node bundler (use esbuild for fast builds)
+  node_bundler = "esbuild"
