@@ -12,4 +12,4 @@ order: 0
 Equipment guidea asd asd asdasdasd123123
 
 
-LOLOLOL
+LOLOLO
