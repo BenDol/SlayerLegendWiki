@@ -160,6 +160,13 @@ git commit -m "Update wiki framework"
 - Claude should NOT use `git add`, `git commit`, or `git push` commands
 - User prefers to review changes and commit them manually with their own messages
 
+**CRITICAL: Do NOT perform git operations in the wiki-framework/ submodule:**
+- The submodule is often in detached HEAD state - this is normal
+- Do NOT use `git checkout`, `git add`, `git commit` in the submodule directory
+- Do NOT attempt to fix detached HEAD state
+- wiki-framework submodule project should NEVER reference code from the parent project
+- User will handle all submodule git operations manually
+
 ## Development Workflow
 
 **Standard workflow (recommended):**
