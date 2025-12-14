@@ -12,9 +12,14 @@
       "Bash(git submodule:*)",
       "Bash(test:*)",
       "Bash(git fetch:*)",
-      "Bash(git checkout:*)",
-      "Bash(git pull:*)",
       "Bash(findstr:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill)",
+      "Bash(python:*)",
+      "Bash(Get-Content \"C:\\Projects\\slayerlegend\\wiki\\wiki-framework\\logs\\debug.log\" -Tail 50)",
+      "Bash(Select-String -Pattern \"spell|Spell|SPELL|Dynamic|Wrapper\")"
     ]
   }
 }

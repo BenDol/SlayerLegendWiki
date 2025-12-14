@@ -10,6 +10,8 @@ This is a **parent wiki project** built using the [GitHub Wiki Framework](https:
 
 **Critical concept:** The `wiki-framework/` directory is a **git submodule** containing the entire React application. Never edit files inside `wiki-framework/` - all customizations belong in the parent project.
 
+**CRITICAL RULE: The framework submodule must NEVER import from the parent project.** The framework is designed to be generic and reusable. Any game-specific logic must live in the parent project and be registered via the Content Renderer Registry (see below).
+
 ```
 Parent Project (this repo)       Framework Submodule
 ├── public/content/              wiki-framework/
@@ -58,6 +60,73 @@ Parent Project (this repo)       Framework Submodule
 - `wiki-framework/src/hooks/` - React hooks
 - `wiki-framework/scripts/` - Build scripts
 - `wiki-framework/vite.config.base.js` - Base Vite configuration
+
+## Content Renderer Registry Pattern
+
+**How to Add Game-Specific Rendering**
+
+The framework provides a registry system for parent projects to add custom markdown rendering without modifying framework code.
+
+### Architecture
+1. **Framework** provides `contentRendererRegistry.js` with `register*()` functions
+2. **Parent project** creates game-specific renderers in `src/utils/gameContentRenderer.js`
+3. **Parent's main.jsx** registers the renderers on app startup
+
+### Example: Spell Card Rendering
+
+**Step 1:** Create custom renderer in parent project (`src/utils/gameContentRenderer.js`):
+```javascript
+import SpellCard from '../components/SpellCard';
+
+export const processGameSyntax = (content) => {
+  // Convert <!-- spell:NAME --> to {{SPELL:NAME}}
+  return content.replace(/<!--\s*spell:\s*(.+?)\s*-->/gi, '{{SPELL:$1}}');
+};
+
+export const getGameComponents = () => ({
+  p: ({ children, ...props }) => {
+    const content = String(children).trim();
+    const match = content.match(/^\{\{SPELL:(.+?)\}\}$/);
+    if (match) {
+      return <SpellCard name={match[1]} />;
+    }
+    return <p {...props}>{children}</p>;
+  }
+});
+```
+
+**Step 2:** Register in `main.jsx`:
+```javascript
+import { registerContentProcessor, registerCustomComponents } from './wiki-framework/src/utils/contentRendererRegistry.js';
+import { processGameSyntax, getGameComponents } from './src/utils/gameContentRenderer.js';
+
+registerContentProcessor(processGameSyntax);
+registerCustomComponents(getGameComponents());
+```
+
+**Step 3:** Use in markdown:
+```markdown
+# Fire Spells
+
+<!-- spell:Fire Slash -->
+
+This spell does fire damage.
+```
+
+The framework's PageViewer and PageEditor automatically use registered renderers without knowing about SpellCard.
+
+### Files Involved
+- **Framework (generic):**
+  - `wiki-framework/src/utils/contentRendererRegistry.js` - Registry
+  - `wiki-framework/src/components/wiki/PageViewer.jsx` - Uses registry
+  - `wiki-framework/src/components/wiki/PageEditor.jsx` - Passes to PageViewer
+  - `wiki-framework/src/pages/PageEditorPage.jsx` - Passes to PageEditor
+- **Parent (game-specific):**
+  - `src/utils/gameContentRenderer.js` - Custom renderers
+  - `src/components/SpellCard.jsx` - Game component
+  - `main.jsx` - Registration
+
+**IMPORTANT:** Never import parent components in framework files. Always use the registry pattern.
 
 ## Common Development Commands
 
@@ -516,27 +585,44 @@ const url = generateBuildURL(build); // Returns shareable URL
 
 Builds are encoded in URL hash: `/#/build?data=encodedString`
 
-### Game-Specific Calculators
+### Game-Specific Components
+
+These components are specific to Slayer Legend and live in the parent project (`src/components/`), NOT the framework.
+
+#### Calculators
 Four calculator components for Slayer Legend mechanics (located in `src/components/calculators/`):
 1. **DamageCalculator** - Calculate damage output with Attack, Crit, Elemental stats
 2. **EnhancementCalculator** - Calculate gold costs for equipment enhancement
 3. **FusionCalculator** - Plan equipment fusion with 5:1 ratio
 4. **StatCalculator** - Calculate stat changes after promotion
 
-**Note:** These are game-specific and live in the parent project, NOT the framework.
+#### SpellCard Component
+Beautiful card component for displaying spell/skill information (located in `src/components/SpellCard.jsx`):
 
-Usage in markdown pages:
-```markdown
----
-title: Damage Calculator
----
+Features:
+- Automatically loads spell data from `/data/skills.json`
+- Color-coded by element (Fire, Water, Wind, Earth)
+- Displays all spell stats (MP Cost, Cooldown, Range, Power, etc.)
+- Full dark mode support
+- Calculates max level damage automatically
 
-# Damage Calculator
+Usage:
+```jsx
+import SpellCard from '../components/SpellCard';
 
-<DamageCalculator />
+// By spell name
+<SpellCard name="Fire Slash" />
+
+// By spell ID
+<SpellCard id={1} />
+
+// With direct data
+<SpellCard spell={{...spellData}} />
 ```
 
-The markdown processor automatically resolves components from `src/components/calculators/`.
+See `src/components/README-SpellCard.md` for complete documentation.
+
+Example implementation: `src/pages/SpellsPage.jsx` (filterable spell gallery)
 
 ### Tier Lists
 Visual tier list component:
