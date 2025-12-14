@@ -151,6 +151,15 @@ git add wiki-framework
 git commit -m "Update wiki framework"
 ```
 
+## Git Workflow
+
+**IMPORTANT: Claude should NEVER handle git commits or pushes.**
+
+- User will handle all git commits and pushes manually
+- Claude should make code changes and edits as requested
+- Claude should NOT use `git add`, `git commit`, or `git push` commands
+- User prefers to review changes and commit them manually with their own messages
+
 ## Development Workflow
 
 **Standard workflow (recommended):**
