@@ -966,3 +966,4 @@ if (loading) {
 - No assumptions about content domain
 
 **See `COMPONENTS-MOVED.md` for detailed guidelines.**
+- When creating very specific markdown files to document a very specific thing that isnt a major feature for the wiki make sure this goes into `.claude/memory` directory.
