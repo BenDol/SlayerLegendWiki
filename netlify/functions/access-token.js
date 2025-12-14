@@ -3,7 +3,7 @@
  * Proxies requests to GitHub's access token endpoint to avoid CORS issues
  */
 
-export async function handler(event) {
+exports.handler = async function(event) {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
@@ -53,4 +53,4 @@ export async function handler(event) {
       }),
     };
   }
-}
+};
