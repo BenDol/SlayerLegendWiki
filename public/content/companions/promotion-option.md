@@ -1,11 +1,10 @@
 ---
 id: promotion-option
-title: Promotion Option
-description: The player can use dice to produce random companion promotion options
-tags:
-  - promotionoption
-category: Companions
-date: '2025-12-14'
+title: ''
+description: ''
+tags: []
+category: ''
+date: ''
 order: 0
 ---
 ##  Recommended Rolls
@@ -34,4 +33,4 @@ Gray is 23% / Green is 20% / Orange is 30% / Purple is 20% / Red is 5% / Blue is
 
 ### Additional Information  
 
-At [Ether] Promotion the player unlocks the ability to roll for the highest option available. This allows the player to change all promotion options for the selected companion to the maximum possible for 40,000 dice. Once an option has been selectedm it cannot be undone.
+At [Ether] Promotion the player unlocks the ability to roll for the highest option available. This allows the player to change all promotion options for the selected companion to the maximum possible for 40,000 dice. Once an option has been selected it cannot be undone.
