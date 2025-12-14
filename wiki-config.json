@@ -56,6 +56,11 @@
         "title": "Guidelines",
         "path": "/meta/guidelines",
         "icon": "📋"
+      },
+      {
+        "title": "Highscore",
+        "path": "/highscore",
+        "icon": "🏆"
       }
     ]
   },
@@ -205,6 +210,10 @@
         "allowDirectCommit": true,
         "allowDirectCommitDelete": false
       }
+    },
+    "contributorHighscore": {
+      "enabled": true,
+      "cacheMinutes": 30
     }
   },
   "theme": {
