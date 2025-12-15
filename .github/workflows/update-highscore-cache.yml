@@ -38,16 +38,61 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const fs = require('fs');
+            const path = require('path');
+
             const CACHE_ISSUE_TITLE = '[Cache] Contributor Highscore';
+
+            // Read wiki config to get the configured branch
+            let configuredBranch = 'main'; // default
+            try {
+              const configPath = path.join(process.env.GITHUB_WORKSPACE, 'wiki-config.json');
+              const configContent = fs.readFileSync(configPath, 'utf8');
+              const config = JSON.parse(configContent);
+              configuredBranch = config?.wiki?.repository?.branch || 'main';
+              console.log(`📋 Using configured branch from wiki-config.json: ${configuredBranch}`);
+            } catch (error) {
+              console.warn('⚠️ Failed to read wiki-config.json, using default branch: main');
+            }
 
             console.log('🔍 Fetching contributor statistics for all time periods...');
 
             /**
+             * Calculate a fair contributor score that prevents gaming
+             * Formula: (contributions * 100) + (quality_bonus * 2)
+             *
+             * - Base score from contributions (heavily weighted at 100x)
+             * - Quality bonus from average lines per contribution (2x weight)
+             * - This rewards both volume AND quality, preventing spam contributions
+             */
+            function calculateContributorScore(contributor) {
+              const contributions = contributor.contributions || 0;
+              const additions = contributor.additions || 0;
+              const deletions = contributor.deletions || 0;
+
+              // Base score: contributions heavily weighted
+              const baseScore = contributions * 100;
+
+              // Quality bonus: average lines changed per contribution
+              // High value = meaningful contributions, Low value = spam
+              const totalLines = additions + deletions;
+              const averageLinesPerContribution = contributions > 0 ? totalLines / contributions : 0;
+              const qualityBonus = averageLinesPerContribution * 2;
+
+              // Final score
+              const score = baseScore + qualityBonus;
+
+              return Math.round(score);
+            }
+
+            /**
              * Fetch all-time contributor stats
+             * Enhanced with PR data for additions/deletions
              */
             async function fetchAllTimeContributors() {
               console.log('📊 Fetching all-time contributors...');
 
+              // Get base contributor counts
               const { data: contributors } = await github.rest.repos.listContributors({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -56,38 +101,201 @@ jobs:
 
               console.log(`✅ Found ${contributors.length} all-time contributors`);
 
-              // Format contributor data with userId
-              const formatted = contributors.map(contributor => ({
-                userId: contributor.id,
-                login: contributor.login,
-                avatarUrl: contributor.avatar_url,
-                contributions: contributor.contributions,
-                profileUrl: contributor.html_url,
-                prestige: 0,
-                type: contributor.type
-              }));
+              // Create map with base stats
+              const contributorMap = new Map();
+              contributors.forEach(contributor => {
+                contributorMap.set(contributor.id, {
+                  userId: contributor.id,
+                  login: contributor.login,
+                  avatarUrl: contributor.avatar_url,
+                  contributions: contributor.contributions,
+                  additions: 0,
+                  deletions: 0,
+                  profileUrl: contributor.html_url,
+                  prestige: 0,
+                  type: contributor.type
+                });
+              });
 
-              // Sort by contributions (descending)
-              formatted.sort((a, b) => b.contributions - a.contributions);
+              // Enhance with PR data to get additions/deletions
+              console.log('📊 Fetching all merged PRs for additions/deletions data...');
+
+              let page = 1;
+              const perPage = 100;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'closed',
+                  base: configuredBranch,
+                  per_page: perPage,
+                  page: page,
+                });
+
+                if (prs.length === 0) break;
+
+                // Only process merged PRs
+                const mergedPRs = prs.filter(pr => pr.merged_at);
+                console.log(`   Page ${page}: ${mergedPRs.length} merged PRs`);
+
+                for (const pr of mergedPRs) {
+                  const userId = pr.user?.id;
+                  if (userId && contributorMap.has(userId)) {
+                    const contributor = contributorMap.get(userId);
+                    contributor.additions += pr.additions || 0;
+                    contributor.deletions += pr.deletions || 0;
+                  }
+                }
+
+                hasMore = prs.length === perPage;
+                page++;
+
+                // Safety limit to prevent excessive API calls
+                if (page > 50) {
+                  console.warn('⚠️ Reached page limit (50) for PR fetching');
+                  break;
+                }
+              }
+
+              // Convert to array and calculate scores
+              const formatted = Array.from(contributorMap.values()).map(contributor => {
+                contributor.score = calculateContributorScore(contributor);
+                return contributor;
+              });
+
+              // Sort by score (descending), fallback to contributions if equal
+              formatted.sort((a, b) => {
+                if (b.score !== a.score) {
+                  return b.score - a.score;
+                }
+                return b.contributions - a.contributions;
+              });
+
+              console.log(`✅ Enhanced ${formatted.length} contributors with PR data`);
 
               return formatted;
             }
 
             /**
-             * Fetch commits within a date range and aggregate by author
+             * Fetch merged PRs within a date range and aggregate additions/deletions by author
+             * This provides accurate line change statistics for the scoring system
              */
-            async function fetchCommitsInDateRange(since, until) {
-              console.log(`📊 Fetching commits from ${since} to ${until}...`);
+            async function fetchMergedPRsInDateRange(since, until, branch = 'main') {
+              console.log(`📊 Fetching merged PRs from ${since} to ${until} targeting branch '${branch}'...`);
+
+              const allPRs = [];
+              let page = 1;
+              const perPage = 100;
+
+              // Fetch all merged PRs (state=closed with merged_at not null)
+              while (true) {
+                const { data } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'closed',
+                  base: branch,
+                  sort: 'updated',
+                  direction: 'desc',
+                  per_page: perPage,
+                  page: page,
+                });
+
+                if (data.length === 0) break;
+
+                // Filter to only merged PRs within date range
+                const mergedPRsInRange = data.filter(pr => {
+                  if (!pr.merged_at) return false;
+                  const mergedDate = new Date(pr.merged_at);
+                  return mergedDate >= new Date(since) && mergedDate <= new Date(until);
+                });
+
+                allPRs.push(...mergedPRsInRange);
+
+                // If we got fewer than perPage, we've reached the end
+                // Also stop if the last PR is before our start date (optimization)
+                if (data.length < perPage) break;
+                const lastPRDate = data[data.length - 1].updated_at;
+                if (new Date(lastPRDate) < new Date(since)) break;
+
+                page++;
+              }
+
+              console.log(`✅ Found ${allPRs.length} merged PRs in date range`);
+
+              // Aggregate PRs by author (use user ID as key for permanent identification)
+              const contributorMap = new Map();
+
+              for (const pr of allPRs) {
+                const author = pr.user;
+                const login = author?.login;
+                const userId = author?.id;
+
+                // Skip PRs without a GitHub user
+                if (!login) continue;
+
+                // Use user ID as key (permanent), fallback to login
+                const key = userId ? userId.toString() : `legacy:${login}`;
+
+                if (contributorMap.has(key)) {
+                  const existing = contributorMap.get(key);
+                  existing.contributions++;
+                  existing.additions += pr.additions || 0;
+                  existing.deletions += pr.deletions || 0;
+                  // Update login in case username changed
+                  existing.login = login;
+                } else {
+                  contributorMap.set(key, {
+                    userId: userId || null,
+                    login: login,
+                    avatarUrl: author.avatar_url,
+                    contributions: 1,
+                    additions: pr.additions || 0,
+                    deletions: pr.deletions || 0,
+                    profileUrl: author.html_url,
+                    prestige: 0,
+                    type: author.type || 'User',
+                  });
+                }
+              }
+
+              // Convert to array and calculate scores
+              const contributors = Array.from(contributorMap.values()).map(contributor => {
+                contributor.score = calculateContributorScore(contributor);
+                return contributor;
+              });
+
+              // Sort by score (descending), fallback to contributions if equal
+              contributors.sort((a, b) => {
+                if (b.score !== a.score) {
+                  return b.score - a.score;
+                }
+                return b.contributions - a.contributions;
+              });
+
+              console.log(`✅ Found ${contributors.length} unique contributors from merged PRs`);
+              return contributors;
+            }
+
+            /**
+             * Fetch commits within a date range and aggregate by author
+             * @deprecated Use fetchMergedPRsInDateRange for accurate additions/deletions
+             */
+            async function fetchCommitsInDateRange(since, until, branch = 'main') {
+              console.log(`📊 Fetching commits from ${since} to ${until} on branch '${branch}'...`);
 
               const commits = [];
               let page = 1;
               const perPage = 100;
 
               // Fetch all commits in date range (with pagination)
+              // Use sha parameter to explicitly specify the branch
               while (true) {
                 const { data } = await github.rest.repos.listCommits({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
+                  sha: branch, // Explicitly specify branch to only count main branch commits
                   since,
                   until,
                   per_page: perPage,
@@ -128,6 +336,8 @@ jobs:
                     login: login,
                     avatarUrl: author.avatar_url,
                     contributions: 1,
+                    additions: 0, // Note: commit data doesn't include line changes
+                    deletions: 0, // Note: commit data doesn't include line changes
                     profileUrl: author.html_url,
                     prestige: 0,
                     type: author.type || 'User',
@@ -135,9 +345,19 @@ jobs:
                 }
               }
 
-              // Convert map to array and sort by contributions
-              const contributors = Array.from(contributorMap.values());
-              contributors.sort((a, b) => b.contributions - a.contributions);
+              // Convert map to array and calculate scores
+              const contributors = Array.from(contributorMap.values()).map(contributor => ({
+                ...contributor,
+                score: calculateContributorScore(contributor),
+              }));
+
+              // Sort by score (descending), fallback to contributions if equal
+              contributors.sort((a, b) => {
+                if (b.score !== a.score) {
+                  return b.score - a.score;
+                }
+                return b.contributions - a.contributions;
+              });
 
               console.log(`✅ Found ${contributors.length} unique contributors in date range`);
               return contributors;
@@ -148,11 +368,12 @@ jobs:
             const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
             const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-            // Fetch all three categories in parallel
+            // Fetch all three categories in parallel (using merged PR data for accurate stats)
+            console.log(`🔄 Fetching contributor data from branch: ${configuredBranch}`);
             const [allTimeContributors, thisMonthContributors, thisWeekContributors] = await Promise.all([
               fetchAllTimeContributors(),
-              fetchCommitsInDateRange(oneMonthAgo.toISOString(), now.toISOString()),
-              fetchCommitsInDateRange(oneWeekAgo.toISOString(), now.toISOString()),
+              fetchMergedPRsInDateRange(oneMonthAgo.toISOString(), now.toISOString(), configuredBranch),
+              fetchMergedPRsInDateRange(oneWeekAgo.toISOString(), now.toISOString(), configuredBranch),
             ]);
 
             // Create cache data with all categories

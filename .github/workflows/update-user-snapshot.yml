@@ -161,14 +161,16 @@ jobs:
               console.log(`✅ Fetched detailed data for ${detailedPRs.length} PRs`);
 
               // Calculate statistics (use detailedPRs which has additions/deletions/files)
+              // ONLY count additions/deletions/files from MERGED PRs (not closed without merging)
+              const mergedPRs = detailedPRs.filter(pr => pr.merged_at || pr.state === 'merged');
               const stats = {
                 totalPRs: detailedPRs.length,
                 openPRs: detailedPRs.filter(pr => pr.state === 'open').length,
-                mergedPRs: detailedPRs.filter(pr => pr.merged_at || pr.state === 'merged').length,
+                mergedPRs: mergedPRs.length,
                 closedPRs: detailedPRs.filter(pr => (pr.state === 'closed' || pr.state === 'merged') && !pr.merged_at).length,
-                totalAdditions: detailedPRs.reduce((sum, pr) => sum + (pr.additions || 0), 0),
-                totalDeletions: detailedPRs.reduce((sum, pr) => sum + (pr.deletions || 0), 0),
-                totalFiles: detailedPRs.reduce((sum, pr) => sum + (pr.changed_files || 0), 0),
+                totalAdditions: mergedPRs.reduce((sum, pr) => sum + (pr.additions || 0), 0),
+                totalDeletions: mergedPRs.reduce((sum, pr) => sum + (pr.deletions || 0), 0),
+                totalFiles: mergedPRs.reduce((sum, pr) => sum + (pr.changed_files || 0), 0),
                 mostRecentEdit: detailedPRs.length > 0
                   ? new Date(Math.max(...detailedPRs.map(pr => new Date(pr.created_at).getTime()))).toISOString()
                   : null,
