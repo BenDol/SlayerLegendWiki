@@ -3,7 +3,7 @@
  * Proxies requests to GitHub's device code endpoint to avoid CORS issues
  */
 
-exports.handler = async function(event) {
+export const handler = async function(event) {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
