@@ -13,26 +13,27 @@ The wiki uses GitHub labels extensively for organizing:
 
 **Problem:** Regular users without write access cannot create labels, which causes failures when they try to comment on a page for the first time or perform other actions that require labels.
 
-**Solution:** A centralized label configuration file (`.github/labels.json`) combined with a GitHub Action that automatically ensures all required labels exist in the repository.
+**Solution:** A centralized label configuration file (`wiki-framework/.github/labels.json`) combined with a GitHub Action that automatically ensures all required labels exist in the repository.
 
 ## Architecture
 
 ```
-.github/
-├── labels.json                    # Single source of truth for all labels
-└── workflows/
-    └── sync-labels.yml           # GitHub Action to sync labels
+wiki-framework/.github/
+└── labels.json                   # Single source of truth for all labels (in framework)
+
+.github/workflows/
+└── sync-labels.yml              # GitHub Action to sync labels (in parent project)
 
 scripts/
-└── syncLabels.js                 # Script to read labels.json and sync to GitHub
+└── syncLabels.js                # Script to read labels.json and sync to GitHub (in parent project)
 
 wiki-framework/src/services/github/
-└── issueLabels.js                # Framework label constants and helpers
+└── issueLabels.js               # Framework label constants and helpers
 ```
 
 ## Label Configuration File
 
-**Location:** `.github/labels.json`
+**Location:** `wiki-framework/.github/labels.json`
 
 This JSON file defines all labels used by the wiki with:
 - `name` - Label name (e.g., "wiki-comments")
@@ -85,7 +86,7 @@ This JSON file defines all labels used by the wiki with:
 ### Trigger Conditions
 
 The label sync runs automatically when:
-1. **Push to main** - When `.github/labels.json` or the workflow file changes
+1. **Push to main** - When the workflow file or wiki-framework submodule changes
 2. **Weekly schedule** - Every Sunday at 00:00 UTC
 3. **Manual dispatch** - Via GitHub Actions UI
 
@@ -93,14 +94,14 @@ The label sync runs automatically when:
 
 The workflow requires:
 - `issues: write` - To create and update labels
-- `contents: read` - To read the labels.json file
+- `contents: read` - To read the labels.json file from submodule
 
 ### What It Does
 
-1. Checks out the repository
+1. Checks out the repository (with submodules)
 2. Installs Node.js and dependencies (@octokit/rest)
 3. Runs `scripts/syncLabels.js` which:
-   - Reads `.github/labels.json`
+   - Reads `wiki-framework/.github/labels.json`
    - Fetches existing labels from GitHub
    - Creates missing labels
    - Updates existing labels if color/description changed
@@ -112,7 +113,7 @@ When you need to add a new label to the system:
 
 ### Step 1: Update labels.json
 
-Edit `.github/labels.json` and add your new label:
+Edit `wiki-framework/.github/labels.json` and add your new label:
 
 ```json
 {
@@ -147,12 +148,16 @@ export const WIKI_LABELS = {
 ### Step 3: Commit and Push
 
 ```bash
+cd wiki-framework
 git add .github/labels.json
 git commit -m "Add new label: your-new-label"
+cd ..
+git add wiki-framework
+git commit -m "Update framework with new label"
 git push
 ```
 
-The GitHub Action will automatically run and create the label in your repository!
+The GitHub Action will automatically run when the submodule is updated and create the label in your repository!
 
 ### Step 4: Verify
 
@@ -239,7 +244,7 @@ If labels aren't being created automatically:
    - Workflow needs `issues: write` permission
    - Check repository settings → Actions → General → Workflow permissions
 
-3. **Check labels.json syntax:**
+3. **Check wiki-framework/.github/labels.json syntax:**
    - Must be valid JSON
    - All labels need `name`, `description`, and `color` fields
    - Colors should be hex codes without `#`
@@ -256,7 +261,7 @@ If users still get errors when commenting:
    - Check that `wiki-comments` and `branch:main` exist
 
 2. **Check branch labels:**
-   - If using custom branches, ensure they're in labels.json
+   - If using custom branches, ensure they're in wiki-framework/.github/labels.json
    - Branch labels follow pattern: `branch:your-branch-name`
 
 3. **Re-run sync:**
@@ -281,7 +286,7 @@ If the sync script fails:
 
 ## Best Practices
 
-1. **Always update labels.json first** - This is the single source of truth
+1. **Always update wiki-framework/.github/labels.json first** - This is the single source of truth
 
 2. **Use consistent naming** - Follow existing patterns:
    - Type labels: `wiki:type` or `wiki-type`
@@ -300,7 +305,7 @@ If the sync script fails:
 
 5. **Test before committing** - Run the sync script locally to catch errors early
 
-6. **Don't manually create labels** - Always use labels.json to ensure consistency
+6. **Don't manually create labels** - Always use wiki-framework/.github/labels.json to ensure consistency
 
 ## Integration with Wiki Features
 
@@ -332,15 +337,15 @@ Potential enhancements to the label system:
 
 1. **Label validation** - Pre-commit hook to validate labels.json syntax
 2. **Automated section detection** - Automatically create section labels from wiki-config.json
-3. **Label cleanup** - Remove labels that are no longer in labels.json (currently only adds/updates)
+3. **Label cleanup** - Remove labels that are no longer in wiki-framework/.github/labels.json (currently only adds/updates)
 4. **Custom label sets** - Allow wikis to define custom label categories
 5. **Label analytics** - Track label usage statistics
 
 ## Related Files
 
-- `.github/labels.json` - Label configuration
-- `.github/workflows/sync-labels.yml` - Sync workflow
-- `scripts/syncLabels.js` - Sync script
+- `wiki-framework/.github/labels.json` - Label configuration (in framework)
+- `.github/workflows/sync-labels.yml` - Sync workflow (in parent project)
+- `scripts/syncLabels.js` - Sync script (in parent project)
 - `wiki-framework/src/services/github/issueLabels.js` - Framework constants
 - `wiki-framework/src/services/github/comments.js` - Comment system
 - `wiki-framework/src/services/github/pullRequests.js` - PR creation

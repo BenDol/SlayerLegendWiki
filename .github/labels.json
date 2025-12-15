@@ -111,6 +111,11 @@
       "color": "0075ca"
     },
     {
+      "name": "first-contribution",
+      "description": "First contribution from this contributor",
+      "color": "7057ff"
+    },
+    {
       "name": "automated",
       "description": "Created and managed by automation",
       "color": "e99695"

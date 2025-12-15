@@ -29,9 +29,10 @@ const [owner, repo] = process.env.REPOSITORY.split('/');
 
 /**
  * Read labels configuration from JSON file
+ * Labels are now stored in the wiki-framework submodule
  */
 function readLabelsConfig() {
-  const configPath = join(__dirname, '..', '.github', 'labels.json');
+  const configPath = join(__dirname, '..', 'wiki-framework', '.github', 'labels.json');
   const configContent = readFileSync(configPath, 'utf-8');
   return JSON.parse(configContent);
 }

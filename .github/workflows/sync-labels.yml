@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - '.github/labels.json'
       - '.github/workflows/sync-labels.yml'
+      - 'wiki-framework'
   workflow_dispatch:
   schedule:
     # Run weekly on Sundays at 00:00 UTC
@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

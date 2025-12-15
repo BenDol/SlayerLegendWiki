@@ -394,6 +394,7 @@ Example structure:
 Must update when deploying:
 - `wiki.title` - Wiki name
 - `wiki.description` - Wiki description
+- `wiki.url` - Production URL (e.g., "https://slayerlegend.wiki") - Used in comment issue links
 - `wiki.logo` - Path to logo (e.g., "/logo.svg")
 - `wiki.favicon` - Path to favicon (e.g., "/favicon.ico", "/favicon.png", "/favicon.svg")
 - `wiki.manifest` - Path to web app manifest (e.g., "/site.webmanifest")
@@ -563,11 +564,11 @@ The wiki uses a centralized label management system to ensure all required label
 
 **Problem:** Regular users without write access cannot create labels, causing failures when they try to comment on pages or perform other actions requiring labels.
 
-**Solution:** All labels are defined in `.github/labels.json` and automatically synced to the repository via GitHub Actions.
+**Solution:** All labels are defined in `wiki-framework/.github/labels.json` and automatically synced to the repository via GitHub Actions.
 
 ### Label Configuration
 
-**Location:** `.github/labels.json`
+**Location:** `wiki-framework/.github/labels.json`
 
 This file is the single source of truth for all repository labels used by:
 - Comment system (`wiki-comments`, `wiki:comment`)
@@ -581,12 +582,12 @@ This file is the single source of truth for all repository labels used by:
 **Workflow:** `.github/workflows/sync-labels.yml`
 
 Labels are automatically synced when:
-1. `.github/labels.json` is modified and pushed
+1. `wiki-framework/.github/labels.json` is modified and the framework submodule is updated
 2. Weekly (every Sunday at 00:00 UTC)
 3. Manually triggered via Actions tab
 
 The workflow:
-- Reads label definitions from `.github/labels.json`
+- Reads label definitions from `wiki-framework/.github/labels.json`
 - Creates missing labels in the repository
 - Updates existing labels if colors/descriptions changed
 - Reports statistics on changes made
@@ -595,7 +596,7 @@ The workflow:
 
 When you need to add a new label:
 
-1. **Update `.github/labels.json`:**
+1. **Update `wiki-framework/.github/labels.json`:**
    ```json
    {
      "name": "your-new-label",
@@ -620,6 +621,70 @@ When you need to add a new label:
 3. **Commit and push** - The GitHub Action will automatically create the label
 
 **See `LABELS.md` for complete documentation on the label management system.**
+
+## Admin System
+
+The wiki includes a comprehensive admin system for managing users and moderators.
+
+### Features
+
+- **User Banning**: Repository owner and admins can ban users from commenting
+- **Admin Management**: Repository owner can designate trusted administrators
+- **GitHub Issue Storage**: Admin/banned user lists stored securely in GitHub issues
+- **Bot-Managed**: Uses bot account to prevent tampering
+- **Full Audit Trail**: All actions tracked in issue history
+
+### Access
+
+**Admin Panel:** `/#/admin`
+
+**Who can access:**
+- Repository owner (always has access)
+- Designated administrators
+
+**Access from:** User menu → "Admin Panel" (only visible to admins/owner)
+
+### User Roles
+
+**Repository Owner:**
+- Full admin access (cannot be removed)
+- Can add/remove administrators
+- Can ban/unban anyone (including admins)
+
+**Administrators:**
+- Can ban/unban regular users
+- Cannot manage other admins
+- Cannot ban other admins or owner
+- Can be removed by owner
+
+**Banned Users:**
+- Cannot post comments
+- Can still view wiki content
+- Can be unbanned by owner/admins
+
+### Quick Start
+
+1. **Configure bot token** (required - see `BOT-SETUP.md`)
+2. **Sign in** as repository owner
+3. **Navigate to** `/#/admin` (or click "Admin Panel" in user menu)
+4. **Manage users:**
+   - **Banned Users tab**: Ban/unban users from commenting
+   - **Administrators tab**: Add/remove admins (owner only)
+
+### Technical Details
+
+**Storage:**
+- Admins list: GitHub issue with label `wiki-admin:admins`
+- Banned users list: GitHub issue with label `wiki-admin:banned-users`
+- Both issues are locked to prevent tampering
+- Bot account manages both issues
+
+**Integration:**
+- Comments component checks ban status before allowing comments
+- User menu shows admin link for admins/owner only
+- Admin panel validates permissions before allowing actions
+
+**See `ADMIN-SYSTEM.md` for complete documentation.**
 
 ## Framework Updates
 

@@ -2,6 +2,7 @@
   "wiki": {
     "title": "Slayer Legend Wiki",
     "description": "Complete guide for Slayer Legend: Idle RPG (슬레이어 키우기)",
+    "url": "https://slayerlegend.wiki",
     "logo": "/images/logo.png",
     "favicon": "/icon/favicon.ico",
     "manifest": "/site.webmanifest",
