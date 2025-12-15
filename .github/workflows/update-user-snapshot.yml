@@ -274,6 +274,19 @@ jobs:
                 });
 
                 issueNumber = newIssue.number;
+
+                // Lock the issue to prevent unwanted comments
+                try {
+                  await github.rest.issues.lock({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    lock_reason: 'off-topic'
+                  });
+                  console.log(`🔒 Locked snapshot issue for @${snapshot.username} to collaborators only`);
+                } catch (lockError) {
+                  console.warn('⚠️ Failed to lock issue:', lockError.message);
+                }
               }
 
               console.log(`✅ Snapshot saved successfully!`);
