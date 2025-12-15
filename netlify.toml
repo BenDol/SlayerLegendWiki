@@ -31,8 +31,8 @@
 
 # Functions configuration
 [functions]
-  # Directory containing serverless functions
-  directory = "netlify/functions"
+  # Directory containing serverless functions (from wiki-framework)
+  directory = "wiki-framework/serverless/netlify/functions"
 
   # Node bundler (use esbuild for fast builds)
   node_bundler = "esbuild"
