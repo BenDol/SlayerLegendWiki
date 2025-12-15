@@ -183,14 +183,17 @@ jobs:
               repo: context.repo.repo,
               state: 'open',
               labels: 'highscore-cache',
-              per_page: 1
+              per_page: 100
             });
+
+            // Find issue with exact title match
+            const existingIssue = issues.find(issue => issue.title === CACHE_ISSUE_TITLE);
 
             let issueNumber;
 
-            if (issues.length > 0) {
+            if (existingIssue) {
               // Update existing issue
-              issueNumber = issues[0].number;
+              issueNumber = existingIssue.number;
               console.log(`📝 Updating existing cache issue #${issueNumber}...`);
 
               await github.rest.issues.update({
