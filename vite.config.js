@@ -42,5 +42,7 @@ export default createWikiConfigSync({
   // You can override any Vite settings here
   server: {
     port: 5173,
+    // SPA fallback: Always serve index.html for client-side routing
+    historyApiFallback: true,
   },
 });

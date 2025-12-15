@@ -15,9 +15,18 @@ on:
     types: [closed]
   workflow_dispatch:
     inputs:
-      username:
-        description: 'GitHub username to update snapshot for'
+      mode:
+        description: 'Update mode'
         required: true
+        type: choice
+        options:
+          - single
+          - refresh_all
+          - force_reload_all
+        default: single
+      username:
+        description: 'GitHub username (for single mode only)'
+        required: false
         type: string
 
 jobs:
@@ -43,153 +52,313 @@ jobs:
             const SNAPSHOT_LABEL = 'user-snapshot';
             const SNAPSHOT_TITLE_PREFIX = '[User Snapshot]';
 
-            // Get username from PR author or manual input
-            const username = context.payload.inputs?.username || context.payload.pull_request.user.login;
+            // Determine mode
+            const mode = context.payload.inputs?.mode || 'single';
+            const inputUsername = context.payload.inputs?.username || context.payload.pull_request?.user?.login;
 
-            console.log(`🔍 Building profile snapshot for @${username}...`);
+            console.log(`🚀 Running snapshot update in mode: ${mode}`);
 
-            // Fetch user data
-            const { data: userData } = await github.rest.users.getByUsername({
-              username: username,
-            });
+            /**
+             * Build snapshot for a single user
+             */
+            async function buildUserSnapshot(username) {
+              console.log(`\n🔍 Building profile snapshot for @${username}...`);
 
-            console.log(`✅ User data fetched: ${userData.name || username}`);
-
-            // Fetch all PRs by this user
-            console.log('🔍 Fetching pull requests...');
-            const allPRs = [];
-            let page = 1;
-            let hasMore = true;
-
-            while (hasMore) {
-              const { data: prs } = await github.rest.pulls.list({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: 'all',
-                per_page: 100,
-                page: page,
+              // Fetch user data
+              const { data: userData } = await github.rest.users.getByUsername({
+                username: username,
               });
 
-              // Filter PRs by this user
-              const userPRs = prs.filter(pr => pr.user.login === username);
-              allPRs.push(...userPRs);
+              console.log(`✅ User data fetched: ${userData.name || username}`);
 
-              hasMore = prs.length === 100;
-              page++;
+              // Fetch all PRs by this user
+              console.log('🔍 Fetching pull requests...');
+              const allPRs = [];
+              let page = 1;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: 100,
+                  page: page,
+                });
+
+                // Filter PRs by this user
+                const userPRs = prs.filter(pr => pr.user.login === username);
+                allPRs.push(...userPRs);
+
+                hasMore = prs.length === 100;
+                page++;
+              }
+
+              console.log(`✅ Found ${allPRs.length} PRs for @${username}`);
+
+              // Calculate statistics
+              const stats = {
+                totalPRs: allPRs.length,
+                openPRs: allPRs.filter(pr => pr.state === 'open').length,
+                mergedPRs: allPRs.filter(pr => pr.merged_at || pr.state === 'merged').length,
+                closedPRs: allPRs.filter(pr => (pr.state === 'closed' || pr.state === 'merged') && !pr.merged_at).length,
+                totalAdditions: allPRs.reduce((sum, pr) => sum + (pr.additions || 0), 0),
+                totalDeletions: allPRs.reduce((sum, pr) => sum + (pr.deletions || 0), 0),
+                totalFiles: allPRs.reduce((sum, pr) => sum + (pr.changed_files || 0), 0),
+                mostRecentEdit: allPRs.length > 0
+                  ? new Date(Math.max(...allPRs.map(pr => new Date(pr.created_at).getTime()))).toISOString()
+                  : null,
+              };
+
+              // Build pull requests list (store essential data)
+              // Limit to most recent 100 PRs to stay within GitHub issue size limits (~65KB)
+              const recentPRs = allPRs
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 100);
+
+              console.log(`📝 Storing ${recentPRs.length} most recent PRs (out of ${allPRs.length} total)`);
+
+              const pullRequests = recentPRs.map(pr => ({
+                number: pr.number,
+                title: pr.title,
+                state: pr.state,
+                created_at: pr.created_at,
+                updated_at: pr.updated_at,
+                merged_at: pr.merged_at,
+                closed_at: pr.closed_at,
+                additions: pr.additions,
+                deletions: pr.deletions,
+                changed_files: pr.changed_files,
+                html_url: pr.html_url,
+                labels: pr.labels.map(label => ({
+                  name: label.name,
+                  color: label.color,
+                })),
+              }));
+
+              // Build snapshot object
+              const snapshot = {
+                username: username,
+                lastUpdated: new Date().toISOString(),
+                stats: stats,
+                pullRequests: pullRequests,
+                pullRequestsCount: allPRs.length,
+                pullRequestsStored: recentPRs.length,
+                pullRequestsTruncated: allPRs.length > 100,
+                user: {
+                  login: userData.login,
+                  name: userData.name,
+                  avatar_url: userData.avatar_url,
+                  bio: userData.bio,
+                },
+              };
+
+              console.log('📊 Snapshot statistics:');
+              console.log(`   Total PRs: ${stats.totalPRs}`);
+              console.log(`   Merged: ${stats.mergedPRs}`);
+              console.log(`   Additions: +${stats.totalAdditions.toLocaleString()}`);
+              console.log(`   Deletions: -${stats.totalDeletions.toLocaleString()}`);
+              console.log(`   Files: ${stats.totalFiles}`);
+
+              return snapshot;
             }
 
-            console.log(`✅ Found ${allPRs.length} PRs for @${username}`);
+            /**
+             * Save snapshot to GitHub issue
+             */
+            async function saveSnapshot(snapshot, existingIssue = null) {
+              const issueTitle = `${SNAPSHOT_TITLE_PREFIX} ${snapshot.username}`;
+              const issueBody = JSON.stringify(snapshot, null, 2);
 
-            // Calculate statistics
-            const stats = {
-              totalPRs: allPRs.length,
-              openPRs: allPRs.filter(pr => pr.state === 'open').length,
-              mergedPRs: allPRs.filter(pr => pr.merged_at || pr.state === 'merged').length,
-              closedPRs: allPRs.filter(pr => (pr.state === 'closed' || pr.state === 'merged') && !pr.merged_at).length,
-              totalAdditions: allPRs.reduce((sum, pr) => sum + (pr.additions || 0), 0),
-              totalDeletions: allPRs.reduce((sum, pr) => sum + (pr.deletions || 0), 0),
-              totalFiles: allPRs.reduce((sum, pr) => sum + (pr.changed_files || 0), 0),
-              mostRecentEdit: allPRs.length > 0
-                ? new Date(Math.max(...allPRs.map(pr => new Date(pr.created_at).getTime()))).toISOString()
-                : null,
-            };
+              let issueNumber;
 
-            // Build pull requests list (store essential data)
-            // Limit to most recent 100 PRs to stay within GitHub issue size limits (~65KB)
-            const recentPRs = allPRs
-              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-              .slice(0, 100);
+              if (existingIssue) {
+                // Update existing snapshot
+                issueNumber = existingIssue.number;
+                console.log(`📝 Updating existing snapshot issue #${issueNumber}...`);
 
-            console.log(`📝 Storing ${recentPRs.length} most recent PRs (out of ${allPRs.length} total)`);
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: issueBody,
+                });
+              } else {
+                // Create new snapshot
+                console.log('📝 Creating new snapshot issue...');
 
-            const pullRequests = recentPRs.map(pr => ({
-              number: pr.number,
-              title: pr.title,
-              state: pr.state,
-              created_at: pr.created_at,
-              updated_at: pr.updated_at,
-              merged_at: pr.merged_at,
-              closed_at: pr.closed_at,
-              additions: pr.additions,
-              deletions: pr.deletions,
-              changed_files: pr.changed_files,
-              html_url: pr.html_url,
-              labels: pr.labels.map(label => ({
-                name: label.name,
-                color: label.color,
-              })),
-            }));
+                const { data: newIssue } = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: issueTitle,
+                  body: issueBody,
+                  labels: [SNAPSHOT_LABEL, 'automated'],
+                });
 
-            // Build snapshot object
-            const snapshot = {
-              username: username,
-              lastUpdated: new Date().toISOString(),
-              stats: stats,
-              pullRequests: pullRequests,
-              pullRequestsCount: allPRs.length,
-              pullRequestsStored: recentPRs.length,
-              pullRequestsTruncated: allPRs.length > 100,
-              user: {
-                login: userData.login,
-                name: userData.name,
-                avatar_url: userData.avatar_url,
-                bio: userData.bio,
-              },
-            };
+                issueNumber = newIssue.number;
+              }
 
-            console.log('📊 Snapshot statistics:');
-            console.log(`   Total PRs: ${stats.totalPRs}`);
-            console.log(`   Merged: ${stats.mergedPRs}`);
-            console.log(`   Additions: +${stats.totalAdditions.toLocaleString()}`);
-            console.log(`   Deletions: -${stats.totalDeletions.toLocaleString()}`);
-            console.log(`   Files: ${stats.totalFiles}`);
+              console.log(`✅ Snapshot saved successfully!`);
+              console.log(`   User: @${snapshot.username}`);
+              console.log(`   Issue: #${issueNumber}`);
+              console.log(`   Last Updated: ${snapshot.lastUpdated}`);
 
-            // Find existing snapshot issue
-            console.log('🔍 Looking for existing snapshot issue...');
-            const { data: issues } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: SNAPSHOT_LABEL,
-              state: 'open',
-              per_page: 100,
-            });
-
-            const existingIssue = issues.find(
-              issue => issue.title === `${SNAPSHOT_TITLE_PREFIX} ${username}`
-            );
-
-            const issueTitle = `${SNAPSHOT_TITLE_PREFIX} ${username}`;
-            const issueBody = JSON.stringify(snapshot, null, 2);
-
-            let issueNumber;
-
-            if (existingIssue) {
-              // Update existing snapshot
-              issueNumber = existingIssue.number;
-              console.log(`📝 Updating existing snapshot issue #${issueNumber}...`);
-
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issueNumber,
-                body: issueBody,
-              });
-            } else {
-              // Create new snapshot
-              console.log('📝 Creating new snapshot issue...');
-
-              const { data: newIssue } = await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: issueTitle,
-                body: issueBody,
-                labels: [SNAPSHOT_LABEL, 'automated'],
-              });
-
-              issueNumber = newIssue.number;
+              return issueNumber;
             }
 
-            console.log(`✅ Snapshot saved successfully!`);
-            console.log(`   User: @${username}`);
-            console.log(`   Issue: #${issueNumber}`);
-            console.log(`   Last Updated: ${snapshot.lastUpdated}`);
+            /**
+             * Get all existing snapshot issues
+             */
+            async function getExistingSnapshots() {
+              console.log('🔍 Fetching existing snapshots...');
+              const snapshots = new Map();
+
+              let page = 1;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: issues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: SNAPSHOT_LABEL,
+                  state: 'open',
+                  per_page: 100,
+                  page: page,
+                });
+
+                for (const issue of issues) {
+                  // Extract username from title "[User Snapshot] username"
+                  const match = issue.title.match(/\[User Snapshot\]\s+(.+)/);
+                  if (match) {
+                    snapshots.set(match[1], issue);
+                  }
+                }
+
+                hasMore = issues.length === 100;
+                page++;
+              }
+
+              console.log(`✅ Found ${snapshots.size} existing snapshots`);
+              return snapshots;
+            }
+
+            /**
+             * Get all unique contributors (PR authors)
+             */
+            async function getAllContributors() {
+              console.log('🔍 Fetching all contributors...');
+              const contributors = new Set();
+
+              let page = 1;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: 100,
+                  page: page,
+                });
+
+                for (const pr of prs) {
+                  if (pr.user && pr.user.login) {
+                    contributors.add(pr.user.login);
+                  }
+                }
+
+                hasMore = prs.length === 100;
+                page++;
+              }
+
+              console.log(`✅ Found ${contributors.size} unique contributors`);
+              return Array.from(contributors);
+            }
+
+            // === MAIN EXECUTION ===
+
+            if (mode === 'single') {
+              // Single user mode (PR trigger or manual single user)
+              if (!inputUsername) {
+                console.error('❌ No username provided for single mode');
+                throw new Error('Username is required for single mode');
+              }
+
+              const snapshot = await buildUserSnapshot(inputUsername);
+
+              // Find existing snapshot issue
+              const existingSnapshots = await getExistingSnapshots();
+              const existingIssue = existingSnapshots.get(inputUsername);
+
+              await saveSnapshot(snapshot, existingIssue);
+
+            } else if (mode === 'refresh_all') {
+              // Refresh all mode - only create snapshots for users who don't have one yet
+              console.log('🔄 Refresh All Mode: Creating snapshots for users without existing snapshots...');
+
+              const contributors = await getAllContributors();
+              const existingSnapshots = await getExistingSnapshots();
+
+              const usersWithoutSnapshots = contributors.filter(username => !existingSnapshots.has(username));
+
+              console.log(`📋 ${usersWithoutSnapshots.length} users need snapshots created`);
+              console.log(`✅ ${existingSnapshots.size} users already have snapshots (skipping)`);
+
+              if (usersWithoutSnapshots.length === 0) {
+                console.log('✅ All contributors already have snapshots!');
+                return;
+              }
+
+              let successCount = 0;
+              let errorCount = 0;
+
+              for (const username of usersWithoutSnapshots) {
+                try {
+                  const snapshot = await buildUserSnapshot(username);
+                  await saveSnapshot(snapshot, null); // No existing issue
+                  successCount++;
+
+                  // Small delay to avoid rate limiting
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                  console.error(`❌ Failed to create snapshot for @${username}:`, error.message);
+                  errorCount++;
+                }
+              }
+
+              console.log(`\n✅ Refresh All Complete!`);
+              console.log(`   Created: ${successCount} snapshots`);
+              console.log(`   Failed: ${errorCount} snapshots`);
+              console.log(`   Skipped: ${existingSnapshots.size} (already exist)`);
+
+            } else if (mode === 'force_reload_all') {
+              // Force reload all mode - rebuild ALL contributor snapshots
+              console.log('🔥 Force Reload All Mode: Rebuilding ALL contributor snapshots...');
+
+              const contributors = await getAllContributors();
+              const existingSnapshots = await getExistingSnapshots();
+
+              console.log(`📋 Rebuilding snapshots for ${contributors.length} contributors...`);
+
+              let successCount = 0;
+              let errorCount = 0;
+
+              for (const username of contributors) {
+                try {
+                  const snapshot = await buildUserSnapshot(username);
+                  const existingIssue = existingSnapshots.get(username);
+                  await saveSnapshot(snapshot, existingIssue);
+                  successCount++;
+
+                  // Small delay to avoid rate limiting
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                  console.error(`❌ Failed to update snapshot for @${username}:`, error.message);
+                  errorCount++;
+                }
+              }
+
+              console.log(`\n✅ Force Reload All Complete!`);
+              console.log(`   Updated: ${successCount} snapshots`);
+              console.log(`   Failed: ${errorCount} snapshots`);
+            }
