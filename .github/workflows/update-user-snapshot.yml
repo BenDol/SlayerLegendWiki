@@ -95,7 +95,14 @@ jobs:
             };
 
             // Build pull requests list (store essential data)
-            const pullRequests = allPRs.map(pr => ({
+            // Limit to most recent 100 PRs to stay within GitHub issue size limits (~65KB)
+            const recentPRs = allPRs
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+              .slice(0, 100);
+
+            console.log(`📝 Storing ${recentPRs.length} most recent PRs (out of ${allPRs.length} total)`);
+
+            const pullRequests = recentPRs.map(pr => ({
               number: pr.number,
               title: pr.title,
               state: pr.state,
@@ -119,6 +126,9 @@ jobs:
               lastUpdated: new Date().toISOString(),
               stats: stats,
               pullRequests: pullRequests,
+              pullRequestsCount: allPRs.length,
+              pullRequestsStored: recentPRs.length,
+              pullRequestsTruncated: allPRs.length > 100,
               user: {
                 login: userData.login,
                 name: userData.name,

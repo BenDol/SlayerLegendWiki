@@ -3,16 +3,11 @@
 /**
  * Manual Cache Update Trigger Script
  *
- * This script manually triggers the GitHub Actions workflows to update
- * the highscore and prestige caches without waiting for the scheduled runs.
+ * This script manually triggers the GitHub Actions workflow to update
+ * the highscore cache without waiting for the scheduled run.
  *
  * Usage:
- *   node scripts/triggerCacheUpdates.js [highscore|prestige|both]
- *
- * Examples:
- *   node scripts/triggerCacheUpdates.js both      # Trigger both workflows
- *   node scripts/triggerCacheUpdates.js highscore # Trigger only highscore
- *   node scripts/triggerCacheUpdates.js prestige  # Trigger only prestige
+ *   node scripts/triggerCacheUpdates.js
  *
  * Requirements:
  *   - GITHUB_TOKEN environment variable with repo scope
@@ -26,11 +21,8 @@ const owner = process.env.VITE_WIKI_REPO_OWNER || 'BenDol';
 const repo = process.env.VITE_WIKI_REPO_NAME || 'SlayerLegendWiki';
 const token = process.env.GITHUB_TOKEN;
 
-// Workflow file names
-const WORKFLOWS = {
-  highscore: 'update-highscore-cache.yml',
-  prestige: 'update-prestige-cache.yml',
-};
+// Workflow file name
+const WORKFLOW_FILE = 'update-highscore-cache.yml';
 
 /**
  * Trigger a GitHub Actions workflow via workflow_dispatch
@@ -81,12 +73,8 @@ async function triggerWorkflow(workflowFile) {
  * Main execution
  */
 async function main() {
-  const args = process.argv.slice(2);
-  const target = args[0] || 'both';
-
   console.log('🚀 Manual Cache Update Trigger\n');
-  console.log(`Repository: ${owner}/${repo}`);
-  console.log(`Target: ${target}\n`);
+  console.log(`Repository: ${owner}/${repo}\n`);
 
   if (!token) {
     console.error('❌ Error: GITHUB_TOKEN environment variable not set');
@@ -98,31 +86,13 @@ async function main() {
     process.exit(1);
   }
 
-  const workflows = [];
-
-  if (target === 'both' || target === 'highscore') {
-    workflows.push({ name: 'Highscore Cache', file: WORKFLOWS.highscore });
-  }
-
-  if (target === 'both' || target === 'prestige') {
-    workflows.push({ name: 'Prestige Cache', file: WORKFLOWS.prestige });
-  }
-
-  if (workflows.length === 0) {
-    console.error('❌ Error: Invalid target. Use "highscore", "prestige", or "both"');
+  try {
+    console.log('⏳ Triggering Highscore Cache workflow...');
+    await triggerWorkflow(WORKFLOW_FILE);
+    console.log('✅ Highscore Cache workflow triggered successfully!');
+  } catch (error) {
+    console.error('❌ Failed to trigger workflow:', error.message);
     process.exit(1);
-  }
-
-  console.log('Triggering workflows...\n');
-
-  for (const workflow of workflows) {
-    try {
-      console.log(`⏳ Triggering ${workflow.name}...`);
-      await triggerWorkflow(workflow.file);
-      console.log(`✅ ${workflow.name} workflow triggered successfully!`);
-    } catch (error) {
-      console.error(`❌ Failed to trigger ${workflow.name}:`, error.message);
-    }
   }
 
   console.log('\n✨ Done!');
