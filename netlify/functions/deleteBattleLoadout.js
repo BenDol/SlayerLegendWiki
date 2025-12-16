@@ -47,8 +47,9 @@ export async function handler(event) {
     const octokit = new Octokit({ auth: botToken });
 
     // Get repo info from environment
-    const owner = process.env.VITE_WIKI_REPO_OWNER;
-    const repo = process.env.VITE_WIKI_REPO_NAME;
+    // Try both VITE_ prefixed (for local dev) and non-prefixed (for Netlify)
+    const owner = process.env.WIKI_REPO_OWNER || process.env.VITE_WIKI_REPO_OWNER;
+    const repo = process.env.WIKI_REPO_NAME || process.env.VITE_WIKI_REPO_NAME;
 
     if (!owner || !repo) {
       console.error('[deleteBattleLoadout] Repository config missing');
