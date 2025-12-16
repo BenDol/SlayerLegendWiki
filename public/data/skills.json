@@ -13,7 +13,7 @@
     "upgradeValue": 40,
     "cooldown": 12,
     "range": 3,
-    "icon": "/images/skills/icons/01_BlazeSlash.png"
+    "icon": "/images/skills/icons/01_FlameSlash.png"
   },
   {
     "id": 2,
@@ -45,7 +45,7 @@
     "upgradeValue": 15,
     "cooldown": 6,
     "range": 5,
-    "icon": "/images/skills/icons/04_LightningSwing.png"
+    "icon": null
   },
   {
     "id": 4,
@@ -109,7 +109,7 @@
     "upgradeValue": 8,
     "cooldown": 10,
     "range": 15,
-    "icon": "/images/skills/icons/18_LightningStrike.png"
+    "icon": null
   },
   {
     "id": 8,
@@ -125,7 +125,7 @@
     "upgradeValue": 2,
     "cooldown": 7,
     "range": 0,
-    "icon": null
+    "icon": "/images/skills/icons/12_EarthCount.png"
   },
   {
     "id": 9,
@@ -173,7 +173,7 @@
     "upgradeValue": 3,
     "cooldown": 20,
     "range": 0,
-    "icon": "/images/skills/icons/05_Swiftness.png"
+    "icon": "/images/skills/icons/09_Tornado.png"
   },
   {
     "id": 12,
@@ -205,7 +205,7 @@
     "upgradeValue": 135,
     "cooldown": 13,
     "range": 5,
-    "icon": "/images/skills/icons/00_FlameSlash.png"
+    "icon": "/images/skills/icons/01_BlazeSlash.png"
   },
   {
     "id": 14,
@@ -269,7 +269,7 @@
     "upgradeValue": 0.8,
     "cooldown": 5,
     "range": 10,
-    "icon": "/images/skills/icons/06_ProminenceBurn.png"
+    "icon": null
   },
   {
     "id": 18,
@@ -285,7 +285,7 @@
     "upgradeValue": 4,
     "cooldown": 18,
     "range": 0,
-    "icon": null
+    "icon": "/images/skills/icons/08_IceAge.png"
   },
   {
     "id": 19,
@@ -349,7 +349,7 @@
     "upgradeValue": 0.9,
     "cooldown": 4,
     "range": 10,
-    "icon": null
+    "icon": "/images/skills/icons/09_IceAge 1.png"
   },
   {
     "id": 23,
@@ -365,7 +365,7 @@
     "upgradeValue": 8,
     "cooldown": 0.5,
     "range": 3,
-    "icon": null
+    "icon": "/images/skills/icons/05_Swiftness.png"
   },
   {
     "id": 24,
@@ -413,7 +413,7 @@
     "upgradeValue": 0.1,
     "cooldown": 15,
     "range": 0,
-    "icon": "/images/skills/icons/14_IceShield.png"
+    "icon": "/images/skills/icons/10_ManaRecovery_2.png"
   },
   {
     "id": 27,
@@ -477,7 +477,7 @@
     "upgradeValue": 67,
     "cooldown": 9,
     "range": 10,
-    "icon": "/images/skills/icons/08_IceAge.png"
+    "icon": "/images/skills/icons/02_IceMeteor.png"
   },
   {
     "id": 31,
@@ -493,7 +493,7 @@
     "upgradeValue": 86,
     "cooldown": 8,
     "range": 10,
-    "icon": "/images/skills/icons/15_DragonThunder.png"
+    "icon": null
   },
   {
     "id": 32,
@@ -557,7 +557,7 @@
     "upgradeValue": 17,
     "cooldown": 12,
     "range": 20,
-    "icon": "/images/skills/icons/10_WhiteLightning.png"
+    "icon": "/images/skills/icons/04_LightningSwing.png"
   },
   {
     "id": 36,
@@ -589,7 +589,7 @@
     "upgradeValue": 70,
     "cooldown": 10,
     "range": 5,
-    "icon": "/images/skills/icons/15_DragonBreath.png"
+    "icon": "/images/skills/icons/06_ProminenceBurn.png"
   },
   {
     "id": 38,
@@ -621,7 +621,7 @@
     "upgradeValue": 26,
     "cooldown": 5,
     "range": 7,
-    "icon": "/images/skills/icons/06_Supernatural.png"
+    "icon": "/images/skills/icons/06_BloodyTornado.png"
   },
   {
     "id": 40,
@@ -637,7 +637,7 @@
     "upgradeValue": 100,
     "cooldown": 33,
     "range": 4,
-    "icon": "/images/skills/icons/11_BeastHunt.png"
+    "icon": "/images/skills/icons/05_Earthquake.png"
   },
   {
     "id": 41,
@@ -669,7 +669,7 @@
     "upgradeValue": 10,
     "cooldown": 50,
     "range": 0,
-    "icon": "/images/skills/icons/66_IceBlast.png"
+    "icon": null
   },
   {
     "id": 43,
@@ -685,7 +685,7 @@
     "upgradeValue": 6,
     "cooldown": 20,
     "range": 0,
-    "icon": null
+    "icon": "/images/skills/icons/10_WhiteLightning.png"
   },
   {
     "id": 44,
@@ -701,7 +701,7 @@
     "upgradeValue": 25,
     "cooldown": 30,
     "range": 0,
-    "icon": "/images/skills/icons/05_Earthquake.png"
+    "icon": "/images/skills/icons/06_Supernatural.png"
   },
   {
     "id": 45,
@@ -733,6 +733,6 @@
     "upgradeValue": 10,
     "cooldown": 0,
     "range": 0,
-    "icon": null
+    "icon": "/images/skills/icons/16_BlazeDance.png"
   }
 ]
