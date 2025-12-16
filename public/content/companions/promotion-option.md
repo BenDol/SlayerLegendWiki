@@ -6,6 +6,7 @@ tags:
   - promotionoption
 category: Companions
 date: '2025-12-14'
+order: 0
 ---
 ##  Recommended Rolls
 
@@ -13,23 +14,23 @@ Typically the player will benefit from having companions with full pages of max 
 
 ### Options
 
-* Extra ATK(%) : 3 / 4 / 6 / 9 / 14 / 20  
-* CRIT Dmg(%) : 5 / 7 / 10 / 15 / 24 / 35  
-* Extra HP(%) : 5 / 7 / 10 /15 / 24 / 35  
-* Extra HP Recovery(%) :  5 / 7 / 10 /15 / 24 / 35  
-* Extra Mana(%) : 3 / 4 / 5 / 8 / 10 / 15  
-* Extra Mana Recovery(%) : 3 / 4 / 5 / 8 / 10 / 15  
-* Monster Gold(%) : 3 / 4 / 6 / 9 / 14 / 20  
-* Accuracy : 3 / 4 / 5 / 8 / 10 / 15  
-* Dodge : 3 / 4 / 5 / 8 / 10 / 15  
-* Extra Exp(%) : 1 / 2 / 3 / 4 / 5 / 8  
-* CC Resist : 3 / 4 / 6 / 9 / 14 /20
+* Extra ATK(%) : <span class="text-gray-400 dark:text-gray-400">3</span> / <span class="text-green-600 dark:text-green-400">4</span> / <span class="text-orange-600 dark:text-orange-400">6</span> / <span class="text-purple-600 dark:text-purple-400">9</span> / <span class="text-red-600 dark:text-red-400">14</span> / <span class="text-cyan-600 dark:text-cyan-400">20</span>  
+* CRIT Dmg(%) : <span class="text-gray-400 dark:text-gray-400">5</span> / <span class="text-green-600 dark:text-green-400">7</span> / <span class="text-orange-600 dark:text-orange-400">10</span> / <span class="text-purple-600 dark:text-purple-400">15</span> / <span class="text-red-600 dark:text-red-400">24</span> /<span class="text-cyan-600 dark:text-cyan-400"> 35</span>  
+* Extra HP(%) : <span class="text-gray-400 dark:text-gray-400">5</span> / <span class="text-green-600 dark:text-green-400">7</span> / <span class="text-orange-600 dark:text-orange-400">10</span> / <span class="text-purple-600 dark:text-purple-400">15</span> / <span class="text-red-600 dark:text-red-400">24</span> / <span class="text-cyan-600 dark:text-cyan-400">35</span>  
+* Extra HP Recovery(%) :  <span class="text-gray-400 dark:text-gray-400">5</span> / <span class="text-green-600 dark:text-green-400">7</span> / <span class="text-orange-600 dark:text-orange-400">10</span> / <span class="text-purple-600 dark:text-purple-400">15</span> / <span class="text-red-600 dark:text-red-400">24</span> / <span class="text-cyan-600 dark:text-cyan-400">35</span>  
+* Extra Mana(%) : <span class="text-gray-400 dark:text-gray-400">3</span> / <span class="text-green-600 dark:text-green-400">4</span> / <span class="text-orange-600 dark:text-orange-400">5</span> / <span class="text-purple-600 dark:text-purple-400">8</span> / <span class="text-red-600 dark:text-red-400">10</span> / <span class="text-cyan-600 dark:text-cyan-400">15</span>  
+* Extra Mana Recovery(%) : <span class="text-gray-400 dark:text-gray-400">3</span> / <span class="text-green-600 dark:text-green-400">4</span> / <span class="text-orange-600 dark:text-orange-400">5</span> / <span class="text-purple-600 dark:text-purple-400">8</span> / <span class="text-red-600 dark:text-red-400">10</span> /<span class="text-cyan-600 dark:text-cyan-400"> 15</span>  
+* Monster Gold(%) : <span class="text-gray-400 dark:text-gray-400">3</span> / <span class="text-green-600 dark:text-green-400">4</span> / <span class="text-orange-600 dark:text-orange-400">6</span> / <span class="text-purple-600 dark:text-purple-400">9</span> / <span class="text-red-600 dark:text-red-400">14</span> / <span class="text-cyan-600 dark:text-cyan-400">20</span>  
+* Accuracy : <span class="text-gray-400 dark:text-gray-400">3</span> / <span class="text-green-600 dark:text-green-400">4</span> / <span class="text-orange-600 dark:text-orange-400">5</span> / <span class="text-purple-600 dark:text-purple-400">8</span> / <span class="text-red-600 dark:text-red-400">10</span> / <span class="text-cyan-600 dark:text-cyan-400">15</span>  
+* Dodge : <span class="text-gray-400 dark:text-gray-400">3</span> / <span class="text-green-600 dark:text-green-400">4</span> / <span class="text-orange-600 dark:text-orange-400">5</span> / <span class="text-purple-600 dark:text-purple-400">8</span> / <span class="text-red-600 dark:text-red-400">10</span> /<span class="text-cyan-600 dark:text-cyan-400"> 15</span>  
+* Extra Exp(%) : <span class="text-gray-400 dark:text-gray-400">1</span> / <span class="text-green-600 dark:text-green-400">2</span> / <span class="text-orange-600 dark:text-orange-400">3</span> / <span class="text-purple-600 dark:text-purple-400">4</span> / <span class="text-red-600 dark:text-red-400">5</span> / <span class="text-cyan-600 dark:text-cyan-400">8</span>  
+* CC Resist : <span class="text-gray-400 dark:text-gray-400">3</span> / <span class="text-green-600 dark:text-green-400">4</span> / <span class="text-orange-600 dark:text-orange-400">6</span> / <span class="text-purple-600 dark:text-purple-400">9</span> / <span class="text-red-600 dark:text-red-400">14</span> / <span class="text-cyan-600 dark:text-cyan-400">20</span>
 
 
 
 ### Probabilities
 
-Gray is 23% / Green is 20% / Orange is 30% / Purple is 20% / Red is 5% / Blue is 2%
+<span class="text-gray-400 dark:text-gray-400">Gray</span> is 23% / <span class="text-green-600 dark:text-green-400">Green</span> is 20% / <span class="text-orange-600 dark:text-orange-400">Orange</span> is 30% / <span class="text-purple-600 dark:text-purple-400">Purple</span> is 20% / <span class="text-red-600 dark:text-red-400">Red</span> is 5% /<span class="text-cyan-600 dark:text-cyan-400"> Blue</span> is 2%
 
 ### Additional Information  
 
