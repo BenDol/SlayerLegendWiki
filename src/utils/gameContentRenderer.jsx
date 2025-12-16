@@ -1,16 +1,16 @@
-import SpellCard from '../components/SpellCard';
+import SkillCard from '../components/SkillCard';
 import EquipmentCard from '../components/EquipmentCard';
 
 /**
  * Process game-specific syntax in markdown content
- * Converts <!-- spell:NAME:MODE --> and <!-- equipment:NAME:MODE --> into special markers
+ * Converts <!-- skill:NAME:MODE --> and <!-- equipment:NAME:MODE --> into special markers
  * Mode is optional, defaults to 'detailed'
  *
  * Supported syntax:
- * - <!-- spell:Fire Slash --> (defaults to detailed)
- * - <!-- spell:Fire Slash:compact -->
- * - <!-- spell:Fire Slash:detailed -->
- * - <!-- spell:Fire Slash:advanced -->
+ * - <!-- skill:Fire Slash --> (defaults to detailed)
+ * - <!-- skill:Fire Slash:compact -->
+ * - <!-- skill:Fire Slash:detailed -->
+ * - <!-- skill:Fire Slash:advanced -->
  *
  * @param {string} content - Markdown content
  * @returns {string} - Processed content with markers
@@ -18,12 +18,12 @@ import EquipmentCard from '../components/EquipmentCard';
 export const processGameSyntax = (content) => {
   if (!content) return content;
 
-  // Replace <!-- spell:NAME:MODE --> with {{SPELL:NAME:MODE}} marker
+  // Replace <!-- skill:NAME:MODE --> with {{SKILL:NAME:MODE}} marker
   // Mode is optional, captured in group 2
-  let processed = content.replace(/<!--\s*spell:\s*([^:]+?)(?::(\w+?))?\s*-->/gi, (match, name, mode) => {
+  let processed = content.replace(/<!--\s*skill:\s*([^:]+?)(?::(\w+?))?\s*-->/gi, (match, name, mode) => {
     const modeStr = mode || 'detailed';
-    console.log('[Game Content] Converting spell:', match, '→', `{{SPELL:${name}:${modeStr}}}`);
-    return `{{SPELL:${name}:${modeStr}}}`;
+    console.log('[Game Content] Converting skill:', match, '→', `{{SKILL:${name}:${modeStr}}}`);
+    return `{{SKILL:${name}:${modeStr}}}`;
   });
 
   // Replace <!-- equipment:NAME:MODE --> with {{EQUIPMENT:NAME:MODE}} marker
@@ -37,30 +37,30 @@ export const processGameSyntax = (content) => {
 };
 
 /**
- * Custom paragraph renderer that detects and renders spell/equipment cards
+ * Custom paragraph renderer that detects and renders skill/equipment cards
  * Use this with ReactMarkdown's components prop
  *
  * Parses markers like:
- * - {{SPELL:Fire Slash:compact}}
- * - {{SPELL:Fire Slash:detailed}}
+ * - {{SKILL:Fire Slash:compact}}
+ * - {{SKILL:Fire Slash:detailed}}
  * - {{EQUIPMENT:Sword:advanced}}
  */
 export const CustomParagraph = ({ node, children, ...props }) => {
   const content = String(children).trim();
 
-  // Check for spell marker with optional mode
-  const spellMatch = content.match(/^\{\{SPELL:([^:]+?)(?::(\w+?))?\}\}$/);
-  if (spellMatch) {
-    const spellIdentifier = spellMatch[1].trim();
-    const mode = spellMatch[2] || 'detailed';
-    const isId = /^\d+$/.test(spellIdentifier);
-    console.log('[Game Content] Rendering SpellCard:', spellIdentifier, 'mode:', mode, 'isId:', isId);
+  // Check for skill marker with optional mode
+  const skillMatch = content.match(/^\{\{SKILL:([^:]+?)(?::(\w+?))?\}\}$/);
+  if (skillMatch) {
+    const skillIdentifier = skillMatch[1].trim();
+    const mode = skillMatch[2] || 'detailed';
+    const isId = /^\d+$/.test(skillIdentifier);
+    console.log('[Game Content] Rendering SkillCard:', skillIdentifier, 'mode:', mode, 'isId:', isId);
 
-    // Render SpellCard with name or id prop and mode
+    // Render SkillCard with name or id prop and mode
     const cardProps = isId
-      ? { id: parseInt(spellIdentifier), mode }
-      : { name: spellIdentifier, mode };
-    return <SpellCard {...cardProps} />;
+      ? { id: parseInt(skillIdentifier), mode }
+      : { name: skillIdentifier, mode };
+    return <SkillCard {...cardProps} />;
   }
 
   // Check for equipment marker with optional mode
@@ -83,12 +83,12 @@ export const CustomParagraph = ({ node, children, ...props }) => {
 };
 
 /**
- * Render a spell card preview for SpellPicker
- * @param {object} params - { spell, mode }
- * @returns {JSX.Element} - SpellCard component
+ * Render a skill card preview for SkillPicker
+ * @param {object} params - { skill, mode }
+ * @returns {JSX.Element} - SkillCard component
  */
-export const renderSpellPreview = ({ spell, mode }) => {
-  return <SpellCard spell={spell} mode={mode} />;
+export const renderSkillPreview = ({ skill, mode }) => {
+  return <SkillCard skill={skill} mode={mode} />;
 };
 
 /**

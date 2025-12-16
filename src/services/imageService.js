@@ -1,6 +1,6 @@
 /**
  * Image Service - Lookup images from the image database
- * Matches spell/skill names to images with fallbacks
+ * Matches skill names to images with fallbacks
  */
 
 // Cache for image database
@@ -60,18 +60,18 @@ function getElementIcon(element) {
 }
 
 /**
- * Search for spell/skill image by name
- * @param {string} spellName - Name of the spell
+ * Search for skill image by name
+ * @param {string} skillName - Name of the skill
  * @param {string} attribute - Element attribute (Fire, Water, Wind, Earth)
  * @returns {Promise<string>} Image path
  */
-export async function getSpellImage(spellName, attribute) {
+export async function getSkillImage(skillName, attribute) {
   // Try to load image search index
   const searchIndex = await loadImageSearchIndex();
 
   if (searchIndex && searchIndex.images) {
-    // Search for images matching the spell name
-    const searchTerm = spellName.toLowerCase().replace(/\s+/g, '');
+    // Search for images matching the skill name
+    const searchTerm = skillName.toLowerCase().replace(/\s+/g, '');
 
     // Search through images
     for (const [id, image] of Object.entries(searchIndex.images)) {

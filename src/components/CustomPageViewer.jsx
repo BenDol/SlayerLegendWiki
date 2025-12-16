@@ -3,7 +3,7 @@ import { processGameSyntax, getGameComponents } from '../utils/gameContentRender
 
 /**
  * Custom PageViewer for Slayer Legend Wiki
- * Wraps the generic PageViewer with game-specific spell/equipment rendering
+ * Wraps the generic PageViewer with game-specific skill/equipment rendering
  */
 const CustomPageViewer = ({ content, metadata, className }) => {
   return (

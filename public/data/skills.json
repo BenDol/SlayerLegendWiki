@@ -12,7 +12,8 @@
     "baseValue": 400,
     "upgradeValue": 40,
     "cooldown": 12,
-    "range": 3
+    "range": 3,
+    "icon": "/images/skills/icons/01_BlazeSlash.png"
   },
   {
     "id": 2,
@@ -27,7 +28,8 @@
     "baseValue": 110,
     "upgradeValue": 11,
     "cooldown": 5,
-    "range": 5
+    "range": 5,
+    "icon": "/images/skills/icons/00_IceStone.png"
   },
   {
     "id": 3,
@@ -42,7 +44,8 @@
     "baseValue": 150,
     "upgradeValue": 15,
     "cooldown": 6,
-    "range": 5
+    "range": 5,
+    "icon": "/images/skills/icons/04_LightningSwing.png"
   },
   {
     "id": 4,
@@ -57,7 +60,8 @@
     "baseValue": 610,
     "upgradeValue": 61,
     "cooldown": 9,
-    "range": 1
+    "range": 1,
+    "icon": "/images/skills/icons/00_StoneStrike.png"
   },
   {
     "id": 5,
@@ -72,7 +76,8 @@
     "baseValue": 80,
     "upgradeValue": 3,
     "cooldown": 17,
-    "range": 0
+    "range": 0,
+    "icon": null
   },
   {
     "id": 6,
@@ -87,7 +92,8 @@
     "baseValue": 30,
     "upgradeValue": 2,
     "cooldown": 8,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/04_ManaRecovery_1.png"
   },
   {
     "id": 7,
@@ -102,7 +108,8 @@
     "baseValue": 80,
     "upgradeValue": 8,
     "cooldown": 10,
-    "range": 15
+    "range": 15,
+    "icon": "/images/skills/icons/18_LightningStrike.png"
   },
   {
     "id": 8,
@@ -117,7 +124,8 @@
     "baseValue": 50,
     "upgradeValue": 2,
     "cooldown": 7,
-    "range": 0
+    "range": 0,
+    "icon": null
   },
   {
     "id": 9,
@@ -132,7 +140,8 @@
     "baseValue": 1500,
     "upgradeValue": 150,
     "cooldown": 12,
-    "range": 3
+    "range": 3,
+    "icon": "/images/skills/icons/03_FireWind.png"
   },
   {
     "id": 10,
@@ -147,7 +156,8 @@
     "baseValue": 310,
     "upgradeValue": 31,
     "cooldown": 7,
-    "range": 8
+    "range": 8,
+    "icon": "/images/skills/icons/01_IceShower.png"
   },
   {
     "id": 11,
@@ -162,7 +172,8 @@
     "baseValue": 30,
     "upgradeValue": 3,
     "cooldown": 20,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/05_Swiftness.png"
   },
   {
     "id": 12,
@@ -177,7 +188,8 @@
     "baseValue": 660,
     "upgradeValue": 66,
     "cooldown": 12,
-    "range": 1
+    "range": 1,
+    "icon": "/images/skills/icons/01_PowerStrike.png"
   },
   {
     "id": 13,
@@ -192,7 +204,8 @@
     "baseValue": 1350,
     "upgradeValue": 135,
     "cooldown": 13,
-    "range": 5
+    "range": 5,
+    "icon": "/images/skills/icons/00_FlameSlash.png"
   },
   {
     "id": 14,
@@ -207,7 +220,8 @@
     "baseValue": 170,
     "upgradeValue": 17,
     "cooldown": 12,
-    "range": 3
+    "range": 3,
+    "icon": "/images/skills/icons/03_IceLancer.png"
   },
   {
     "id": 15,
@@ -222,7 +236,8 @@
     "baseValue": 500,
     "upgradeValue": 50,
     "cooldown": 7,
-    "range": 7
+    "range": 7,
+    "icon": null
   },
   {
     "id": 16,
@@ -237,7 +252,8 @@
     "baseValue": 1060,
     "upgradeValue": 106,
     "cooldown": 10,
-    "range": 5
+    "range": 5,
+    "icon": "/images/skills/icons/03_PowerWave.png"
   },
   {
     "id": 17,
@@ -252,7 +268,8 @@
     "baseValue": 16,
     "upgradeValue": 0.8,
     "cooldown": 5,
-    "range": 10
+    "range": 10,
+    "icon": "/images/skills/icons/06_ProminenceBurn.png"
   },
   {
     "id": 18,
@@ -267,7 +284,8 @@
     "baseValue": 100,
     "upgradeValue": 4,
     "cooldown": 18,
-    "range": 0
+    "range": 0,
+    "icon": null
   },
   {
     "id": 19,
@@ -282,7 +300,8 @@
     "baseValue": 7,
     "upgradeValue": 0.35,
     "cooldown": 5,
-    "range": 20
+    "range": 20,
+    "icon": null
   },
   {
     "id": 20,
@@ -297,7 +316,8 @@
     "baseValue": 8,
     "upgradeValue": 0.4,
     "cooldown": 7,
-    "range": 20
+    "range": 20,
+    "icon": "/images/skills/icons/08_EarthWill.png"
   },
   {
     "id": 21,
@@ -312,7 +332,8 @@
     "baseValue": 700,
     "upgradeValue": 70,
     "cooldown": 4,
-    "range": 7
+    "range": 7,
+    "icon": "/images/skills/icons/05_BlazeWave.png"
   },
   {
     "id": 22,
@@ -327,7 +348,8 @@
     "baseValue": 18,
     "upgradeValue": 0.9,
     "cooldown": 4,
-    "range": 10
+    "range": 10,
+    "icon": null
   },
   {
     "id": 23,
@@ -342,7 +364,8 @@
     "baseValue": 80,
     "upgradeValue": 8,
     "cooldown": 0.5,
-    "range": 3
+    "range": 3,
+    "icon": null
   },
   {
     "id": 24,
@@ -357,7 +380,8 @@
     "baseValue": 50,
     "upgradeValue": 2.5,
     "cooldown": 1,
-    "range": 0
+    "range": 0,
+    "icon": null
   },
   {
     "id": 25,
@@ -372,7 +396,8 @@
     "baseValue": 1920,
     "upgradeValue": 192,
     "cooldown": 15,
-    "range": 7
+    "range": 7,
+    "icon": "/images/skills/icons/02_ExplosionSlash.png"
   },
   {
     "id": 26,
@@ -387,7 +412,8 @@
     "baseValue": 3.5,
     "upgradeValue": 0.1,
     "cooldown": 15,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/14_IceShield.png"
   },
   {
     "id": 27,
@@ -402,7 +428,8 @@
     "baseValue": 40,
     "upgradeValue": 2,
     "cooldown": 1,
-    "range": 10
+    "range": 10,
+    "icon": null
   },
   {
     "id": 28,
@@ -417,7 +444,8 @@
     "baseValue": 30,
     "upgradeValue": 2,
     "cooldown": 20,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/10_LifeStock.png"
   },
   {
     "id": 29,
@@ -432,7 +460,8 @@
     "baseValue": 3330,
     "upgradeValue": 333,
     "cooldown": 12,
-    "range": 3
+    "range": 3,
+    "icon": "/images/skills/icons/04_FireWind_Expert.png"
   },
   {
     "id": 30,
@@ -447,7 +476,8 @@
     "baseValue": 670,
     "upgradeValue": 67,
     "cooldown": 9,
-    "range": 10
+    "range": 10,
+    "icon": "/images/skills/icons/08_IceAge.png"
   },
   {
     "id": 31,
@@ -462,7 +492,8 @@
     "baseValue": 860,
     "upgradeValue": 86,
     "cooldown": 8,
-    "range": 10
+    "range": 10,
+    "icon": "/images/skills/icons/15_DragonThunder.png"
   },
   {
     "id": 32,
@@ -477,7 +508,8 @@
     "baseValue": 750,
     "upgradeValue": 75,
     "cooldown": 15,
-    "range": 1
+    "range": 1,
+    "icon": "/images/skills/icons/02_GigaStrike.png"
   },
   {
     "id": 33,
@@ -492,7 +524,8 @@
     "baseValue": 2,
     "upgradeValue": 0.1,
     "cooldown": 15,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/09_Rage.png"
   },
   {
     "id": 34,
@@ -507,7 +540,8 @@
     "baseValue": 30,
     "upgradeValue": 1,
     "cooldown": 15,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/05_Meditation.png"
   },
   {
     "id": 35,
@@ -522,7 +556,8 @@
     "baseValue": 170,
     "upgradeValue": 17,
     "cooldown": 12,
-    "range": 20
+    "range": 20,
+    "icon": "/images/skills/icons/10_WhiteLightning.png"
   },
   {
     "id": 36,
@@ -537,7 +572,8 @@
     "baseValue": 2580,
     "upgradeValue": 258,
     "cooldown": 10,
-    "range": 5
+    "range": 5,
+    "icon": "/images/skills/icons/04_GigaWave.png"
   },
   {
     "id": 37,
@@ -552,7 +588,8 @@
     "baseValue": 700,
     "upgradeValue": 70,
     "cooldown": 10,
-    "range": 5
+    "range": 5,
+    "icon": "/images/skills/icons/15_DragonBreath.png"
   },
   {
     "id": 38,
@@ -567,7 +604,8 @@
     "baseValue": 650,
     "upgradeValue": 65,
     "cooldown": 10,
-    "range": 30
+    "range": 30,
+    "icon": "/images/skills/icons/06_Blizard.png"
   },
   {
     "id": 39,
@@ -582,7 +620,8 @@
     "baseValue": 260,
     "upgradeValue": 26,
     "cooldown": 5,
-    "range": 7
+    "range": 7,
+    "icon": "/images/skills/icons/06_Supernatural.png"
   },
   {
     "id": 40,
@@ -597,7 +636,8 @@
     "baseValue": 1000,
     "upgradeValue": 100,
     "cooldown": 33,
-    "range": 4
+    "range": 4,
+    "icon": "/images/skills/icons/11_BeastHunt.png"
   },
   {
     "id": 41,
@@ -612,7 +652,8 @@
     "baseValue": 250,
     "upgradeValue": 7,
     "cooldown": 18,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/10_WarriorBurn.png"
   },
   {
     "id": 42,
@@ -627,7 +668,8 @@
     "baseValue": 350,
     "upgradeValue": 10,
     "cooldown": 50,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/66_IceBlast.png"
   },
   {
     "id": 43,
@@ -642,7 +684,8 @@
     "baseValue": 250,
     "upgradeValue": 6,
     "cooldown": 20,
-    "range": 0
+    "range": 0,
+    "icon": null
   },
   {
     "id": 44,
@@ -657,7 +700,8 @@
     "baseValue": 500,
     "upgradeValue": 25,
     "cooldown": 30,
-    "range": 0
+    "range": 0,
+    "icon": "/images/skills/icons/05_Earthquake.png"
   },
   {
     "id": 45,
@@ -672,7 +716,8 @@
     "baseValue": 70,
     "upgradeValue": 10,
     "cooldown": 60,
-    "range": 6
+    "range": 6,
+    "icon": null
   },
   {
     "id": 46,
@@ -687,6 +732,7 @@
     "baseValue": 30,
     "upgradeValue": 10,
     "cooldown": 0,
-    "range": 0
+    "range": 0,
+    "icon": null
   }
 ]

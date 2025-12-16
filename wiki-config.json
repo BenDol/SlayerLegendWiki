@@ -17,7 +17,15 @@
         "allowedBranches": ["main", "dev"],
         "defaultBranch": "main"
       }
-    }
+    },
+    "tools": [
+      {
+        "title": "Skill Builder",
+        "path": "/skill-builder",
+        "icon": "⚔️",
+        "description": "Create and share skill builds"
+      }
+    ]
   },
   "categories": [
     {
@@ -38,10 +46,18 @@
     },
     {
       "id": "guides",
-      "title": "Guides & Tools",
+      "title": "Guides",
       "icon": "📚",
       "order": 3,
-      "sections": ["guides", "database", "tools"]
+      "sections": ["guides", "database"]
+    },
+    {
+      "id": "tools",
+      "title": "Tools",
+      "icon": "🛠️",
+      "order": 4,
+      "expandedByDefault": true,
+      "sections": ["tools"]
     }
   ],
   "sidebar": {
@@ -156,6 +172,7 @@
       "path": "tools",
       "icon": "🛠️",
       "allowContributions": false,
+      "hideTitleInSidebar": true,
       "order": 11
     },
     {

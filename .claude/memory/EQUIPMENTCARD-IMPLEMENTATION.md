@@ -308,11 +308,11 @@ The equipment with higher efficiency gives you more attack power per gold spent!
 
 ## Comparison with SpellCard
 
-| Feature | SpellCard | EquipmentCard |
+| Feature | SkillCard | EquipmentCard |
 |---------|-----------|---------------|
 | **Data Source** | skills.json | equipment.json |
-| **Markdown Syntax** | `<!-- spell:X -->` | `<!-- equipment:X -->` |
-| **Image Loading** | ❌ No images | ✅ Auto-load from database |
+| **Markdown Syntax** | `<!-- skill:X -->` | `<!-- equipment:X -->` |
+| **Image Loading** | ✅ Auto-load icons | ✅ Auto-load from database |
 | **Rarity System** | Grade-based (5 tiers) | Cost-based (5 tiers) |
 | **Stats Display** | 6 main stats | 4 main + 2 calculated |
 | **Visual Design** | Gradient + badges | Gradient + badges |

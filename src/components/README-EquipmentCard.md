@@ -335,7 +335,7 @@ Compatible with all modern browsers:
 
 ## Related Components
 
-- **SpellCard** - Similar component for displaying spell information
+- **SkillCard** - Similar component for displaying skill information
 - **DataDrivenPage** - For loading and displaying equipment lists
 - **SortableTable** - For equipment comparison tables
 - **TierList** - For ranking equipment by effectiveness

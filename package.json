@@ -11,7 +11,8 @@
     "prebuild": "node scripts/copyConfig.js && node scripts/buildSearchIndex.js",
     "build": "vite build",
     "preview": "vite preview",
-    "build:search": "node scripts/buildSearchIndex.js"
+    "build:search": "node scripts/buildSearchIndex.js",
+    "validate:html": "node wiki-framework/scripts/validateHtml.js"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.2.3",
@@ -29,6 +30,7 @@
     "rehype-autolink-headings": "^7.1.0",
     "rehype-highlight": "^7.0.0",
     "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
     "rehype-slug": "^6.0.0",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.0",

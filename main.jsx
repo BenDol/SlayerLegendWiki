@@ -9,14 +9,26 @@ import { initializeBotOctokit } from './wiki-framework/src/services/github/api.j
 initializeBotOctokit();
 
 // Register game-specific content renderers
-import { registerContentProcessor, registerCustomComponents, registerSpellPreview, registerEquipmentPreview } from './wiki-framework/src/utils/contentRendererRegistry.js';
-import { processGameSyntax, getGameComponents, renderSpellPreview, renderEquipmentPreview } from './src/utils/gameContentRenderer.jsx';
+import { registerContentProcessor, registerCustomComponents, registerSkillPreview, registerEquipmentPreview } from './wiki-framework/src/utils/contentRendererRegistry.js';
+import { processGameSyntax, getGameComponents, renderSkillPreview, renderEquipmentPreview } from './src/utils/gameContentRenderer.jsx';
 
-// Register custom markdown processors for spell/equipment cards
+// Register custom markdown processors for skill/equipment cards
 registerContentProcessor(processGameSyntax);
 registerCustomComponents(getGameComponents());
-registerSpellPreview(renderSpellPreview);
+registerSkillPreview(renderSkillPreview);
 registerEquipmentPreview(renderEquipmentPreview);
+
+// Register game-specific custom routes
+import { registerCustomRoutes } from './wiki-framework/src/utils/routeRegistry.js';
+import SkillBuildSimulatorPage from './src/pages/SkillBuildSimulatorPage.jsx';
+
+registerCustomRoutes([
+  {
+    path: 'skill-builder',
+    component: <SkillBuildSimulatorPage />,
+    suspense: true
+  }
+]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getRarityBackgroundColor } from '../../wiki-framework/src/utils/rarityColors';
 
 /**
  * EquipmentCard Component
@@ -128,22 +129,6 @@ const EquipmentCard = ({ name, id, equipment, mode = 'detailed' }) => {
     }
   };
 
-  // Get rarity badge color
-  const getRarityBadgeColor = (rarity) => {
-    switch (rarity) {
-      case 'Legendary':
-        return 'bg-orange-500';
-      case 'Epic':
-        return 'bg-purple-500';
-      case 'Rare':
-        return 'bg-blue-500';
-      case 'Great':
-        return 'bg-green-500';
-      case 'Common':
-      default:
-        return 'bg-gray-500';
-    }
-  };
 
   // Loading state
   if (loading) {
@@ -181,7 +166,7 @@ const EquipmentCard = ({ name, id, equipment, mode = 'detailed' }) => {
 
   const rarity = getRarityTier(equipmentData.requirements);
   const rarityColor = getRarityColor(rarity);
-  const rarityBadgeColor = getRarityBadgeColor(rarity);
+  const rarityBadgeColor = getRarityBackgroundColor(rarity);
 
   // Render based on mode
   if (mode === 'compact') {

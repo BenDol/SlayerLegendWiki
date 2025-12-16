@@ -61,34 +61,36 @@ Parent Project (this repo)       Framework Submodule
 - `wiki-framework/scripts/` - Build scripts
 - `wiki-framework/vite.config.base.js` - Base Vite configuration
 
-## Content Renderer Registry Pattern
+## Registry Patterns
 
-**How to Add Game-Specific Rendering**
+The framework provides registry systems for parent projects to add custom functionality without modifying framework code. This ensures the framework remains generic and reusable.
 
-The framework provides a registry system for parent projects to add custom markdown rendering without modifying framework code.
+### Content Renderer Registry
+
+**How to Add Game-Specific Markdown Rendering**
 
 ### Architecture
 1. **Framework** provides `contentRendererRegistry.js` with `register*()` functions
 2. **Parent project** creates game-specific renderers in `src/utils/gameContentRenderer.js`
 3. **Parent's main.jsx** registers the renderers on app startup
 
-### Example: Spell Card Rendering
+### Example: Skill Card Rendering
 
 **Step 1:** Create custom renderer in parent project (`src/utils/gameContentRenderer.js`):
 ```javascript
-import SpellCard from '../components/SpellCard';
+import SkillCard from '../components/SkillCard';
 
 export const processGameSyntax = (content) => {
-  // Convert <!-- spell:NAME --> to {{SPELL:NAME}}
-  return content.replace(/<!--\s*spell:\s*(.+?)\s*-->/gi, '{{SPELL:$1}}');
+  // Convert <!-- skill:NAME --> to {{SKILL:NAME}}
+  return content.replace(/<!--\s*skill:\s*(.+?)\s*-->/gi, '{{SKILL:$1}}');
 };
 
 export const getGameComponents = () => ({
   p: ({ children, ...props }) => {
     const content = String(children).trim();
-    const match = content.match(/^\{\{SPELL:(.+?)\}\}$/);
+    const match = content.match(/^\{\{SKILL:(.+?)\}\}$/);
     if (match) {
-      return <SpellCard name={match[1]} />;
+      return <SkillCard name={match[1]} />;
     }
     return <p {...props}>{children}</p>;
   }
@@ -106,14 +108,14 @@ registerCustomComponents(getGameComponents());
 
 **Step 3:** Use in markdown:
 ```markdown
-# Fire Spells
+# Fire Skills
 
-<!-- spell:Fire Slash -->
+<!-- skill:Fire Slash -->
 
-This spell does fire damage.
+This skill does fire damage.
 ```
 
-The framework's PageViewer and PageEditor automatically use registered renderers without knowing about SpellCard.
+The framework's PageViewer and PageEditor automatically use registered renderers without knowing about SkillCard.
 
 ### Files Involved
 - **Framework (generic):**
@@ -123,10 +125,63 @@ The framework's PageViewer and PageEditor automatically use registered renderers
   - `wiki-framework/src/pages/PageEditorPage.jsx` - Passes to PageEditor
 - **Parent (game-specific):**
   - `src/utils/gameContentRenderer.js` - Custom renderers
-  - `src/components/SpellCard.jsx` - Game component
+  - `src/components/SkillCard.jsx` - Game component
   - `main.jsx` - Registration
 
 **IMPORTANT:** Never import parent components in framework files. Always use the registry pattern.
+
+### Route Registry
+
+**How to Add Game-Specific Routes**
+
+The framework provides a route registry system for adding custom routes (tools, simulators, etc.) without modifying the framework router.
+
+#### Architecture
+1. **Framework** provides `routeRegistry.js` with `registerCustomRoutes()` function
+2. **Parent project** creates game-specific page components in `src/pages/`
+3. **Parent's main.jsx** registers the routes on app startup
+
+#### Example: Skill Build Simulator
+
+**Step 1:** Create page component in parent project (`src/pages/SkillBuildSimulatorPage.jsx`):
+```javascript
+import SkillBuildSimulator from '../components/SkillBuildSimulator';
+
+const SkillBuildSimulatorPage = () => {
+  return <SkillBuildSimulator />;
+};
+
+export default SkillBuildSimulatorPage;
+```
+
+**Step 2:** Register in `main.jsx`:
+```javascript
+import { registerCustomRoutes } from './wiki-framework/src/utils/routeRegistry.js';
+import SkillBuildSimulatorPage from './src/pages/SkillBuildSimulatorPage.jsx';
+
+registerCustomRoutes([
+  {
+    path: 'skill-builder',
+    component: <SkillBuildSimulatorPage />,
+    suspense: true  // Optional, defaults to true
+  }
+]);
+```
+
+**Step 3:** Access at: `/#/skill-builder`
+
+The framework router automatically includes all registered custom routes at runtime.
+
+#### Files Involved
+- **Framework (generic):**
+  - `wiki-framework/src/utils/routeRegistry.js` - Registry system
+  - `wiki-framework/src/router.jsx` - Uses `getCustomRoutes()`
+- **Parent (game-specific):**
+  - `src/pages/SkillBuildSimulatorPage.jsx` - Custom page
+  - `src/components/SkillBuildSimulator.jsx` - Custom component
+  - `main.jsx` - Registration
+
+**IMPORTANT:** Never import parent routes/pages in framework router. Always use the route registry pattern.
 
 ## Common Development Commands
 
@@ -874,33 +929,33 @@ Four calculator components for Slayer Legend mechanics (located in `src/componen
 3. **FusionCalculator** - Plan equipment fusion with 5:1 ratio
 4. **StatCalculator** - Calculate stat changes after promotion
 
-#### SpellCard Component
-Beautiful card component for displaying spell/skill information (located in `src/components/SpellCard.jsx`):
+#### SkillCard Component
+Beautiful card component for displaying skill information (located in `src/components/SkillCard.jsx`):
 
 Features:
-- Automatically loads spell data from `/data/skills.json`
+- Automatically loads skill data from `/data/skills.json`
 - Color-coded by element (Fire, Water, Wind, Earth)
-- Displays all spell stats (MP Cost, Cooldown, Range, Power, etc.)
+- Displays all skill stats (MP Cost, Cooldown, Range, Power, etc.)
 - Full dark mode support
 - Calculates max level damage automatically
 
 Usage:
 ```jsx
-import SpellCard from '../components/SpellCard';
+import SkillCard from '../components/SkillCard';
 
-// By spell name
-<SpellCard name="Fire Slash" />
+// By skill name
+<SkillCard name="Fire Slash" />
 
-// By spell ID
-<SpellCard id={1} />
+// By skill ID
+<SkillCard id={1} />
 
 // With direct data
-<SpellCard spell={{...spellData}} />
+<SkillCard skill={{...skillData}} />
 ```
 
-See `src/components/README-SpellCard.md` for complete documentation.
+See `src/components/README-SkillCard.md` for complete documentation.
 
-Example implementation: `src/pages/SpellsPage.jsx` (filterable spell gallery)
+Example implementation: `src/pages/SkillsPage.jsx` (filterable skill gallery)
 
 ### Tier Lists
 Visual tier list component:
@@ -986,6 +1041,32 @@ Features:
 
 **Total: 91 content pages**
 
+## Security
+
+### HTML Injection Protection
+
+The wiki uses `rehype-sanitize` to protect against XSS and HTML injection attacks while allowing safe HTML for wiki features.
+
+**Protected Against:**
+- Script injection (`<script>` tags)
+- Event handlers (`onclick`, `onerror`, etc.)
+- JavaScript URLs (`javascript:`)
+- Iframe/object/embed injection
+- Form injection
+- Malicious CSS with JavaScript
+
+**Allowed HTML:**
+- `<span class="text-*">` - Text colors (Tailwind classes only)
+- `<img src="...">` - Images (safe protocols: http, https, relative paths)
+- `<div align="left|center|right">` - Text alignment
+- Standard markdown elements (headings, links, lists, etc.)
+
+**Configuration:** `wiki-framework/src/components/wiki/PageViewer.jsx` - `sanitizeSchema`
+
+**Documentation:** See `wiki-framework/SECURITY.md` for complete details, testing examples, and security best practices.
+
+**Important:** When adding new allowed HTML elements, always assess security risks and test with malicious payloads.
+
 ## Important Constraints
 
 1. **Never modify `wiki-framework/` files** - The framework is a submodule containing generic wiki functionality only
@@ -995,6 +1076,7 @@ Features:
 5. **Restart dev server** after configuration changes
 6. **Use frontmatter** on all markdown files for proper indexing
 7. **Data files must be valid JSON** in `public/data/` directory
+8. **Never bypass HTML sanitization** - Don't use `dangerouslySetInnerHTML` or disable `rehype-sanitize`
 
 ## Component Rendering Order (CRITICAL)
 
