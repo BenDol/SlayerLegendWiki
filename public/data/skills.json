@@ -13,7 +13,7 @@
     "upgradeValue": 40,
     "cooldown": 12,
     "range": 3,
-    "icon": "/images/skills/icons/01_FlameSlash.png"
+    "icon": "/images/skills/icons/00_FlameSlash.png"
   },
   {
     "id": 2,
