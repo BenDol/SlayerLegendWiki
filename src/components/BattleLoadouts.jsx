@@ -211,15 +211,16 @@ const BattleLoadouts = () => {
         familiar: currentLoadout.familiar,
       };
 
-      const response = await fetch('/.netlify/functions/saveBattleLoadout', {
+      const response = await fetch('/.netlify/functions/save-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          type: 'battle-loadout',
           username: user.login,
           userId: user.id,
-          loadout: loadoutData,
+          data: loadoutData,
         }),
       });
 

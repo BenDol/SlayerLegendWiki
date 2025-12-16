@@ -77,15 +77,16 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout }) => {
     setError(null);
 
     try {
-      const response = await fetch('/.netlify/functions/deleteBattleLoadout', {
+      const response = await fetch('/.netlify/functions/delete-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          type: 'battle-loadout',
           username: user.login,
           userId: user.id,
-          loadoutId,
+          itemId: loadoutId,
         }),
       });
 

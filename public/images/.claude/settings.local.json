@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(python extract_skill_icons.py:*)",
+      "Bash(python extract_all_atlas_icons.py:*)",
+      "Bash(python:*)"
     ]
   }
 }

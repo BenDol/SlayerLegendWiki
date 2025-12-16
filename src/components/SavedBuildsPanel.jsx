@@ -87,15 +87,16 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
         slots: currentBuild.slots,
       };
 
-      const response = await fetch('/.netlify/functions/saveSkillBuild', {
+      const response = await fetch('/.netlify/functions/save-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          type: 'skill-build',
           username: user.login,
           userId: user.id,
-          build: buildData,
+          data: buildData,
         }),
       });
 
@@ -129,15 +130,16 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
     setError(null);
 
     try {
-      const response = await fetch('/.netlify/functions/deleteSkillBuild', {
+      const response = await fetch('/.netlify/functions/delete-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          type: 'skill-build',
           username: user.login,
           userId: user.id,
-          buildId,
+          itemId: buildId,
         }),
       });
 
