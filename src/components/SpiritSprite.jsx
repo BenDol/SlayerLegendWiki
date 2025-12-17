@@ -388,8 +388,8 @@ const SpiritSprite = ({
             </div>
           )}
 
-          {/* Animation Controls (show on hover) - only show if we have valid frames */}
-          {framesDetected && validFrames.length > 0 && (
+          {/* Animation Controls (show on hover) - only show if we have valid frames and size is not small */}
+          {framesDetected && validFrames.length > 0 && size !== 'small' && (
             <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-1">
               <div className="flex items-center justify-center gap-2">
               <button

@@ -9,9 +9,8 @@ import { initializeBotOctokit } from './wiki-framework/src/services/github/api.j
 initializeBotOctokit();
 
 // Register game-specific content renderers
-import { registerContentProcessor, registerCustomComponents, registerSkillPreview, registerEquipmentPreview, registerDataAutocompleteSearch } from './wiki-framework/src/utils/contentRendererRegistry.js';
+import { registerContentProcessor, registerCustomComponents, registerSkillPreview, registerEquipmentPreview, registerDataAutocompleteSearch, registerPicker } from './wiki-framework/src/utils/contentRendererRegistry.js';
 import { registerDataSelector } from './wiki-framework/src/utils/dataSelectorRegistry.js';
-import { registerSpiritPicker } from './wiki-framework/src/utils/pickerRegistry.js';
 import { processGameSyntax, getGameComponents, renderSkillPreview, renderEquipmentPreview } from './src/utils/gameContentRenderer.jsx';
 import { searchDataForAutocomplete } from './src/utils/dataAutocompleteSearch.js';
 import DataSelector from './src/components/DataSelector.jsx';
@@ -23,7 +22,7 @@ registerCustomComponents(getGameComponents());
 registerSkillPreview(renderSkillPreview);
 registerEquipmentPreview(renderEquipmentPreview);
 registerDataSelector(DataSelector);
-registerSpiritPicker(SpiritPicker);
+registerPicker('spirit', SpiritPicker);
 registerDataAutocompleteSearch(searchDataForAutocomplete);
 
 // Register data sources for data injection
