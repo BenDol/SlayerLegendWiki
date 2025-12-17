@@ -1,13 +1,18 @@
 ---
 id: information
 title: Spirit Characters
-description: Complete guide to all Spirit characters, their unique skills, and strategic uses
-tags: [spirits, companions, skills, strategy]
+description: >-
+  Complete guide to all Spirit characters, their unique skills, and strategic
+  uses
+tags:
+  - spirits
+  - companions
+  - skills
+  - strategy
 category: Spirits
-date: 2025-12-16
+date: 2025-12-16T00:00:00.000Z
 order: 1
 ---
-
 # Spirit Characters
 
 Spirits are powerful companion characters that provide unique combat abilities and strategic advantages. Each Spirit has a specialized skill that activates during battle, offering different tactical benefits ranging from damage over time to crowd control and resource generation.
@@ -45,7 +50,7 @@ Spirits focused on dealing damage and controlling the battlefield.
 
 ### Sala - Damage Over Time Specialist
 
-<!-- spirit:Sala -->
+<!-- spirit:Sala:1:4 -->
 
 **Best For:** Sustained damage against high-HP enemies, boss battles  
 **Strategy:** Sala excels in prolonged fights where her percentage-based DoT can chip away at large health pools. Pair with defensive Spirits for maximum uptime.
@@ -54,7 +59,7 @@ Spirits focused on dealing damage and controlling the battlefield.
 
 ### Zappy - Execute Specialist
 
-<!-- spirit:Zappy -->
+<!-- spirit:Zappy:1:4 -->
 
 **Best For:** Finishing off weakened enemies, clearing stages faster  
 **Strategy:** Zappy shines when enemies are below the threshold. Use in combination with high-damage dealers to maximize elimination efficiency.
@@ -63,7 +68,7 @@ Spirits focused on dealing damage and controlling the battlefield.
 
 ### Radon - Conditional Damage
 
-<!-- spirit:Radon -->
+<!-- spirit:Radon:1:4 -->
 
 **Best For:** Specific battle scenarios, strategic deployment  
 **Strategy:** Learn the conditions that trigger Radon's bonus damage and optimize your build around maximizing those situations.
@@ -72,7 +77,7 @@ Spirits focused on dealing damage and controlling the battlefield.
 
 ### Kart - First Strike Specialist
 
-<!-- spirit:Kart -->
+<!-- spirit:Kart:1:4 -->
 
 **Best For:** Speed clearing, one-shot builds, stage pushing  
 **Strategy:** Maximize your first hit damage to take full advantage of Kart's bonus. Combine with critical hit builds for devastating opening attacks.
@@ -81,7 +86,7 @@ Spirits focused on dealing damage and controlling the battlefield.
 
 ### Noah - Burst Damage
 
-<!-- spirit:Noah -->
+<!-- spirit:Noah:1:4 -->
 
 **Best For:** Time-limited damage windows, burst phases  
 **Strategy:** Noah provides powerful short-duration damage spikes. Use during boss vulnerable phases or when you need quick elimination.
@@ -94,7 +99,7 @@ Spirits that provide utility, control, and combat advantages.
 
 ### Ark - Time Control
 
-<!-- spirit:Ark -->
+<!-- spirit:Ark:1:4 -->
 
 **Best For:** Surviving difficult encounters, extending buff durations  
 **Strategy:** Ark's time freeze provides breathing room in tough battles. Use it strategically to dodge dangerous attacks or extend important buffs.
@@ -103,7 +108,7 @@ Spirits that provide utility, control, and combat advantages.
 
 ### Herh - Cooldown Reduction
 
-<!-- spirit:Herh -->
+<!-- spirit:Herh:1:4 -->
 
 **Best For:** Skill-focused builds, maximizing ability usage  
 **Strategy:** Herh allows more frequent skill usage. Essential for builds that rely heavily on active abilities. Synergizes well with high-impact cooldown skills.
@@ -116,7 +121,7 @@ Specialized Spirits for specific enemy types.
 
 ### Loar - Dragon Slayer
 
-<!-- spirit:Loar -->
+<!-- spirit:Loar:1:4 -->
 
 **Best For:** Boss battles, dragon encounters, raid content  
 **Strategy:** Loar dramatically increases your boss damage output. Mandatory for serious boss pushing and dragon hunting builds.
@@ -125,7 +130,7 @@ Specialized Spirits for specific enemy types.
 
 ### Mum - Monster Hunter
 
-<!-- spirit:Mum -->
+<!-- spirit:Mum:1:4 -->
 
 **Best For:** Stage clearing, farming, regular monster encounters  
 **Strategy:** Mum speeds up regular combat by boosting damage against normal monsters. Great for efficient stage clearing and farming runs.
@@ -138,7 +143,7 @@ Spirits that help you accumulate gold and experience faster.
 
 ### Todd - Gold Generation
 
-<!-- spirit:Todd -->
+<!-- spirit:Todd:1:4 -->
 
 **Best For:** Gold farming, economic optimization  
 **Strategy:** Todd increases your gold income, essential for upgrading equipment and enhancing gear. Use during gold farming sessions to maximize profits.
@@ -147,7 +152,7 @@ Spirits that help you accumulate gold and experience faster.
 
 ### Luga - Experience Boost
 
-<!-- spirit:Luga -->
+<!-- spirit:Luga:1:4 -->
 
 **Best For:** Leveling, experience farming, progression  
 **Strategy:** Luga accelerates your leveling speed. Crucial during early game and when pushing through level caps. Pair with exp-boosting equipment for maximum effect.
@@ -158,7 +163,7 @@ Spirits that help you accumulate gold and experience faster.
 
 ### Bo - Vitality Boost
 
-<!-- spirit:Bo -->
+<!-- spirit:Bo:1:4 -->
 
 **Best For:** Survival, tanky builds, difficult content  
 **Strategy:** Bo increases your maximum HP, improving survivability. Essential when facing high-damage enemies or learning new content.
