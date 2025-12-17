@@ -10,6 +10,7 @@ import SpiritSprite from './SpiritSprite';
  * <SpiritCard id={4} />
  * <SpiritCard spirit={{...spiritData}} />
  * <SpiritCard name="Loar" mode="compact" />
+ * <SpiritCard name="Loar" mode="compact" inline={false} />
  * <SpiritCard name="Loar" mode="detailed" />
  * <SpiritCard name="Loar" mode="advanced" />
  * <SpiritCard name="Loar" level={4} />
@@ -19,8 +20,9 @@ import SpiritSprite from './SpiritSprite';
  * @param {object} spirit - Direct spirit data object
  * @param {string} mode - Display mode: 'compact', 'detailed' (default), 'advanced'
  * @param {number} level - Evolution level (0-7, default: 0)
+ * @param {boolean} inline - For compact mode: true (default) for inline, false for block-level
  */
-const SpiritCard = ({ id, name, spirit, mode = 'detailed', level = 0 }) => {
+const SpiritCard = ({ id, name, spirit, mode = 'detailed', level = 0, inline = true }) => {
   const [spiritData, setSpiritData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
@@ -105,8 +107,9 @@ const SpiritCard = ({ id, name, spirit, mode = 'detailed', level = 0 }) => {
 
   // Render based on mode
   if (mode === 'compact') {
+    const displayClass = inline ? 'inline-flex' : 'flex';
     return (
-      <div className="not-prose flex items-center gap-2 bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 px-2.5 py-1.5 my-1 max-w-fit">
+      <div className={`not-prose ${displayClass} items-center gap-2 bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 px-2.5 py-1.5 my-1 max-w-fit`}>
         {/* Animated Spirit Sprite - Compact Size */}
         <div className="w-8 h-8 flex-shrink-0">
           <SpiritSprite

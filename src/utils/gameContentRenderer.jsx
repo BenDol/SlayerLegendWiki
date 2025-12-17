@@ -13,8 +13,9 @@ import SpiritCard from '../components/SpiritCard';
  * - {{skill:Fire Slash}} or <!-- skill:Fire Slash --> (defaults to detailed)
  * - {{skill:Fire Slash:compact}} or <!-- skill:Fire Slash:compact -->
  * - {{equipment:Common Sword:detailed}} or <!-- equipment:Common Sword:detailed -->
- * - {{spirit:Loar}} or <!-- spirit:Loar --> (defaults to detailed)
- * - {{spirit:Loar:compact}} or <!-- spirit:Loar:compact -->
+ * - {{spirit:Loar}} or <!-- spirit:Loar --> (defaults to detailed, level 0, inline)
+ * - {{spirit:Loar:compact:4}} or <!-- spirit:Loar:compact:4 --> (compact, level 4, inline)
+ * - {{spirit:Loar:compact:4:block}} or <!-- spirit:Loar:compact:4:block --> (compact, level 4, block)
  * - {{data:spirits:1}} or <!-- data:spirits:1 --> (defaults to card template)
  * - {{data:spirits:1:inline}} or <!-- data:spirits:1:inline -->
  * - {{spirit-sprite:1:0}} or <!-- spirit-sprite:1:0 -->
@@ -58,19 +59,23 @@ export const processGameSyntax = (content) => {
   });
 
   // Process {{spirit:...}} format
-  processed = processed.replace(/\{\{\s*spirit:\s*([^:}]+?)\s*(?::\s*(\w+?)\s*)?(?::\s*(\d+?)\s*)?\}\}/gi, (match, name, mode, level) => {
+  // Syntax: {{spirit:NAME:MODE:LEVEL:DISPLAY}}
+  // Example: {{spirit:Loar:compact:4:inline}} or {{spirit:Loar:compact:4:block}}
+  processed = processed.replace(/\{\{\s*spirit:\s*([^:}]+?)\s*(?::\s*(\w+?)\s*)?(?::\s*(\d+?)\s*)?(?::\s*(inline|block)\s*)?\}\}/gi, (match, name, mode, level, display) => {
     const modeStr = mode || 'detailed';
     const levelStr = level || '0';
-    console.log('[Game Content] Converting {{spirit}}:', match, '→', `{{SPIRIT:${name}:${modeStr}:${levelStr}}}`);
-    return `{{SPIRIT:${name}:${modeStr}:${levelStr}}}`;
+    const displayStr = display || 'inline';
+    console.log('[Game Content] Converting {{spirit}}:', match, '→', `{{SPIRIT:${name}:${modeStr}:${levelStr}:${displayStr}}}`);
+    return `{{SPIRIT:${name}:${modeStr}:${levelStr}:${displayStr}}}`;
   });
 
   // Process <!-- spirit:... --> format (legacy)
-  processed = processed.replace(/<!--\s*spirit:\s*([^:]+?)(?::(\w+?))?(?::(\d+?))?\s*-->/gi, (match, name, mode, level) => {
+  processed = processed.replace(/<!--\s*spirit:\s*([^:]+?)(?::(\w+?))?(?::(\d+?))?(?::(inline|block))?\s*-->/gi, (match, name, mode, level, display) => {
     const modeStr = mode || 'detailed';
     const levelStr = level || '0';
-    console.log('[Game Content] Converting <!-- spirit -->:', match, '→', `{{SPIRIT:${name}:${modeStr}:${levelStr}}}`);
-    return `{{SPIRIT:${name}:${modeStr}:${levelStr}}}`;
+    const displayStr = display || 'inline';
+    console.log('[Game Content] Converting <!-- spirit -->:', match, '→', `{{SPIRIT:${name}:${modeStr}:${levelStr}:${displayStr}}}`);
+    return `{{SPIRIT:${name}:${modeStr}:${levelStr}:${displayStr}}}`;
   });
 
   // Process {{data:...}} format (this is the autocomplete output, needs uppercase conversion)
@@ -208,18 +213,20 @@ export const CustomParagraph = ({ node, children, ...props }) => {
   }
 
   // Check for standalone spirit marker
-  const spiritMatch = content.match(/^\{\{SPIRIT:([^:]+?)(?::(\w+?))?(?::(\d+?))?\}\}$/);
+  const spiritMatch = content.match(/^\{\{SPIRIT:([^:]+?)(?::(\w+?))?(?::(\d+?))?(?::(inline|block))?\}\}$/);
   if (spiritMatch) {
     const spiritIdentifier = spiritMatch[1].trim();
     const mode = spiritMatch[2] || 'detailed';
     const level = spiritMatch[3] ? parseInt(spiritMatch[3]) : 0;
+    const display = spiritMatch[4] || 'inline';
+    const inline = display === 'inline';
     const isId = /^\d+$/.test(spiritIdentifier);
-    console.log('[Game Content] Rendering standalone SpiritCard:', spiritIdentifier, 'mode:', mode, 'level:', level, 'isId:', isId);
+    console.log('[Game Content] Rendering standalone SpiritCard:', spiritIdentifier, 'mode:', mode, 'level:', level, 'display:', display, 'isId:', isId);
 
-    // Render SpiritCard with name or id prop, mode, and level
+    // Render SpiritCard with name or id prop, mode, level, and inline
     const cardProps = isId
-      ? { id: parseInt(spiritIdentifier), mode, level }
-      : { name: spiritIdentifier, mode, level };
+      ? { id: parseInt(spiritIdentifier), mode, level, inline }
+      : { name: spiritIdentifier, mode, level, inline };
     return <SpiritCard {...cardProps} />;
   }
 

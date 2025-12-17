@@ -23,6 +23,7 @@ const SpiritPicker = ({ isOpen, onClose, onSelect, renderPreview = null }) => {
   const [displayMode, setDisplayMode] = useState('detailed');
   const [alignment, setAlignment] = useState('none');
   const [selectedLevel, setSelectedLevel] = useState(4);
+  const [displayInline, setDisplayInline] = useState(true); // Inline by default for compact mode
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
   const spiritsPerPage = 12;
@@ -117,7 +118,7 @@ const SpiritPicker = ({ isOpen, onClose, onSelect, renderPreview = null }) => {
 
   const handleInsert = () => {
     if (!selectedSpirit) return;
-    onSelect({ spirit: selectedSpirit, mode: displayMode, alignment, level: selectedLevel });
+    onSelect({ spirit: selectedSpirit, mode: displayMode, alignment, level: selectedLevel, inline: displayInline });
     onClose();
   };
 
@@ -308,6 +309,37 @@ const SpiritPicker = ({ isOpen, onClose, onSelect, renderPreview = null }) => {
                     ))}
                   </div>
                 </div>
+
+                {/* Inline/Block Toggle (only for compact mode) */}
+                {displayMode === 'compact' && (
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide whitespace-nowrap">
+                      Layout:
+                    </label>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setDisplayInline(true)}
+                        className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                          displayInline
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:border-blue-400'
+                        }`}
+                      >
+                        Inline
+                      </button>
+                      <button
+                        onClick={() => setDisplayInline(false)}
+                        className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                          !displayInline
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:border-blue-400'
+                        }`}
+                      >
+                        Block
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Alignment */}
                 <div className="flex items-center gap-2">
