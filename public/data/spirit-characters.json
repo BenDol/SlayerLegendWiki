@@ -1,0 +1,1121 @@
+{
+  "metadata": {
+    "version": "1.1",
+    "source": "User-provided Spirit character data",
+    "totalSpirits": 12,
+    "description": "Individual Spirit companions with their unique skills and progression",
+    "lastUpdated": "2025-12-16",
+    "spriteInfo": {
+      "totalEvolutionLevels": 8,
+      "framesPerLevel": 16,
+      "basePath": "/images/spirits/",
+      "pattern": "Spirit_{id:03d}_{level}_{frame}.png"
+    }
+  },
+  "spirits": [
+    {
+      "id": 1,
+      "name": "Sala",
+      "image": "/images/spirits/Spirit_001_3_6.png",
+      "element": "Fire",
+      "skill": {
+        "name": "Breath of Fire",
+        "description": "Every 12 seconds after the start of the battle deal remaining 6-10% of hp.",
+        "type": "Damage Over Time",
+        "cooldown": 12,
+        "levels": [
+          {
+            "level": 1,
+            "effect": "6% HP damage"
+          },
+          {
+            "level": 2,
+            "effect": "7% HP damage"
+          },
+          {
+            "level": 3,
+            "effect": "8% HP damage"
+          },
+          {
+            "level": 4,
+            "effect": "9% HP damage"
+          },
+          {
+            "level": 5,
+            "effect": "10% HP damage"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_001_0.png",
+          "spriteSheet": "/images/spirits/Spirit_001_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_001_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_001_1.png",
+          "spriteSheet": "/images/spirits/Spirit_001_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_001_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_001_2.png",
+          "spriteSheet": "/images/spirits/Spirit_001_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_001_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_001_3.png",
+          "spriteSheet": "/images/spirits/Spirit_001_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_001_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_001_4.png",
+          "spriteSheet": "/images/spirits/Spirit_001_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_001_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_001_5.png",
+          "spriteSheet": "/images/spirits/Spirit_001_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_001_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_001_6.png",
+          "spriteSheet": "/images/spirits/Spirit_001_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_001_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_001_7.png",
+          "spriteSheet": "/images/spirits/Spirit_001_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_001_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Ark",
+      "image": "/images/spirits/Spirit_002_3_6.png",
+      "element": "Water",
+      "skill": {
+        "name": "Time Freeze",
+        "description": "After 8 seconds from the start of the battle stop time for 4-10 seconds. Once per battle.",
+        "type": "Crowd Control",
+        "activationDelay": 8,
+        "usesPerBattle": 1,
+        "levels": [
+          {
+            "level": 1,
+            "effect": "4 seconds time stop"
+          },
+          {
+            "level": 2,
+            "effect": "5 seconds time stop"
+          },
+          {
+            "level": 3,
+            "effect": "6 seconds time stop"
+          },
+          {
+            "level": 4,
+            "effect": "8 seconds time stop"
+          },
+          {
+            "level": 5,
+            "effect": "10 seconds time stop"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_002_0.png",
+          "spriteSheet": "/images/spirits/Spirit_002_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_002_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_002_1.png",
+          "spriteSheet": "/images/spirits/Spirit_002_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_002_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_002_2.png",
+          "spriteSheet": "/images/spirits/Spirit_002_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_002_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_002_3.png",
+          "spriteSheet": "/images/spirits/Spirit_002_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_002_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_002_4.png",
+          "spriteSheet": "/images/spirits/Spirit_002_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_002_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_002_5.png",
+          "spriteSheet": "/images/spirits/Spirit_002_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_002_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_002_6.png",
+          "spriteSheet": "/images/spirits/Spirit_002_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_002_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_002_7.png",
+          "spriteSheet": "/images/spirits/Spirit_002_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_002_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Herh",
+      "image": "/images/spirits/Spirit_003_3_6.png",
+      "element": "Wind",
+      "skill": {
+        "name": "Wind Force",
+        "description": "Skill cooldown + 4-6% recovery every 10 seconds.",
+        "type": "Cooldown Reduction",
+        "tickInterval": 10,
+        "levels": [
+          {
+            "level": 1,
+            "effect": "4% cooldown recovery"
+          },
+          {
+            "level": 2,
+            "effect": "4.5% cooldown recovery"
+          },
+          {
+            "level": 3,
+            "effect": "5% cooldown recovery"
+          },
+          {
+            "level": 4,
+            "effect": "5.5% cooldown recovery"
+          },
+          {
+            "level": 5,
+            "effect": "6% cooldown recovery"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_003_0.png",
+          "spriteSheet": "/images/spirits/Spirit_003_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_003_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_003_1.png",
+          "spriteSheet": "/images/spirits/Spirit_003_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_003_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_003_2.png",
+          "spriteSheet": "/images/spirits/Spirit_003_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_003_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_003_3.png",
+          "spriteSheet": "/images/spirits/Spirit_003_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_003_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_003_4.png",
+          "spriteSheet": "/images/spirits/Spirit_003_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_003_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_003_5.png",
+          "spriteSheet": "/images/spirits/Spirit_003_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_003_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_003_6.png",
+          "spriteSheet": "/images/spirits/Spirit_003_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_003_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_003_7.png",
+          "spriteSheet": "/images/spirits/Spirit_003_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_003_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Loar",
+      "image": "/images/spirits/Spirit_004_3_6.png",
+      "element": "Earth",
+      "skill": {
+        "name": "Wilderness Roar",
+        "description": "Increase skill damage to boss monsters by 10-80%.",
+        "type": "Damage Boost",
+        "targetType": "Boss",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "10% boss damage"
+          },
+          {
+            "level": 2,
+            "effect": "22% boss damage"
+          },
+          {
+            "level": 3,
+            "effect": "35% boss damage"
+          },
+          {
+            "level": 4,
+            "effect": "50% boss damage"
+          },
+          {
+            "level": 5,
+            "effect": "80% boss damage"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_004_0.png",
+          "spriteSheet": "/images/spirits/Spirit_004_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_004_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_004_1.png",
+          "spriteSheet": "/images/spirits/Spirit_004_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_004_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_004_2.png",
+          "spriteSheet": "/images/spirits/Spirit_004_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_004_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_004_3.png",
+          "spriteSheet": "/images/spirits/Spirit_004_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_004_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_004_4.png",
+          "spriteSheet": "/images/spirits/Spirit_004_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_004_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_004_5.png",
+          "spriteSheet": "/images/spirits/Spirit_004_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_004_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_004_6.png",
+          "spriteSheet": "/images/spirits/Spirit_004_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_004_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_004_7.png",
+          "spriteSheet": "/images/spirits/Spirit_004_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_004_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Mum",
+      "image": "/images/spirits/Spirit_005_3_6.png",
+      "element": "Fire",
+      "skill": {
+        "name": "Reign",
+        "description": "Skill damage 10-80% against normal monsters",
+        "type": "Damage Boost",
+        "targetType": "Normal",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "10% normal monster damage"
+          },
+          {
+            "level": 2,
+            "effect": "22% normal monster damage"
+          },
+          {
+            "level": 3,
+            "effect": "35% normal monster damage"
+          },
+          {
+            "level": 4,
+            "effect": "50% normal monster damage"
+          },
+          {
+            "level": 5,
+            "effect": "80% normal monster damage"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_005_0.png",
+          "spriteSheet": "/images/spirits/Spirit_005_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_005_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_005_1.png",
+          "spriteSheet": "/images/spirits/Spirit_005_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_005_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_005_2.png",
+          "spriteSheet": "/images/spirits/Spirit_005_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_005_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_005_3.png",
+          "spriteSheet": "/images/spirits/Spirit_005_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_005_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_005_4.png",
+          "spriteSheet": "/images/spirits/Spirit_005_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_005_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_005_5.png",
+          "spriteSheet": "/images/spirits/Spirit_005_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_005_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_005_6.png",
+          "spriteSheet": "/images/spirits/Spirit_005_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_005_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_005_7.png",
+          "spriteSheet": "/images/spirits/Spirit_005_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_005_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Todd",
+      "image": "/images/spirits/Spirit_006_3_6.png",
+      "element": "Water",
+      "skill": {
+        "name": "Gold Rumble",
+        "description": "10-80% chance of obtaining 2x gold whenever acquired.",
+        "type": "Gold Farming",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "10% chance for 2x gold"
+          },
+          {
+            "level": 2,
+            "effect": "22% chance for 2x gold"
+          },
+          {
+            "level": 3,
+            "effect": "35% chance for 2x gold"
+          },
+          {
+            "level": 4,
+            "effect": "50% chance for 2x gold"
+          },
+          {
+            "level": 5,
+            "effect": "80% chance for 2x gold"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_006_0.png",
+          "spriteSheet": "/images/spirits/Spirit_006_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_006_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_006_1.png",
+          "spriteSheet": "/images/spirits/Spirit_006_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_006_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_006_2.png",
+          "spriteSheet": "/images/spirits/Spirit_006_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_006_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_006_3.png",
+          "spriteSheet": "/images/spirits/Spirit_006_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_006_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_006_4.png",
+          "spriteSheet": "/images/spirits/Spirit_006_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_006_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_006_5.png",
+          "spriteSheet": "/images/spirits/Spirit_006_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_006_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_006_6.png",
+          "spriteSheet": "/images/spirits/Spirit_006_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_006_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_006_7.png",
+          "spriteSheet": "/images/spirits/Spirit_006_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_006_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Zappy",
+      "image": "/images/spirits/Spirit_007_3_6.png",
+      "element": "Wind",
+      "skill": {
+        "name": "Judge's Torpedo",
+        "description": "Instantly kills normal monsters with less than 14-30% HP.",
+        "type": "Execute",
+        "targetType": "Normal",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "Execute below 14% HP"
+          },
+          {
+            "level": 2,
+            "effect": "Execute below 18% HP"
+          },
+          {
+            "level": 3,
+            "effect": "Execute below 22% HP"
+          },
+          {
+            "level": 4,
+            "effect": "Execute below 26% HP"
+          },
+          {
+            "level": 5,
+            "effect": "Execute below 30% HP"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_007_0.png",
+          "spriteSheet": "/images/spirits/Spirit_007_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_007_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_007_1.png",
+          "spriteSheet": "/images/spirits/Spirit_007_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_007_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_007_2.png",
+          "spriteSheet": "/images/spirits/Spirit_007_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_007_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_007_3.png",
+          "spriteSheet": "/images/spirits/Spirit_007_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_007_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_007_4.png",
+          "spriteSheet": "/images/spirits/Spirit_007_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_007_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_007_5.png",
+          "spriteSheet": "/images/spirits/Spirit_007_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_007_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_007_6.png",
+          "spriteSheet": "/images/spirits/Spirit_007_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_007_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_007_7.png",
+          "spriteSheet": "/images/spirits/Spirit_007_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_007_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Radon",
+      "image": "/images/spirits/Spirit_008_3_6.png",
+      "element": "Earth",
+      "skill": {
+        "name": "Leveling",
+        "description": "Increases damage dealt to enemies by 10-80% when the enemy's HP is above 70%.",
+        "type": "Conditional Damage",
+        "condition": "Enemy HP > 70%",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "10% damage (HP > 70%)"
+          },
+          {
+            "level": 2,
+            "effect": "22% damage (HP > 70%)"
+          },
+          {
+            "level": 3,
+            "effect": "35% damage (HP > 70%)"
+          },
+          {
+            "level": 4,
+            "effect": "50% damage (HP > 70%)"
+          },
+          {
+            "level": 5,
+            "effect": "80% damage (HP > 70%)"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_008_0.png",
+          "spriteSheet": "/images/spirits/Spirit_008_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_008_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_008_1.png",
+          "spriteSheet": "/images/spirits/Spirit_008_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_008_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_008_2.png",
+          "spriteSheet": "/images/spirits/Spirit_008_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_008_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_008_3.png",
+          "spriteSheet": "/images/spirits/Spirit_008_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_008_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_008_4.png",
+          "spriteSheet": "/images/spirits/Spirit_008_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_008_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_008_5.png",
+          "spriteSheet": "/images/spirits/Spirit_008_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_008_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_008_6.png",
+          "spriteSheet": "/images/spirits/Spirit_008_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_008_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_008_7.png",
+          "spriteSheet": "/images/spirits/Spirit_008_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_008_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Bo",
+      "image": "/images/spirits/Spirit_009_3_6.png",
+      "element": "Fire",
+      "skill": {
+        "name": "Wild Heart",
+        "description": "Total HP increased by 100-500%.",
+        "type": "HP Boost",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "100% HP increase"
+          },
+          {
+            "level": 2,
+            "effect": "180% HP increase"
+          },
+          {
+            "level": 3,
+            "effect": "Unknown",
+            "note": "Data missing"
+          },
+          {
+            "level": 4,
+            "effect": "Unknown",
+            "note": "Data missing"
+          },
+          {
+            "level": 5,
+            "effect": "500% HP increase"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_009_0.png",
+          "spriteSheet": "/images/spirits/Spirit_009_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_009_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_009_1.png",
+          "spriteSheet": "/images/spirits/Spirit_009_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_009_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_009_2.png",
+          "spriteSheet": "/images/spirits/Spirit_009_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_009_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_009_3.png",
+          "spriteSheet": "/images/spirits/Spirit_009_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_009_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_009_4.png",
+          "spriteSheet": "/images/spirits/Spirit_009_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_009_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_009_5.png",
+          "spriteSheet": "/images/spirits/Spirit_009_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_009_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_009_6.png",
+          "spriteSheet": "/images/spirits/Spirit_009_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_009_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_009_7.png",
+          "spriteSheet": "/images/spirits/Spirit_009_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_009_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Luga",
+      "image": "/images/spirits/Spirit_010_3_6.png",
+      "element": "Water",
+      "skill": {
+        "name": "Understanding of the Abyss",
+        "description": "When gaining exp 10-80% chance for double exp.",
+        "type": "EXP Farming",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "10% chance for 2x exp"
+          },
+          {
+            "level": 2,
+            "effect": "22% chance for 2x exp"
+          },
+          {
+            "level": 3,
+            "effect": "35% chance for 2x exp"
+          },
+          {
+            "level": 4,
+            "effect": "50% chance for 2x exp"
+          },
+          {
+            "level": 5,
+            "effect": "80% chance for 2x exp"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_010_0.png",
+          "spriteSheet": "/images/spirits/Spirit_010_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_010_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_010_1.png",
+          "spriteSheet": "/images/spirits/Spirit_010_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_010_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_010_2.png",
+          "spriteSheet": "/images/spirits/Spirit_010_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_010_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_010_3.png",
+          "spriteSheet": "/images/spirits/Spirit_010_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_010_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_010_4.png",
+          "spriteSheet": "/images/spirits/Spirit_010_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_010_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_010_5.png",
+          "spriteSheet": "/images/spirits/Spirit_010_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_010_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_010_6.png",
+          "spriteSheet": "/images/spirits/Spirit_010_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_010_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_010_7.png",
+          "spriteSheet": "/images/spirits/Spirit_010_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_010_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Kart",
+      "image": "/images/spirits/Spirit_011_3_6.png",
+      "element": "Wind",
+      "skill": {
+        "name": "Thief Wind",
+        "description": "When attacking a normal monster for the first time, HP is reduced by 13-25%.",
+        "type": "First Strike",
+        "targetType": "Normal",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "13% HP reduction on first hit"
+          },
+          {
+            "level": 2,
+            "effect": "16% HP reduction on first hit"
+          },
+          {
+            "level": 3,
+            "effect": "19% HP reduction on first hit"
+          },
+          {
+            "level": 4,
+            "effect": "22% HP reduction on first hit"
+          },
+          {
+            "level": 5,
+            "effect": "25% HP reduction on first hit"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_011_0.png",
+          "spriteSheet": "/images/spirits/Spirit_011_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_011_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_011_1.png",
+          "spriteSheet": "/images/spirits/Spirit_011_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_011_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_011_2.png",
+          "spriteSheet": "/images/spirits/Spirit_011_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_011_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_011_3.png",
+          "spriteSheet": "/images/spirits/Spirit_011_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_011_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_011_4.png",
+          "spriteSheet": "/images/spirits/Spirit_011_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_011_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_011_5.png",
+          "spriteSheet": "/images/spirits/Spirit_011_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_011_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_011_6.png",
+          "spriteSheet": "/images/spirits/Spirit_011_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_011_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_011_7.png",
+          "spriteSheet": "/images/spirits/Spirit_011_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_011_7_[0-15].png"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Noah",
+      "image": "/images/spirits/Spirit_012_3_6.png",
+      "element": "Earth",
+      "skill": {
+        "name": "Last Fight",
+        "description": "5 seconds before the end of a battle increase your damage by 1.2-2X.",
+        "type": "Burst Damage",
+        "activationTiming": "Last 5 seconds of battle",
+        "levels": [
+          {
+            "level": 1,
+            "effect": "1.2x damage multiplier"
+          },
+          {
+            "level": 2,
+            "effect": "1.4x damage multiplier"
+          },
+          {
+            "level": 3,
+            "effect": "1.6x damage multiplier"
+          },
+          {
+            "level": 4,
+            "effect": "1.8x damage multiplier"
+          },
+          {
+            "level": 5,
+            "effect": "2x damage multiplier"
+          }
+        ]
+      },
+      "sprites": [
+        {
+          "level": 0,
+          "baseSprite": "/images/spirits/Spirit_012_0.png",
+          "spriteSheet": "/images/spirits/Spirit_012_0_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_012_0_[0-15].png"
+        },
+        {
+          "level": 1,
+          "baseSprite": "/images/spirits/Spirit_012_1.png",
+          "spriteSheet": "/images/spirits/Spirit_012_1_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_012_1_[0-15].png"
+        },
+        {
+          "level": 2,
+          "baseSprite": "/images/spirits/Spirit_012_2.png",
+          "spriteSheet": "/images/spirits/Spirit_012_2_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_012_2_[0-15].png"
+        },
+        {
+          "level": 3,
+          "baseSprite": "/images/spirits/Spirit_012_3.png",
+          "spriteSheet": "/images/spirits/Spirit_012_3_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_012_3_[0-15].png"
+        },
+        {
+          "level": 4,
+          "baseSprite": "/images/spirits/Spirit_012_4.png",
+          "spriteSheet": "/images/spirits/Spirit_012_4_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_012_4_[0-15].png"
+        },
+        {
+          "level": 5,
+          "baseSprite": "/images/spirits/Spirit_012_5.png",
+          "spriteSheet": "/images/spirits/Spirit_012_5_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_012_5_[0-15].png"
+        },
+        {
+          "level": 6,
+          "baseSprite": "/images/spirits/Spirit_012_6.png",
+          "spriteSheet": "/images/spirits/Spirit_012_6_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_012_6_[0-15].png"
+        },
+        {
+          "level": 7,
+          "baseSprite": "/images/spirits/Spirit_012_7.png",
+          "spriteSheet": "/images/spirits/Spirit_012_7_{frame}.png",
+          "animationFrames": 16,
+          "framePattern": "/images/spirits/Spirit_012_7_[0-15].png"
+        }
+      ]
+    }
+  ]
+}

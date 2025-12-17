@@ -1,0 +1,3641 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "source": "Google Sheets (SPIRITS)",
+    "totalLevels": 401,
+    "maxLevel": 400,
+    "description": "Spirit progression system upgrade costs and multipliers"
+  },
+  "spirits": [
+    {
+      "level": 0,
+      "upgradeCosts": {
+        "enhanceCubes": 30,
+        "manaCrystal": 300
+      },
+      "goldExpFactor": 1.0,
+      "attackHpFactor": 3.33
+    },
+    {
+      "level": 1,
+      "upgradeCosts": {
+        "enhanceCubes": 240,
+        "manaCrystal": 315
+      },
+      "goldExpFactor": 1.14,
+      "attackHpFactor": 3.63,
+      "inventoryCapacity": 0
+    },
+    {
+      "level": 2,
+      "upgradeCosts": {
+        "enhanceCubes": 810,
+        "manaCrystal": 331
+      },
+      "goldExpFactor": 1.28,
+      "attackHpFactor": 3.92,
+      "inventoryCapacity": 1
+    },
+    {
+      "level": 3,
+      "upgradeCosts": {
+        "enhanceCubes": 1920,
+        "manaCrystal": 347
+      },
+      "goldExpFactor": 1.41,
+      "attackHpFactor": 4.22,
+      "inventoryCapacity": 2
+    },
+    {
+      "level": 4,
+      "upgradeCosts": {
+        "enhanceCubes": 3750,
+        "manaCrystal": 365
+      },
+      "goldExpFactor": 1.55,
+      "attackHpFactor": 4.52,
+      "inventoryCapacity": 3
+    },
+    {
+      "level": 5,
+      "upgradeCosts": {
+        "enhanceCubes": 6480,
+        "manaCrystal": 383
+      },
+      "goldExpFactor": 1.69,
+      "attackHpFactor": 4.82,
+      "inventoryCapacity": 4
+    },
+    {
+      "level": 6,
+      "upgradeCosts": {
+        "enhanceCubes": 10290,
+        "manaCrystal": 402
+      },
+      "goldExpFactor": 1.83,
+      "attackHpFactor": 5.13,
+      "inventoryCapacity": 5
+    },
+    {
+      "level": 7,
+      "upgradeCosts": {
+        "enhanceCubes": 15360,
+        "manaCrystal": 422
+      },
+      "goldExpFactor": 1.97,
+      "attackHpFactor": 5.44,
+      "inventoryCapacity": 6
+    },
+    {
+      "level": 8,
+      "upgradeCosts": {
+        "enhanceCubes": 21870,
+        "manaCrystal": 443
+      },
+      "goldExpFactor": 2.11,
+      "attackHpFactor": 5.75,
+      "inventoryCapacity": 7
+    },
+    {
+      "level": 9,
+      "upgradeCosts": {
+        "enhanceCubes": 30000,
+        "manaCrystal": 789
+      },
+      "goldExpFactor": 2.26,
+      "attackHpFactor": 6.06,
+      "inventoryCapacity": 8
+    },
+    {
+      "level": 10,
+      "upgradeCosts": {
+        "enhanceCubes": 39930,
+        "manaCrystal": 828
+      },
+      "goldExpFactor": 2.4,
+      "attackHpFactor": 6.37,
+      "inventoryCapacity": 9
+    },
+    {
+      "level": 11,
+      "upgradeCosts": {
+        "enhanceCubes": 51840,
+        "manaCrystal": 870
+      },
+      "goldExpFactor": 2.54,
+      "attackHpFactor": 6.69,
+      "inventoryCapacity": 10
+    },
+    {
+      "level": 12,
+      "upgradeCosts": {
+        "enhanceCubes": 65910,
+        "manaCrystal": 913
+      },
+      "goldExpFactor": 2.68,
+      "attackHpFactor": 7.01,
+      "inventoryCapacity": 11
+    },
+    {
+      "level": 13,
+      "upgradeCosts": {
+        "enhanceCubes": 82320,
+        "manaCrystal": 959
+      },
+      "goldExpFactor": 2.83,
+      "attackHpFactor": 7.34,
+      "inventoryCapacity": 12
+    },
+    {
+      "level": 14,
+      "upgradeCosts": {
+        "enhanceCubes": 101250,
+        "manaCrystal": 1007
+      },
+      "goldExpFactor": 2.97,
+      "attackHpFactor": 7.66,
+      "inventoryCapacity": 13
+    },
+    {
+      "level": 15,
+      "upgradeCosts": {
+        "enhanceCubes": 122880,
+        "manaCrystal": 1057
+      },
+      "goldExpFactor": 3.12,
+      "attackHpFactor": 7.99,
+      "inventoryCapacity": 14
+    },
+    {
+      "level": 16,
+      "upgradeCosts": {
+        "enhanceCubes": 147390,
+        "manaCrystal": 1110
+      },
+      "goldExpFactor": 3.26,
+      "attackHpFactor": 8.32,
+      "inventoryCapacity": 15
+    },
+    {
+      "level": 17,
+      "upgradeCosts": {
+        "enhanceCubes": 174960,
+        "manaCrystal": 1166
+      },
+      "goldExpFactor": 3.41,
+      "attackHpFactor": 8.65,
+      "inventoryCapacity": 16
+    },
+    {
+      "level": 18,
+      "upgradeCosts": {
+        "enhanceCubes": 205770,
+        "manaCrystal": 1224
+      },
+      "goldExpFactor": 3.56,
+      "attackHpFactor": 8.99,
+      "inventoryCapacity": 17
+    },
+    {
+      "level": 19,
+      "upgradeCosts": {
+        "enhanceCubes": 240000,
+        "manaCrystal": 2179
+      },
+      "goldExpFactor": 3.71,
+      "attackHpFactor": 9.33,
+      "inventoryCapacity": 18
+    },
+    {
+      "level": 20,
+      "upgradeCosts": {
+        "enhanceCubes": 277830,
+        "manaCrystal": 2288
+      },
+      "goldExpFactor": 3.85,
+      "attackHpFactor": 9.67,
+      "inventoryCapacity": 19
+    },
+    {
+      "level": 21,
+      "upgradeCosts": {
+        "enhanceCubes": 319440,
+        "manaCrystal": 2402
+      },
+      "goldExpFactor": 4.0,
+      "attackHpFactor": 10.01,
+      "inventoryCapacity": 20
+    },
+    {
+      "level": 22,
+      "upgradeCosts": {
+        "enhanceCubes": 365010,
+        "manaCrystal": 2522
+      },
+      "goldExpFactor": 4.15,
+      "attackHpFactor": 10.36
+    },
+    {
+      "level": 23,
+      "upgradeCosts": {
+        "enhanceCubes": 414720,
+        "manaCrystal": 2648
+      },
+      "goldExpFactor": 4.3,
+      "attackHpFactor": 10.71
+    },
+    {
+      "level": 24,
+      "upgradeCosts": {
+        "enhanceCubes": 468750,
+        "manaCrystal": 2781
+      },
+      "goldExpFactor": 4.45,
+      "attackHpFactor": 11.06
+    },
+    {
+      "level": 25,
+      "upgradeCosts": {
+        "enhanceCubes": 527280,
+        "manaCrystal": 2920
+      },
+      "goldExpFactor": 4.6,
+      "attackHpFactor": 11.42
+    },
+    {
+      "level": 26,
+      "upgradeCosts": {
+        "enhanceCubes": 590490,
+        "manaCrystal": 3066
+      },
+      "goldExpFactor": 4.76,
+      "attackHpFactor": 11.77
+    },
+    {
+      "level": 27,
+      "upgradeCosts": {
+        "enhanceCubes": 658560,
+        "manaCrystal": 3219
+      },
+      "goldExpFactor": 4.91,
+      "attackHpFactor": 12.13
+    },
+    {
+      "level": 28,
+      "upgradeCosts": {
+        "enhanceCubes": 731670,
+        "manaCrystal": 3380
+      },
+      "goldExpFactor": 5.06,
+      "attackHpFactor": 12.5
+    },
+    {
+      "level": 29,
+      "upgradeCosts": {
+        "enhanceCubes": 810000,
+        "manaCrystal": 6016
+      },
+      "goldExpFactor": 5.21,
+      "attackHpFactor": 12.87
+    },
+    {
+      "level": 30,
+      "upgradeCosts": {
+        "enhanceCubes": 893730,
+        "manaCrystal": 6317
+      },
+      "goldExpFactor": 5.37,
+      "attackHpFactor": 13.23
+    },
+    {
+      "level": 31,
+      "upgradeCosts": {
+        "enhanceCubes": 983040,
+        "manaCrystal": 6633
+      },
+      "goldExpFactor": 5.52,
+      "attackHpFactor": 13.61
+    },
+    {
+      "level": 32,
+      "upgradeCosts": {
+        "enhanceCubes": 1078110,
+        "manaCrystal": 6964
+      },
+      "goldExpFactor": 5.68,
+      "attackHpFactor": 13.98
+    },
+    {
+      "level": 33,
+      "upgradeCosts": {
+        "enhanceCubes": 1179120,
+        "manaCrystal": 7312
+      },
+      "goldExpFactor": 5.83,
+      "attackHpFactor": 14.36
+    },
+    {
+      "level": 34,
+      "upgradeCosts": {
+        "enhanceCubes": 1286250,
+        "manaCrystal": 7678
+      },
+      "goldExpFactor": 5.99,
+      "attackHpFactor": 14.74
+    },
+    {
+      "level": 35,
+      "upgradeCosts": {
+        "enhanceCubes": 1399680,
+        "manaCrystal": 8062
+      },
+      "goldExpFactor": 6.15,
+      "attackHpFactor": 15.13
+    },
+    {
+      "level": 36,
+      "upgradeCosts": {
+        "enhanceCubes": 1519590,
+        "manaCrystal": 8465
+      },
+      "goldExpFactor": 6.31,
+      "attackHpFactor": 15.52
+    },
+    {
+      "level": 37,
+      "upgradeCosts": {
+        "enhanceCubes": 1646160,
+        "manaCrystal": 8888
+      },
+      "goldExpFactor": 6.46,
+      "attackHpFactor": 15.91
+    },
+    {
+      "level": 38,
+      "upgradeCosts": {
+        "enhanceCubes": 1779570,
+        "manaCrystal": 9333
+      },
+      "goldExpFactor": 6.62,
+      "attackHpFactor": 16.3
+    },
+    {
+      "level": 39,
+      "upgradeCosts": {
+        "enhanceCubes": 1920000,
+        "manaCrystal": 16612
+      },
+      "goldExpFactor": 6.78,
+      "attackHpFactor": 16.7
+    },
+    {
+      "level": 40,
+      "upgradeCosts": {
+        "enhanceCubes": 2067630,
+        "manaCrystal": 17443
+      },
+      "goldExpFactor": 6.94,
+      "attackHpFactor": 17.1
+    },
+    {
+      "level": 41,
+      "upgradeCosts": {
+        "enhanceCubes": 2222640,
+        "manaCrystal": 18315
+      },
+      "goldExpFactor": 7.11,
+      "attackHpFactor": 17.5
+    },
+    {
+      "level": 42,
+      "upgradeCosts": {
+        "enhanceCubes": 2385210,
+        "manaCrystal": 19231
+      },
+      "goldExpFactor": 7.27,
+      "attackHpFactor": 17.91
+    },
+    {
+      "level": 43,
+      "upgradeCosts": {
+        "enhanceCubes": 2555520,
+        "manaCrystal": 20192
+      },
+      "goldExpFactor": 7.43,
+      "attackHpFactor": 18.32
+    },
+    {
+      "level": 44,
+      "upgradeCosts": {
+        "enhanceCubes": 2733750,
+        "manaCrystal": 21202
+      },
+      "goldExpFactor": 7.59,
+      "attackHpFactor": 18.73
+    },
+    {
+      "level": 45,
+      "upgradeCosts": {
+        "enhanceCubes": 2920080,
+        "manaCrystal": 22262
+      },
+      "goldExpFactor": 7.76,
+      "attackHpFactor": 19.15
+    },
+    {
+      "level": 46,
+      "upgradeCosts": {
+        "enhanceCubes": 3114690,
+        "manaCrystal": 23375
+      },
+      "goldExpFactor": 7.92,
+      "attackHpFactor": 19.57
+    },
+    {
+      "level": 47,
+      "upgradeCosts": {
+        "enhanceCubes": 3317760,
+        "manaCrystal": 24544
+      },
+      "goldExpFactor": 8.09,
+      "attackHpFactor": 19.99
+    },
+    {
+      "level": 48,
+      "upgradeCosts": {
+        "enhanceCubes": 3529470,
+        "manaCrystal": 25771
+      },
+      "goldExpFactor": 8.25,
+      "attackHpFactor": 20.42
+    },
+    {
+      "level": 49,
+      "upgradeCosts": {
+        "enhanceCubes": 3750000,
+        "manaCrystal": 45872
+      },
+      "goldExpFactor": 8.42,
+      "attackHpFactor": 20.85
+    },
+    {
+      "level": 50,
+      "upgradeCosts": {
+        "enhanceCubes": 3979530,
+        "manaCrystal": 48166
+      },
+      "goldExpFactor": 8.58,
+      "attackHpFactor": 21.28
+    },
+    {
+      "level": 51,
+      "upgradeCosts": {
+        "enhanceCubes": 4218240,
+        "manaCrystal": 50574
+      },
+      "goldExpFactor": 8.75,
+      "attackHpFactor": 21.72
+    },
+    {
+      "level": 52,
+      "upgradeCosts": {
+        "enhanceCubes": 4466310,
+        "manaCrystal": 53103
+      },
+      "goldExpFactor": 8.92,
+      "attackHpFactor": 22.16
+    },
+    {
+      "level": 53,
+      "upgradeCosts": {
+        "enhanceCubes": 4723920,
+        "manaCrystal": 55758
+      },
+      "goldExpFactor": 9.09,
+      "attackHpFactor": 22.6
+    },
+    {
+      "level": 54,
+      "upgradeCosts": {
+        "enhanceCubes": 4991250,
+        "manaCrystal": 58546
+      },
+      "goldExpFactor": 9.26,
+      "attackHpFactor": 23.05
+    },
+    {
+      "level": 55,
+      "upgradeCosts": {
+        "enhanceCubes": 5268480,
+        "manaCrystal": 61473
+      },
+      "goldExpFactor": 9.43,
+      "attackHpFactor": 23.5
+    },
+    {
+      "level": 56,
+      "upgradeCosts": {
+        "enhanceCubes": 5555790,
+        "manaCrystal": 64547
+      },
+      "goldExpFactor": 9.6,
+      "attackHpFactor": 23.95
+    },
+    {
+      "level": 57,
+      "upgradeCosts": {
+        "enhanceCubes": 5853360,
+        "manaCrystal": 67774
+      },
+      "goldExpFactor": 9.77,
+      "attackHpFactor": 24.41
+    },
+    {
+      "level": 58,
+      "upgradeCosts": {
+        "enhanceCubes": 6161370,
+        "manaCrystal": 71163
+      },
+      "goldExpFactor": 9.95,
+      "attackHpFactor": 24.87
+    },
+    {
+      "level": 59,
+      "upgradeCosts": {
+        "enhanceCubes": 6480000,
+        "manaCrystal": 126670
+      },
+      "goldExpFactor": 10.12,
+      "attackHpFactor": 25.34
+    },
+    {
+      "level": 60,
+      "upgradeCosts": {
+        "enhanceCubes": 6809430,
+        "manaCrystal": 133004
+      },
+      "goldExpFactor": 10.29,
+      "attackHpFactor": 25.81
+    },
+    {
+      "level": 61,
+      "upgradeCosts": {
+        "enhanceCubes": 7149840,
+        "manaCrystal": 139654
+      },
+      "goldExpFactor": 10.47,
+      "attackHpFactor": 26.28
+    },
+    {
+      "level": 62,
+      "upgradeCosts": {
+        "enhanceCubes": 7501410,
+        "manaCrystal": 146636
+      },
+      "goldExpFactor": 10.64,
+      "attackHpFactor": 26.76
+    },
+    {
+      "level": 63,
+      "upgradeCosts": {
+        "enhanceCubes": 7864320,
+        "manaCrystal": 153968
+      },
+      "goldExpFactor": 10.82,
+      "attackHpFactor": 27.24
+    },
+    {
+      "level": 64,
+      "upgradeCosts": {
+        "enhanceCubes": 8238750,
+        "manaCrystal": 161667
+      },
+      "goldExpFactor": 10.99,
+      "attackHpFactor": 27.73
+    },
+    {
+      "level": 65,
+      "upgradeCosts": {
+        "enhanceCubes": 8624880,
+        "manaCrystal": 169750
+      },
+      "goldExpFactor": 11.17,
+      "attackHpFactor": 28.21
+    },
+    {
+      "level": 66,
+      "upgradeCosts": {
+        "enhanceCubes": 9022890,
+        "manaCrystal": 178238
+      },
+      "goldExpFactor": 11.35,
+      "attackHpFactor": 28.71
+    },
+    {
+      "level": 67,
+      "upgradeCosts": {
+        "enhanceCubes": 9432960,
+        "manaCrystal": 187149
+      },
+      "goldExpFactor": 11.53,
+      "attackHpFactor": 29.2
+    },
+    {
+      "level": 68,
+      "upgradeCosts": {
+        "enhanceCubes": 9855270,
+        "manaCrystal": 196507
+      },
+      "goldExpFactor": 11.71,
+      "attackHpFactor": 29.7
+    },
+    {
+      "level": 69,
+      "upgradeCosts": {
+        "enhanceCubes": 10290000,
+        "manaCrystal": 349782
+      },
+      "goldExpFactor": 11.89,
+      "attackHpFactor": 30.21
+    },
+    {
+      "level": 70,
+      "upgradeCosts": {
+        "enhanceCubes": 10737330,
+        "manaCrystal": 367271
+      },
+      "goldExpFactor": 12.07,
+      "attackHpFactor": 30.72
+    },
+    {
+      "level": 71,
+      "upgradeCosts": {
+        "enhanceCubes": 11197440,
+        "manaCrystal": 385635
+      },
+      "goldExpFactor": 12.25,
+      "attackHpFactor": 31.23
+    },
+    {
+      "level": 72,
+      "upgradeCosts": {
+        "enhanceCubes": 11670510,
+        "manaCrystal": 404917
+      },
+      "goldExpFactor": 12.43,
+      "attackHpFactor": 31.74
+    },
+    {
+      "level": 73,
+      "upgradeCosts": {
+        "enhanceCubes": 12156720,
+        "manaCrystal": 425163
+      },
+      "goldExpFactor": 12.62,
+      "attackHpFactor": 32.26
+    },
+    {
+      "level": 74,
+      "upgradeCosts": {
+        "enhanceCubes": 12656250,
+        "manaCrystal": 446421
+      },
+      "goldExpFactor": 12.8,
+      "attackHpFactor": 32.79
+    },
+    {
+      "level": 75,
+      "upgradeCosts": {
+        "enhanceCubes": 13169280,
+        "manaCrystal": 468742
+      },
+      "goldExpFactor": 12.98,
+      "attackHpFactor": 33.32
+    },
+    {
+      "level": 76,
+      "upgradeCosts": {
+        "enhanceCubes": 13695990,
+        "manaCrystal": 492179
+      },
+      "goldExpFactor": 13.17,
+      "attackHpFactor": 33.85
+    },
+    {
+      "level": 77,
+      "upgradeCosts": {
+        "enhanceCubes": 14236560,
+        "manaCrystal": 516788
+      },
+      "goldExpFactor": 13.36,
+      "attackHpFactor": 34.39
+    },
+    {
+      "level": 78,
+      "upgradeCosts": {
+        "enhanceCubes": 14791170,
+        "manaCrystal": 542627
+      },
+      "goldExpFactor": 13.54,
+      "attackHpFactor": 34.93
+    },
+    {
+      "level": 79,
+      "upgradeCosts": {
+        "enhanceCubes": 15360000,
+        "manaCrystal": 965876
+      },
+      "goldExpFactor": 13.73,
+      "attackHpFactor": 35.48
+    },
+    {
+      "level": 80,
+      "upgradeCosts": {
+        "enhanceCubes": 15943230,
+        "manaCrystal": 1014170
+      },
+      "goldExpFactor": 13.92,
+      "attackHpFactor": 36.03
+    },
+    {
+      "level": 81,
+      "upgradeCosts": {
+        "enhanceCubes": 16541040,
+        "manaCrystal": 1064879
+      },
+      "goldExpFactor": 14.11,
+      "attackHpFactor": 36.58
+    },
+    {
+      "level": 82,
+      "upgradeCosts": {
+        "enhanceCubes": 17153610,
+        "manaCrystal": 1118123
+      },
+      "goldExpFactor": 14.3,
+      "attackHpFactor": 37.14
+    },
+    {
+      "level": 83,
+      "upgradeCosts": {
+        "enhanceCubes": 17781120,
+        "manaCrystal": 1174029
+      },
+      "goldExpFactor": 14.49,
+      "attackHpFactor": 37.71
+    },
+    {
+      "level": 84,
+      "upgradeCosts": {
+        "enhanceCubes": 18423750,
+        "manaCrystal": 1232730
+      },
+      "goldExpFactor": 14.68,
+      "attackHpFactor": 38.27
+    },
+    {
+      "level": 85,
+      "upgradeCosts": {
+        "enhanceCubes": 19081680,
+        "manaCrystal": 1294367
+      },
+      "goldExpFactor": 14.87,
+      "attackHpFactor": 38.85
+    },
+    {
+      "level": 86,
+      "upgradeCosts": {
+        "enhanceCubes": 19755090,
+        "manaCrystal": 1359085
+      },
+      "goldExpFactor": 15.06,
+      "attackHpFactor": 39.42
+    },
+    {
+      "level": 87,
+      "upgradeCosts": {
+        "enhanceCubes": 20444160,
+        "manaCrystal": 1427039
+      },
+      "goldExpFactor": 15.26,
+      "attackHpFactor": 40.01
+    },
+    {
+      "level": 88,
+      "upgradeCosts": {
+        "enhanceCubes": 21149070,
+        "manaCrystal": 1498391
+      },
+      "goldExpFactor": 15.45,
+      "attackHpFactor": 40.59
+    },
+    {
+      "level": 89,
+      "upgradeCosts": {
+        "enhanceCubes": 21870000,
+        "manaCrystal": 2667136
+      },
+      "goldExpFactor": 15.65,
+      "attackHpFactor": 41.18
+    },
+    {
+      "level": 90,
+      "upgradeCosts": {
+        "enhanceCubes": 22607130,
+        "manaCrystal": 2800493
+      },
+      "goldExpFactor": 15.84,
+      "attackHpFactor": 41.78
+    },
+    {
+      "level": 91,
+      "upgradeCosts": {
+        "enhanceCubes": 23360640,
+        "manaCrystal": 2940518
+      },
+      "goldExpFactor": 16.04,
+      "attackHpFactor": 42.38
+    },
+    {
+      "level": 92,
+      "upgradeCosts": {
+        "enhanceCubes": 24130710,
+        "manaCrystal": 3087544
+      },
+      "goldExpFactor": 16.24,
+      "attackHpFactor": 42.99
+    },
+    {
+      "level": 93,
+      "upgradeCosts": {
+        "enhanceCubes": 24917520,
+        "manaCrystal": 3241921
+      },
+      "goldExpFactor": 16.43,
+      "attackHpFactor": 43.6
+    },
+    {
+      "level": 94,
+      "upgradeCosts": {
+        "enhanceCubes": 25721250,
+        "manaCrystal": 3404017
+      },
+      "goldExpFactor": 16.63,
+      "attackHpFactor": 44.21
+    },
+    {
+      "level": 95,
+      "upgradeCosts": {
+        "enhanceCubes": 26542080,
+        "manaCrystal": 3574218
+      },
+      "goldExpFactor": 16.83,
+      "attackHpFactor": 44.83
+    },
+    {
+      "level": 96,
+      "upgradeCosts": {
+        "enhanceCubes": 27380190,
+        "manaCrystal": 3752929
+      },
+      "goldExpFactor": 17.03,
+      "attackHpFactor": 45.46
+    },
+    {
+      "level": 97,
+      "upgradeCosts": {
+        "enhanceCubes": 28235760,
+        "manaCrystal": 3940575
+      },
+      "goldExpFactor": 17.24,
+      "attackHpFactor": 46.09
+    },
+    {
+      "level": 98,
+      "upgradeCosts": {
+        "enhanceCubes": 29108970,
+        "manaCrystal": 4137604
+      },
+      "goldExpFactor": 17.44,
+      "attackHpFactor": 46.72
+    },
+    {
+      "level": 99,
+      "upgradeCosts": {
+        "enhanceCubes": 30000000,
+        "manaCrystal": 7364935
+      },
+      "goldExpFactor": 17.64,
+      "attackHpFactor": 47.36
+    },
+    {
+      "level": 100,
+      "upgradeCosts": {
+        "enhanceCubes": 30909030,
+        "manaCrystal": 7462152
+      },
+      "goldExpFactor": 17.85,
+      "attackHpFactor": 48.01
+    },
+    {
+      "level": 101,
+      "upgradeCosts": {
+        "enhanceCubes": 31836240,
+        "manaCrystal": 7560652
+      },
+      "goldExpFactor": 18.05,
+      "attackHpFactor": 48.66
+    },
+    {
+      "level": 102,
+      "upgradeCosts": {
+        "enhanceCubes": 32781810,
+        "manaCrystal": 7660453
+      },
+      "goldExpFactor": 18.26,
+      "attackHpFactor": 49.32
+    },
+    {
+      "level": 103,
+      "upgradeCosts": {
+        "enhanceCubes": 33745920,
+        "manaCrystal": 7761571
+      },
+      "goldExpFactor": 18.46,
+      "attackHpFactor": 49.98
+    },
+    {
+      "level": 104,
+      "upgradeCosts": {
+        "enhanceCubes": 34728750,
+        "manaCrystal": 7864023
+      },
+      "goldExpFactor": 18.67,
+      "attackHpFactor": 50.64
+    },
+    {
+      "level": 105,
+      "upgradeCosts": {
+        "enhanceCubes": 35730480,
+        "manaCrystal": 7967829
+      },
+      "goldExpFactor": 18.88,
+      "attackHpFactor": 51.32
+    },
+    {
+      "level": 106,
+      "upgradeCosts": {
+        "enhanceCubes": 36751290,
+        "manaCrystal": 8073004
+      },
+      "goldExpFactor": 19.09,
+      "attackHpFactor": 51.99
+    },
+    {
+      "level": 107,
+      "upgradeCosts": {
+        "enhanceCubes": 37791360,
+        "manaCrystal": 8179568
+      },
+      "goldExpFactor": 19.3,
+      "attackHpFactor": 52.68
+    },
+    {
+      "level": 108,
+      "upgradeCosts": {
+        "enhanceCubes": 38850870,
+        "manaCrystal": 8287538
+      },
+      "goldExpFactor": 19.51,
+      "attackHpFactor": 53.36
+    },
+    {
+      "level": 109,
+      "upgradeCosts": {
+        "enhanceCubes": 39930000,
+        "manaCrystal": 10293122
+      },
+      "goldExpFactor": 19.72,
+      "attackHpFactor": 54.06
+    },
+    {
+      "level": 110,
+      "upgradeCosts": {
+        "enhanceCubes": 41028930,
+        "manaCrystal": 10428991
+      },
+      "goldExpFactor": 19.93,
+      "attackHpFactor": 54.76
+    },
+    {
+      "level": 111,
+      "upgradeCosts": {
+        "enhanceCubes": 42147840,
+        "manaCrystal": 10566654
+      },
+      "goldExpFactor": 20.14,
+      "attackHpFactor": 55.46
+    },
+    {
+      "level": 112,
+      "upgradeCosts": {
+        "enhanceCubes": 43286910,
+        "manaCrystal": 10706134
+      },
+      "goldExpFactor": 20.36,
+      "attackHpFactor": 56.17
+    },
+    {
+      "level": 113,
+      "upgradeCosts": {
+        "enhanceCubes": 44446320,
+        "manaCrystal": 10847455
+      },
+      "goldExpFactor": 20.57,
+      "attackHpFactor": 56.89
+    },
+    {
+      "level": 114,
+      "upgradeCosts": {
+        "enhanceCubes": 45626250,
+        "manaCrystal": 10990641
+      },
+      "goldExpFactor": 20.79,
+      "attackHpFactor": 57.61
+    },
+    {
+      "level": 115,
+      "upgradeCosts": {
+        "enhanceCubes": 46826880,
+        "manaCrystal": 11135718
+      },
+      "goldExpFactor": 21.0,
+      "attackHpFactor": 58.34
+    },
+    {
+      "level": 116,
+      "upgradeCosts": {
+        "enhanceCubes": 48048390,
+        "manaCrystal": 11282709
+      },
+      "goldExpFactor": 21.22,
+      "attackHpFactor": 59.07
+    },
+    {
+      "level": 117,
+      "upgradeCosts": {
+        "enhanceCubes": 49290960,
+        "manaCrystal": 11431641
+      },
+      "goldExpFactor": 21.44,
+      "attackHpFactor": 59.81
+    },
+    {
+      "level": 118,
+      "upgradeCosts": {
+        "enhanceCubes": 50554770,
+        "manaCrystal": 11582538
+      },
+      "goldExpFactor": 21.66,
+      "attackHpFactor": 60.56
+    },
+    {
+      "level": 119,
+      "upgradeCosts": {
+        "enhanceCubes": 51840000,
+        "manaCrystal": 14385513
+      },
+      "goldExpFactor": 21.88,
+      "attackHpFactor": 61.31
+    },
+    {
+      "level": 120,
+      "upgradeCosts": {
+        "enhanceCubes": 53146830,
+        "manaCrystal": 14575402
+      },
+      "goldExpFactor": 22.1,
+      "attackHpFactor": 62.06
+    },
+    {
+      "level": 121,
+      "upgradeCosts": {
+        "enhanceCubes": 54475440,
+        "manaCrystal": 14767797
+      },
+      "goldExpFactor": 22.32,
+      "attackHpFactor": 62.83
+    },
+    {
+      "level": 122,
+      "upgradeCosts": {
+        "enhanceCubes": 55826010,
+        "manaCrystal": 14962732
+      },
+      "goldExpFactor": 22.54,
+      "attackHpFactor": 63.6
+    },
+    {
+      "level": 123,
+      "upgradeCosts": {
+        "enhanceCubes": 57198720,
+        "manaCrystal": 15160240
+      },
+      "goldExpFactor": 22.77,
+      "attackHpFactor": 64.37
+    },
+    {
+      "level": 124,
+      "upgradeCosts": {
+        "enhanceCubes": 58593750,
+        "manaCrystal": 15360355
+      },
+      "goldExpFactor": 22.99,
+      "attackHpFactor": 65.15
+    },
+    {
+      "level": 125,
+      "upgradeCosts": {
+        "enhanceCubes": 60011280,
+        "manaCrystal": 15563112
+      },
+      "goldExpFactor": 23.22,
+      "attackHpFactor": 65.94
+    },
+    {
+      "level": 126,
+      "upgradeCosts": {
+        "enhanceCubes": 61451490,
+        "manaCrystal": 15768545
+      },
+      "goldExpFactor": 23.44,
+      "attackHpFactor": 66.74
+    },
+    {
+      "level": 127,
+      "upgradeCosts": {
+        "enhanceCubes": 62914560,
+        "manaCrystal": 15976690
+      },
+      "goldExpFactor": 23.67,
+      "attackHpFactor": 67.54
+    },
+    {
+      "level": 128,
+      "upgradeCosts": {
+        "enhanceCubes": 64400670,
+        "manaCrystal": 16187582
+      },
+      "goldExpFactor": 23.9,
+      "attackHpFactor": 68.34
+    },
+    {
+      "level": 129,
+      "upgradeCosts": {
+        "enhanceCubes": 65910000,
+        "manaCrystal": 20104977
+      },
+      "goldExpFactor": 24.13,
+      "attackHpFactor": 69.16
+    },
+    {
+      "level": 130,
+      "upgradeCosts": {
+        "enhanceCubes": 67442730,
+        "manaCrystal": 20370362
+      },
+      "goldExpFactor": 24.36,
+      "attackHpFactor": 69.98
+    },
+    {
+      "level": 131,
+      "upgradeCosts": {
+        "enhanceCubes": 68999040,
+        "manaCrystal": 20639251
+      },
+      "goldExpFactor": 24.59,
+      "attackHpFactor": 70.8
+    },
+    {
+      "level": 132,
+      "upgradeCosts": {
+        "enhanceCubes": 70579110,
+        "manaCrystal": 20911689
+      },
+      "goldExpFactor": 24.82,
+      "attackHpFactor": 71.64
+    },
+    {
+      "level": 133,
+      "upgradeCosts": {
+        "enhanceCubes": 72183120,
+        "manaCrystal": 21187724
+      },
+      "goldExpFactor": 25.05,
+      "attackHpFactor": 72.48
+    },
+    {
+      "level": 134,
+      "upgradeCosts": {
+        "enhanceCubes": 73811250,
+        "manaCrystal": 21467401
+      },
+      "goldExpFactor": 25.29,
+      "attackHpFactor": 73.32
+    },
+    {
+      "level": 135,
+      "upgradeCosts": {
+        "enhanceCubes": 75463680,
+        "manaCrystal": 21750771
+      },
+      "goldExpFactor": 25.52,
+      "attackHpFactor": 74.18
+    },
+    {
+      "level": 136,
+      "upgradeCosts": {
+        "enhanceCubes": 77140590,
+        "manaCrystal": 22037881
+      },
+      "goldExpFactor": 25.75,
+      "attackHpFactor": 75.04
+    },
+    {
+      "level": 137,
+      "upgradeCosts": {
+        "enhanceCubes": 78842160,
+        "manaCrystal": 22328781
+      },
+      "goldExpFactor": 25.99,
+      "attackHpFactor": 75.9
+    },
+    {
+      "level": 138,
+      "upgradeCosts": {
+        "enhanceCubes": 80568570,
+        "manaCrystal": 22623521
+      },
+      "goldExpFactor": 26.23,
+      "attackHpFactor": 76.78
+    },
+    {
+      "level": 139,
+      "upgradeCosts": {
+        "enhanceCubes": 82320000,
+        "manaCrystal": 28098413
+      },
+      "goldExpFactor": 26.47,
+      "attackHpFactor": 77.66
+    },
+    {
+      "level": 140,
+      "upgradeCosts": {
+        "enhanceCubes": 84096630,
+        "manaCrystal": 28469313
+      },
+      "goldExpFactor": 26.71,
+      "attackHpFactor": 78.54
+    },
+    {
+      "level": 141,
+      "upgradeCosts": {
+        "enhanceCubes": 85898640,
+        "manaCrystal": 28845107
+      },
+      "goldExpFactor": 26.95,
+      "attackHpFactor": 79.44
+    },
+    {
+      "level": 142,
+      "upgradeCosts": {
+        "enhanceCubes": 87726210,
+        "manaCrystal": 29225863
+      },
+      "goldExpFactor": 27.19,
+      "attackHpFactor": 80.34
+    },
+    {
+      "level": 143,
+      "upgradeCosts": {
+        "enhanceCubes": 89579520,
+        "manaCrystal": 29611644
+      },
+      "goldExpFactor": 27.43,
+      "attackHpFactor": 81.25
+    },
+    {
+      "level": 144,
+      "upgradeCosts": {
+        "enhanceCubes": 91458750,
+        "manaCrystal": 30002518
+      },
+      "goldExpFactor": 27.67,
+      "attackHpFactor": 82.17
+    },
+    {
+      "level": 145,
+      "upgradeCosts": {
+        "enhanceCubes": 93364080,
+        "manaCrystal": 30398551
+      },
+      "goldExpFactor": 27.92,
+      "attackHpFactor": 83.09
+    },
+    {
+      "level": 146,
+      "upgradeCosts": {
+        "enhanceCubes": 95295690,
+        "manaCrystal": 30799812
+      },
+      "goldExpFactor": 28.16,
+      "attackHpFactor": 84.02
+    },
+    {
+      "level": 147,
+      "upgradeCosts": {
+        "enhanceCubes": 97253760,
+        "manaCrystal": 31206370
+      },
+      "goldExpFactor": 28.41,
+      "attackHpFactor": 84.96
+    },
+    {
+      "level": 148,
+      "upgradeCosts": {
+        "enhanceCubes": 99238470,
+        "manaCrystal": 31618294
+      },
+      "goldExpFactor": 28.65,
+      "attackHpFactor": 85.91
+    },
+    {
+      "level": 149,
+      "upgradeCosts": {
+        "enhanceCubes": 101250000,
+        "manaCrystal": 39269921
+      },
+      "goldExpFactor": 28.9,
+      "attackHpFactor": 86.86
+    },
+    {
+      "level": 150,
+      "upgradeCosts": {
+        "enhanceCubes": 103288530,
+        "manaCrystal": 39788284
+      },
+      "goldExpFactor": 29.15,
+      "attackHpFactor": 87.82
+    },
+    {
+      "level": 151,
+      "upgradeCosts": {
+        "enhanceCubes": 105354240,
+        "manaCrystal": 40313489
+      },
+      "goldExpFactor": 29.4,
+      "attackHpFactor": 88.79
+    },
+    {
+      "level": 152,
+      "upgradeCosts": {
+        "enhanceCubes": 107447310,
+        "manaCrystal": 40845627
+      },
+      "goldExpFactor": 29.65,
+      "attackHpFactor": 89.77
+    },
+    {
+      "level": 153,
+      "upgradeCosts": {
+        "enhanceCubes": 109567920,
+        "manaCrystal": 41384789
+      },
+      "goldExpFactor": 29.9,
+      "attackHpFactor": 90.76
+    },
+    {
+      "level": 154,
+      "upgradeCosts": {
+        "enhanceCubes": 111716250,
+        "manaCrystal": 41931069
+      },
+      "goldExpFactor": 30.16,
+      "attackHpFactor": 91.75
+    },
+    {
+      "level": 155,
+      "upgradeCosts": {
+        "enhanceCubes": 113892480,
+        "manaCrystal": 42484559
+      },
+      "goldExpFactor": 30.41,
+      "attackHpFactor": 92.75
+    },
+    {
+      "level": 156,
+      "upgradeCosts": {
+        "enhanceCubes": 116096790,
+        "manaCrystal": 43045355
+      },
+      "goldExpFactor": 30.67,
+      "attackHpFactor": 93.76
+    },
+    {
+      "level": 157,
+      "upgradeCosts": {
+        "enhanceCubes": 118329360,
+        "manaCrystal": 43613554
+      },
+      "goldExpFactor": 30.92,
+      "attackHpFactor": 94.77
+    },
+    {
+      "level": 158,
+      "upgradeCosts": {
+        "enhanceCubes": 120590370,
+        "manaCrystal": 44189252
+      },
+      "goldExpFactor": 31.18,
+      "attackHpFactor": 95.8
+    },
+    {
+      "level": 159,
+      "upgradeCosts": {
+        "enhanceCubes": 122880000,
+        "manaCrystal": 54883052
+      },
+      "goldExpFactor": 31.44,
+      "attackHpFactor": 96.83
+    },
+    {
+      "level": 160,
+      "upgradeCosts": {
+        "enhanceCubes": 125198430,
+        "manaCrystal": 55607508
+      },
+      "goldExpFactor": 31.7,
+      "attackHpFactor": 97.87
+    },
+    {
+      "level": 161,
+      "upgradeCosts": {
+        "enhanceCubes": 127545840,
+        "manaCrystal": 56341527
+      },
+      "goldExpFactor": 31.96,
+      "attackHpFactor": 98.92
+    },
+    {
+      "level": 162,
+      "upgradeCosts": {
+        "enhanceCubes": 129922410,
+        "manaCrystal": 57085235
+      },
+      "goldExpFactor": 32.22,
+      "attackHpFactor": 99.98
+    },
+    {
+      "level": 163,
+      "upgradeCosts": {
+        "enhanceCubes": 132328320,
+        "manaCrystal": 57838760
+      },
+      "goldExpFactor": 32.48,
+      "attackHpFactor": 101.05
+    },
+    {
+      "level": 164,
+      "upgradeCosts": {
+        "enhanceCubes": 134763750,
+        "manaCrystal": 58602232
+      },
+      "goldExpFactor": 32.74,
+      "attackHpFactor": 102.12
+    },
+    {
+      "level": 165,
+      "upgradeCosts": {
+        "enhanceCubes": 137228880,
+        "manaCrystal": 59375781
+      },
+      "goldExpFactor": 33.01,
+      "attackHpFactor": 103.21
+    },
+    {
+      "level": 166,
+      "upgradeCosts": {
+        "enhanceCubes": 139723890,
+        "manaCrystal": 60159542
+      },
+      "goldExpFactor": 33.27,
+      "attackHpFactor": 104.3
+    },
+    {
+      "level": 167,
+      "upgradeCosts": {
+        "enhanceCubes": 142248960,
+        "manaCrystal": 60953648
+      },
+      "goldExpFactor": 33.54,
+      "attackHpFactor": 105.4
+    },
+    {
+      "level": 168,
+      "upgradeCosts": {
+        "enhanceCubes": 144804270,
+        "manaCrystal": 61758236
+      },
+      "goldExpFactor": 33.81,
+      "attackHpFactor": 106.51
+    },
+    {
+      "level": 169,
+      "upgradeCosts": {
+        "enhanceCubes": 147390000,
+        "manaCrystal": 76703729
+      },
+      "goldExpFactor": 34.07,
+      "attackHpFactor": 107.63
+    },
+    {
+      "level": 170,
+      "upgradeCosts": {
+        "enhanceCubes": 150006330,
+        "manaCrystal": 77716218
+      },
+      "goldExpFactor": 34.34,
+      "attackHpFactor": 108.76
+    },
+    {
+      "level": 171,
+      "upgradeCosts": {
+        "enhanceCubes": 152653440,
+        "manaCrystal": 78742072
+      },
+      "goldExpFactor": 34.62,
+      "attackHpFactor": 109.89
+    },
+    {
+      "level": 172,
+      "upgradeCosts": {
+        "enhanceCubes": 155331510,
+        "manaCrystal": 79781467
+      },
+      "goldExpFactor": 34.89,
+      "attackHpFactor": 111.04
+    },
+    {
+      "level": 173,
+      "upgradeCosts": {
+        "enhanceCubes": 158040720,
+        "manaCrystal": 80834583
+      },
+      "goldExpFactor": 35.16,
+      "attackHpFactor": 112.19
+    },
+    {
+      "level": 174,
+      "upgradeCosts": {
+        "enhanceCubes": 160781250,
+        "manaCrystal": 81901599
+      },
+      "goldExpFactor": 35.43,
+      "attackHpFactor": 113.36
+    },
+    {
+      "level": 175,
+      "upgradeCosts": {
+        "enhanceCubes": 163553280,
+        "manaCrystal": 82982700
+      },
+      "goldExpFactor": 35.71,
+      "attackHpFactor": 114.53
+    },
+    {
+      "level": 176,
+      "upgradeCosts": {
+        "enhanceCubes": 166356990,
+        "manaCrystal": 84078072
+      },
+      "goldExpFactor": 35.99,
+      "attackHpFactor": 115.71
+    },
+    {
+      "level": 177,
+      "upgradeCosts": {
+        "enhanceCubes": 169192560,
+        "manaCrystal": 85187903
+      },
+      "goldExpFactor": 36.26,
+      "attackHpFactor": 116.91
+    },
+    {
+      "level": 178,
+      "upgradeCosts": {
+        "enhanceCubes": 172060170,
+        "manaCrystal": 86312383
+      },
+      "goldExpFactor": 36.54,
+      "attackHpFactor": 118.11
+    },
+    {
+      "level": 179,
+      "upgradeCosts": {
+        "enhanceCubes": 174960000,
+        "manaCrystal": 107199979
+      },
+      "goldExpFactor": 36.82,
+      "attackHpFactor": 119.32
+    },
+    {
+      "level": 180,
+      "upgradeCosts": {
+        "enhanceCubes": 177892230,
+        "manaCrystal": 108615019
+      },
+      "goldExpFactor": 37.1,
+      "attackHpFactor": 120.54
+    },
+    {
+      "level": 181,
+      "upgradeCosts": {
+        "enhanceCubes": 180857040,
+        "manaCrystal": 110048737
+      },
+      "goldExpFactor": 37.38,
+      "attackHpFactor": 121.77
+    },
+    {
+      "level": 182,
+      "upgradeCosts": {
+        "enhanceCubes": 183854610,
+        "manaCrystal": 111501381
+      },
+      "goldExpFactor": 37.67,
+      "attackHpFactor": 123.01
+    },
+    {
+      "level": 183,
+      "upgradeCosts": {
+        "enhanceCubes": 186885120,
+        "manaCrystal": 112973199
+      },
+      "goldExpFactor": 37.95,
+      "attackHpFactor": 124.26
+    },
+    {
+      "level": 184,
+      "upgradeCosts": {
+        "enhanceCubes": 189948750,
+        "manaCrystal": 114464445
+      },
+      "goldExpFactor": 38.23,
+      "attackHpFactor": 125.52
+    },
+    {
+      "level": 185,
+      "upgradeCosts": {
+        "enhanceCubes": 193045680,
+        "manaCrystal": 115975376
+      },
+      "goldExpFactor": 38.52,
+      "attackHpFactor": 126.8
+    },
+    {
+      "level": 186,
+      "upgradeCosts": {
+        "enhanceCubes": 196176090,
+        "manaCrystal": 117506251
+      },
+      "goldExpFactor": 38.81,
+      "attackHpFactor": 128.08
+    },
+    {
+      "level": 187,
+      "upgradeCosts": {
+        "enhanceCubes": 199340160,
+        "manaCrystal": 119057333
+      },
+      "goldExpFactor": 39.1,
+      "attackHpFactor": 129.37
+    },
+    {
+      "level": 188,
+      "upgradeCosts": {
+        "enhanceCubes": 202538070,
+        "manaCrystal": 120628890
+      },
+      "goldExpFactor": 39.39,
+      "attackHpFactor": 130.67
+    },
+    {
+      "level": 189,
+      "upgradeCosts": {
+        "enhanceCubes": 205770000,
+        "manaCrystal": 149821082
+      },
+      "goldExpFactor": 39.68,
+      "attackHpFactor": 131.98
+    },
+    {
+      "level": 190,
+      "upgradeCosts": {
+        "enhanceCubes": 209036130,
+        "manaCrystal": 151798720
+      },
+      "goldExpFactor": 39.97,
+      "attackHpFactor": 133.3
+    },
+    {
+      "level": 191,
+      "upgradeCosts": {
+        "enhanceCubes": 212336640,
+        "manaCrystal": 153802463
+      },
+      "goldExpFactor": 40.26,
+      "attackHpFactor": 134.64
+    },
+    {
+      "level": 192,
+      "upgradeCosts": {
+        "enhanceCubes": 215671710,
+        "manaCrystal": 155832656
+      },
+      "goldExpFactor": 40.56,
+      "attackHpFactor": 135.98
+    },
+    {
+      "level": 193,
+      "upgradeCosts": {
+        "enhanceCubes": 219041520,
+        "manaCrystal": 157889647
+      },
+      "goldExpFactor": 40.85,
+      "attackHpFactor": 137.34
+    },
+    {
+      "level": 194,
+      "upgradeCosts": {
+        "enhanceCubes": 222446250,
+        "manaCrystal": 159973790
+      },
+      "goldExpFactor": 41.15,
+      "attackHpFactor": 138.7
+    },
+    {
+      "level": 195,
+      "upgradeCosts": {
+        "enhanceCubes": 225886080,
+        "manaCrystal": 162085444
+      },
+      "goldExpFactor": 41.45,
+      "attackHpFactor": 140.08
+    },
+    {
+      "level": 196,
+      "upgradeCosts": {
+        "enhanceCubes": 229361190,
+        "manaCrystal": 164224972
+      },
+      "goldExpFactor": 41.75,
+      "attackHpFactor": 141.46
+    },
+    {
+      "level": 197,
+      "upgradeCosts": {
+        "enhanceCubes": 232871760,
+        "manaCrystal": 166392741
+      },
+      "goldExpFactor": 42.05,
+      "attackHpFactor": 142.86
+    },
+    {
+      "level": 198,
+      "upgradeCosts": {
+        "enhanceCubes": 236417970,
+        "manaCrystal": 168589126
+      },
+      "goldExpFactor": 42.35,
+      "attackHpFactor": 144.27
+    },
+    {
+      "level": 199,
+      "upgradeCosts": {
+        "enhanceCubes": 240000000,
+        "manaCrystal": 209387694
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 200,
+      "upgradeCosts": {
+        "enhanceCubes": 243618030,
+        "manaCrystal": 212151612
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 201,
+      "upgradeCosts": {
+        "enhanceCubes": 247272240,
+        "manaCrystal": 214952013
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 202,
+      "upgradeCosts": {
+        "enhanceCubes": 250962810,
+        "manaCrystal": 217789379
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 203,
+      "upgradeCosts": {
+        "enhanceCubes": 254689920,
+        "manaCrystal": 220664199
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 204,
+      "upgradeCosts": {
+        "enhanceCubes": 258453750,
+        "manaCrystal": 223576967
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 205,
+      "upgradeCosts": {
+        "enhanceCubes": 262254480,
+        "manaCrystal": 226528183
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 206,
+      "upgradeCosts": {
+        "enhanceCubes": 266092290,
+        "manaCrystal": 229518355
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 207,
+      "upgradeCosts": {
+        "enhanceCubes": 269967360,
+        "manaCrystal": 232547997
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 208,
+      "upgradeCosts": {
+        "enhanceCubes": 273879870,
+        "manaCrystal": 235617630
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 209,
+      "upgradeCosts": {
+        "enhanceCubes": 277830000,
+        "manaCrystal": 292637097
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 210,
+      "upgradeCosts": {
+        "enhanceCubes": 281817930,
+        "manaCrystal": 296499907
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 211,
+      "upgradeCosts": {
+        "enhanceCubes": 285843840,
+        "manaCrystal": 300413706
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 212,
+      "upgradeCosts": {
+        "enhanceCubes": 289907910,
+        "manaCrystal": 304379166
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 213,
+      "upgradeCosts": {
+        "enhanceCubes": 294010320,
+        "manaCrystal": 308396971
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 214,
+      "upgradeCosts": {
+        "enhanceCubes": 298151250,
+        "manaCrystal": 312467811
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 215,
+      "upgradeCosts": {
+        "enhanceCubes": 302330880,
+        "manaCrystal": 316592387
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 216,
+      "upgradeCosts": {
+        "enhanceCubes": 306549390,
+        "manaCrystal": 320771406
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 217,
+      "upgradeCosts": {
+        "enhanceCubes": 310806960,
+        "manaCrystal": 325005589
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 218,
+      "upgradeCosts": {
+        "enhanceCubes": 315103770,
+        "manaCrystal": 329295662
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 219,
+      "upgradeCosts": {
+        "enhanceCubes": 319440000,
+        "manaCrystal": 408985213
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 220,
+      "upgradeCosts": {
+        "enhanceCubes": 323815830,
+        "manaCrystal": 414383818
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 221,
+      "upgradeCosts": {
+        "enhanceCubes": 328231440,
+        "manaCrystal": 419853684
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 222,
+      "upgradeCosts": {
+        "enhanceCubes": 332687010,
+        "manaCrystal": 425395753
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 223,
+      "upgradeCosts": {
+        "enhanceCubes": 337182720,
+        "manaCrystal": 431010976
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 224,
+      "upgradeCosts": {
+        "enhanceCubes": 341718750,
+        "manaCrystal": 436700321
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 225,
+      "upgradeCosts": {
+        "enhanceCubes": 346295280,
+        "manaCrystal": 442464766
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 226,
+      "upgradeCosts": {
+        "enhanceCubes": 350912490,
+        "manaCrystal": 448305301
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 227,
+      "upgradeCosts": {
+        "enhanceCubes": 355570560,
+        "manaCrystal": 454222930
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 228,
+      "upgradeCosts": {
+        "enhanceCubes": 360269670,
+        "manaCrystal": 460218673
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 229,
+      "upgradeCosts": {
+        "enhanceCubes": 365010000,
+        "manaCrystal": 571591592
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 230,
+      "upgradeCosts": {
+        "enhanceCubes": 369791730,
+        "manaCrystal": 579136601
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 231,
+      "upgradeCosts": {
+        "enhanceCubes": 374615040,
+        "manaCrystal": 586781204
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 232,
+      "upgradeCosts": {
+        "enhanceCubes": 379480110,
+        "manaCrystal": 594526716
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 233,
+      "upgradeCosts": {
+        "enhanceCubes": 384387120,
+        "manaCrystal": 602374469
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 234,
+      "upgradeCosts": {
+        "enhanceCubes": 389336250,
+        "manaCrystal": 610325812
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 235,
+      "upgradeCosts": {
+        "enhanceCubes": 394327680,
+        "manaCrystal": 618382112
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 236,
+      "upgradeCosts": {
+        "enhanceCubes": 399361590,
+        "manaCrystal": 626544756
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 237,
+      "upgradeCosts": {
+        "enhanceCubes": 404438160,
+        "manaCrystal": 634815147
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 238,
+      "upgradeCosts": {
+        "enhanceCubes": 409557570,
+        "manaCrystal": 643194707
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 239,
+      "upgradeCosts": {
+        "enhanceCubes": 414720000,
+        "manaCrystal": 798847826
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 240,
+      "upgradeCosts": {
+        "enhanceCubes": 419925630,
+        "manaCrystal": 809392617
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 241,
+      "upgradeCosts": {
+        "enhanceCubes": 425174640,
+        "manaCrystal": 820076600
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 242,
+      "upgradeCosts": {
+        "enhanceCubes": 430467210,
+        "manaCrystal": 830901611
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 243,
+      "upgradeCosts": {
+        "enhanceCubes": 435803520,
+        "manaCrystal": 841869512
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 244,
+      "upgradeCosts": {
+        "enhanceCubes": 441183750,
+        "manaCrystal": 852982190
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 245,
+      "upgradeCosts": {
+        "enhanceCubes": 446608080,
+        "manaCrystal": 864241555
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 246,
+      "upgradeCosts": {
+        "enhanceCubes": 452076690,
+        "manaCrystal": 875649543
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 247,
+      "upgradeCosts": {
+        "enhanceCubes": 457589760,
+        "manaCrystal": 887208117
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 248,
+      "upgradeCosts": {
+        "enhanceCubes": 463147470,
+        "manaCrystal": 898919265
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 249,
+      "upgradeCosts": {
+        "enhanceCubes": 468750000,
+        "manaCrystal": 1116457727
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 250,
+      "upgradeCosts": {
+        "enhanceCubes": 474397530,
+        "manaCrystal": 1131194969
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 251,
+      "upgradeCosts": {
+        "enhanceCubes": 480090240,
+        "manaCrystal": 1146126742
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 252,
+      "upgradeCosts": {
+        "enhanceCubes": 485828310,
+        "manaCrystal": 1161255615
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 253,
+      "upgradeCosts": {
+        "enhanceCubes": 491611920,
+        "manaCrystal": 1176584189
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 254,
+      "upgradeCosts": {
+        "enhanceCubes": 497441250,
+        "manaCrystal": 1192115101
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 255,
+      "upgradeCosts": {
+        "enhanceCubes": 503316480,
+        "manaCrystal": 1207851020
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 256,
+      "upgradeCosts": {
+        "enhanceCubes": 509237790,
+        "manaCrystal": 1223794653
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 257,
+      "upgradeCosts": {
+        "enhanceCubes": 515205360,
+        "manaCrystal": 1239948743
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 258,
+      "upgradeCosts": {
+        "enhanceCubes": 521219370,
+        "manaCrystal": 1256316066
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 259,
+      "upgradeCosts": {
+        "enhanceCubes": 527280000,
+        "manaCrystal": 1560344554
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 260,
+      "upgradeCosts": {
+        "enhanceCubes": 533387430,
+        "manaCrystal": 1580941102
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 261,
+      "upgradeCosts": {
+        "enhanceCubes": 539541840,
+        "manaCrystal": 1601809525
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 262,
+      "upgradeCosts": {
+        "enhanceCubes": 545743410,
+        "manaCrystal": 1622953411
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 263,
+      "upgradeCosts": {
+        "enhanceCubes": 551992320,
+        "manaCrystal": 1644376396
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 264,
+      "upgradeCosts": {
+        "enhanceCubes": 558288750,
+        "manaCrystal": 1666082164
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 265,
+      "upgradeCosts": {
+        "enhanceCubes": 564632880,
+        "manaCrystal": 1688074449
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 266,
+      "upgradeCosts": {
+        "enhanceCubes": 571024890,
+        "manaCrystal": 1710357031
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 267,
+      "upgradeCosts": {
+        "enhanceCubes": 577464960,
+        "manaCrystal": 1732933744
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 268,
+      "upgradeCosts": {
+        "enhanceCubes": 583953270,
+        "manaCrystal": 1755808470
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 269,
+      "upgradeCosts": {
+        "enhanceCubes": 590490000,
+        "manaCrystal": 2180714119
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 270,
+      "upgradeCosts": {
+        "enhanceCubes": 597075330,
+        "manaCrystal": 2209499546
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 271,
+      "upgradeCosts": {
+        "enhanceCubes": 603709440,
+        "manaCrystal": 2238664940
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 272,
+      "upgradeCosts": {
+        "enhanceCubes": 610392510,
+        "manaCrystal": 2268215317
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 273,
+      "upgradeCosts": {
+        "enhanceCubes": 617124720,
+        "manaCrystal": 2298155759
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 274,
+      "upgradeCosts": {
+        "enhanceCubes": 623906250,
+        "manaCrystal": 2328491415
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 275,
+      "upgradeCosts": {
+        "enhanceCubes": 630737280,
+        "manaCrystal": 2359227502
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 276,
+      "upgradeCosts": {
+        "enhanceCubes": 637617990,
+        "manaCrystal": 2390369305
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 277,
+      "upgradeCosts": {
+        "enhanceCubes": 644548560,
+        "manaCrystal": 2421922179
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 278,
+      "upgradeCosts": {
+        "enhanceCubes": 651529170,
+        "manaCrystal": 2453891552
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 279,
+      "upgradeCosts": {
+        "enhanceCubes": 658560000,
+        "manaCrystal": 3047733308
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 280,
+      "upgradeCosts": {
+        "enhanceCubes": 665641230,
+        "manaCrystal": 3087963388
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 281,
+      "upgradeCosts": {
+        "enhanceCubes": 672773040,
+        "manaCrystal": 3128724504
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 282,
+      "upgradeCosts": {
+        "enhanceCubes": 679955610,
+        "manaCrystal": 3170023668
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 283,
+      "upgradeCosts": {
+        "enhanceCubes": 687189120,
+        "manaCrystal": 3211867980
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 284,
+      "upgradeCosts": {
+        "enhanceCubes": 694473750,
+        "manaCrystal": 3254264637
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 285,
+      "upgradeCosts": {
+        "enhanceCubes": 701809680,
+        "manaCrystal": 3297220931
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 286,
+      "upgradeCosts": {
+        "enhanceCubes": 709197090,
+        "manaCrystal": 3340744247
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 287,
+      "upgradeCosts": {
+        "enhanceCubes": 716636160,
+        "manaCrystal": 3384842071
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 288,
+      "upgradeCosts": {
+        "enhanceCubes": 724127070,
+        "manaCrystal": 3429521986
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 289,
+      "upgradeCosts": {
+        "enhanceCubes": 731670000,
+        "manaCrystal": 4259466307
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 290,
+      "upgradeCosts": {
+        "enhanceCubes": 739265130,
+        "manaCrystal": 4315691262
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 291,
+      "upgradeCosts": {
+        "enhanceCubes": 746912640,
+        "manaCrystal": 4372658387
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 292,
+      "upgradeCosts": {
+        "enhanceCubes": 754612710,
+        "manaCrystal": 4430377478
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 293,
+      "upgradeCosts": {
+        "enhanceCubes": 762365520,
+        "manaCrystal": 4488858460
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 294,
+      "upgradeCosts": {
+        "enhanceCubes": 770171250,
+        "manaCrystal": 4548111392
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 295,
+      "upgradeCosts": {
+        "enhanceCubes": 778030080,
+        "manaCrystal": 4608146462
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 296,
+      "upgradeCosts": {
+        "enhanceCubes": 785942190,
+        "manaCrystal": 4668973996
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 297,
+      "upgradeCosts": {
+        "enhanceCubes": 793907760,
+        "manaCrystal": 4730604453
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 298,
+      "upgradeCosts": {
+        "enhanceCubes": 801926970,
+        "manaCrystal": 4793048431
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 299,
+      "upgradeCosts": {
+        "enhanceCubes": 810000000,
+        "manaCrystal": 5952966152
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 300,
+      "upgradeCosts": {
+        "enhanceCubes": 818127030,
+        "manaCrystal": 6031545305
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 301,
+      "upgradeCosts": {
+        "enhanceCubes": 826308240,
+        "manaCrystal": 6111161703
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 302,
+      "upgradeCosts": {
+        "enhanceCubes": 834543810,
+        "manaCrystal": 6191829037
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 303,
+      "upgradeCosts": {
+        "enhanceCubes": 842833920,
+        "manaCrystal": 6273561181
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 304,
+      "upgradeCosts": {
+        "enhanceCubes": 851178750,
+        "manaCrystal": 6356372188
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 305,
+      "upgradeCosts": {
+        "enhanceCubes": 859578480,
+        "manaCrystal": 6440276301
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 306,
+      "upgradeCosts": {
+        "enhanceCubes": 868033290,
+        "manaCrystal": 6525287948
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 307,
+      "upgradeCosts": {
+        "enhanceCubes": 876543360,
+        "manaCrystal": 6611421749
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 308,
+      "upgradeCosts": {
+        "enhanceCubes": 885108870,
+        "manaCrystal": 6698692516
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 309,
+      "upgradeCosts": {
+        "enhanceCubes": 893730000,
+        "manaCrystal": 8319776105
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 310,
+      "upgradeCosts": {
+        "enhanceCubes": 902406930,
+        "manaCrystal": 8429597150
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 311,
+      "upgradeCosts": {
+        "enhanceCubes": 911139840,
+        "manaCrystal": 8540867832
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 312,
+      "upgradeCosts": {
+        "enhanceCubes": 919928910,
+        "manaCrystal": 8653607288
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 313,
+      "upgradeCosts": {
+        "enhanceCubes": 928774320,
+        "manaCrystal": 8767834904
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 314,
+      "upgradeCosts": {
+        "enhanceCubes": 937676250,
+        "manaCrystal": 8883570325
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 315,
+      "upgradeCosts": {
+        "enhanceCubes": 946634880,
+        "manaCrystal": 9000833453
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 316,
+      "upgradeCosts": {
+        "enhanceCubes": 955650390,
+        "manaCrystal": 9119644454
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 317,
+      "upgradeCosts": {
+        "enhanceCubes": 964722960,
+        "manaCrystal": 9240023761
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 318,
+      "upgradeCosts": {
+        "enhanceCubes": 973852770,
+        "manaCrystal": 9361992075
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 319,
+      "upgradeCosts": {
+        "enhanceCubes": 983040000,
+        "manaCrystal": 11627594157
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 320,
+      "upgradeCosts": {
+        "enhanceCubes": 992284830,
+        "manaCrystal": 11781078400
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 321,
+      "upgradeCosts": {
+        "enhanceCubes": 1001587440,
+        "manaCrystal": 11936588635
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 322,
+      "upgradeCosts": {
+        "enhanceCubes": 1010948010,
+        "manaCrystal": 12094151605
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 323,
+      "upgradeCosts": {
+        "enhanceCubes": 1020366720,
+        "manaCrystal": 12253794406
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 324,
+      "upgradeCosts": {
+        "enhanceCubes": 1029843750,
+        "manaCrystal": 12415544492
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 325,
+      "upgradeCosts": {
+        "enhanceCubes": 1039379280,
+        "manaCrystal": 12579429679
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 326,
+      "upgradeCosts": {
+        "enhanceCubes": 1048973490,
+        "manaCrystal": 12745478151
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 327,
+      "upgradeCosts": {
+        "enhanceCubes": 1058626560,
+        "manaCrystal": 12913718463
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 328,
+      "upgradeCosts": {
+        "enhanceCubes": 1068338670,
+        "manaCrystal": 13084179546
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 329,
+      "upgradeCosts": {
+        "enhanceCubes": 1078110000,
+        "manaCrystal": 16250550997
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 330,
+      "upgradeCosts": {
+        "enhanceCubes": 1087940730,
+        "manaCrystal": 16465058270
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 331,
+      "upgradeCosts": {
+        "enhanceCubes": 1097831040,
+        "manaCrystal": 16682397039
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 332,
+      "upgradeCosts": {
+        "enhanceCubes": 1107781110,
+        "manaCrystal": 16902604680
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 333,
+      "upgradeCosts": {
+        "enhanceCubes": 1117791120,
+        "manaCrystal": 17125719062
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 334,
+      "upgradeCosts": {
+        "enhanceCubes": 1127861250,
+        "manaCrystal": 17351778553
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 335,
+      "upgradeCosts": {
+        "enhanceCubes": 1137991680,
+        "manaCrystal": 17580822030
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 336,
+      "upgradeCosts": {
+        "enhanceCubes": 1148182590,
+        "manaCrystal": 17812888881
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 337,
+      "upgradeCosts": {
+        "enhanceCubes": 1158434160,
+        "manaCrystal": 18048019014
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 338,
+      "upgradeCosts": {
+        "enhanceCubes": 1168746570,
+        "manaCrystal": 18286252865
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 339,
+      "upgradeCosts": {
+        "enhanceCubes": 1179120000,
+        "manaCrystal": 22711526058
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 340,
+      "upgradeCosts": {
+        "enhanceCubes": 1189554630,
+        "manaCrystal": 23011318202
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 341,
+      "upgradeCosts": {
+        "enhanceCubes": 1200050640,
+        "manaCrystal": 23315067603
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 342,
+      "upgradeCosts": {
+        "enhanceCubes": 1210608210,
+        "manaCrystal": 23622826495
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 343,
+      "upgradeCosts": {
+        "enhanceCubes": 1221227520,
+        "manaCrystal": 23934647805
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 344,
+      "upgradeCosts": {
+        "enhanceCubes": 1231908750,
+        "manaCrystal": 24250585156
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 345,
+      "upgradeCosts": {
+        "enhanceCubes": 1242652080,
+        "manaCrystal": 24570692880
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 346,
+      "upgradeCosts": {
+        "enhanceCubes": 1253457690,
+        "manaCrystal": 24895026026
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 347,
+      "upgradeCosts": {
+        "enhanceCubes": 1264325760,
+        "manaCrystal": 25223640369
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 348,
+      "upgradeCosts": {
+        "enhanceCubes": 1275256470,
+        "manaCrystal": 25556592422
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 349,
+      "upgradeCosts": {
+        "enhanceCubes": 1286250000,
+        "manaCrystal": 31741287789
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 350,
+      "upgradeCosts": {
+        "enhanceCubes": 1297306530,
+        "manaCrystal": 32160272787
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 351,
+      "upgradeCosts": {
+        "enhanceCubes": 1308426240,
+        "manaCrystal": 32584788388
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 352,
+      "upgradeCosts": {
+        "enhanceCubes": 1319609310,
+        "manaCrystal": 33014907595
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 353,
+      "upgradeCosts": {
+        "enhanceCubes": 1330855920,
+        "manaCrystal": 33450704375
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 354,
+      "upgradeCosts": {
+        "enhanceCubes": 1342166250,
+        "manaCrystal": 33892253673
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 355,
+      "upgradeCosts": {
+        "enhanceCubes": 1353540480,
+        "manaCrystal": 34339631421
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 356,
+      "upgradeCosts": {
+        "enhanceCubes": 1364978790,
+        "manaCrystal": 34792914556
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 357,
+      "upgradeCosts": {
+        "enhanceCubes": 1376481360,
+        "manaCrystal": 35252181028
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 358,
+      "upgradeCosts": {
+        "enhanceCubes": 1388048370,
+        "manaCrystal": 35717509818
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 359,
+      "upgradeCosts": {
+        "enhanceCubes": 1399680000,
+        "manaCrystal": 44361147194
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 360,
+      "upgradeCosts": {
+        "enhanceCubes": 1411376430,
+        "manaCrystal": 44946714337
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 361,
+      "upgradeCosts": {
+        "enhanceCubes": 1423137840,
+        "manaCrystal": 45540010966
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 362,
+      "upgradeCosts": {
+        "enhanceCubes": 1434964410,
+        "manaCrystal": 46141139111
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 363,
+      "upgradeCosts": {
+        "enhanceCubes": 1446856320,
+        "manaCrystal": 46750202147
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 364,
+      "upgradeCosts": {
+        "enhanceCubes": 1458813750,
+        "manaCrystal": 47367304815
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 365,
+      "upgradeCosts": {
+        "enhanceCubes": 1470836880,
+        "manaCrystal": 47992553239
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 366,
+      "upgradeCosts": {
+        "enhanceCubes": 1482925890,
+        "manaCrystal": 48626054942
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 367,
+      "upgradeCosts": {
+        "enhanceCubes": 1495080960,
+        "manaCrystal": 49267918867
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 368,
+      "upgradeCosts": {
+        "enhanceCubes": 1507302270,
+        "manaCrystal": 49918255396
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 369,
+      "upgradeCosts": {
+        "enhanceCubes": 1519590000,
+        "manaCrystal": 61998473202
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 370,
+      "upgradeCosts": {
+        "enhanceCubes": 1531944330,
+        "manaCrystal": 62816853048
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 371,
+      "upgradeCosts": {
+        "enhanceCubes": 1544365440,
+        "manaCrystal": 63646035508
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 372,
+      "upgradeCosts": {
+        "enhanceCubes": 1556853510,
+        "manaCrystal": 64486163177
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 373,
+      "upgradeCosts": {
+        "enhanceCubes": 1569408720,
+        "manaCrystal": 65337380531
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 374,
+      "upgradeCosts": {
+        "enhanceCubes": 1582031250,
+        "manaCrystal": 66199833954
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 375,
+      "upgradeCosts": {
+        "enhanceCubes": 1594721280,
+        "manaCrystal": 67073671762
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 376,
+      "upgradeCosts": {
+        "enhanceCubes": 1607478990,
+        "manaCrystal": 67959044229
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 377,
+      "upgradeCosts": {
+        "enhanceCubes": 1620304560,
+        "manaCrystal": 68856103613
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 378,
+      "upgradeCosts": {
+        "enhanceCubes": 1633198170,
+        "manaCrystal": 69765004181
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 379,
+      "upgradeCosts": {
+        "enhanceCubes": 1646160000,
+        "manaCrystal": 86648135193
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 380,
+      "upgradeCosts": {
+        "enhanceCubes": 1659190230,
+        "manaCrystal": 87791890577
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 381,
+      "upgradeCosts": {
+        "enhanceCubes": 1672289040,
+        "manaCrystal": 88950743533
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 382,
+      "upgradeCosts": {
+        "enhanceCubes": 1685456610,
+        "manaCrystal": 90124893347
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 383,
+      "upgradeCosts": {
+        "enhanceCubes": 1698693120,
+        "manaCrystal": 91314541939
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 384,
+      "upgradeCosts": {
+        "enhanceCubes": 1711998750,
+        "manaCrystal": 92519893893
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 385,
+      "upgradeCosts": {
+        "enhanceCubes": 1725373680,
+        "manaCrystal": 93741156492
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 386,
+      "upgradeCosts": {
+        "enhanceCubes": 1738818090,
+        "manaCrystal": 94978539758
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 387,
+      "upgradeCosts": {
+        "enhanceCubes": 1752332160,
+        "manaCrystal": 96232256483
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 388,
+      "upgradeCosts": {
+        "enhanceCubes": 1765916070,
+        "manaCrystal": 97502522269
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 389,
+      "upgradeCosts": {
+        "enhanceCubes": 1779570000,
+        "manaCrystal": 121098132658
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 390,
+      "upgradeCosts": {
+        "enhanceCubes": 1793294130,
+        "manaCrystal": 122696628009
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 391,
+      "upgradeCosts": {
+        "enhanceCubes": 1807088640,
+        "manaCrystal": 124316223498
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 392,
+      "upgradeCosts": {
+        "enhanceCubes": 1820953710,
+        "manaCrystal": 125957197649
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 393,
+      "upgradeCosts": {
+        "enhanceCubes": 1834889520,
+        "manaCrystal": 127619832657
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 394,
+      "upgradeCosts": {
+        "enhanceCubes": 1848896250,
+        "manaCrystal": 129304414449
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 395,
+      "upgradeCosts": {
+        "enhanceCubes": 1862974080,
+        "manaCrystal": 131011232719
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 396,
+      "upgradeCosts": {
+        "enhanceCubes": 1877123190,
+        "manaCrystal": 132740580991
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 397,
+      "upgradeCosts": {
+        "enhanceCubes": 1891343760,
+        "manaCrystal": 134492756660
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 398,
+      "upgradeCosts": {
+        "enhanceCubes": 1905635970,
+        "manaCrystal": 136268061048
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 399,
+      "upgradeCosts": {
+        "enhanceCubes": 1920000000,
+        "manaCrystal": 169244931822
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    },
+    {
+      "level": 400,
+      "upgradeCosts": {
+        "enhanceCubes": 1934436030,
+        "manaCrystal": 171478964922
+      },
+      "goldExpFactor": 42.65,
+      "attackHpFactor": 145.69
+    }
+  ]
+}

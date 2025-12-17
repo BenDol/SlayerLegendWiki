@@ -40,7 +40,7 @@
       "icon": "⚔️",
       "order": 1,
       "expandedByDefault": true,
-      "sections": ["getting-started", "characters", "equipment", "companions", "skills"]
+      "sections": ["getting-started", "progression"]
     },
     {
       "id": "content",
@@ -48,7 +48,7 @@
       "icon": "🗺️",
       "order": 2,
       "expandedByDefault": true,
-      "sections": ["content", "progression", "resources"]
+      "sections": ["characters", "equipment", "companions", "skills", "stages", "spirits", "resources"]
     },
     {
       "id": "guides",
@@ -133,12 +133,20 @@
       "order": 5
     },
     {
-      "id": "content",
-      "title": "Content",
-      "path": "content",
+      "id": "stages",
+      "title": "Stages",
+      "path": "stages",
       "icon": "🗺️",
       "allowContributions": true,
       "order": 6
+    },
+    {
+      "id": "spirits",
+      "title": "Spirits",
+      "path": "spirits",
+      "icon": "👻",
+      "allowContributions": true,
+      "order": 6.5
     },
     {
       "id": "progression",

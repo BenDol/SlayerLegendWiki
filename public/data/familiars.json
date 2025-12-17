@@ -1,0 +1,282 @@
+[
+  {
+    "id": 1,
+    "name": "Fire Demon",
+    "element": "Fire",
+    "attribute": "Offensive",
+    "description": "A fierce demon familiar aligned with the fire element, specializing in high burst damage attacks",
+    "unlockRequirement": "Unknown",
+    "baseStats": {
+      "attack": "High",
+      "defense": "Medium",
+      "speed": "Medium"
+    },
+    "attackStyle": {
+      "type": 1,
+      "name": "Aggressive Assault",
+      "description": "Close-range combat with rapid consecutive attacks"
+    },
+    "attackRange": {
+      "type": 1,
+      "range": "Close",
+      "pattern": "Circular AOE"
+    },
+    "weapons": [
+      {
+        "id": "scythe",
+        "name": "Demon Scythe",
+        "type": "Scythe",
+        "tiers": 4,
+        "description": "Curved blade weapon for sweeping attacks",
+        "image": "/images/familiars/DemonScythe_1_01.png"
+      },
+      {
+        "id": "spear",
+        "name": "Demon Spear",
+        "type": "Spear",
+        "tiers": 4,
+        "description": "Long-range piercing weapon",
+        "image": "/images/familiars/DemonSpear_1_01.png"
+      },
+      {
+        "id": "wand",
+        "name": "Demon Wand",
+        "type": "Wand",
+        "tiers": 4,
+        "description": "Magical catalyst for elemental attacks",
+        "image": "/images/familiars/DemonWand_1_01.png"
+      },
+      {
+        "id": "shadow",
+        "name": "Shadow Blade",
+        "type": "Shadow",
+        "tiers": 4,
+        "description": "Dark energy weapon",
+        "image": "/images/familiars/DemonShadow_1_01.png"
+      }
+    ],
+    "images": {
+      "attackStyle": "/images/familiars/Demon_AttackStyle_Display_01.png",
+      "attackRange": "/images/familiars/Demon_AttackRange_Display_01.png",
+      "attribute": "/images/familiars/Demon_Attribute_Display_01.png"
+    },
+    "skills": [
+      {
+        "name": "Rift Demon DMG Reduction",
+        "description": "Reduces damage taken from Rift Demons",
+        "type": "passive",
+        "unlockCondition": "Unknown"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Water Demon",
+    "element": "Water",
+    "attribute": "Balanced",
+    "description": "A mystical demon familiar attuned to water, providing balanced offense and defense",
+    "unlockRequirement": "Unknown",
+    "baseStats": {
+      "attack": "Medium",
+      "defense": "High",
+      "speed": "Medium"
+    },
+    "attackStyle": {
+      "type": 2,
+      "name": "Flowing Strikes",
+      "description": "Medium-range fluid combat with continuous attacks"
+    },
+    "attackRange": {
+      "type": 2,
+      "range": "Medium",
+      "pattern": "Linear sweep"
+    },
+    "weapons": [
+      {
+        "id": "scythe",
+        "name": "Demon Scythe",
+        "type": "Scythe",
+        "tiers": 4,
+        "description": "Curved blade weapon for sweeping attacks",
+        "image": "/images/familiars/DemonScythe_2_01.png"
+      },
+      {
+        "id": "spear",
+        "name": "Demon Spear",
+        "type": "Spear",
+        "tiers": 4,
+        "description": "Long-range piercing weapon",
+        "image": "/images/familiars/DemonSpear_2_01.png"
+      },
+      {
+        "id": "wand",
+        "name": "Demon Wand",
+        "type": "Wand",
+        "tiers": 4,
+        "description": "Magical catalyst for elemental attacks",
+        "image": "/images/familiars/DemonWand_2_01.png"
+      },
+      {
+        "id": "shadow",
+        "name": "Shadow Blade",
+        "type": "Shadow",
+        "tiers": 4,
+        "description": "Dark energy weapon",
+        "image": "/images/familiars/DemonShadow_2_01.png"
+      }
+    ],
+    "images": {
+      "attackStyle": "/images/familiars/Demon_AttackStyle_Display_02.png",
+      "attackRange": "/images/familiars/Demon_AttackRange_Display_02.png",
+      "attribute": "/images/familiars/Demon_Attribute_Display_02.png"
+    },
+    "skills": [
+      {
+        "name": "Water Spirit Stats",
+        "description": "Enhances water spirit statistics",
+        "type": "passive",
+        "unlockCondition": "Unknown"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Wind Demon",
+    "element": "Wind",
+    "attribute": "Speed",
+    "description": "An agile demon familiar empowered by wind, specializing in rapid attack speed",
+    "unlockRequirement": "Unknown",
+    "baseStats": {
+      "attack": "Medium",
+      "defense": "Low",
+      "speed": "Very High"
+    },
+    "attackStyle": {
+      "type": 3,
+      "name": "Swift Tempest",
+      "description": "Fast-paced attacks with enhanced mobility"
+    },
+    "attackRange": {
+      "type": 3,
+      "range": "Medium",
+      "pattern": "Multi-directional"
+    },
+    "weapons": [
+      {
+        "id": "scythe",
+        "name": "Demon Scythe",
+        "type": "Scythe",
+        "tiers": 4,
+        "description": "Curved blade weapon for sweeping attacks",
+        "image": "/images/familiars/DemonScythe_3_01.png"
+      },
+      {
+        "id": "spear",
+        "name": "Demon Spear",
+        "type": "Spear",
+        "tiers": 4,
+        "description": "Long-range piercing weapon",
+        "image": "/images/familiars/DemonSpear_3_01.png"
+      },
+      {
+        "id": "wand",
+        "name": "Demon Wand",
+        "type": "Wand",
+        "tiers": 4,
+        "description": "Magical catalyst for elemental attacks",
+        "image": "/images/familiars/DemonWand_3_01.png"
+      },
+      {
+        "id": "shadow",
+        "name": "Shadow Blade",
+        "type": "Shadow",
+        "tiers": 4,
+        "description": "Dark energy weapon",
+        "image": "/images/familiars/DemonShadow_3_01.png"
+      }
+    ],
+    "images": {
+      "attackStyle": "/images/familiars/Demon_AttackStyle_Display_03.png",
+      "attackRange": "/images/familiars/Demon_AttackRange_Display_03.png",
+      "attribute": "/images/familiars/Demon_Attribute_Display_03.png"
+    },
+    "skills": [
+      {
+        "name": "Wind Spirit Stats",
+        "description": "Enhances wind spirit statistics",
+        "type": "passive",
+        "unlockCondition": "Unknown"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Earth Demon",
+    "element": "Earth",
+    "attribute": "Defensive",
+    "description": "A sturdy demon familiar grounded in earth element, excelling in defense and sustainability",
+    "unlockRequirement": "Unknown",
+    "baseStats": {
+      "attack": "Low",
+      "defense": "Very High",
+      "speed": "Low"
+    },
+    "attackStyle": {
+      "type": 4,
+      "name": "Heavy Impact",
+      "description": "Powerful slow attacks with high damage per hit"
+    },
+    "attackRange": {
+      "type": 4,
+      "range": "Wide",
+      "pattern": "Ground slam AOE"
+    },
+    "weapons": [
+      {
+        "id": "scythe",
+        "name": "Demon Scythe",
+        "type": "Scythe",
+        "tiers": 4,
+        "description": "Curved blade weapon for sweeping attacks",
+        "image": "/images/familiars/DemonScythe_4_01.png"
+      },
+      {
+        "id": "spear",
+        "name": "Demon Spear",
+        "type": "Spear",
+        "tiers": 4,
+        "description": "Long-range piercing weapon",
+        "image": "/images/familiars/DemonSpear_4_01.png"
+      },
+      {
+        "id": "wand",
+        "name": "Demon Wand",
+        "type": "Wand",
+        "tiers": 4,
+        "description": "Magical catalyst for elemental attacks",
+        "image": "/images/familiars/DemonWand_4_01.png"
+      },
+      {
+        "id": "shadow",
+        "name": "Shadow Blade",
+        "type": "Shadow",
+        "tiers": 4,
+        "description": "Dark energy weapon",
+        "image": "/images/familiars/DemonShadow_4_01.png"
+      }
+    ],
+    "images": {
+      "attackStyle": "/images/familiars/Demon_AttackStyle_Display_04.png",
+      "attackRange": "/images/familiars/Demon_AttackRange_Display_04.png",
+      "attribute": "/images/familiars/Demon_Attribute_Display_04.png"
+    },
+    "skills": [
+      {
+        "name": "Earth Spirit Stats",
+        "description": "Enhances earth spirit statistics",
+        "type": "passive",
+        "unlockCondition": "Unknown"
+      }
+    ]
+  }
+]
