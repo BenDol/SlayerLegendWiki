@@ -229,6 +229,15 @@ const SkillSlot = ({
             max={skill.maxLevel}
             value={level}
             onChange={(e) => handleLevelChange(parseInt(e.target.value) || 1)}
+            onWheel={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const delta = e.deltaY > 0 ? -1 : 1;
+              const newLevel = level + delta;
+              const maxLevel = skill?.maxLevel || 130;
+              const validLevel = Math.max(1, Math.min(newLevel, maxLevel));
+              handleLevelChange(validLevel);
+            }}
             className="w-20 px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             onBlur={() => setShowLevelInput(false)}
             autoFocus

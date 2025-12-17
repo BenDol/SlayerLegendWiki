@@ -1,0 +1,96 @@
+{
+  "$schema": "soul-weapon-grids-schema",
+  "version": "1.0.0",
+  "description": "Soul weapon emblem grid layouts for Slayer Legend. Each weapon has a unique grid pattern that determines where emblems can be placed.",
+  "gridTypes": {
+    "2x2": { "rows": 2, "columns": 2, "totalSlots": 4 },
+    "3x3": { "rows": 3, "columns": 3, "totalSlots": 9 },
+    "3x4": { "rows": 3, "columns": 4, "totalSlots": 12 },
+    "4x4": { "rows": 4, "columns": 4, "totalSlots": 16 },
+    "4x5": { "rows": 4, "columns": 5, "totalSlots": 20 }
+  },
+  "weapons": [
+    {
+      "id": 1,
+      "name": "Innocence",
+      "gridType": "2x2",
+      "activeSlots": [
+        { "row": 0, "col": 0, "active": true },
+        { "row": 0, "col": 1, "active": true },
+        { "row": 1, "col": 0, "active": true },
+        { "row": 1, "col": 1, "active": true }
+      ],
+      "totalActiveSlots": 4,
+      "notes": "TODO: Extract actual grid layout from game"
+    },
+    {
+      "id": 2,
+      "name": "Coolness",
+      "gridType": "2x2",
+      "activeSlots": [
+        { "row": 0, "col": 0, "active": true },
+        { "row": 0, "col": 1, "active": true },
+        { "row": 1, "col": 0, "active": true },
+        { "row": 1, "col": 1, "active": true }
+      ],
+      "totalActiveSlots": 4,
+      "notes": "TODO: Extract actual grid layout from game"
+    },
+    {
+      "id": 3,
+      "name": "Desire",
+      "gridType": "3x3",
+      "activeSlots": [
+        { "row": 0, "col": 0, "active": true },
+        { "row": 0, "col": 1, "active": true },
+        { "row": 0, "col": 2, "active": true },
+        { "row": 1, "col": 0, "active": true },
+        { "row": 1, "col": 1, "active": true },
+        { "row": 1, "col": 2, "active": true },
+        { "row": 2, "col": 0, "active": true },
+        { "row": 2, "col": 1, "active": true },
+        { "row": 2, "col": 2, "active": true }
+      ],
+      "totalActiveSlots": 9,
+      "notes": "TODO: Extract actual grid layout from game"
+    }
+  ],
+  "_instructions": {
+    "purpose": "This file maps soul weapon IDs to their emblem grid layouts",
+    "dataNeeded": [
+      "Actual grid dimensions for each weapon (rows x columns)",
+      "Which slots are active/available for emblems (some grids may have inactive corners/edges)",
+      "Any special slot properties (central slots, bonus slots, etc.)"
+    ],
+    "dataSources": [
+      "Game files: Look for SoulGem or emblem-related data in decompiled assets",
+      "Manual extraction: Screenshot and map each weapon's grid in-game",
+      "Community: Check game wiki, Discord, or Reddit for grid layouts"
+    ],
+    "howToUpdate": [
+      "1. For each weapon ID (1-57), determine its grid layout",
+      "2. Map the grid dimensions (e.g., 3x3, 4x4, 4x5)",
+      "3. Mark which slots are active (some grids have patterns, not all slots usable)",
+      "4. Add any special properties (locked slots, bonus slots, etc.)",
+      "5. Update the weapon entry with complete grid data"
+    ],
+    "exampleCompleteEntry": {
+      "id": 99,
+      "name": "Example Weapon",
+      "gridType": "3x4",
+      "activeSlots": [
+        { "row": 0, "col": 1, "active": true, "special": null },
+        { "row": 0, "col": 2, "active": true, "special": null },
+        { "row": 1, "col": 0, "active": true, "special": null },
+        { "row": 1, "col": 1, "active": true, "special": "center" },
+        { "row": 1, "col": 2, "active": true, "special": null },
+        { "row": 1, "col": 3, "active": true, "special": null },
+        { "row": 2, "col": 1, "active": true, "special": null },
+        { "row": 2, "col": 2, "active": true, "special": null }
+      ],
+      "totalActiveSlots": 8,
+      "gridPattern": "diamond",
+      "notes": "Center slot provides bonus effects"
+    }
+  }
+}

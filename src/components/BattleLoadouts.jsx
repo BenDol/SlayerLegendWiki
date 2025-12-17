@@ -10,6 +10,7 @@ import SavedLoadoutsPanel from './SavedLoadoutsPanel';
 import { encodeLoadout, decodeLoadout } from '../../wiki-framework/src/utils/battleLoadoutEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
+import { saveBuild, loadBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 
 /**
  * BattleLoadouts Component
@@ -45,6 +46,8 @@ const BattleLoadouts = () => {
   const [highlightNameField, setHighlightNameField] = useState(false);
   const [draggedSkillSlotIndex, setDraggedSkillSlotIndex] = useState(null);
   const [draggedSpiritSlotIndex, setDraggedSpiritSlotIndex] = useState(null);
+  const [sharing, setSharing] = useState(false);
+  const [shareError, setShareError] = useState(null);
 
   // Load skills data
   useEffect(() => {
@@ -56,9 +59,49 @@ const BattleLoadouts = () => {
     if (skills.length === 0) return; // Wait for skills to load
 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const shareChecksum = urlParams.get('share');
     const encodedLoadout = urlParams.get('data');
 
-    if (encodedLoadout) {
+    // Load from new share system (short URL)
+    if (shareChecksum) {
+      const loadSharedBuild = async () => {
+        try {
+          setLoading(true);
+          console.log('[BattleLoadouts] Loading shared build:', shareChecksum);
+
+          // Get repo info from config
+          const configResponse = await fetch('/wiki-config.json');
+          const config = await configResponse.json();
+          const owner = config.wiki.repository.owner;
+          const repo = config.wiki.repository.repo;
+
+          const buildData = await loadBuild(owner, repo, shareChecksum);
+
+          if (buildData.type === 'battle-loadout') {
+            // Deserialize skill build
+            const deserializedLoadout = {
+              ...buildData.data,
+              skillBuild: buildData.data.skillBuild ? deserializeSkillBuild(buildData.data.skillBuild, skills) : null
+            };
+            setCurrentLoadout(deserializedLoadout);
+            setLoadoutName(deserializedLoadout.name || '');
+            setHasUnsavedChanges(false);
+            console.log('[BattleLoadouts] ✓ Shared build loaded successfully');
+          } else {
+            throw new Error(`Invalid build type: ${buildData.type}`);
+          }
+        } catch (error) {
+          console.error('[BattleLoadouts] Failed to load shared build:', error);
+          alert(`Failed to load shared build: ${error.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      loadSharedBuild();
+    }
+    // Fallback to old encoded system
+    else if (encodedLoadout) {
       try {
         const decodedLoadout = decodeLoadout(encodedLoadout);
         if (decodedLoadout) {
@@ -72,7 +115,7 @@ const BattleLoadouts = () => {
           setHasUnsavedChanges(false); // Loaded from URL, no unsaved changes yet
         }
       } catch (error) {
-        console.error('Failed to load loadout from URL:', error);
+        console.error('[BattleLoadouts] Failed to load loadout from URL:', error);
       }
     }
   }, [skills]);
@@ -428,26 +471,70 @@ const BattleLoadouts = () => {
   };
 
   // Share loadout
-  const handleShareLoadout = () => {
-    // Serialize the loadout
-    const serializedLoadout = {
-      ...currentLoadout,
-      skillBuild: serializeSkillBuild(currentLoadout.skillBuild)
-    };
+  const handleShareLoadout = async () => {
+    try {
+      setSharing(true);
+      setShareError(null);
 
-    const encoded = encodeLoadout(serializedLoadout);
-    if (!encoded) {
-      alert('Failed to encode loadout');
-      return;
-    }
+      console.log('[BattleLoadouts] Generating share URL...');
 
-    const baseURL = window.location.origin + window.location.pathname;
-    const shareURL = `${baseURL}#/battle-loadouts?data=${encoded}`;
+      // Get repo info from config
+      const configResponse = await fetch('/wiki-config.json');
+      const config = await configResponse.json();
+      const owner = config.wiki.repository.owner;
+      const repo = config.wiki.repository.repo;
 
-    navigator.clipboard.writeText(shareURL).then(() => {
+      // Serialize the loadout
+      const serializedLoadout = {
+        ...currentLoadout,
+        skillBuild: serializeSkillBuild(currentLoadout.skillBuild)
+      };
+
+      // Save build and get checksum
+      const checksum = await saveBuild(owner, repo, 'battle-loadout', serializedLoadout);
+
+      // Generate share URL
+      const baseURL = window.location.origin + window.location.pathname;
+      const shareURL = generateShareUrl(baseURL, 'battle-loadout', checksum);
+
+      console.log('[BattleLoadouts] ✓ Share URL generated:', shareURL);
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(shareURL);
+
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+    } catch (error) {
+      console.error('[BattleLoadouts] Failed to generate share URL:', error);
+      setShareError(error.message || 'Failed to generate share URL');
+
+      // Fallback to old method if share service fails
+      try {
+        const serializedLoadout = {
+          ...currentLoadout,
+          skillBuild: serializeSkillBuild(currentLoadout.skillBuild)
+        };
+
+        const encoded = encodeLoadout(serializedLoadout);
+        if (encoded) {
+          const baseURL = window.location.origin + window.location.pathname;
+          const shareURL = `${baseURL}#/battle-loadouts?data=${encoded}`;
+
+          await navigator.clipboard.writeText(shareURL);
+
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          console.log('[BattleLoadouts] ⚠️ Used fallback encoding method');
+        } else {
+          alert('Failed to generate share URL');
+        }
+      } catch (fallbackError) {
+        console.error('[BattleLoadouts] Fallback also failed:', fallbackError);
+        alert('Failed to generate share URL');
+      }
+    } finally {
+      setSharing(false);
+    }
   };
 
   // Export loadout as JSON
@@ -580,9 +667,15 @@ const BattleLoadouts = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleShareLoadout}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+              disabled={sharing}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {copied ? (
+              {sharing ? (
+                <>
+                  <Loader className="w-4 h-4 flex-shrink-0 text-blue-600 dark:text-blue-400 animate-spin" />
+                  <span>Generating...</span>
+                </>
+              ) : copied ? (
                 <>
                   <Check className="w-4 h-4 flex-shrink-0 text-green-600 dark:text-green-400" />
                   <span>Copied!</span>
@@ -619,7 +712,6 @@ const BattleLoadouts = () => {
               className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
             >
               <Trash2 className="w-4 h-4 flex-shrink-0 text-red-600 dark:text-red-400" />
-              <span>Clear</span>
             </button>
           </div>
         </div>
@@ -792,7 +884,6 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick, onDragStart,
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
             >
               <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span>Clear</span>
             </button>
           )}
         </div>
@@ -875,7 +966,6 @@ const SpiritsSection = ({ spiritBuild, onEdit, onClear, onRemoveSpirit, onDragSt
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
             >
               <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span>Clear</span>
             </button>
           )}
         </div>

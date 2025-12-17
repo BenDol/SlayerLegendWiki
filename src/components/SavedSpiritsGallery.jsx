@@ -120,15 +120,32 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
           return (
             <div
               key={spirit.id}
+              draggable={!isInUse}
+              onDragStart={(e) => {
+                if (isInUse) {
+                  e.preventDefault();
+                  return;
+                }
+                // Store the full spirit configuration in drag data
+                e.dataTransfer.effectAllowed = 'copy';
+                e.dataTransfer.setData('application/json', JSON.stringify({
+                  type: 'saved-spirit',
+                  spirit: spirit
+                }));
+                console.log('[SavedSpiritsGallery] Drag started:', spirit.spirit.name);
+              }}
+              onDragEnd={(e) => {
+                console.log('[SavedSpiritsGallery] Drag ended');
+              }}
               className={`relative bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200 dark:border-gray-800 shadow-sm transition-all ${
                 isInUse
                   ? 'opacity-50 cursor-not-allowed'
-                  : 'cursor-pointer hover:shadow-md hover:scale-105'
+                  : 'cursor-move hover:shadow-md hover:scale-105'
               }`}
               onClick={() => !isInUse && onSelectSpirit(spirit)}
             >
               {isInUse && (
-                <div className="absolute top-1 right-1 bg-gray-600 text-white text-xs px-1.5 py-0.5 rounded z-10">
+                <div className="absolute top-1 right-1 bg-gray-600 text-white text-xs px-1.5 py-0.5 rounded z-20">
                   In Use
                 </div>
               )}
@@ -150,7 +167,7 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
       </div>
 
       <p className="text-xs text-gray-500 dark:text-gray-500 text-center mt-3">
-        Click a spirit to add it to your build
+        Click or drag a spirit to add it to your build
       </p>
     </div>
   );

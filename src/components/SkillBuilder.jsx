@@ -7,6 +7,7 @@ import SavedBuildsPanel from './SavedBuildsPanel';
 import { encodeBuild, decodeBuild } from '../../wiki-framework/src/components/wiki/BuildEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
+import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 
 /**
  * SkillBuilder Component
@@ -44,6 +45,8 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [sharing, setSharing] = useState(false);
+  const [shareError, setShareError] = useState(null);
 
   // Load skills data
   useEffect(() => {
@@ -56,9 +59,45 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     if (isModal) return; // Skip URL loading in modal mode
 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const shareChecksum = urlParams.get('share');
     const encodedBuild = urlParams.get('data');
 
-    if (encodedBuild) {
+    // Load from new share system (short URL)
+    if (shareChecksum) {
+      const loadFromSharedUrl = async () => {
+        try {
+          setLoading(true);
+          console.log('[SkillBuilder] Loading shared build:', shareChecksum);
+
+          const configResponse = await fetch('/wiki-config.json');
+          const config = await configResponse.json();
+          const owner = config.wiki.repository.owner;
+          const repo = config.wiki.repository.repo;
+
+          const buildData = await loadSharedBuild(owner, repo, shareChecksum);
+
+          if (buildData.type === 'skill-build') {
+            const deserializedBuild = deserializeBuild(buildData.data, skills);
+            setBuildName(buildData.data.name || '');
+            setMaxSlots(buildData.data.maxSlots || 10);
+            setBuild({ slots: deserializedBuild.slots });
+            setHasUnsavedChanges(true);
+            console.log('[SkillBuilder] ✓ Shared build loaded successfully');
+          } else {
+            console.error('[SkillBuilder] Invalid build type:', buildData.type);
+            alert('Invalid build type. This URL is for a different builder.');
+          }
+        } catch (error) {
+          console.error('[SkillBuilder] Failed to load shared build:', error);
+          alert(`Failed to load shared build: ${error.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadFromSharedUrl();
+    }
+    // Fallback to old encoded system
+    else if (encodedBuild) {
       try {
         const decodedBuild = decodeBuild(encodedBuild);
         if (decodedBuild) {
@@ -334,23 +373,65 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
   };
 
   // Share build
-  const handleShareBuild = () => {
-    // Serialize build to only include skill IDs (not full skill objects)
-    const serializedBuild = serializeBuild(build);
+  const handleShareBuild = async () => {
+    try {
+      setSharing(true);
+      setShareError(null);
 
-    const encoded = encodeBuild(serializedBuild);
-    if (!encoded) {
-      alert('Failed to encode build');
-      return;
-    }
+      console.log('[SkillBuilder] Generating share URL...');
 
-    const baseURL = window.location.origin + window.location.pathname;
-    const shareURL = `${baseURL}#/skill-builder?data=${encoded}`;
+      const configResponse = await fetch('/wiki-config.json');
+      const config = await configResponse.json();
+      const owner = config.wiki.repository.owner;
+      const repo = config.wiki.repository.repo;
 
-    navigator.clipboard.writeText(shareURL).then(() => {
+      // Serialize build to only include skill IDs
+      const serializedBuild = serializeBuild(build);
+      const buildData = {
+        name: buildName,
+        maxSlots,
+        slots: serializedBuild.slots
+      };
+
+      // Save build and get checksum
+      const checksum = await saveSharedBuild(owner, repo, 'skill-build', buildData);
+
+      console.log('[SkillBuilder] Generated checksum:', checksum);
+
+      // Generate share URL
+      const baseURL = window.location.origin + window.location.pathname;
+      const shareURL = generateShareUrl(baseURL, 'skill-build', checksum);
+
+      await navigator.clipboard.writeText(shareURL);
+
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+
+      console.log('[SkillBuilder] ✓ Share URL copied to clipboard');
+    } catch (error) {
+      console.error('[SkillBuilder] Failed to generate share URL:', error);
+      setShareError(error.message || 'Failed to generate share URL');
+
+      // Fallback to old method if share service fails
+      try {
+        console.log('[SkillBuilder] Falling back to old encoding method...');
+        const serializedBuild = serializeBuild(build);
+        const encoded = encodeBuild(serializedBuild);
+        if (encoded) {
+          const baseURL = window.location.origin + window.location.pathname;
+          const shareURL = `${baseURL}#/skill-builder?data=${encoded}`;
+          await navigator.clipboard.writeText(shareURL);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          console.log('[SkillBuilder] ✓ Fallback URL copied to clipboard');
+        }
+      } catch (fallbackError) {
+        console.error('[SkillBuilder] Fallback also failed:', fallbackError);
+        alert('Failed to generate share URL');
+      }
+    } finally {
+      setSharing(false);
+    }
   };
 
   // Export build as JSON
@@ -642,9 +723,15 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleShareBuild}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                disabled={sharing}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
               >
-                {copied ? (
+                {sharing ? (
+                  <>
+                    <Loader className="w-4 h-4 flex-shrink-0 animate-spin text-blue-600 dark:text-blue-400" />
+                    <span>Generating...</span>
+                  </>
+                ) : copied ? (
                   <>
                     <Check className="w-4 h-4 flex-shrink-0 text-green-600 dark:text-green-400" />
                     <span>Copied!</span>
@@ -684,6 +771,12 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
                 <span>Clear</span>
               </button>
             </div>
+            {/* Share Error Message */}
+            {shareError && (
+              <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
+                {shareError}
+              </div>
+            )}
           </div>
         )}
 

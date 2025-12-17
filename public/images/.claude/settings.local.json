@@ -6,7 +6,9 @@
       "Bash(python extract_all_atlas_icons.py:*)",
       "Bash(python:*)",
       "Bash(done)",
-      "Bash(sort:*)"
+      "Bash(sort:*)",
+      "Bash(find:*)",
+      "WebSearch"
     ]
   }
 }

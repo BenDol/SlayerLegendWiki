@@ -26,6 +26,12 @@
         "description": "Create and share skill builds"
       },
       {
+        "title": "Spirit Builder",
+        "path": "/spirit-builder",
+        "icon": "🔮",
+        "description": "Build and share spirit configurations"
+      },
+      {
         "title": "Battle Loadouts",
         "path": "/battle-loadouts",
         "icon": "📖",

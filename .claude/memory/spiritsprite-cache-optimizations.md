@@ -284,8 +284,9 @@ export const cleanupExpiredImages = () => { ... }
 ### New Module-Level State
 ```javascript
 const animationDetectionCache = new Map();
-const imageCache = new Map();
+const imageCache = new Map(); // Now stores { img: Image, timestamp: number }
 const imageCacheAccess = new Map();
+const IMAGE_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 const MAX_ANIMATION_CACHE_SIZE = 200;
 const MAX_IMAGE_CACHE_SIZE = 2000;
 ```
@@ -332,11 +333,16 @@ These are NOT currently needed but documented for reference:
 
 ## Conclusion
 
-The implemented caching system provides:
+The implemented caching system with TTL provides:
 - ✅ **60-92% reduction** in image requests for common scenarios
-- ✅ **Instant loading** for previously seen spirits
-- ✅ **Bounded memory** with automatic cleanup
-- ✅ **Zero manual management** required
+- ✅ **Zero network traffic** for 10 minutes after initial load (TTL window)
+- ✅ **Instant loading** for previously seen spirits (no network round-trip)
+- ✅ **Clean network tab** - no 304 spam during TTL window
+- ✅ **Bounded memory** with automatic cleanup and LRU eviction
+- ✅ **Zero manual management** required - fully automatic
 - ✅ **Full monitoring** capabilities for debugging
+- ✅ **Automatic refresh** after TTL expires (ensures up-to-date content)
 
-The optimizations maintain simplicity while providing enterprise-grade performance and memory management.
+The TTL-based caching eliminates the "silly" network calls you mentioned by completely bypassing the network for cached images within the 10-minute window. Images are automatically refreshed after expiration, providing the perfect balance between performance and freshness.
+
+The optimizations maintain simplicity while providing enterprise-grade performance and memory management with true network silence during the cache window.

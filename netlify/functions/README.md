@@ -43,17 +43,45 @@ Add to `package.json`:
 }
 ```
 
-## Framework Functions Reference
+## Active Functions
 
-Functions provided by the framework:
+Functions in this directory:
 
 | Function | Purpose | Environment Variables |
 |----------|---------|----------------------|
 | `access-token.js` | GitHub OAuth token proxy (CORS) | - |
 | `device-code.js` | GitHub Device Flow proxy (CORS) | - |
-| `create-comment-issue.js` | Create comment issues with bot | `WIKI_BOT_TOKEN` |
-| `create-admin-issue.js` | Create admin/ban issues (secured) | `WIKI_BOT_TOKEN` |
-| `update-admin-issue.js` | Update admin/ban issues (secured) | `WIKI_BOT_TOKEN` |
+| `save-data.js` | Save skill builds, loadouts, spirits | `WIKI_BOT_TOKEN`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
+| `load-data.js` | Load saved user data | `WIKI_BOT_TOKEN`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
+| `delete-data.js` | Delete saved user data | `WIKI_BOT_TOKEN`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
+| `github-bot.js` | **Consolidated bot operations** | `WIKI_BOT_TOKEN` |
+
+### github-bot.js (Consolidated Function)
+
+Single function that handles all bot-authenticated GitHub operations to reduce function count.
+
+**Actions supported:**
+- `create-comment` - Create comment on issue (build sharing)
+- `update-issue` - Update issue body (build index updates)
+- `list-issues` - List issues by label (find index issue)
+- `get-comment` - Get comment by ID (load shared builds)
+- `create-comment-issue` - Create comment issue (comments system)
+- `create-admin-issue` - Create admin/ban issues (admin system)
+- `update-admin-issue` - Update admin/ban issues (admin system)
+
+**Usage:**
+```javascript
+fetch('/.netlify/functions/github-bot', {
+  method: 'POST',
+  body: JSON.stringify({
+    action: 'create-comment',
+    owner: 'username',
+    repo: 'repo-name',
+    issueNumber: 123,
+    body: 'Comment text'
+  })
+})
+```
 
 ### Security Features
 

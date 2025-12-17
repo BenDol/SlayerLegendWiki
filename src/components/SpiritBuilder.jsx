@@ -8,6 +8,7 @@ import SavedSpiritsGallery from './SavedSpiritsGallery';
 import { encodeBuild, decodeBuild } from '../../wiki-framework/src/components/wiki/BuildEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
+import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 
 /**
  * SpiritBuilder Component
@@ -50,6 +51,8 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [sharing, setSharing] = useState(false);
+  const [shareError, setShareError] = useState(null);
 
   // Load spirits data
   useEffect(() => {
@@ -62,9 +65,44 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     if (isModal) return; // Skip URL loading in modal mode
 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const shareChecksum = urlParams.get('share');
     const encodedBuild = urlParams.get('data');
 
-    if (encodedBuild) {
+    // Load from new share system (short URL)
+    if (shareChecksum) {
+      const loadFromSharedUrl = async () => {
+        try {
+          setLoading(true);
+          console.log('[SpiritBuilder] Loading shared build:', shareChecksum);
+
+          const configResponse = await fetch('/wiki-config.json');
+          const config = await configResponse.json();
+          const owner = config.wiki.repository.owner;
+          const repo = config.wiki.repository.repo;
+
+          const buildData = await loadSharedBuild(owner, repo, shareChecksum);
+
+          if (buildData.type === 'spirit-build') {
+            const deserializedBuild = deserializeBuild(buildData.data, spirits);
+            setBuildName(buildData.data.name || '');
+            setBuild({ slots: deserializedBuild.slots });
+            setHasUnsavedChanges(true);
+            console.log('[SpiritBuilder] ✓ Shared build loaded successfully');
+          } else {
+            console.error('[SpiritBuilder] Invalid build type:', buildData.type);
+            alert('Invalid build type. This URL is for a different builder.');
+          }
+        } catch (error) {
+          console.error('[SpiritBuilder] Failed to load shared build:', error);
+          alert(`Failed to load shared build: ${error.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadFromSharedUrl();
+    }
+    // Fallback to old encoded system
+    else if (encodedBuild) {
       try {
         const decodedBuild = decodeBuild(encodedBuild);
         if (decodedBuild) {
@@ -306,11 +344,25 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
   // Handle selecting a saved spirit from gallery (includes configuration)
   const handleSavedSpiritSelected = (savedSpirit) => {
-    if (selectedSlotIndex === null) return;
+    // Auto-select slot if none is selected
+    let targetSlotIndex = selectedSlotIndex;
+
+    if (targetSlotIndex === null) {
+      // Find first empty slot
+      const firstEmptySlot = build.slots.findIndex(slot => slot.spirit === null);
+
+      if (firstEmptySlot !== -1) {
+        // Use first empty slot
+        targetSlotIndex = firstEmptySlot;
+      } else {
+        // All slots are filled, use the last slot (slot 2)
+        targetSlotIndex = 2;
+      }
+    }
 
     // Check if spirit is already equipped in another slot
     const isAlreadyEquipped = build.slots.some((slot, index) =>
-      slot.spirit && slot.spirit.id === savedSpirit.spirit.id && index !== selectedSlotIndex
+      slot.spirit && slot.spirit.id === savedSpirit.spirit.id && index !== targetSlotIndex
     );
 
     if (isAlreadyEquipped) {
@@ -319,7 +371,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     }
 
     const newSlots = [...build.slots];
-    newSlots[selectedSlotIndex] = {
+    newSlots[targetSlotIndex] = {
       spirit: savedSpirit.spirit,
       level: savedSpirit.level,
       awakeningLevel: savedSpirit.awakeningLevel,
@@ -374,12 +426,53 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
   const handleDragOver = (e, index) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    // Check if it's an external drag (from SavedSpiritsGallery) by looking at data types
+    const hasExternalData = e.dataTransfer.types.includes('application/json');
+    // Set appropriate drop effect: 'copy' for external, 'move' for internal slot swaps
+    e.dataTransfer.dropEffect = hasExternalData ? 'copy' : 'move';
   };
 
   const handleDrop = (e, targetIndex) => {
     e.preventDefault();
 
+    // Check for saved spirit drag from SavedSpiritsGallery
+    const dragData = e.dataTransfer.getData('application/json');
+    if (dragData) {
+      try {
+        const { type, spirit } = JSON.parse(dragData);
+        if (type === 'saved-spirit') {
+          console.log('[SpiritBuilder] Dropped saved spirit:', spirit.spirit.name);
+
+          // Check if spirit is already equipped in another slot
+          const isAlreadyEquipped = build.slots.some((slot, index) =>
+            slot.spirit && slot.spirit.id === spirit.spirit.id && index !== targetIndex
+          );
+
+          if (isAlreadyEquipped) {
+            alert('This spirit is already equipped in another slot!');
+            setDraggedSlotIndex(null);
+            return;
+          }
+
+          // Add saved spirit to target slot with its configuration
+          const newSlots = [...build.slots];
+          newSlots[targetIndex] = {
+            spirit: spirit.spirit,
+            level: spirit.level,
+            awakeningLevel: spirit.awakeningLevel,
+            evolutionLevel: spirit.evolutionLevel,
+            skillEnhancementLevel: spirit.skillEnhancementLevel
+          };
+          setBuild({ slots: newSlots });
+          setDraggedSlotIndex(null);
+          return;
+        }
+      } catch (error) {
+        console.error('[SpiritBuilder] Failed to parse drag data:', error);
+      }
+    }
+
+    // Handle slot swap (existing logic)
     if (draggedSlotIndex === null || draggedSlotIndex === targetIndex) {
       setDraggedSlotIndex(null);
       return;
@@ -398,21 +491,64 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
   };
 
   // Share build
-  const handleShareBuild = () => {
-    const serializedBuild = serializeBuild(build);
-    const encoded = encodeBuild(serializedBuild);
-    if (!encoded) {
-      alert('Failed to encode build');
-      return;
-    }
+  const handleShareBuild = async () => {
+    try {
+      setSharing(true);
+      setShareError(null);
 
-    const baseURL = window.location.origin + window.location.pathname;
-    const shareURL = `${baseURL}#/spirit-builder?data=${encoded}`;
+      console.log('[SpiritBuilder] Generating share URL...');
 
-    navigator.clipboard.writeText(shareURL).then(() => {
+      const configResponse = await fetch('/wiki-config.json');
+      const config = await configResponse.json();
+      const owner = config.wiki.repository.owner;
+      const repo = config.wiki.repository.repo;
+
+      // Serialize build to only include spirit IDs
+      const serializedBuild = serializeBuild(build);
+      const buildData = {
+        name: buildName,
+        slots: serializedBuild.slots
+      };
+
+      // Save build and get checksum
+      const checksum = await saveSharedBuild(owner, repo, 'spirit-build', buildData);
+
+      console.log('[SpiritBuilder] Generated checksum:', checksum);
+
+      // Generate share URL
+      const baseURL = window.location.origin + window.location.pathname;
+      const shareURL = generateShareUrl(baseURL, 'spirit-build', checksum);
+
+      await navigator.clipboard.writeText(shareURL);
+
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+
+      console.log('[SpiritBuilder] ✓ Share URL copied to clipboard');
+    } catch (error) {
+      console.error('[SpiritBuilder] Failed to generate share URL:', error);
+      setShareError(error.message || 'Failed to generate share URL');
+
+      // Fallback to old method if share service fails
+      try {
+        console.log('[SpiritBuilder] Falling back to old encoding method...');
+        const serializedBuild = serializeBuild(build);
+        const encoded = encodeBuild(serializedBuild);
+        if (encoded) {
+          const baseURL = window.location.origin + window.location.pathname;
+          const shareURL = `${baseURL}#/spirit-builder?data=${encoded}`;
+          await navigator.clipboard.writeText(shareURL);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          console.log('[SpiritBuilder] ✓ Fallback URL copied to clipboard');
+        }
+      } catch (fallbackError) {
+        console.error('[SpiritBuilder] Fallback also failed:', fallbackError);
+        alert('Failed to generate share URL');
+      }
+    } finally {
+      setSharing(false);
+    }
   };
 
   // Export build as JSON
@@ -667,9 +803,15 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleShareBuild}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                disabled={sharing}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
               >
-                {copied ? (
+                {sharing ? (
+                  <>
+                    <Loader className="w-4 h-4 flex-shrink-0 animate-spin text-blue-600 dark:text-blue-400" />
+                    <span>Generating...</span>
+                  </>
+                ) : copied ? (
                   <>
                     <Check className="w-4 h-4 flex-shrink-0 text-green-600 dark:text-green-400" />
                     <span>Copied!</span>
@@ -709,6 +851,12 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
                 <span>Clear</span>
               </button>
             </div>
+            {/* Share Error Message */}
+            {shareError && (
+              <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
+                {shareError}
+              </div>
+            )}
           </div>
         )}
 
@@ -784,7 +932,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
         </div>
 
         {/* Saved Spirits Gallery */}
-        {!isModal && isAuthenticated && selectedSlotIndex !== null && (
+        {isAuthenticated && (
           <div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
             <SavedSpiritsGallery
               onSelectSpirit={handleSavedSpiritSelected}

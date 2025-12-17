@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Plus, X, Settings, Move } from 'lucide-react';
 import SpiritSprite from './SpiritSprite';
 
@@ -52,6 +52,10 @@ const SpiritSlot = ({
 }) => {
   const isEmpty = !spirit;
   const [showConfigPopup, setShowConfigPopup] = useState(false);
+
+  // Refs for awakening input fields to attach wheel event listeners
+  const inlineAwakeningInputRef = useRef(null);
+  const modalAwakeningInputRef = useRef(null);
 
   // Element icon mapping
   const elementIcons = {
@@ -117,6 +121,44 @@ const SpiritSlot = ({
     }
   };
 
+  // Add wheel event listener for inline awakening input with passive: false
+  useEffect(() => {
+    const input = inlineAwakeningInputRef.current;
+    if (!input || readOnly || !isAwakeningEnabled) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const delta = e.deltaY > 0 ? -1 : 1;
+      const newLevel = Math.max(0, Math.min(awakeningLevel + delta, maxAwakeningLevel));
+      handleAwakeningLevelInput({ target: { value: newLevel } });
+    };
+
+    input.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      input.removeEventListener('wheel', handleWheel);
+    };
+  }, [awakeningLevel, maxAwakeningLevel, isAwakeningEnabled, readOnly]);
+
+  // Add wheel event listener for modal awakening input with passive: false
+  useEffect(() => {
+    const input = modalAwakeningInputRef.current;
+    if (!input || !isAwakeningEnabled) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const delta = e.deltaY > 0 ? -1 : 1;
+      const newLevel = Math.max(0, Math.min(awakeningLevel + delta, maxAwakeningLevel));
+      handleAwakeningLevelInput({ target: { value: newLevel } });
+    };
+
+    input.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      input.removeEventListener('wheel', handleWheel);
+    };
+  }, [awakeningLevel, maxAwakeningLevel, isAwakeningEnabled]);
+
   return (
     <div
       className={`flex flex-col items-center gap-2 transition-opacity ${isDragging ? 'opacity-50' : ''}`}
@@ -164,9 +206,6 @@ const SpiritSlot = ({
         {/* Ring Platform Background */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-yellow-500/20 to-orange-500/20 blur-xl"></div>
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-20 h-6 sm:w-24 sm:h-7 md:w-32 md:h-8 rounded-full bg-gradient-to-r from-transparent via-yellow-400/40 to-transparent blur-sm"></div>
         </div>
 
         {/* Spirit Container */}
@@ -225,10 +264,13 @@ const SpiritSlot = ({
               </div>
 
               {/* Remove Button (show on hover, not in readOnly mode) */}
-              {!readOnly && !onDragStart && (
+              {!readOnly && onRemoveSpirit && (
                 <button
-                  onClick={onRemoveSpirit}
-                  className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-20"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveSpirit();
+                  }}
+                  className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-30"
                   title="Remove spirit"
                 >
                   <X className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -265,6 +307,14 @@ const SpiritSlot = ({
                     type="number"
                     value={level}
                     onChange={handleLevelInput}
+                    onWheel={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (readOnly) return;
+                      const delta = e.deltaY > 0 ? -1 : 1;
+                      const newLevel = Math.max(1, Math.min(level + delta, 300));
+                      handleLevelInput({ target: { value: newLevel } });
+                    }}
                     disabled={readOnly}
                     min="1"
                     max="300"
@@ -298,6 +348,7 @@ const SpiritSlot = ({
                     Awakening:
                   </label>
                   <input
+                    ref={inlineAwakeningInputRef}
                     type="number"
                     value={awakeningLevel}
                     onChange={handleAwakeningLevelInput}
@@ -375,6 +426,13 @@ const SpiritSlot = ({
                   type="number"
                   value={level}
                   onChange={handleLevelInput}
+                  onWheel={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const delta = e.deltaY > 0 ? -1 : 1;
+                    const newLevel = Math.max(1, Math.min(level + delta, 300));
+                    handleLevelInput({ target: { value: newLevel } });
+                  }}
                   min="1"
                   max="300"
                   className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -416,6 +474,7 @@ const SpiritSlot = ({
                   Awakening Level {!isAwakeningEnabled && '(Locked)'}
                 </label>
                 <input
+                  ref={modalAwakeningInputRef}
                   type="number"
                   value={awakeningLevel}
                   onChange={handleAwakeningLevelInput}
