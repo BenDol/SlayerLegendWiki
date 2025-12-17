@@ -225,6 +225,16 @@ git commit -m "Update wiki framework"
 - wiki-framework submodule project should NEVER reference code from the parent project
 - User will handle all submodule git operations manually
 
+## Dev Server Management
+
+**IMPORTANT: Claude should NEVER start the dev server.**
+
+- User will start and stop the dev server manually
+- Claude should make code changes and edits as requested
+- Claude should NOT use `npm run dev`, `npm run dev:server`, or `npm run dev:vite` commands
+- User prefers to control when the server runs
+- After making changes, inform the user they may need to restart the server if it's running
+
 ## Development Workflow
 
 **Standard workflow (recommended):**

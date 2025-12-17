@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Lock, Plus } from 'lucide-react';
+import { Lock, Plus, Move } from 'lucide-react';
 import { getSkillGradeColor } from '../../wiki-framework/src/utils/rarityColors';
 
 /**
@@ -29,11 +29,16 @@ const SkillSlot = ({
   level = 1,
   isLocked = false,
   slotNumber,
+  slotIndex,
   onSelectSkill,
   onRemoveSkill,
   onLevelChange,
   readOnly = false,
-  onSkillClick
+  onSkillClick,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  isDragging = false
 }) => {
   const [showLevelInput, setShowLevelInput] = useState(false);
   const levelBadgeRef = useRef(null);
@@ -85,7 +90,7 @@ const SkillSlot = ({
     return (
       <div className="relative flex flex-col items-center">
         {/* Slot Background */}
-        <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+        <div className="relative w-24 h-24 sm:w-24 sm:h-24">
           <img
             src="/images/skills/skill_baseSlot_Wide.png"
             alt="Locked Slot"
@@ -106,20 +111,27 @@ const SkillSlot = ({
   // Empty slot
   if (!skill) {
     return (
-      <div className="relative flex flex-col items-center">
-        {/* Slot Background */}
-        <div className="relative w-20 h-20 sm:w-20 sm:h-20 group cursor-pointer flex items-center justify-center"
+      <div
+        className="relative flex flex-col items-center"
+        onDragOver={(e) => {
+          e.preventDefault();
+          onDragOver?.(e, slotNumber);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          onDrop?.(e, slotNumber);
+        }}
+      >
+        {/* Empty Slot - Similar to Spirit Placeholder */}
+        <div
+          className="relative w-24 h-24 sm:w-24 sm:h-24 group cursor-pointer flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 transition-colors bg-gray-50 dark:bg-gray-900/50"
           onClick={onSelectSkill}
         >
-          <img
-            src="/images/skills/skill_baseSlot_Wide.png"
-            alt="Empty Slot"
-            className="absolute inset-0 w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-          />
-
-          {/* Add Button */}
-          <div className="relative z-10 bg-blue-600/80 group-hover:bg-blue-500 rounded-full p-2 transition-colors shadow-lg">
-            <Plus className="w-8 h-8 text-white" />
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-10 h-10 rounded-full border-2 border-gray-400 dark:border-gray-500 flex items-center justify-center group-hover:border-blue-500 transition-colors">
+              <Plus className="w-6 h-6 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 transition-colors" />
+            </div>
+            <span className="text-gray-600 dark:text-gray-500 text-[10px] group-hover:text-blue-400 transition-colors">Add Skill</span>
           </div>
         </div>
 
@@ -131,21 +143,26 @@ const SkillSlot = ({
 
   // Skill slot with skill equipped
   return (
-    <div className="relative flex flex-col items-center group">
+    <div
+      className="relative flex flex-col items-center group"
+      draggable={!isLocked && (onDragStart !== undefined)}
+      onDragStart={(e) => !isLocked && onDragStart?.(e, slotIndex ?? slotNumber)}
+      onDragOver={(e) => {
+        e.preventDefault();
+        onDragOver?.(e, slotIndex ?? slotNumber);
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        onDrop?.(e, slotIndex ?? slotNumber);
+      }}
+    >
       {/* Skill Icon Container */}
       <div
-        className="relative w-20 h-20 sm:w-20 sm:h-20 cursor-pointer"
+        className={`relative w-24 h-24 sm:w-24 sm:h-24 cursor-pointer transition-opacity ${isDragging ? 'opacity-50' : ''}`}
         onClick={readOnly ? () => onSkillClick?.(skill) : onRemoveSkill}
       >
-        {/* Base Slot */}
-        <img
-          src="/images/skills/skill_baseSlot_Wide.png"
-          alt="Skill Slot"
-          className="absolute inset-0 w-full h-full object-contain"
-        />
-
         {/* Skill Icon with Rarity Glow */}
-        <div className={`absolute inset-2 sm:inset-3 rounded-lg overflow-hidden border-2 ${gradeColors.border} ${gradeColors.glow}`}>
+        <div className={`absolute inset-0 rounded-lg overflow-hidden border-2 ${gradeColors.border} ${gradeColors.glow}`}>
           <img
             src={skill.icon || '/images/skills/skill_deam.png'}
             alt={skill.name}
@@ -160,7 +177,7 @@ const SkillSlot = ({
             <img
               src={getElementIcon(skill.attribute)}
               alt={skill.attribute}
-              className="absolute -top-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+              className="absolute -top-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
             />
           )}
         </div>
@@ -168,16 +185,24 @@ const SkillSlot = ({
         {/* Hover indicator */}
         {!readOnly && (
           <div className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/20 rounded-lg transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <span className="text-white text-xs font-bold bg-red-600 px-2 py-1 rounded">
-              Remove
-            </span>
+            {onDragStart ? (
+              <div className="bg-gray-900/50 rounded-lg p-2">
+                <Move className="w-6 h-6 text-white/70" />
+              </div>
+            ) : (
+              <span className="text-white text-xs font-bold bg-red-600 px-2 py-1 rounded">
+                Remove
+              </span>
+            )}
           </div>
         )}
         {readOnly && (
           <div className="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/20 rounded-lg transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <span className="text-white text-xs font-bold bg-blue-600 px-2 py-1 rounded">
-              View
-            </span>
+            {onDragStart && (
+              <div className="bg-gray-900/50 rounded-lg p-2">
+                <Move className="w-6 h-6 text-white/70" />
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -185,7 +210,7 @@ const SkillSlot = ({
       {/* Level Badge - Top Center */}
       <div
         ref={levelBadgeRef}
-        className="absolute top-[2px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-bold rounded px-1.5 py-0.5 border border-gray-700 dark:border-gray-300 cursor-pointer hover:scale-110 transition-transform z-20 shadow-md"
+        className="absolute top-[2px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-white text-[10px] font-bold rounded px-1.5 py-0.5 border border-gray-700 cursor-pointer hover:scale-110 transition-transform z-20 shadow-md"
         onClick={(e) => {
           e.stopPropagation();
           setShowLevelInput(!showLevelInput);

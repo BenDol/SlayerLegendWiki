@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useBlocker } from 'react-router-dom';
-import { Share2, Download, Upload, Trash2, Copy, Check, Edit, Plus, Save, Loader, CheckCircle2 } from 'lucide-react';
+import { Share2, Download, Upload, Trash2, Copy, Check, Edit, Plus, Save, Loader, CheckCircle2, X, Move } from 'lucide-react';
 import SkillBuilderModal from './SkillBuilderModal';
 import SkillSlot from './SkillSlot';
 import SkillInformation from './SkillInformation';
+import SpiritBuilderModal from './SpiritBuilderModal';
+import SpiritComponent from './SpiritComponent';
 import SavedLoadoutsPanel from './SavedLoadoutsPanel';
 import { encodeLoadout, decodeLoadout } from '../../wiki-framework/src/utils/battleLoadoutEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
@@ -24,11 +26,13 @@ import { setCache } from '../utils/buildCache';
  */
 const BattleLoadouts = () => {
   const { isAuthenticated, user } = useAuthStore();
+  const loadoutNameInputRef = useRef(null);
   const [loadoutName, setLoadoutName] = useState('');
   const [currentLoadout, setCurrentLoadout] = useState(createEmptyLoadout(''));
   const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSkillBuilder, setShowSkillBuilder] = useState(false);
+  const [showSpiritBuilder, setShowSpiritBuilder] = useState(false);
   const [showSkillInfo, setShowSkillInfo] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -38,6 +42,9 @@ const BattleLoadouts = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [currentLoadedLoadoutId, setCurrentLoadedLoadoutId] = useState(null);
+  const [highlightNameField, setHighlightNameField] = useState(false);
+  const [draggedSkillSlotIndex, setDraggedSkillSlotIndex] = useState(null);
+  const [draggedSpiritSlotIndex, setDraggedSpiritSlotIndex] = useState(null);
 
   // Load skills data
   useEffect(() => {
@@ -73,7 +80,8 @@ const BattleLoadouts = () => {
   // Check if there are actual meaningful changes
   const hasActualChanges = hasUnsavedChanges && (
     loadoutName.trim() !== '' ||
-    currentLoadout.skillBuild !== null
+    currentLoadout.skillBuild !== null ||
+    currentLoadout.spiritBuild !== null
   );
 
   // Use React Router's useBlocker for navigation blocking
@@ -190,12 +198,137 @@ const BattleLoadouts = () => {
     setCurrentLoadedLoadoutId(null); // Clear loaded loadout ID when making changes
   };
 
+  // Handle spirit builder save
+  const handleSpiritBuildSave = (build) => {
+    setCurrentLoadout(prev => ({ ...prev, spiritBuild: build }));
+    setShowSpiritBuilder(false);
+    setHasUnsavedChanges(true);
+    setCurrentLoadedLoadoutId(null); // Clear loaded loadout ID when making changes
+  };
+
+  // Clear spirit build
+  const handleClearSpiritBuild = () => {
+    if (!confirm('Remove spirit build from this loadout?')) return;
+    setCurrentLoadout(prev => ({ ...prev, spiritBuild: null }));
+    setHasUnsavedChanges(true);
+    setCurrentLoadedLoadoutId(null); // Clear loaded loadout ID when making changes
+  };
+
+  // Remove individual spirit from slot
+  const handleRemoveSpirit = (slotIndex) => {
+    setCurrentLoadout(prev => {
+      if (!prev.spiritBuild) return prev;
+
+      const updatedSlots = [...prev.spiritBuild.slots];
+      updatedSlots[slotIndex] = {
+        spirit: null,
+        level: 1,
+        awakeningLevel: 0,
+        evolutionLevel: 0,
+        skillEnhancementLevel: 0
+      };
+
+      return {
+        ...prev,
+        spiritBuild: {
+          ...prev.spiritBuild,
+          slots: updatedSlots
+        }
+      };
+    });
+    setHasUnsavedChanges(true);
+    setCurrentLoadedLoadoutId(null); // Clear loaded loadout ID when making changes
+  };
+
+  // Drag and drop handlers for skills
+  const handleSkillDragStart = (e, index) => {
+    setDraggedSkillSlotIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleSkillDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleSkillDrop = (e, targetIndex) => {
+    e.preventDefault();
+
+    if (draggedSkillSlotIndex === null || draggedSkillSlotIndex === targetIndex) {
+      setDraggedSkillSlotIndex(null);
+      return;
+    }
+
+    if (!currentLoadout.skillBuild) return;
+
+    const newSlots = [...currentLoadout.skillBuild.slots];
+    const draggedSlot = newSlots[draggedSkillSlotIndex];
+    const targetSlot = newSlots[targetIndex];
+
+    // Swap slots
+    newSlots[draggedSkillSlotIndex] = targetSlot;
+    newSlots[targetIndex] = draggedSlot;
+
+    setCurrentLoadout(prev => ({
+      ...prev,
+      skillBuild: {
+        ...prev.skillBuild,
+        slots: newSlots
+      }
+    }));
+    setDraggedSkillSlotIndex(null);
+    setHasUnsavedChanges(true);
+    setCurrentLoadedLoadoutId(null);
+  };
+
+  // Drag and drop handlers for spirits
+  const handleSpiritDragStart = (e, index) => {
+    setDraggedSpiritSlotIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleSpiritDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleSpiritDrop = (e, targetIndex) => {
+    e.preventDefault();
+
+    if (draggedSpiritSlotIndex === null || draggedSpiritSlotIndex === targetIndex) {
+      setDraggedSpiritSlotIndex(null);
+      return;
+    }
+
+    if (!currentLoadout.spiritBuild) return;
+
+    const newSlots = [...currentLoadout.spiritBuild.slots];
+    const draggedSlot = newSlots[draggedSpiritSlotIndex];
+    const targetSlot = newSlots[targetIndex];
+
+    // Swap slots
+    newSlots[draggedSpiritSlotIndex] = targetSlot;
+    newSlots[targetIndex] = draggedSlot;
+
+    setCurrentLoadout(prev => ({
+      ...prev,
+      spiritBuild: {
+        ...prev.spiritBuild,
+        slots: newSlots
+      }
+    }));
+    setDraggedSpiritSlotIndex(null);
+    setHasUnsavedChanges(true);
+    setCurrentLoadedLoadoutId(null);
+  };
+
   // Load saved loadout
   const handleLoadLoadout = (loadout) => {
     // Check if there are actual meaningful changes (not just initial state)
     const hasActualChanges = hasUnsavedChanges && (
       loadoutName.trim() !== '' ||
-      currentLoadout.skillBuild !== null
+      currentLoadout.skillBuild !== null ||
+      currentLoadout.spiritBuild !== null
     );
 
     // Check for unsaved changes before loading
@@ -230,6 +363,7 @@ const BattleLoadouts = () => {
       const loadoutData = {
         name: currentLoadout.name,
         skillBuild: currentLoadout.skillBuild,
+        spiritBuild: currentLoadout.spiritBuild,
         spirit: currentLoadout.spirit,
         skillStone: currentLoadout.skillStone,
         promotionAbility: currentLoadout.promotionAbility,
@@ -271,7 +405,23 @@ const BattleLoadouts = () => {
       setRefreshTrigger(prev => prev + 1);
     } catch (err) {
       console.error('[BattleLoadouts] Failed to save loadout:', err);
-      setSaveError(err.message || 'Failed to save loadout');
+      const errorMessage = err.message || 'Failed to save loadout';
+      setSaveError(errorMessage);
+
+      // If error is about missing name, scroll to and focus the name input
+      if (errorMessage.toLowerCase().includes('name')) {
+        // Scroll to the name input
+        loadoutNameInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Focus the input
+        setTimeout(() => {
+          loadoutNameInputRef.current?.focus();
+
+          // Trigger highlight animation
+          setHighlightNameField(true);
+          setTimeout(() => setHighlightNameField(false), 2000);
+        }, 300);
+      }
     } finally {
       setSaving(false);
     }
@@ -327,7 +477,8 @@ const BattleLoadouts = () => {
     // Check if there are actual meaningful changes (not just initial state)
     const hasActualChanges = hasUnsavedChanges && (
       loadoutName.trim() !== '' ||
-      currentLoadout.skillBuild !== null
+      currentLoadout.skillBuild !== null ||
+      currentLoadout.spiritBuild !== null
     );
 
     // Check for unsaved changes before importing
@@ -410,14 +561,15 @@ const BattleLoadouts = () => {
         />
 
         {/* Loadout Name Panel */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className={`bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm transition-all ${highlightNameField ? 'ring-4 ring-red-500 ring-opacity-50' : ''}`}>
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Loadout Name:</label>
             <input
+              ref={loadoutNameInputRef}
               type="text"
               value={loadoutName}
               onChange={(e) => setLoadoutName(e.target.value)}
-              className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+              className={`flex-1 px-3 py-2 bg-white dark:bg-gray-800 border rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all ${highlightNameField ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
               placeholder="Enter loadout name..."
             />
           </div>
@@ -481,39 +633,47 @@ const BattleLoadouts = () => {
             setSelectedSkill(skill);
             setShowSkillInfo(true);
           }}
+          onDragStart={handleSkillDragStart}
+          onDragOver={handleSkillDragOver}
+          onDrop={handleSkillDrop}
+          draggedSlotIndex={draggedSkillSlotIndex}
         />
 
         {/* Two Column Layout for Other Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column */}
-          <div className="space-y-6">
-            <PlaceholderSection
-              title="Spirits"
-              description="Spirit Builder coming soon"
-              icon="🔮"
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:auto-rows-min">
+          {/* Spirits Section - Row 1, Col 1 */}
+          <SpiritsSection
+            spiritBuild={currentLoadout.spiritBuild}
+            onEdit={() => setShowSpiritBuilder(true)}
+            onClear={handleClearSpiritBuild}
+            onRemoveSpirit={handleRemoveSpirit}
+            onDragStart={handleSpiritDragStart}
+            onDragOver={handleSpiritDragOver}
+            onDrop={handleSpiritDrop}
+            draggedSlotIndex={draggedSpiritSlotIndex}
+          />
 
-            <PlaceholderSection
-              title="Slayer Promotion Abilities"
-              description="Promotion Ability Builder coming soon"
-              icon="⭐"
-            />
-          </div>
+          {/* Skill Stones - Row 1, Col 2 */}
+          <PlaceholderSection
+            title="Skill Stones"
+            description="Skill Stone Builder coming soon"
+            icon="💎"
+            matchHeight={true}
+          />
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            <PlaceholderSection
-              title="Skill Stones"
-              description="Skill Stone Builder coming soon"
-              icon="💎"
-            />
+          {/* Promotion Abilities - Row 2, Col 1 */}
+          <PlaceholderSection
+            title="Slayer Promotion Abilities"
+            description="Promotion Ability Builder coming soon"
+            icon="⭐"
+          />
 
-            <PlaceholderSection
-              title="Familiar"
-              description="Familiar Builder coming soon"
-              icon="🐾"
-            />
-          </div>
+          {/* Familiar - Row 2, Col 2 */}
+          <PlaceholderSection
+            title="Familiar"
+            description="Familiar Builder coming soon"
+            icon="🐾"
+          />
         </div>
         </div>
 
@@ -521,7 +681,7 @@ const BattleLoadouts = () => {
         {isAuthenticated && (
           <div className="sticky bottom-0 left-0 right-0 z-40 mt-6">
             <div className="max-w-7xl mx-auto px-3 sm:px-4">
-              <div className="bg-gray-900 rounded-t-lg border border-gray-700 border-b-0 shadow-2xl py-3">
+              <div className="bg-white dark:bg-gray-900 rounded-t-lg border border-gray-200 dark:border-gray-700 border-b-0 shadow-2xl py-3">
                 <div className="flex flex-col items-center gap-2">
                   {/* Error Message */}
                   {saveError && (
@@ -530,29 +690,42 @@ const BattleLoadouts = () => {
                     </div>
                   )}
 
-                  {/* Save Button */}
-                  <button
-                    onClick={handleSaveLoadout}
-                    disabled={saving || saveSuccess}
-                    className="flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-base font-semibold transition-colors shadow-lg"
-                  >
-                    {saving ? (
-                      <>
-                        <Loader className="w-5 h-5 animate-spin flex-shrink-0" />
-                        <span>Saving...</span>
-                      </>
-                    ) : saveSuccess ? (
-                      <>
-                        <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-                        <span>Saved!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-5 h-5 flex-shrink-0" />
-                        <span>Save Loadout</span>
-                      </>
+                  {/* Save Button with Unsaved Changes Indicator */}
+                  <div className="flex items-center gap-3">
+                    {/* Unsaved Changes Indicator */}
+                    {hasActualChanges && (
+                      <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <span className="hidden sm:inline text-sm">Unsaved changes</span>
+                      </div>
                     )}
-                  </button>
+
+                    {/* Save Button */}
+                    <button
+                      onClick={handleSaveLoadout}
+                      disabled={saving || saveSuccess}
+                      className="flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-base font-semibold transition-colors shadow-lg"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader className="w-5 h-5 animate-spin flex-shrink-0" />
+                          <span>Saving...</span>
+                        </>
+                      ) : saveSuccess ? (
+                        <>
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                          <span>Saved!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-5 h-5 flex-shrink-0" />
+                          <span>Save Loadout</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -566,6 +739,14 @@ const BattleLoadouts = () => {
         onClose={() => setShowSkillBuilder(false)}
         initialBuild={currentLoadout.skillBuild}
         onSave={handleSkillBuildSave}
+      />
+
+      {/* Spirit Builder Modal */}
+      <SpiritBuilderModal
+        isOpen={showSpiritBuilder}
+        onClose={() => setShowSpiritBuilder(false)}
+        initialBuild={currentLoadout.spiritBuild}
+        onSave={handleSpiritBuildSave}
       />
 
       {/* Skill Information Modal */}
@@ -584,28 +765,34 @@ const BattleLoadouts = () => {
 /**
  * Skills Section Component
  */
-const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick }) => {
+const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick, onDragStart, onDragOver, onDrop, draggedSlotIndex }) => {
+  const handleClear = () => {
+    if (window.confirm('Are you sure you want to clear the skill build? This cannot be undone.')) {
+      onClear();
+    }
+  };
+
   return (
-    <div style={{ paddingBottom: '2.5rem' }} className="bg-gray-800 rounded-lg p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-white">Skills to use</span>
+    <div style={{ paddingBottom: '2.5rem' }} className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 border border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Skills to use</span>
         </div>
         <div className="flex gap-2">
           <button
             onClick={onEdit}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
           >
-            <Edit className="w-4 h-4" />
-            {skillBuild ? 'Edit Build' : 'Create Build'}
+            <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>{skillBuild ? 'Edit' : 'Create'}</span>
           </button>
           {skillBuild && (
             <button
-              onClick={onClear}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+              onClick={handleClear}
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
             >
-              <Trash2 className="w-4 h-4" />
-              Clear
+              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Clear</span>
             </button>
           )}
         </div>
@@ -613,10 +800,10 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick }) => {
 
       {skillBuild ? (
         <div>
-          <div className="text-sm text-gray-400 mb-4">
-            Build: <span className="text-white font-medium">{skillBuild.name}</span>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3 md:mb-4">
+            Build: <span className="text-gray-900 dark:text-white font-medium">{skillBuild.name}</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 justify-items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 md:gap-4 justify-items-center">
             {skillBuild.slots.slice(0, 10).map((slot, index) => (
               <SkillSlot
                 key={index}
@@ -624,11 +811,16 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick }) => {
                 level={slot.level}
                 isLocked={false}
                 slotNumber={index + 1}
-                onSelectSkill={() => {}}
+                slotIndex={index}
+                onSelectSkill={onEdit}
                 onRemoveSkill={() => {}}
                 onLevelChange={() => {}}
                 readOnly={true}
                 onSkillClick={onSkillClick}
+                onDragStart={onDragStart}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
+                isDragging={draggedSlotIndex === index}
               />
             ))}
           </div>
@@ -636,12 +828,165 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick }) => {
       ) : (
         <button
           onClick={onEdit}
-          className="w-full flex items-center justify-center py-12 border-2 border-dashed border-gray-600 rounded-lg hover:border-blue-500 hover:bg-gray-700/50 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-center py-8 sm:py-10 md:py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
         >
-          <div className="text-center">
-            <Plus className="w-12 h-12 text-gray-500 mx-auto mb-2" />
-            <p className="text-gray-400">No skill build configured</p>
-            <p className="text-sm text-gray-500 mt-1">Click here or "Create Build" to get started</p>
+          <div className="text-center px-2">
+            <Plus className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">No skill build configured</p>
+            <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click here or "Create" to get started</p>
+          </div>
+        </button>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Spirits Section Component
+ */
+const SpiritsSection = ({ spiritBuild, onEdit, onClear, onRemoveSpirit, onDragStart, onDragOver, onDrop, draggedSlotIndex }) => {
+  // Check if spirit build has any spirits configured
+  const hasAnySpirits = spiritBuild && spiritBuild.slots.some(slot => slot.spirit !== null);
+
+  const handleClear = () => {
+    if (window.confirm('Are you sure you want to clear the spirit build? This cannot be undone.')) {
+      onClear();
+    }
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="text-2xl sm:text-3xl">🔮</span>
+          <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Spirits</span>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={onEdit}
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
+          >
+            <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>{hasAnySpirits ? 'Edit' : 'Create'}</span>
+          </button>
+          {hasAnySpirits && (
+            <button
+              onClick={handleClear}
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
+            >
+              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Clear</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {spiritBuild ? (
+        <div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3 md:mb-4">
+            Build: <span className="text-gray-900 dark:text-white font-medium">{spiritBuild.name}</span>
+          </div>
+          <div className="grid grid-cols-3 gap-1 sm:gap-2 md:gap-4 lg:gap-6">
+            {spiritBuild.slots.slice(0, 3).map((slot, index) => (
+              <div
+                key={index}
+                className={`flex justify-center transition-opacity ${draggedSlotIndex === index ? 'opacity-50' : ''}`}
+                draggable={slot.spirit !== null}
+                onDragStart={(e) => slot.spirit && onDragStart?.(e, index)}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  onDragOver?.(e, index);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  onDrop?.(e, index);
+                }}
+              >
+                {slot.spirit ? (
+                  <div className="relative group">
+                    {/* Mobile X Button - Bottom Center */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveSpirit(index);
+                      }}
+                      className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-20 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center shadow-lg transition-colors lg:hidden"
+                      aria-label="Remove spirit"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+
+                    {/* Spirit Card */}
+                    <button
+                      onClick={onEdit}
+                      className="bg-gray-100 dark:bg-gray-800/50 rounded-lg p-1.5 sm:p-2 md:p-3 border border-gray-300 dark:border-gray-700 hover:border-blue-500 hover:bg-gray-200 dark:hover:bg-gray-700/50 transition-colors cursor-pointer relative"
+                    >
+                      <div className="scale-75 sm:scale-90 md:scale-100 origin-center">
+                        <SpiritComponent
+                          spirit={slot.spirit}
+                          level={slot.level}
+                          awakeningLevel={slot.awakeningLevel || 0}
+                          evolutionLevel={slot.evolutionLevel}
+                          skillEnhancementLevel={slot.skillEnhancementLevel}
+                          showLevelOverlays={true}
+                          showPlatform={true}
+                          showEnhancementLevel={true}
+                          showElementIcon={true}
+                          size="medium"
+                        />
+                      </div>
+
+                      {/* Drag Indicator Overlay */}
+                      <div className="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/20 rounded-lg transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                        <div className="bg-gray-900/50 rounded-lg p-2">
+                          <Move className="w-5 h-5 sm:w-6 sm:h-6 text-white/70" />
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Desktop Remove Button - Bottom (hover only) */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveSpirit(index);
+                      }}
+                      className="hidden lg:flex absolute bottom-0 left-0 right-0 bg-red-600/90 hover:bg-red-600 text-white py-2 rounded-b-lg items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium"
+                      aria-label="Remove spirit"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={onEdit}
+                    className="bg-gray-100 dark:bg-gray-800/50 rounded-lg p-1.5 sm:p-2 md:p-3 border border-gray-300 dark:border-gray-700 hover:border-blue-500 hover:bg-gray-200 dark:hover:bg-gray-700/50 transition-colors group"
+                  >
+                    <div className="scale-75 sm:scale-90 md:scale-100 origin-center">
+                      <div className="w-24 h-28 sm:w-28 sm:h-32 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg group-hover:border-blue-500 transition-colors">
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="w-10 h-10 rounded-full border-2 border-gray-400 dark:border-gray-500 flex items-center justify-center group-hover:border-blue-500 transition-colors">
+                            <Plus className="w-6 h-6 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 transition-colors" />
+                          </div>
+                          <span className="text-gray-600 dark:text-gray-500 text-xs group-hover:text-blue-400 transition-colors">Add Spirit</span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={onEdit}
+          className="w-full flex items-center justify-center py-8 sm:py-10 md:py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+        >
+          <div className="text-center px-2">
+            <Plus className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">No spirit build configured</p>
+            <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click here or "Create" to get started</p>
           </div>
         </button>
       )}
@@ -652,16 +997,16 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick }) => {
 /**
  * Placeholder Section Component
  */
-const PlaceholderSection = ({ title, description, icon }) => {
+const PlaceholderSection = ({ title, description, icon, matchHeight = false }) => {
   return (
-    <div className="bg-gray-800 rounded-lg p-6 opacity-60">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-2xl">{icon}</span>
-        <span className="text-xl font-bold text-white">{title}</span>
+    <div className={`bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 opacity-60 border border-gray-200 dark:border-gray-800 ${matchHeight ? 'flex flex-col h-full' : ''}`}>
+      <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+        <span className="text-2xl sm:text-3xl">{icon}</span>
+        <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{title}</span>
       </div>
-      <div className="flex items-center justify-center py-12 border-2 border-dashed border-gray-600 rounded-lg">
-        <div className="text-center">
-          <p className="text-gray-400 text-lg">{description}</p>
+      <div className={`flex items-center justify-center ${matchHeight ? 'flex-1' : 'py-8 sm:py-10 md:py-12'} border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg`}>
+        <div className="text-center px-2">
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base md:text-lg">{description}</p>
         </div>
       </div>
     </div>
@@ -675,6 +1020,7 @@ function createEmptyLoadout(name) {
   return {
     name,
     skillBuild: null,
+    spiritBuild: null,
     spirit: null,
     skillStone: null,
     promotionAbility: null,

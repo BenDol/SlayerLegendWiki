@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './wiki-framework/src/App.jsx';
 import ErrorBoundary from './wiki-framework/src/components/common/ErrorBoundary.jsx';
 import './wiki-framework/src/styles/index.css';
+import { Ghost, Sparkles, Sword } from 'lucide-react';
 
 // Initialize bot token for comment system (prevents users from closing comment issues)
 import { initializeBotOctokit } from './wiki-framework/src/services/github/api.js';
@@ -15,6 +16,8 @@ import { processGameSyntax, getGameComponents, renderSkillPreview, renderEquipme
 import { searchDataForAutocomplete } from './src/utils/dataAutocompleteSearch.js';
 import DataSelector from './src/components/DataSelector.jsx';
 import SpiritPicker from './src/components/SpiritPicker.jsx';
+import SkillPicker from './src/components/SkillPicker.jsx';
+import EquipmentPicker from './src/components/EquipmentPicker.jsx';
 
 // Register custom markdown processors for skill/equipment cards and data injection
 registerContentProcessor(processGameSyntax);
@@ -22,7 +25,9 @@ registerCustomComponents(getGameComponents());
 registerSkillPreview(renderSkillPreview);
 registerEquipmentPreview(renderEquipmentPreview);
 registerDataSelector(DataSelector);
-registerPicker('spirit', SpiritPicker);
+registerPicker('spirit', SpiritPicker, { icon: Ghost, label: 'Insert Spirit' });
+registerPicker('skill', SkillPicker, { icon: Sparkles, label: 'Insert Skill' });
+registerPicker('equipment', EquipmentPicker, { icon: Sword, label: 'Insert Equipment' });
 registerDataAutocompleteSearch(searchDataForAutocomplete);
 
 // Register data sources for data injection
@@ -310,16 +315,30 @@ dataRegistry.register('drop-tables', {
   type: 'object'
 });
 
-// Register game-specific custom routes
+// Register game-specific custom routes with lazy loading for better startup performance
 import { registerCustomRoutes } from './wiki-framework/src/utils/routeRegistry.js';
-import SkillBuildSimulatorPage from './src/pages/SkillBuildSimulatorPage.jsx';
-import BattleLoadoutsPage from './src/pages/BattleLoadoutsPage.jsx';
-import SpiritSpriteDemoPage from './src/pages/SpiritSpriteDemoPage.jsx';
+
+// Lazy load pages to improve initial load time - components only load when route is visited
+const SkillBuildSimulatorPage = React.lazy(() => import('./src/pages/SkillBuildSimulatorPage.jsx'));
+const BattleLoadoutsPage = React.lazy(() => import('./src/pages/BattleLoadoutsPage.jsx'));
+const SpiritSpriteDemoPage = React.lazy(() => import('./src/pages/SpiritSpriteDemoPage.jsx'));
+const SpiritBuilderPage = React.lazy(() => import('./src/pages/SpiritBuilderPage.jsx'));
+const MySpiritCollectionPage = React.lazy(() => import('./src/pages/MySpiritCollectionPage.jsx'));
 
 registerCustomRoutes([
   {
     path: 'skill-builder',
     component: <SkillBuildSimulatorPage />,
+    suspense: true
+  },
+  {
+    path: 'spirit-builder',
+    component: <SpiritBuilderPage />,
+    suspense: true
+  },
+  {
+    path: 'my-spirits',
+    component: <MySpiritCollectionPage />,
     suspense: true
   },
   {

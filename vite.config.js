@@ -44,5 +44,14 @@ export default createWikiConfigSync({
     port: 5173,
     // SPA fallback: Always serve index.html for client-side routing
     historyApiFallback: true,
+    watch: {
+      // Exclude images from file watching to improve startup performance
+      // With 12,000+ images, watching them adds significant overhead
+      // Images are static assets that don't need hot module replacement
+      ignored: [
+        '**/public/images/**',
+        '**/external/**',
+      ],
+    },
   },
 });

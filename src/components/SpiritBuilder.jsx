@@ -1,40 +1,46 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useBlocker } from 'react-router-dom';
-import { Share2, Download, Upload, Settings, Trash2, Copy, Check, Save, Loader, CheckCircle2 } from 'lucide-react';
-import SkillSlot from './SkillSlot';
-import SkillSelector from './SkillSelector';
-import SavedBuildsPanel from './SavedBuildsPanel';
+import { Share2, Download, Upload, Trash2, Check, Save, Loader, CheckCircle2 } from 'lucide-react';
+import SpiritSlot from './SpiritSlot';
+import SpiritSelector from './SpiritSelector';
+import SavedSpiritBuildsPanel from './SavedSpiritBuildsPanel';
+import SavedSpiritsGallery from './SavedSpiritsGallery';
 import { encodeBuild, decodeBuild } from '../../wiki-framework/src/components/wiki/BuildEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
 
 /**
- * SkillBuilder Component
+ * SpiritBuilder Component
  *
- * Main component for creating and sharing skill builds
+ * Main component for creating and sharing spirit builds
  * Features:
- * - Configurable skill slots (1-10)
+ * - 3 Spirit Slots (1 companion + 2 partners)
+ * - Configuration per slot (level, evolution, skill enhancement)
  * - URL sharing with encoded build data
  * - Import/Export builds as JSON
- * - Build statistics
- * - Game-accurate UI design
+ * - Save system with GitHub backend
+ * - Unsaved changes detection and navigation blocking
  *
- * @param {boolean} isModal - If true, renders in modal mode with Save button instead of Share
+ * @param {boolean} isModal - If true, renders in modal mode with Save button
  * @param {object} initialBuild - Initial build data to load (for modal mode)
  * @param {function} onSave - Callback when Save is clicked in modal mode
  * @param {boolean} allowSavingBuilds - If true, shows build name field and save-related UI (default: true)
  */
-const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave = null, allowSavingBuilds = true }, ref) => {
+const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave = null, allowSavingBuilds = true }, ref) => {
   const { isAuthenticated, user } = useAuthStore();
-  const [skills, setSkills] = useState([]);
+  const [spirits, setSpirits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [buildName, setBuildName] = useState('');
-  const [maxSlots, setMaxSlots] = useState(10);
-  const [autoMaxLevel, setAutoMaxLevel] = useState(false);
   const [build, setBuild] = useState({
-    slots: Array(10).fill(null).map(() => ({ skill: null, level: 1 }))
+    slots: Array(3).fill(null).map(() => ({
+      spirit: null,
+      level: 1,
+      awakeningLevel: 0,
+      evolutionLevel: 4,
+      skillEnhancementLevel: 0
+    }))
   });
-  const [showSkillSelector, setShowSkillSelector] = useState(false);
+  const [showSpiritSelector, setShowSpiritSelector] = useState(false);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState(null);
   const [copied, setCopied] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -45,14 +51,14 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
-  // Load skills data
+  // Load spirits data
   useEffect(() => {
-    loadSkills();
+    loadSpirits();
   }, []);
 
-  // Load build from URL after skills are loaded (only in page mode)
+  // Load build from URL after spirits are loaded (only in page mode)
   useEffect(() => {
-    if (skills.length === 0) return; // Wait for skills to load
+    if (spirits.length === 0) return; // Wait for spirits to load
     if (isModal) return; // Skip URL loading in modal mode
 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
@@ -63,10 +69,9 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         const decodedBuild = decodeBuild(encodedBuild);
         if (decodedBuild) {
           setBuildName(decodedBuild.name || '');
-          setMaxSlots(decodedBuild.maxSlots || 10);
 
-          // Deserialize build (convert skill IDs back to full skill objects)
-          const deserializedBuild = deserializeBuild(decodedBuild, skills);
+          // Deserialize build (convert spirit IDs back to full spirit objects)
+          const deserializedBuild = deserializeBuild(decodedBuild, spirits);
           setBuild({ slots: deserializedBuild.slots });
           setHasUnsavedChanges(true); // Mark as having changes to block navigation
         }
@@ -74,26 +79,25 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         console.error('Failed to load build from URL:', error);
       }
     }
-  }, [skills, isModal]); // Trigger when skills load
+  }, [spirits, isModal]);
 
   // Load initial build in modal mode
   useEffect(() => {
-    if (skills.length === 0) return; // Wait for skills to load
+    if (spirits.length === 0) return; // Wait for spirits to load
     if (!isModal || !initialBuild) return; // Only in modal mode with initial data
 
-    setBuildName(initialBuild.name || 'My Build');
-    setMaxSlots(initialBuild.maxSlots || 10);
+    setBuildName(initialBuild.name || 'My Spirit Build');
 
-    // Deserialize build to ensure skill objects are current
-    const deserializedBuild = deserializeBuild(initialBuild, skills);
+    // Deserialize build to ensure spirit objects are current
+    const deserializedBuild = deserializeBuild(initialBuild, spirits);
     setBuild({ slots: deserializedBuild.slots });
     setHasUnsavedChanges(true); // Mark as having changes to block navigation
-  }, [skills, isModal, initialBuild]);
+  }, [spirits, isModal, initialBuild]);
 
   // Check if there are actual meaningful changes
   const hasActualChanges = hasUnsavedChanges && (
     buildName.trim() !== '' ||
-    build.slots.some(slot => slot.skill !== null)
+    build.slots.some(slot => slot.spirit !== null)
   );
 
   // Use React Router's useBlocker for navigation blocking (only in page mode, not modal)
@@ -135,63 +139,74 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     };
   }, [hasActualChanges, isModal]);
 
-  const loadSkills = async () => {
+  const loadSpirits = async () => {
     try {
-      const response = await fetch('/data/skills.json');
+      const response = await fetch('/data/spirit-characters.json');
       const data = await response.json();
-      setSkills(data);
+      setSpirits(data.spirits);
     } catch (error) {
-      console.error('Failed to load skills:', error);
+      console.error('Failed to load spirits:', error);
     } finally {
       setLoading(false);
     }
   };
 
   /**
-   * Serialize build for URL encoding (skill objects -> skill IDs only)
-   * This makes URLs resilient to skill data changes
+   * Serialize build for URL encoding (spirit objects -> spirit IDs only)
    */
   const serializeBuild = (build) => {
     return {
       name: buildName,
-      maxSlots,
       slots: build.slots.map(slot => ({
-        skillId: slot.skill?.id || null,
-        level: slot.level
+        spiritId: slot.spirit?.id || null,
+        level: slot.level,
+        awakeningLevel: slot.awakeningLevel,
+        evolutionLevel: slot.evolutionLevel,
+        skillEnhancementLevel: slot.skillEnhancementLevel
       }))
     };
   };
 
   /**
-   * Deserialize build after decoding (skill IDs -> full skill objects)
-   * Handles both new format (IDs) and old format (full objects) for backward compatibility
+   * Deserialize build after decoding (spirit IDs -> full spirit objects)
    */
-  const deserializeBuild = (serializedBuild, skillsArray) => {
+  const deserializeBuild = (serializedBuild, spiritsArray) => {
     return {
       slots: serializedBuild.slots.map(slot => {
-        // Handle new format (skillId)
-        if (slot.skillId !== undefined) {
-          const skill = skillsArray.find(s => s.id === slot.skillId);
+        // Handle new format (spiritId)
+        if (slot.spiritId !== undefined) {
+          const spirit = spiritsArray.find(s => s.id === slot.spiritId);
           return {
-            skill: skill || null,
-            level: slot.level || 1
+            spirit: spirit || null,
+            level: slot.level || 1,
+            awakeningLevel: slot.awakeningLevel || 0,
+            evolutionLevel: slot.evolutionLevel || 4,
+            skillEnhancementLevel: slot.skillEnhancementLevel || 0
           };
         }
-        // Handle old format (full skill object) for backward compatibility
-        else if (slot.skill) {
-          // Try to find skill by ID first, fallback to name
-          let skill = skillsArray.find(s => s.id === slot.skill.id);
-          if (!skill) {
-            skill = skillsArray.find(s => s.name === slot.skill.name);
+        // Handle old format (full spirit object) for backward compatibility
+        else if (slot.spirit) {
+          let spirit = spiritsArray.find(s => s.id === slot.spirit.id);
+          if (!spirit) {
+            spirit = spiritsArray.find(s => s.name === slot.spirit.name);
           }
           return {
-            skill: skill || slot.skill, // Use found skill or keep old data
-            level: slot.level || 1
+            spirit: spirit || slot.spirit,
+            level: slot.level || 1,
+            awakeningLevel: slot.awakeningLevel || 0,
+            evolutionLevel: slot.evolutionLevel || 4,
+            skillEnhancementLevel: slot.skillEnhancementLevel || 0
           };
         }
         // Empty slot
         else {
-          return { skill: null, level: 1 };
+          return {
+            spirit: null,
+            level: 1,
+            awakeningLevel: 0,
+            evolutionLevel: 4,
+            skillEnhancementLevel: 0
+          };
         }
       })
     };
@@ -203,24 +218,26 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
   const buildsMatch = (savedBuild) => {
     if (!savedBuild) return false;
 
-    // Check name and maxSlots
+    // Check name
     if (savedBuild.name !== buildName) return false;
-    if (savedBuild.maxSlots !== maxSlots) return false;
 
     // Check if all slots match
-    for (let i = 0; i < maxSlots; i++) {
+    for (let i = 0; i < 3; i++) {
       const currentSlot = build.slots[i];
       const savedSlot = savedBuild.slots[i];
 
       // Both empty
-      if (!currentSlot?.skill && !savedSlot?.skill) continue;
+      if (!currentSlot?.spirit && !savedSlot?.spirit) continue;
 
       // One empty, one not
-      if (!currentSlot?.skill || !savedSlot?.skill) return false;
+      if (!currentSlot?.spirit || !savedSlot?.spirit) return false;
 
-      // Check skill ID and level
-      if (currentSlot.skill.id !== savedSlot.skill?.id) return false;
+      // Check spirit ID and levels
+      if (currentSlot.spirit.id !== savedSlot.spirit?.id) return false;
       if (currentSlot.level !== savedSlot.level) return false;
+      if (currentSlot.awakeningLevel !== savedSlot.awakeningLevel) return false;
+      if (currentSlot.evolutionLevel !== savedSlot.evolutionLevel) return false;
+      if (currentSlot.skillEnhancementLevel !== savedSlot.skillEnhancementLevel) return false;
     }
 
     return true;
@@ -228,17 +245,14 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
   /**
    * Check if current build matches any saved build and update highlighting
-   * Note: This only tracks which build is loaded, not unsaved changes
    */
   useEffect(() => {
-    // Check if there's any content
-    const hasContent = buildName.trim() !== '' || build.slots.some(slot => slot.skill !== null);
+    const hasContent = buildName.trim() !== '' || build.slots.some(slot => slot.spirit !== null);
 
     if (!isAuthenticated || savedBuilds.length === 0) {
       if (currentLoadedBuildId !== null) {
         setCurrentLoadedBuildId(null);
       }
-      // If not authenticated or no saved builds, only update if no content
       if (!hasContent && hasUnsavedChanges) {
         setHasUnsavedChanges(false);
       } else if (hasContent && !hasUnsavedChanges) {
@@ -252,53 +266,103 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
     if (matchingBuild) {
       setCurrentLoadedBuildId(matchingBuild.id);
-      // Don't automatically clear hasUnsavedChanges when matching
-      // It should only be cleared when explicitly loading or after successful save
     } else {
       setCurrentLoadedBuildId(null);
-      // Mark as having changes if there's content and no match
       if (hasContent && !hasUnsavedChanges) {
         setHasUnsavedChanges(true);
       }
     }
-  }, [buildName, maxSlots, build, savedBuilds, isAuthenticated, hasUnsavedChanges]);
+  }, [buildName, build, savedBuilds, isAuthenticated, hasUnsavedChanges]);
 
   // Handle slot actions
   const handleSelectSlot = (index) => {
     setSelectedSlotIndex(index);
-    setShowSkillSelector(true);
+    setShowSpiritSelector(true);
   };
 
-  const handleSkillSelected = (skill) => {
+  const handleSpiritSelected = (spirit) => {
     if (selectedSlotIndex === null) return;
 
-    // Check if skill is already equipped in another slot
+    // Check if spirit is already equipped in another slot
     const isAlreadyEquipped = build.slots.some((slot, index) =>
-      slot.skill && slot.skill.id === skill.id && index !== selectedSlotIndex
+      slot.spirit && slot.spirit.id === spirit.id && index !== selectedSlotIndex
     );
 
     if (isAlreadyEquipped) {
-      alert('This skill is already equipped in another slot!');
+      alert('This spirit is already equipped in another slot!');
       return;
     }
 
     const newSlots = [...build.slots];
     newSlots[selectedSlotIndex] = {
-      skill: skill,
-      level: autoMaxLevel ? (skill.maxLevel || 130) : 1
+      spirit: spirit,
+      level: 1,
+      awakeningLevel: 0,
+      evolutionLevel: 4,
+      skillEnhancementLevel: 0
     };
     setBuild({ slots: newSlots });
   };
 
-  const handleRemoveSkill = (index) => {
+  // Handle selecting a saved spirit from gallery (includes configuration)
+  const handleSavedSpiritSelected = (savedSpirit) => {
+    if (selectedSlotIndex === null) return;
+
+    // Check if spirit is already equipped in another slot
+    const isAlreadyEquipped = build.slots.some((slot, index) =>
+      slot.spirit && slot.spirit.id === savedSpirit.spirit.id && index !== selectedSlotIndex
+    );
+
+    if (isAlreadyEquipped) {
+      alert('This spirit is already equipped in another slot!');
+      return;
+    }
+
     const newSlots = [...build.slots];
-    newSlots[index] = { skill: null, level: 1 };
+    newSlots[selectedSlotIndex] = {
+      spirit: savedSpirit.spirit,
+      level: savedSpirit.level,
+      awakeningLevel: savedSpirit.awakeningLevel,
+      evolutionLevel: savedSpirit.evolutionLevel,
+      skillEnhancementLevel: savedSpirit.skillEnhancementLevel
+    };
+    setBuild({ slots: newSlots });
+    setShowSpiritSelector(false);
+  };
+
+  const handleRemoveSpirit = (index) => {
+    const newSlots = [...build.slots];
+    newSlots[index] = {
+      spirit: null,
+      level: 1,
+      awakeningLevel: 0,
+      evolutionLevel: 4,
+      skillEnhancementLevel: 0
+    };
     setBuild({ slots: newSlots });
   };
 
   const handleLevelChange = (index, newLevel) => {
     const newSlots = [...build.slots];
     newSlots[index].level = newLevel;
+    setBuild({ slots: newSlots });
+  };
+
+  const handleAwakeningLevelChange = (index, newAwakeningLevel) => {
+    const newSlots = [...build.slots];
+    newSlots[index].awakeningLevel = newAwakeningLevel;
+    setBuild({ slots: newSlots });
+  };
+
+  const handleEvolutionChange = (index, newEvolution) => {
+    const newSlots = [...build.slots];
+    newSlots[index].evolutionLevel = newEvolution;
+    setBuild({ slots: newSlots });
+  };
+
+  const handleSkillEnhancementChange = (index, newSkillEnhancement) => {
+    const newSlots = [...build.slots];
+    newSlots[index].skillEnhancementLevel = newSkillEnhancement;
     setBuild({ slots: newSlots });
   };
 
@@ -335,9 +399,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
   // Share build
   const handleShareBuild = () => {
-    // Serialize build to only include skill IDs (not full skill objects)
     const serializedBuild = serializeBuild(build);
-
     const encoded = encodeBuild(serializedBuild);
     if (!encoded) {
       alert('Failed to encode build');
@@ -345,7 +407,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     }
 
     const baseURL = window.location.origin + window.location.pathname;
-    const shareURL = `${baseURL}#/skill-builder?data=${encoded}`;
+    const shareURL = `${baseURL}#/spirit-builder?data=${encoded}`;
 
     navigator.clipboard.writeText(shareURL).then(() => {
       setCopied(true);
@@ -357,7 +419,6 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
   const handleExportBuild = () => {
     const buildData = {
       name: buildName,
-      maxSlots,
       slots: build.slots,
       exportedAt: new Date().toISOString()
     };
@@ -368,7 +429,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${buildName.replace(/\s+/g, '_')}.json`;
+    link.download = `${buildName.replace(/\s+/g, '_')}_spirit_build.json`;
     link.click();
 
     URL.revokeObjectURL(url);
@@ -379,19 +440,16 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check if there are actual meaningful changes (not just initial state)
     const hasActualChanges = hasUnsavedChanges && (
       buildName.trim() !== '' ||
-      build.slots.some(slot => slot.skill !== null)
+      build.slots.some(slot => slot.spirit !== null)
     );
 
-    // Check for unsaved changes before importing
     if (hasActualChanges) {
       const confirmed = window.confirm(
         'You have unsaved changes. Importing a build will discard your current changes. Continue?'
       );
       if (!confirmed) {
-        // Reset file input
         event.target.value = '';
         return;
       }
@@ -402,12 +460,10 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       try {
         const buildData = JSON.parse(e.target.result);
         setBuildName(buildData.name || '');
-        setMaxSlots(buildData.maxSlots || 10);
 
-        // Deserialize build to ensure skill objects are current
-        const deserializedBuild = deserializeBuild(buildData, skills);
+        const deserializedBuild = deserializeBuild(buildData, spirits);
         setBuild({ slots: deserializedBuild.slots });
-        setHasUnsavedChanges(true); // Mark as having changes to block navigation
+        setHasUnsavedChanges(true);
       } catch (error) {
         console.error('Failed to import build:', error);
         alert('Failed to import build. Invalid file format.');
@@ -415,28 +471,32 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     };
     reader.readAsText(file);
 
-    // Reset file input for next import
     event.target.value = '';
   };
 
   // Clear build
   const handleClearBuild = () => {
-    if (!confirm('Clear all skills from this build?')) return;
-    setBuild({ slots: Array(maxSlots).fill(null).map(() => ({ skill: null, level: 1 })) });
+    if (!confirm('Clear all spirits from this build?')) return;
+    setBuild({
+      slots: Array(3).fill(null).map(() => ({
+        spirit: null,
+        level: 1,
+        evolutionLevel: 4,
+        skillEnhancementLevel: 0
+      }))
+    });
     setBuildName('');
-    setHasUnsavedChanges(false); // No content after clearing
-    setCurrentLoadedBuildId(null); // No loaded build after clearing
+    setHasUnsavedChanges(false);
+    setCurrentLoadedBuildId(null);
   };
 
   // Load build from saved builds
   const handleLoadBuild = (savedBuild) => {
-    // Check if there are actual meaningful changes (not just initial state)
     const hasActualChanges = hasUnsavedChanges && (
       buildName.trim() !== '' ||
-      build.slots.some(slot => slot.skill !== null)
+      build.slots.some(slot => slot.spirit !== null)
     );
 
-    // Check for unsaved changes before loading
     if (hasActualChanges) {
       const confirmed = window.confirm(
         'You have unsaved changes. Loading this build will discard your current changes. Continue?'
@@ -445,13 +505,11 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     }
 
     setBuildName(savedBuild.name);
-    setMaxSlots(savedBuild.maxSlots);
 
-    // Deserialize build to ensure skill objects are current
-    const deserializedBuild = deserializeBuild(savedBuild, skills);
+    const deserializedBuild = deserializeBuild(savedBuild, spirits);
     setBuild({ slots: deserializedBuild.slots });
-    setHasUnsavedChanges(true); // Mark as having changes to block navigation
-    setCurrentLoadedBuildId(savedBuild.id); // Track which build is currently loaded
+    setHasUnsavedChanges(true);
+    setCurrentLoadedBuildId(savedBuild.id);
   };
 
   // Save build to backend
@@ -465,7 +523,6 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     try {
       const buildData = {
         name: buildName,
-        maxSlots,
         slots: build.slots,
       };
 
@@ -475,7 +532,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'skill-build',
+          type: 'spirit-build',
           username: user.login,
           userId: user.id,
           data: buildData,
@@ -491,15 +548,14 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       const sortedBuilds = data.builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       setSavedBuilds(sortedBuilds);
       setSaveSuccess(true);
-      setHasUnsavedChanges(false); // Clear unsaved changes after successful save
+      setHasUnsavedChanges(false);
 
       // Cache the updated builds
-      setCache('skill-builds', user.id, sortedBuilds);
+      setCache('spirit-builds', user.id, sortedBuilds);
 
-      // Hide success message after 2 seconds
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (err) {
-      console.error('[SkillBuilder] Failed to save build:', err);
+      console.error('[SpiritBuilder] Failed to save build:', err);
       setSaveError(err.message || 'Failed to save build');
     } finally {
       setSaving(false);
@@ -511,7 +567,6 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     if (onSave) {
       const buildData = {
         name: buildName,
-        maxSlots,
         slots: build.slots
       };
       onSave(buildData);
@@ -523,37 +578,10 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     saveBuild: handleSaveBuild
   }));
 
-  // Get element icon
-  const getElementIcon = (element) => {
-    const icons = {
-      Fire: '/images/icons/typeicon_fire_1.png',
-      Water: '/images/icons/typeicon_water_1.png',
-      Wind: '/images/icons/typeicon_wind_1.png',
-      Earth: '/images/icons/typeicon_earth s_1.png'
-    };
-    return icons[element];
-  };
-
-  // Calculate build stats
-  const getEquippedSkillsCount = () => {
-    return build.slots.filter(slot => slot.skill !== null).length;
-  };
-
-  const getElementDistribution = () => {
-    const distribution = {};
-    build.slots.forEach(slot => {
-      if (slot.skill) {
-        const attr = slot.skill.attribute;
-        distribution[attr] = (distribution[attr] || 0) + 1;
-      }
-    });
-    return distribution;
-  };
-
   if (loading) {
     return (
       <div className={`flex items-center justify-center ${isModal ? 'min-h-[400px]' : 'min-h-screen'} bg-gradient-to-b from-gray-900 to-black`}>
-        <div className="text-white text-xl">Loading skills...</div>
+        <div className="text-white text-xl">Loading spirits...</div>
       </div>
     );
   }
@@ -565,8 +593,8 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
             <div className="flex items-center gap-3">
-              <img src="/images/skills/Icon_skillCard.png" alt="" className="w-8 h-8 flex-shrink-0" />
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Skill Builder</h1>
+              <span className="text-3xl">🔮</span>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Spirit Builder</h1>
             </div>
           </div>
         </div>
@@ -574,12 +602,10 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
       {/* Saved Builds Panel */}
       <div className={`${isModal ? 'px-4 pt-6 pb-0' : 'max-w-7xl mx-auto px-3 sm:px-4 pt-2 pb-0'}`}>
-        <SavedBuildsPanel
+        <SavedSpiritBuildsPanel
           currentBuild={build}
           buildName={buildName}
-          maxSlots={maxSlots}
           onLoadBuild={handleLoadBuild}
-          allowSavingBuilds={false}
           currentLoadedBuildId={currentLoadedBuildId}
           onBuildsChange={setSavedBuilds}
           defaultExpanded={!isModal}
@@ -588,7 +614,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
       {/* Main Content */}
       <div className={`${isModal ? 'px-4 pt-1 pb-3' : 'max-w-7xl mx-auto px-3 sm:px-4 pt-1 pb-3'}`}>
-        {/* Build Name Panel - Controlled by allowSavingBuilds */}
+        {/* Build Name Panel */}
         {allowSavingBuilds && (
           <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -627,7 +653,6 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
                 </button>
               )}
             </div>
-            {/* Save Error Message */}
             {saveError && (
               <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
                 {saveError}
@@ -687,151 +712,113 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           </div>
         )}
 
-        {/* Settings Bar */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-6 border border-gray-200 dark:border-gray-800 shadow-sm">
-          <div className="flex flex-col gap-4">
-            {/* Settings Row */}
-            <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <Settings className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Max Slots:</label>
-                <select
-                  value={maxSlots}
-                  onChange={(e) => {
-                    const newMax = parseInt(e.target.value);
-                    setMaxSlots(newMax);
-                    const newSlots = [...build.slots];
-                    while (newSlots.length < newMax) {
-                      newSlots.push({ skill: null, level: 1 });
-                    }
-                    setBuild({ slots: newSlots.slice(0, newMax) });
-                  }}
-                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                >
-                  {[...Array(10)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>{i + 1}</option>
-                  ))}
-                </select>
-              </div>
+        {/* Spirit Slots */}
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-8">
+            {/* Companion Slot (Slot 0) */}
+            <SpiritSlot
+              spirit={build.slots[0].spirit}
+              level={build.slots[0].level}
+              awakeningLevel={build.slots[0].awakeningLevel}
+              evolutionLevel={build.slots[0].evolutionLevel}
+              skillEnhancementLevel={build.slots[0].skillEnhancementLevel}
+              isCompanionSlot={true}
+              slotNumber={1}
+              slotIndex={0}
+              onSelectSpirit={() => handleSelectSlot(0)}
+              onRemoveSpirit={() => handleRemoveSpirit(0)}
+              onLevelChange={(newLevel) => handleLevelChange(0, newLevel)}
+              onAwakeningLevelChange={(newAwakeningLevel) => handleAwakeningLevelChange(0, newAwakeningLevel)}
+              onEvolutionChange={(newEvolution) => handleEvolutionChange(0, newEvolution)}
+              onSkillEnhancementChange={(newSkillEnhancement) => handleSkillEnhancementChange(0, newSkillEnhancement)}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              isDragging={draggedSlotIndex === 0}
+            />
 
-              <div className="flex items-center">
-                <label htmlFor="autoMaxLevel" className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    id="autoMaxLevel"
-                    checked={autoMaxLevel}
-                    onChange={(e) => setAutoMaxLevel(e.target.checked)}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 flex-shrink-0"
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    Auto-max level
-                  </span>
-                </label>
-              </div>
-            </div>
+            {/* Partner Spirit 1 (Slot 1) */}
+            <SpiritSlot
+              spirit={build.slots[1].spirit}
+              level={build.slots[1].level}
+              awakeningLevel={build.slots[1].awakeningLevel}
+              evolutionLevel={build.slots[1].evolutionLevel}
+              skillEnhancementLevel={build.slots[1].skillEnhancementLevel}
+              isCompanionSlot={false}
+              slotNumber={1}
+              slotIndex={1}
+              onSelectSpirit={() => handleSelectSlot(1)}
+              onRemoveSpirit={() => handleRemoveSpirit(1)}
+              onLevelChange={(newLevel) => handleLevelChange(1, newLevel)}
+              onAwakeningLevelChange={(newAwakeningLevel) => handleAwakeningLevelChange(1, newAwakeningLevel)}
+              onEvolutionChange={(newEvolution) => handleEvolutionChange(1, newEvolution)}
+              onSkillEnhancementChange={(newSkillEnhancement) => handleSkillEnhancementChange(1, newSkillEnhancement)}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              isDragging={draggedSlotIndex === 1}
+            />
 
-            {/* Stats Row */}
-            <div className="flex items-center gap-4 sm:gap-6 text-sm flex-wrap pt-2 border-t border-gray-200 dark:border-gray-700">
-              <div>
-                <span className="text-gray-600 dark:text-gray-400">Equipped:</span>
-                <span className="ml-2 font-semibold text-gray-900 dark:text-white">{getEquippedSkillsCount()}/{maxSlots}</span>
-              </div>
-
-              {/* Element Distribution */}
-              {Object.entries(getElementDistribution()).map(([element, count]) => (
-                <div key={element} className="flex items-center gap-1.5" title={element}>
-                  <img
-                    src={getElementIcon(element)}
-                    alt={element}
-                    className="w-4 h-4 cursor-help"
-                  />
-                  <span className="font-semibold text-gray-900 dark:text-white">{count}</span>
-                </div>
-              ))}
-            </div>
+            {/* Partner Spirit 2 (Slot 2) */}
+            <SpiritSlot
+              spirit={build.slots[2].spirit}
+              level={build.slots[2].level}
+              awakeningLevel={build.slots[2].awakeningLevel}
+              evolutionLevel={build.slots[2].evolutionLevel}
+              skillEnhancementLevel={build.slots[2].skillEnhancementLevel}
+              isCompanionSlot={false}
+              slotNumber={2}
+              slotIndex={2}
+              onSelectSpirit={() => handleSelectSlot(2)}
+              onRemoveSpirit={() => handleRemoveSpirit(2)}
+              onLevelChange={(newLevel) => handleLevelChange(2, newLevel)}
+              onAwakeningLevelChange={(newAwakeningLevel) => handleAwakeningLevelChange(2, newAwakeningLevel)}
+              onEvolutionChange={(newEvolution) => handleEvolutionChange(2, newEvolution)}
+              onSkillEnhancementChange={(newSkillEnhancement) => handleSkillEnhancementChange(2, newSkillEnhancement)}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              isDragging={draggedSlotIndex === 2}
+            />
           </div>
         </div>
 
-        {/* Skill Slots Grid */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 justify-items-center">
-            {build.slots.slice(0, maxSlots).map((slot, index) => (
-              <SkillSlot
-                key={index}
-                skill={slot.skill}
-                level={slot.level}
-                isLocked={index >= maxSlots}
-                slotNumber={index + 1}
-                slotIndex={index}
-                onSelectSkill={() => handleSelectSlot(index)}
-                onRemoveSkill={() => handleRemoveSkill(index)}
-                onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                isDragging={draggedSlotIndex === index}
-              />
-            ))}
+        {/* Saved Spirits Gallery */}
+        {!isModal && isAuthenticated && selectedSlotIndex !== null && (
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
+            <SavedSpiritsGallery
+              onSelectSpirit={handleSavedSpiritSelected}
+              excludedSpiritIds={build.slots.map(slot => slot.spirit?.id).filter(Boolean)}
+            />
           </div>
-        </div>
-
-        {/* Bulk Level Actions */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
-          <div className="flex justify-center gap-2">
-            <button
-              onClick={() => {
-                if (confirm('Set all equipped skills to level 1?')) {
-                  const newSlots = build.slots.map(slot =>
-                    slot.skill ? { ...slot, level: 1 } : slot
-                  );
-                  setBuild({ slots: newSlots });
-                }
-              }}
-              className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs font-medium transition-colors"
-            >
-              Min All Levels
-            </button>
-            <button
-              onClick={() => {
-                if (confirm('Set all equipped skills to their maximum level?')) {
-                  const newSlots = build.slots.map(slot =>
-                    slot.skill ? { ...slot, level: slot.skill.maxLevel || 130 } : slot
-                  );
-                  setBuild({ slots: newSlots });
-                }
-              }}
-              className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs font-medium transition-colors"
-            >
-              Max All Levels
-            </button>
-          </div>
-        </div>
+        )}
 
         {/* Build Info */}
         <div className="bg-blue-50 dark:bg-blue-900/10 rounded-lg p-4 border border-blue-200 dark:border-blue-900">
           <h3 className="text-base font-semibold mb-2 text-blue-900 dark:text-blue-100">How to Use:</h3>
           <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-            <li>• Click the <span className="font-medium">+ icon</span> on an empty slot to add a skill</li>
-            <li>• Click on a skill to remove it from your build</li>
-            <li>• Click the <span className="font-medium">level badge</span> to adjust skill levels</li>
+            <li>• Click the <span className="font-medium">+ icon</span> to add a spirit to a slot</li>
+            <li>• The <span className="font-medium text-yellow-600 dark:text-yellow-400">Companion Slot</span> provides enhanced passive effects</li>
+            <li>• Configure each spirit's level and evolution (base evolution caps at 4)</li>
+            <li>• <span className="font-medium">Awakening</span> and <span className="font-medium">Skill Enhancement</span> unlock at Evolution Level 4 (Legendary)</li>
+            <li>• <span className="font-medium">Awakening</span>: Every 6 levels = +1 evolution beyond base (use to reach 5-7)</li>
             <li>• Use <span className="font-medium">Share</span> to get a shareable URL for your build</li>
             <li>• Use <span className="font-medium">Export/Import</span> to save and load builds as files</li>
           </ul>
         </div>
       </div>
 
-      {/* Skill Selector Modal */}
-      <SkillSelector
-        isOpen={showSkillSelector}
-        onClose={() => setShowSkillSelector(false)}
-        onSelectSkill={handleSkillSelected}
-        skills={skills}
+      {/* Spirit Selector Modal */}
+      <SpiritSelector
+        isOpen={showSpiritSelector}
+        onClose={() => setShowSpiritSelector(false)}
+        onSelectSpirit={handleSpiritSelected}
         currentBuild={build}
       />
     </div>
   );
 });
 
-SkillBuilder.displayName = 'SkillBuilder';
+SpiritBuilder.displayName = 'SpiritBuilder';
 
-export default SkillBuilder;
+export default SpiritBuilder;

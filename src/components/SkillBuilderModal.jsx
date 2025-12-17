@@ -79,10 +79,10 @@ const SkillBuilderModal = ({ isOpen, onClose, initialBuild = null, onSave }) => 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
     >
       <div
-        className="relative w-full max-w-7xl max-h-[90vh] m-4 bg-gray-900 rounded-lg shadow-2xl flex flex-col"
+        className="relative w-full h-full md:max-w-7xl md:max-h-[90vh] md:m-4 md:rounded-lg bg-gray-900 shadow-2xl flex flex-col"
       >
         {/* Fixed Header with title and close button */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 bg-gray-900 rounded-t-lg border-b border-blue-900">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 bg-gray-900 md:rounded-t-lg border-b border-blue-900">
           <div className="flex items-center gap-3">
             <img src="/images/skills/Icon_skillCard.png" alt="" className="w-6 h-6" />
             <h2 className="text-xl font-bold text-white">Skill Builder</h2>
@@ -108,7 +108,7 @@ const SkillBuilderModal = ({ isOpen, onClose, initialBuild = null, onSave }) => 
         </div>
 
         {/* Fixed Footer with Save button */}
-        <div className="flex-shrink-0 flex justify-center p-4 bg-gray-900 rounded-b-lg border-t border-blue-900">
+        <div className="flex-shrink-0 flex justify-center p-4 bg-gray-900 md:rounded-b-lg border-t border-blue-900">
           <button
             onClick={handleSaveBuild}
             className="flex items-center justify-center gap-3 px-12 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-colors shadow-lg min-w-[200px]"

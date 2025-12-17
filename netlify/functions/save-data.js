@@ -1,13 +1,14 @@
 /**
  * Netlify Function: Save Data (Universal)
- * Handles saving both skill builds and battle loadouts
+ * Handles saving skill builds, battle loadouts, and spirit collection
  *
  * POST /.netlify/functions/save-data
  * Body: {
- *   type: 'skill-build' | 'battle-loadout',
+ *   type: 'skill-build' | 'battle-loadout' | 'my-spirit' | 'spirit-build',
  *   username: string,
  *   userId: number,
- *   data: object
+ *   data: object,
+ *   spiritId?: string (for my-spirit updates)
  * }
  */
 
@@ -24,7 +25,7 @@ export async function handler(event) {
 
   try {
     // Parse request body
-    const { type, username, userId, data } = JSON.parse(event.body);
+    const { type, username, userId, data, spiritId } = JSON.parse(event.body);
 
     // Validate required fields
     if (!type || !username || !userId || !data) {
@@ -35,10 +36,11 @@ export async function handler(event) {
     }
 
     // Validate type
-    if (type !== 'skill-build' && type !== 'battle-loadout') {
+    const validTypes = ['skill-build', 'battle-loadout', 'my-spirit', 'spirit-build'];
+    if (!validTypes.includes(type)) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid type. Must be "skill-build" or "battle-loadout"' }),
+        body: JSON.stringify({ error: `Invalid type. Must be one of: ${validTypes.join(', ')}` }),
       };
     }
 
@@ -69,27 +71,50 @@ export async function handler(event) {
     }
 
     // Set type-specific constants
-    const config = type === 'skill-build'
-      ? {
-          label: 'skill-builds',
-          titlePrefix: '[Skill Builds]',
-          maxItems: 10,
-          itemName: 'build',
-          itemsName: 'builds',
-        }
-      : {
-          label: 'battle-loadouts',
-          titlePrefix: '[Battle Loadouts]',
-          maxItems: 10,
-          itemName: 'loadout',
-          itemsName: 'loadouts',
-        };
+    const configs = {
+      'skill-build': {
+        label: 'skill-builds',
+        titlePrefix: '[Skill Builds]',
+        maxItems: 10,
+        itemName: 'build',
+        itemsName: 'builds',
+      },
+      'battle-loadout': {
+        label: 'battle-loadouts',
+        titlePrefix: '[Battle Loadouts]',
+        maxItems: 10,
+        itemName: 'loadout',
+        itemsName: 'loadouts',
+      },
+      'my-spirit': {
+        label: 'my-spirits',
+        titlePrefix: '[My Spirits]',
+        maxItems: 50,
+        itemName: 'spirit',
+        itemsName: 'spirits',
+      },
+      'spirit-build': {
+        label: 'spirit-builds',
+        titlePrefix: '[Spirit Builds]',
+        maxItems: 10,
+        itemName: 'build',
+        itemsName: 'builds',
+      },
+    };
+    const config = configs[type];
 
     // Validate data structure
-    if (!data.name) {
+    if (type !== 'my-spirit' && !data.name) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: `${config.itemName} must have a name` }),
+      };
+    }
+
+    if (type === 'my-spirit' && !data.spirit) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Spirit data must include a spirit object' }),
       };
     }
 
@@ -130,8 +155,15 @@ export async function handler(event) {
       }
     }
 
-    // Check if updating existing item (by name)
-    const itemIndex = items.findIndex(item => item.name === data.name);
+    // Check if updating existing item
+    let itemIndex = -1;
+    if (type === 'my-spirit' && spiritId) {
+      // For my-spirit updates, find by spiritId
+      itemIndex = items.findIndex(item => item.id === spiritId);
+    } else if (type !== 'my-spirit') {
+      // For other types, find by name
+      itemIndex = items.findIndex(item => item.name === data.name);
+    }
 
     if (itemIndex !== -1) {
       // Update existing item

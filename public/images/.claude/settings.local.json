@@ -4,7 +4,9 @@
       "Bash(ls:*)",
       "Bash(python extract_skill_icons.py:*)",
       "Bash(python extract_all_atlas_icons.py:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(done)",
+      "Bash(sort:*)"
     ]
   }
 }

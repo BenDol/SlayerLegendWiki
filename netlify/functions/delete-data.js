@@ -1,13 +1,14 @@
 /**
  * Netlify Function: Delete Data (Universal)
- * Handles deleting both skill builds and battle loadouts
+ * Handles deleting skill builds, battle loadouts, and spirit collection
  *
  * POST /.netlify/functions/delete-data
  * Body: {
- *   type: 'skill-build' | 'battle-loadout',
+ *   type: 'skill-build' | 'battle-loadout' | 'my-spirit' | 'spirit-build',
  *   username: string,
  *   userId: number,
- *   itemId: string
+ *   itemId: string (for skill-build/battle-loadout/spirit-build),
+ *   spiritId: string (for my-spirit)
  * }
  */
 
@@ -24,21 +25,23 @@ export async function handler(event) {
 
   try {
     // Parse request body
-    const { type, username, userId, itemId } = JSON.parse(event.body);
+    const { type, username, userId, itemId, spiritId } = JSON.parse(event.body);
 
     // Validate required fields
-    if (!type || !username || !userId || !itemId) {
+    const deleteId = type === 'my-spirit' ? spiritId : itemId;
+    if (!type || !username || !userId || !deleteId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Missing required fields: type, username, userId, itemId' }),
+        body: JSON.stringify({ error: `Missing required fields: type, username, userId, ${type === 'my-spirit' ? 'spiritId' : 'itemId'}` }),
       };
     }
 
     // Validate type
-    if (type !== 'skill-build' && type !== 'battle-loadout') {
+    const validTypes = ['skill-build', 'battle-loadout', 'my-spirit', 'spirit-build'];
+    if (!validTypes.includes(type)) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid type. Must be "skill-build" or "battle-loadout"' }),
+        body: JSON.stringify({ error: `Invalid type. Must be one of: ${validTypes.join(', ')}` }),
       };
     }
 
@@ -69,17 +72,29 @@ export async function handler(event) {
     }
 
     // Set type-specific constants
-    const config = type === 'skill-build'
-      ? {
-          label: 'skill-builds',
-          titlePrefix: '[Skill Builds]',
-          itemsName: 'builds',
-        }
-      : {
-          label: 'battle-loadouts',
-          titlePrefix: '[Battle Loadouts]',
-          itemsName: 'loadouts',
-        };
+    const configs = {
+      'skill-build': {
+        label: 'skill-builds',
+        titlePrefix: '[Skill Builds]',
+        itemsName: 'builds',
+      },
+      'battle-loadout': {
+        label: 'battle-loadouts',
+        titlePrefix: '[Battle Loadouts]',
+        itemsName: 'loadouts',
+      },
+      'my-spirit': {
+        label: 'my-spirits',
+        titlePrefix: '[My Spirits]',
+        itemsName: 'spirits',
+      },
+      'spirit-build': {
+        label: 'spirit-builds',
+        titlePrefix: '[Spirit Builds]',
+        itemsName: 'builds',
+      },
+    };
+    const config = configs[type];
 
     // Get existing items
     const { data: issues } = await octokit.rest.issues.listForRepo({
@@ -115,7 +130,7 @@ export async function handler(event) {
     }
 
     // Find and remove the item
-    const itemIndex = items.findIndex(item => item.id === itemId);
+    const itemIndex = items.findIndex(item => item.id === deleteId);
 
     if (itemIndex === -1) {
       return {

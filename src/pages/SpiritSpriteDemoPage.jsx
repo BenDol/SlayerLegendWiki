@@ -84,6 +84,7 @@ const SpiritSpriteDemoPage = () => {
               size={size}
               animated={animated}
               showInfo={showInfo}
+              showControls={true}
               onAnimationTypesDetected={handleAnimationTypesDetected}
             />
 

@@ -1,6 +1,156 @@
 import { useState, useEffect, useRef } from 'react';
 import spiritData from '../../public/data/spirit-characters.json';
 
+// Module-level cache for animation type detection results
+// Prevents re-detecting frames for the same spirit+level combination
+const animationDetectionCache = new Map();
+
+// Module-level cache for preloaded Image objects
+// Shared across all component instances to prevent redundant loading
+// Key format: "spiritId_level_frameNumber" -> { img: Image, timestamp: number }
+const imageCache = new Map();
+
+// Cache TTL (time-to-live) - images are valid for 10 minutes before re-fetching
+// This completely eliminates network requests (even 304 checks) within the TTL window
+const IMAGE_CACHE_TTL = 10 * 60 * 1000; // 10 minutes in milliseconds
+
+// Cache size limits to prevent unbounded memory growth
+const MAX_ANIMATION_CACHE_SIZE = 200; // Max spirit+level combinations (12 spirits × 8 levels × 2 for safety)
+const MAX_IMAGE_CACHE_SIZE = 2000; // Max images (12 spirits × 8 levels × 16 frames × ~1.3 for overhead)
+
+// Track cache access for LRU eviction
+const imageCacheAccess = new Map(); // Key -> timestamp of last access
+
+// Clean up old cache entries when limits are exceeded
+const cleanupCache = (cache, accessMap, maxSize) => {
+  if (cache.size <= maxSize) return;
+
+  // Sort by last access time (oldest first)
+  const entries = Array.from(accessMap.entries()).sort((a, b) => a[1] - b[1]);
+
+  // Remove oldest 20% of entries
+  const toRemove = Math.ceil(cache.size * 0.2);
+  for (let i = 0; i < toRemove && i < entries.length; i++) {
+    const [key] = entries[i];
+    cache.delete(key);
+    accessMap.delete(key);
+  }
+
+  console.log(`[SpiritSprite] Cache cleanup: removed ${toRemove} old entries, ${cache.size} remaining`);
+};
+
+// Utility function to clear all SpiritSprite caches (useful for debugging or memory management)
+export const clearSpiritCaches = () => {
+  const imageCount = imageCache.size;
+  const animationCount = animationDetectionCache.size;
+
+  imageCache.clear();
+  imageCacheAccess.clear();
+  animationDetectionCache.clear();
+
+  console.log(`[SpiritSprite] Cleared all caches: ${imageCount} images, ${animationCount} animation detections`);
+  return { imageCount, animationCount };
+};
+
+// Utility function to get cache statistics
+export const getSpiritCacheStats = () => {
+  const now = Date.now();
+  let validImages = 0;
+  let expiredImages = 0;
+
+  // Count valid vs expired images
+  imageCache.forEach((cached) => {
+    if (now - cached.timestamp < IMAGE_CACHE_TTL) {
+      validImages++;
+    } else {
+      expiredImages++;
+    }
+  });
+
+  return {
+    imageCache: {
+      size: imageCache.size,
+      validImages,
+      expiredImages,
+      maxSize: MAX_IMAGE_CACHE_SIZE,
+      utilization: `${((imageCache.size / MAX_IMAGE_CACHE_SIZE) * 100).toFixed(1)}%`,
+      ttl: `${IMAGE_CACHE_TTL / 60000} minutes`
+    },
+    animationCache: {
+      size: animationDetectionCache.size,
+      maxSize: MAX_ANIMATION_CACHE_SIZE,
+      utilization: `${((animationDetectionCache.size / MAX_ANIMATION_CACHE_SIZE) * 100).toFixed(1)}%`
+    }
+  };
+};
+
+// Utility function to clean up expired cache entries manually
+export const cleanupExpiredImages = () => {
+  const now = Date.now();
+  let removed = 0;
+
+  imageCache.forEach((cached, key) => {
+    if (now - cached.timestamp >= IMAGE_CACHE_TTL) {
+      imageCache.delete(key);
+      imageCacheAccess.delete(key);
+      removed++;
+    }
+  });
+
+  console.log(`[SpiritSprite] Cleaned up ${removed} expired images`);
+  return removed;
+};
+
+// Helper function to get or create cached image with TTL and LRU tracking
+const getCachedImage = (spiritId, level, frameNumber, framePath) => {
+  const cacheKey = `${spiritId}_${level}_${frameNumber}`;
+  const now = Date.now();
+
+  // Check if we have a cached entry
+  if (imageCache.has(cacheKey)) {
+    const cached = imageCache.get(cacheKey);
+
+    // Check if cache entry is still valid (within TTL)
+    if (now - cached.timestamp < IMAGE_CACHE_TTL) {
+      // Update access time for LRU
+      imageCacheAccess.set(cacheKey, now);
+      return Promise.resolve(cached.img);
+    } else {
+      // Cache expired, remove it and fetch fresh
+      console.log(`[SpiritSprite] Cache expired for ${cacheKey}, re-fetching`);
+      imageCache.delete(cacheKey);
+      imageCacheAccess.delete(cacheKey);
+    }
+  }
+
+  // Not in cache or expired - fetch the image
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      // Check cache size and cleanup if needed
+      if (imageCache.size >= MAX_IMAGE_CACHE_SIZE) {
+        cleanupCache(imageCache, imageCacheAccess, MAX_IMAGE_CACHE_SIZE);
+      }
+
+      // Store image with timestamp
+      imageCache.set(cacheKey, { img, timestamp: now });
+      imageCacheAccess.set(cacheKey, now);
+      resolve(img);
+    };
+    img.onerror = () => {
+      resolve(null);
+    };
+    img.src = framePath;
+
+    // Timeout fallback
+    setTimeout(() => {
+      if (!img.complete) {
+        resolve(null);
+      }
+    }, 3000);
+  });
+};
+
 /**
  * SpiritSprite - Animated spirit sprite component
  * Displays a spirit with frame-by-frame animation from sprite sheets
@@ -25,6 +175,10 @@ import spiritData from '../../public/data/spirit-characters.json';
  * @param {boolean} showInfo - Whether to show spirit name and level (default: false)
  * @param {string} size - Size preset: 'small' (64px), 'medium' (128px), 'large' (256px), or custom CSS value
  * @param {function} onAnimationTypesDetected - Callback with available animation types: { idle: {available, frameCount, frames: [12,13,14,15]}, attack: {...}, ... }
+ * @param {number} displayLevel - Character level to display (1-300)
+ * @param {number} displayAwakeningLevel - Awakening level to display (0+)
+ * @param {number} displaySkillEnhancement - Skill enhancement level to display (0-5)
+ * @param {boolean} showControls - Show animation control panel (default: false)
  */
 const SpiritSprite = ({
   spiritId,
@@ -35,7 +189,11 @@ const SpiritSprite = ({
   showInfo = false,
   size = 'medium',
   className = '',
-  onAnimationTypesDetected = null // Callback to report available animation types
+  onAnimationTypesDetected = null,
+  displayLevel = null,
+  displayAwakeningLevel = null,
+  displaySkillEnhancement = null,
+  showControls = false
 }) => {
   const [currentFrame, setCurrentFrame] = useState(0);
   const [isPlaying, setIsPlaying] = useState(animated);
@@ -117,69 +275,84 @@ const SpiritSprite = ({
   // Detect all available animation types on mount/change
   useEffect(() => {
     const detectAllAnimationTypes = async () => {
-      // Step 1: Detect ALL frames that exist (0-15)
-      const allFramesPromises = [];
-      for (let frameNum = 0; frameNum < 16; frameNum++) {
-        const framePath = spriteLevel.spriteSheet.replace('{frame}', frameNum);
+      // Check cache first to avoid re-detecting same spirit+level
+      const cacheKey = `${spiritId}_${level}`;
+      const cachedResults = animationDetectionCache.get(cacheKey);
 
-        const promise = new Promise((resolve) => {
-          const img = new Image();
+      if (cachedResults) {
+        console.log(`[SpiritSprite] Using cached animation types for spirit ${spiritId} level ${level}`);
+        setAvailableAnimationTypes(cachedResults);
+        detectionCompleteRef.current = true;
 
-          img.onload = () => {
-            // Check if the image has valid dimensions
-            if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-              // Check if image is not empty by drawing to canvas and checking pixels
-              const canvas = document.createElement('canvas');
-              canvas.width = img.naturalWidth;
-              canvas.height = img.naturalHeight;
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0);
-
-              try {
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const pixels = imageData.data;
-
-                // Check if any pixel has non-zero alpha (is not fully transparent)
-                let hasContent = false;
-                for (let i = 3; i < pixels.length; i += 4) { // Check alpha channel (every 4th value)
-                  if (pixels[i] > 10) { // Alpha > 10 (allow for slight transparency artifacts)
-                    hasContent = true;
-                    break;
-                  }
-                }
-
-                if (hasContent) {
-                  resolve(frameNum);
-                } else {
-                  resolve(null);
-                }
-              } catch (e) {
-                // Canvas security error or other issue - assume frame is valid
-                resolve(frameNum);
-              }
-            } else {
-              resolve(null);
-            }
-          };
-
-          img.onerror = () => {
-            resolve(null);
-          };
-
-          img.src = framePath;
-
-          // Add timeout
-          setTimeout(() => {
-            if (!img.complete) {
-              resolve(null);
-            }
-          }, 3000);
-        });
-        allFramesPromises.push(promise);
+        if (onAnimationTypesDetected) {
+          onAnimationTypesDetected(cachedResults);
+        }
+        return;
       }
 
-      const allFrameResults = await Promise.all(allFramesPromises);
-      const existingFrames = allFrameResults.filter(r => r !== null);
+      // Step 1: Detect ALL frames that exist (0-15) - with batching to prevent resource exhaustion
+      const BATCH_SIZE = 4; // Load 4 frames at a time to prevent ERR_INSUFFICIENT_RESOURCES
+      const existingFrames = [];
+
+      // Helper function to load a single frame using cached images
+      const loadFrame = async (frameNum) => {
+        const framePath = spriteLevel.spriteSheet.replace('{frame}', frameNum);
+        const img = await getCachedImage(spiritId, level, frameNum, framePath);
+
+        if (!img) {
+          return null;
+        }
+
+        // Check if the image has valid dimensions
+        if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+          // Check if image is not empty by drawing to canvas and checking pixels
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          try {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+
+            // Check if any pixel has non-zero alpha (is not fully transparent)
+            let hasContent = false;
+            for (let i = 3; i < pixels.length; i += 4) { // Check alpha channel (every 4th value)
+              if (pixels[i] > 10) { // Alpha > 10 (allow for slight transparency artifacts)
+                hasContent = true;
+                break;
+              }
+            }
+
+            if (hasContent) {
+              return frameNum;
+            } else {
+              return null;
+            }
+          } catch (e) {
+            // Canvas security error or other issue - assume frame is valid
+            return frameNum;
+          }
+        } else {
+          return null;
+        }
+      };
+
+      // Load frames in batches to prevent resource exhaustion
+      for (let i = 0; i < 16; i += BATCH_SIZE) {
+        const batchPromises = [];
+        for (let j = i; j < Math.min(i + BATCH_SIZE, 16); j++) {
+          batchPromises.push(loadFrame(j));
+        }
+        const batchResults = await Promise.all(batchPromises);
+        existingFrames.push(...batchResults.filter(r => r !== null));
+
+        // Add small delay between batches to prevent overwhelming the browser
+        if (i + BATCH_SIZE < 16) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+      }
 
       // Step 2: Intelligently map existing frames to animation types
       // Try multiple possible frame ranges for each animation type
@@ -245,6 +418,20 @@ const SpiritSprite = ({
         }
       }
 
+      // Cache the results for future use with size limit
+      if (animationDetectionCache.size >= MAX_ANIMATION_CACHE_SIZE) {
+        // Simple FIFO eviction: remove oldest entries (first 20%)
+        const toRemove = Math.ceil(animationDetectionCache.size * 0.2);
+        const keys = Array.from(animationDetectionCache.keys());
+        for (let i = 0; i < toRemove; i++) {
+          animationDetectionCache.delete(keys[i]);
+        }
+        console.log(`[SpiritSprite] Animation cache cleanup: removed ${toRemove} entries`);
+      }
+
+      animationDetectionCache.set(cacheKey, results);
+      console.log(`[SpiritSprite] Cached animation types for spirit ${spiritId} level ${level}`, results);
+
       setAvailableAnimationTypes(results);
       detectionCompleteRef.current = true;
 
@@ -277,33 +464,25 @@ const SpiritSprite = ({
       // Use the pre-detected frame numbers
       const frameNumbers = animationInfo.frames;
       const tempPreloaded = {};
-      const promises = [];
 
-      // Preload the actual frames
+      // Preload the actual frames using cached images
+      // These images were already loaded during detection, so this is very fast
       for (let i = 0; i < frameNumbers.length; i++) {
         const frameNumber = frameNumbers[i];
         const framePath = spriteLevel.spriteSheet.replace('{frame}', frameNumber);
 
-        const promise = new Promise((resolve) => {
-          const img = new Image();
-          img.onload = () => {
-            tempPreloaded[frameNumber] = img;
-            resolve(i);
-          };
-          img.onerror = () => {
-            resolve(null);
-          };
-          img.src = framePath;
-        });
-
-        promises.push(promise);
+        // Get from cache (will be instant if already loaded during detection)
+        const img = await getCachedImage(spiritId, level, frameNumber, framePath);
+        if (img) {
+          tempPreloaded[frameNumber] = img;
+        }
       }
-
-      const results = await Promise.all(promises);
-      const validIndices = results.filter(r => r !== null);
 
       // Update preloaded images cache
       preloadedImages.current = tempPreloaded;
+
+      // All frames loaded successfully (or were already cached)
+      const validIndices = Object.keys(tempPreloaded).map((_, i) => i);
 
       // Store the indices (0, 1, 2...) for animation loop
       setValidFrames(validIndices);
@@ -388,8 +567,29 @@ const SpiritSprite = ({
             </div>
           )}
 
-          {/* Animation Controls (show on hover) - only show if we have valid frames and size is not small */}
-          {framesDetected && validFrames.length > 0 && size !== 'small' && (
+          {/* Level Overlays */}
+          {framesDetected && validFrames.length > 0 && (displayLevel !== null || displayAwakeningLevel !== null || displaySkillEnhancement !== null) && (
+            <div className="absolute top-1 left-1 right-1 flex flex-col gap-0.5 pointer-events-none">
+              {displayLevel !== null && (
+                <div className="inline-flex items-center justify-center px-1.5 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded shadow-lg self-start">
+                  Lv.{displayLevel}
+                </div>
+              )}
+              {displayAwakeningLevel !== null && displayAwakeningLevel > 0 && (
+                <div className="inline-flex items-center justify-center px-1.5 py-0.5 bg-purple-600 text-white text-[10px] font-bold rounded shadow-lg self-start">
+                  Awk Lv.{displayAwakeningLevel}
+                </div>
+              )}
+              {displaySkillEnhancement !== null && displaySkillEnhancement > 0 && (
+                <div className="inline-flex items-center justify-center px-1.5 py-0.5 bg-green-600 text-white text-[10px] font-bold rounded shadow-lg self-start">
+                  Enh Lv.{displaySkillEnhancement}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Animation Controls (show on hover) - only show if showControls is true */}
+          {showControls && framesDetected && validFrames.length > 0 && size !== 'small' && (
             <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-1">
               <div className="flex items-center justify-center gap-2">
               <button
