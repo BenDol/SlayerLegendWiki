@@ -101,9 +101,13 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
   return (
     <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+        <a
+          href="/#/my-spirits"
+          className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors"
+          title="Go to My Spirit Collection"
+        >
           My Saved Spirits
-        </h3>
+        </a>
         <button
           onClick={handleRefresh}
           disabled={refreshing}

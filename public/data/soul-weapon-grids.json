@@ -3,94 +3,712 @@
   "version": "1.0.0",
   "description": "Soul weapon emblem grid layouts for Slayer Legend. Each weapon has a unique grid pattern that determines where emblems can be placed.",
   "gridTypes": {
-    "2x2": { "rows": 2, "columns": 2, "totalSlots": 4 },
-    "3x3": { "rows": 3, "columns": 3, "totalSlots": 9 },
-    "3x4": { "rows": 3, "columns": 4, "totalSlots": 12 },
     "4x4": { "rows": 4, "columns": 4, "totalSlots": 16 },
-    "4x5": { "rows": 4, "columns": 5, "totalSlots": 20 }
+    "5x5": { "rows": 5, "columns": 5, "totalSlots": 25 }
   },
   "weapons": [
     {
       "id": 1,
-      "name": "Innocence",
-      "gridType": "2x2",
+      "name": "Pride",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "2%",
+        "hp": "5.6%"
+      },
       "activeSlots": [
-        { "row": 0, "col": 0, "active": true },
-        { "row": 0, "col": 1, "active": true },
-        { "row": 1, "col": 0, "active": true },
-        { "row": 1, "col": 1, "active": true }
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
       ],
-      "totalActiveSlots": 4,
-      "notes": "TODO: Extract actual grid layout from game"
+      "totalActiveSlots": 12
     },
     {
       "id": 2,
-      "name": "Coolness",
-      "gridType": "2x2",
+      "name": "Bravery",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "2.2%",
+        "hp": "7.8%"
+      },
       "activeSlots": [
-        { "row": 0, "col": 0, "active": true },
-        { "row": 0, "col": 1, "active": true },
-        { "row": 1, "col": 0, "active": true },
-        { "row": 1, "col": 1, "active": true }
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
       ],
-      "totalActiveSlots": 4,
-      "notes": "TODO: Extract actual grid layout from game"
+      "totalActiveSlots": 12
     },
     {
       "id": 3,
-      "name": "Desire",
-      "gridType": "3x3",
+      "name": "Runaway",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "3.1%",
+        "hp": "10.7%"
+      },
       "activeSlots": [
-        { "row": 0, "col": 0, "active": true },
-        { "row": 0, "col": 1, "active": true },
-        { "row": 0, "col": 2, "active": true },
-        { "row": 1, "col": 0, "active": true },
-        { "row": 1, "col": 1, "active": true },
-        { "row": 1, "col": 2, "active": true },
-        { "row": 2, "col": 0, "active": true },
-        { "row": 2, "col": 1, "active": true },
-        { "row": 2, "col": 2, "active": true }
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }
       ],
-      "totalActiveSlots": 9,
-      "notes": "TODO: Extract actual grid layout from game"
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 4,
+      "name": "Dullness",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "5%",
+        "hp": "15.6%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 5,
+      "name": "Exciting",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "5.6%",
+        "hp": "18.5%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 2 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 6,
+      "name": "Corruption",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "5.8%",
+        "hp": "20%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 7,
+      "name": "Romance",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "9.6%",
+        "hp": "25.9%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 2 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 8,
+      "name": "Silence",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "10.7%",
+        "hp": "32.6%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 9,
+      "name": "Oblivion",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "11.6%",
+        "hp": "39.9%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 10,
+      "name": "Regret",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "12.7%",
+        "hp": "38.8%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 11,
+      "name": "Willingness",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "13.8%",
+        "hp": "46%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 12,
+      "name": "Grit",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "15%",
+        "hp": "73%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+      ],
+      "totalActiveSlots": 12
+    },
+    {
+      "id": 13,
+      "name": "Hope",
+      "gridType": "4x4",
+      "completionEffect": {
+        "atk": "16.1%",
+        "hp": "73.1%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 14,
+      "name": "Calmness",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "17.1%",
+        "hp": "79.9%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 15,
+      "name": "Dream",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "18.6%",
+        "hp": "90.8%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 2 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 16,
+      "name": "Faith",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "20.9%",
+        "hp": "84.1%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 },
+        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 17,
+      "name": "Temptation",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "21.9%",
+        "hp": "89.5%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 18,
+      "name": "Wound",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "23.5%",
+        "hp": "97.1%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 4 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 19,
+      "name": "Wild",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "24.6%",
+        "hp": "102.3%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 15
+    },
+    {
+      "id": 20,
+      "name": "Ambition",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "26.3%",
+        "hp": "112.3%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 21,
+      "name": "Solitude",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "27.7%",
+        "hp": "120.7%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 22,
+      "name": "Envy",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "28.4%",
+        "hp": "122.3%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 23,
+      "name": "Wisdom",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "30%",
+        "hp": "131.3%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 24,
+      "name": "Vision",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "31.6%",
+        "hp": "140.5%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 25,
+      "name": "Ordeal",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "32.8%",
+        "hp": "131.7%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 26,
+      "name": "Friendship",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "34.6%",
+        "hp": "141%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 27,
+      "name": "Skilfulness",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "36.4%",
+        "hp": "150.5%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 2 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }, { "row": 4, "col": 2 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 28,
+      "name": "Relax",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "35.3%",
+        "hp": "157%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 29,
+      "name": "Conceit",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "39.1%",
+        "hp": "165.5%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 30,
+      "name": "Instinct",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "40.9%",
+        "hp": "174.4%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 2 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 31,
+      "name": "Honor",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "42.7%",
+        "hp": "182.7%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 1 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 32,
+      "name": "Grand",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "44.5%",
+        "hp": "199.7%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 33,
+      "name": "Blessing",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "44.6%",
+        "hp": "187.8%"
+      },
+      "activeSlots": [
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 2 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 34,
+      "name": "Fighting Will",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "47.5%",
+        "hp": "214.9%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 4 },
+        { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 15
+    },
+    {
+      "id": 35,
+      "name": "Transition",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "49.8%",
+        "hp": "227.4%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 4 },
+        { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
+        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 36,
+      "name": "Interest",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "48.1%",
+        "hp": "213.5%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 37,
+      "name": "Intelligence",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "50.2%",
+        "hp": "224.6%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 },
+        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 38,
+      "name": "Greed",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "52.6%",
+        "hp": "237.5%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+      ],
+      "totalActiveSlots": 17
+    },
+    {
+      "id": 39,
+      "name": "Vow",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "51.8%",
+        "hp": "233.7%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 },
+        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }
+      ],
+      "totalActiveSlots": 15
+    },
+    {
+      "id": 40,
+      "name": "Anxiety",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "54.3%",
+        "hp": "247.3%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
+        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 41,
+      "name": "Vigor",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "58.1%",
+        "hp": "258%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+      ],
+      "totalActiveSlots": 16
+    },
+    {
+      "id": 42,
+      "name": "Ecstasy",
+      "gridType": "5x5",
+      "completionEffect": {
+        "atk": "40.3%",
+        "hp": "169.9%"
+      },
+      "activeSlots": [
+        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
+        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
+        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
+        { "row": 3, "col": 4 }
+      ],
+      "totalActiveSlots": 16
     }
   ],
-  "_instructions": {
-    "purpose": "This file maps soul weapon IDs to their emblem grid layouts",
-    "dataNeeded": [
-      "Actual grid dimensions for each weapon (rows x columns)",
-      "Which slots are active/available for emblems (some grids may have inactive corners/edges)",
-      "Any special slot properties (central slots, bonus slots, etc.)"
-    ],
-    "dataSources": [
-      "Game files: Look for SoulGem or emblem-related data in decompiled assets",
-      "Manual extraction: Screenshot and map each weapon's grid in-game",
-      "Community: Check game wiki, Discord, or Reddit for grid layouts"
-    ],
-    "howToUpdate": [
-      "1. For each weapon ID (1-57), determine its grid layout",
-      "2. Map the grid dimensions (e.g., 3x3, 4x4, 4x5)",
-      "3. Mark which slots are active (some grids have patterns, not all slots usable)",
-      "4. Add any special properties (locked slots, bonus slots, etc.)",
-      "5. Update the weapon entry with complete grid data"
-    ],
-    "exampleCompleteEntry": {
-      "id": 99,
-      "name": "Example Weapon",
-      "gridType": "3x4",
-      "activeSlots": [
-        { "row": 0, "col": 1, "active": true, "special": null },
-        { "row": 0, "col": 2, "active": true, "special": null },
-        { "row": 1, "col": 0, "active": true, "special": null },
-        { "row": 1, "col": 1, "active": true, "special": "center" },
-        { "row": 1, "col": 2, "active": true, "special": null },
-        { "row": 1, "col": 3, "active": true, "special": null },
-        { "row": 2, "col": 1, "active": true, "special": null },
-        { "row": 2, "col": 2, "active": true, "special": null }
-      ],
-      "totalActiveSlots": 8,
-      "gridPattern": "diamond",
-      "notes": "Center slot provides bonus effects"
-    }
+  "_metadata": {
+    "lastUpdated": "2025-12-17",
+    "totalWeapons": 42,
+    "extractionSource": "In-game screenshots from research/screenshots/sw-grids/",
+    "notes": "Grid layouts extracted from game UI screenshots. Active slots represent non-grayed-out squares in the emblem grid. Completion effects show the ATK and HP bonuses when all active slots are filled."
   }
 }

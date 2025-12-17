@@ -261,6 +261,19 @@ const MySpiritCollection = () => {
                 </div>
               </div>
             ))}
+
+            {/* Add Spirit Placeholder Button */}
+            <button
+              onClick={() => setShowSpiritSelector(true)}
+              className="bg-white dark:bg-gray-900 rounded-lg p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 shadow-sm transition-all flex flex-col items-center justify-center min-h-[200px] group"
+            >
+              <div className="w-16 h-16 rounded-full border-2 border-gray-400 dark:border-gray-600 group-hover:border-blue-500 dark:group-hover:border-blue-400 flex items-center justify-center transition-colors mb-3">
+                <Plus className="w-8 h-8 text-gray-400 dark:text-gray-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
+              </div>
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                Add Spirit
+              </span>
+            </button>
           </div>
         )}
       </div>
