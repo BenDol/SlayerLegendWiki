@@ -1,7 +1,7 @@
 # Cloudflare Pages Configuration
 # Used for local development with Wrangler
 
-name = "slayerlegend-wiki"
+name = "slayer-legend-wiki"
 compatibility_date = "2024-01-01"
 
 # Pages configuration
