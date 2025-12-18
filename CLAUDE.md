@@ -1186,6 +1186,87 @@ The wiki uses `rehype-sanitize` to protect against XSS and HTML injection attack
 7. **Data files must be valid JSON** in `public/data/` directory
 8. **Never bypass HTML sanitization** - Don't use `dangerouslySetInnerHTML` or disable `rehype-sanitize`
 
+## Coding Standards
+
+### Use Constants for Configuration Values
+
+**CRITICAL: Extract repetitive magic numbers and strings into named constants.** This makes code maintainable and prevents errors when values need to change.
+
+**When to use constants:**
+- Values used in multiple places (3+ occurrences)
+- Configuration values that may need adjustment (sizes, limits, scales)
+- Values that have semantic meaning (padding, gaps, thresholds)
+- Magic numbers that aren't immediately obvious (why 8? why 240?)
+
+**Where to define constants:**
+- At the top of the component/file, clearly grouped and commented
+- Use UPPER_SNAKE_CASE for true constants (never change at runtime)
+- Use descriptive names that explain the purpose, not just the value
+
+**Example - BAD (repetitive magic numbers):**
+```javascript
+const [gridScale, setGridScale] = useState(1.5);
+
+<input min="0.5" max="2.4" step="0.1" />
+<div style={{ marginBottom: `${(gridScale - 1) * 300}px` }} />
+
+const newInventory = Array(8).fill(null).map(() => {
+  const randomLevel = Math.floor(Math.random() * 50) + 1;
+  const randomRarity = Math.floor(Math.random() * 6);
+});
+```
+
+**Example - GOOD (extracted constants):**
+```javascript
+// ===== CONSTANTS =====
+// Grid scaling
+const GRID_SCALE_DEFAULT = 1.5;
+const GRID_SCALE_MIN = 0.5;
+const GRID_SCALE_MAX = 2.4;
+const GRID_SCALE_STEP = 0.1;
+const GRID_SCALE_MARGIN_MULTIPLIER = 300;
+
+// Inventory
+const INVENTORY_SIZE = 8;
+
+// Piece configuration
+const MIN_PIECE_LEVEL = 1;
+const MAX_PIECE_LEVEL = 50;
+const RARITY_COUNT = 6; // Common, Great, Rare, Epic, Legendary, Mythic (0-5)
+
+// Grid configuration
+const GAP_SIZE = 4;
+const GRID_PADDING = 8;
+const LINE_THICKNESS = 8;
+
+// Usage
+const [gridScale, setGridScale] = useState(GRID_SCALE_DEFAULT);
+
+<input
+  min={GRID_SCALE_MIN}
+  max={GRID_SCALE_MAX}
+  step={GRID_SCALE_STEP}
+/>
+<div style={{
+  marginBottom: `${(gridScale - 1) * GRID_SCALE_MARGIN_MULTIPLIER}px`
+}} />
+
+const newInventory = Array(INVENTORY_SIZE).fill(null).map(() => {
+  const randomLevel = Math.floor(Math.random() * MAX_PIECE_LEVEL) + MIN_PIECE_LEVEL;
+  const randomRarity = Math.floor(Math.random() * RARITY_COUNT);
+});
+```
+
+**Benefits:**
+- Single source of truth - change once, updates everywhere
+- Self-documenting code - names explain purpose
+- Type safety - easier to catch errors
+- Easier refactoring - find all uses with "Find References"
+- Prevents typos - `GRID_PADDING` vs random `8` scattered everywhere
+
+**Real example from codebase:**
+See `src/components/SoulWeaponEngravingBuilder.jsx` (lines 25-46) for a comprehensive example of properly organized constants.
+
 ## Component Rendering Order (CRITICAL)
 
 **ALWAYS check loading states BEFORE any other conditional renders** to prevent flickering.

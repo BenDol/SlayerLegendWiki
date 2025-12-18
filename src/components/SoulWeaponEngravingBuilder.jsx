@@ -29,7 +29,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const LINE_THICKNESS = 8; // Thickness of connecting lines between gems
 
   // Grid scaling
-  const GRID_SCALE_DEFAULT = 1.5; // Default scale (150%)
+  const GRID_SCALE_DEFAULT = 1.5; // Default scale (150%) when auto-scale is off
   const GRID_SCALE_MIN = 0.5; // Minimum scale (50%)
   const GRID_SCALE_MAX = 2.4; // Maximum scale (240%)
   const GRID_SCALE_STEP = 0.1; // Scale slider step size
@@ -44,6 +44,25 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
   // Rarity tiers
   const RARITY_COUNT = 6; // Common, Great, Rare, Epic, Legendary, Mythic (0-5)
+
+  // Preset inventory configurations
+  const INVENTORY_PRESETS = [
+    {
+      id: 'atk-gold',
+      name: '4 ATK + 4 Gold',
+      description: '4 L-Shapes (ATK) + 4 Lines (Gold)',
+      pieces: [
+        { shapeId: 1, rarity: 5, level: 50 }, // L-Shape (ATK) - Mythic
+        { shapeId: 1, rarity: 5, level: 50 }, // L-Shape (ATK) - Mythic
+        { shapeId: 1, rarity: 5, level: 50 }, // L-Shape (ATK) - Mythic
+        { shapeId: 1, rarity: 5, level: 50 }, // L-Shape (ATK) - Mythic
+        { shapeId: 5, rarity: 5, level: 50 }, // Line (EXTRA_GOLD) - Mythic
+        { shapeId: 5, rarity: 5, level: 50 }, // Line (EXTRA_GOLD) - Mythic
+        { shapeId: 5, rarity: 5, level: 50 }, // Line (EXTRA_GOLD) - Mythic
+        { shapeId: 5, rarity: 5, level: 50 }  // Line (EXTRA_GOLD) - Mythic
+      ]
+    }
+  ];
 
   // Natural image sizing - calculated from actual piece images
   const [cellSize, setCellSize] = useState(45); // Will be set from image dimensions
@@ -84,7 +103,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const [debugMode, setDebugMode] = useState(false);
 
   // Grid scaling state (1.0 = 100%, 2.0 = 200%, etc.)
+  const [autoScale, setAutoScale] = useState(true); // Auto-fit to parent container
   const [gridScale, setGridScale] = useState(GRID_SCALE_DEFAULT);
+  const [calculatedScale, setCalculatedScale] = useState(GRID_SCALE_DEFAULT); // Scale calculated from container size
+  const gridContainerRef = useRef(null); // Ref for measuring parent container
 
   // Piece selection modal states
   const [showPieceSelector, setShowPieceSelector] = useState(false);
@@ -92,6 +114,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const [selectedShape, setSelectedShape] = useState(null);
   const [selectedRarity, setSelectedRarity] = useState(0);
   const [selectedLevel, setSelectedLevel] = useState(MIN_PIECE_LEVEL);
+
+  // Level editor state
+  const [editingLevelSlot, setEditingLevelSlot] = useState(null); // Index of slot being edited
+  const [levelInputValue, setLevelInputValue] = useState('');
 
   // Draft storage hook
   const { loadDraft, clearDraft } = useDraftStorage(
@@ -124,6 +150,53 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   useEffect(() => {
     updateLockedInventoryIndices();
   }, [gridState, inventory]);
+
+  // Calculate auto-scale based on container size
+  useEffect(() => {
+    if (!autoScale || !selectedWeapon || !gridContainerRef.current) return;
+
+    const calculateAutoScale = () => {
+      const container = gridContainerRef.current;
+      if (!container) return;
+
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+
+      // Calculate grid natural size
+      const gridSize = selectedWeapon.gridType === '4x4' ? 4 : 5;
+      const adjustedCellSize = cellSize;
+      const gridNaturalWidth = gridSize * adjustedCellSize + (gridSize - 1) * GAP_SIZE + GRID_PADDING * 2;
+      const gridNaturalHeight = gridNaturalWidth; // Grid is square
+
+      // Calculate scale to fit container with some padding (90% of container)
+      const scaleX = (containerWidth * 0.9) / gridNaturalWidth;
+      const scaleY = (containerHeight * 0.9) / gridNaturalHeight;
+      const newScale = Math.min(scaleX, scaleY, GRID_SCALE_MAX);
+
+      // Clamp to min/max
+      const clampedScale = Math.max(GRID_SCALE_MIN, Math.min(GRID_SCALE_MAX, newScale));
+
+      console.log('Auto-scale calculation:', {
+        containerWidth,
+        containerHeight,
+        gridNaturalWidth,
+        gridNaturalHeight,
+        scaleX,
+        scaleY,
+        clampedScale
+      });
+
+      setCalculatedScale(clampedScale);
+    };
+
+    calculateAutoScale();
+
+    // Recalculate on window resize
+    const resizeObserver = new ResizeObserver(calculateAutoScale);
+    resizeObserver.observe(gridContainerRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, [autoScale, selectedWeapon, cellSize, GAP_SIZE, GRID_PADDING, GRID_SCALE_MIN, GRID_SCALE_MAX]);
 
   // Debug: Track gridState changes to investigate socketing issue
   useEffect(() => {
@@ -326,6 +399,57 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     setInventory(newInventory);
     setHasUnsavedChanges(true);
+  };
+
+  const handleLoadPreset = (presetId) => {
+    const preset = INVENTORY_PRESETS.find(p => p.id === presetId);
+    if (!preset) return;
+
+    const newInventory = preset.pieces.map(pieceConfig => {
+      const shape = engravings.find(e => e.id === pieceConfig.shapeId);
+      if (!shape) return null;
+
+      return {
+        shapeId: shape.id,
+        shape: shape,
+        rarity: pieceConfig.rarity,
+        level: pieceConfig.level
+      };
+    });
+
+    setInventory(newInventory);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleChangePieceLevel = (slotIndex, newLevel) => {
+    const clampedLevel = Math.max(MIN_PIECE_LEVEL, Math.min(MAX_PIECE_LEVEL, newLevel));
+    const newInventory = [...inventory];
+    if (newInventory[slotIndex]) {
+      newInventory[slotIndex] = {
+        ...newInventory[slotIndex],
+        level: clampedLevel
+      };
+      setInventory(newInventory);
+      setHasUnsavedChanges(true);
+    }
+  };
+
+  const handleOpenLevelEditor = (slotIndex, currentLevel) => {
+    setEditingLevelSlot(slotIndex);
+    setLevelInputValue(currentLevel.toString());
+  };
+
+  const handleCloseLevelEditor = () => {
+    setEditingLevelSlot(null);
+    setLevelInputValue('');
+  };
+
+  const handleApplyLevel = () => {
+    const newLevel = parseInt(levelInputValue);
+    if (!isNaN(newLevel) && editingLevelSlot !== null) {
+      handleChangePieceLevel(editingLevelSlot, newLevel);
+    }
+    handleCloseLevelEditor();
   };
 
   const handleOpenPieceSelector = (slotIndex) => {
@@ -1082,6 +1206,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const completionBonus = getCompletionBonus();
   const gridSize = selectedWeapon?.gridType === '4x4' ? 4 : 5;
   const adjustedCellSize = getAdjustedCellSize(gridSize);
+  const currentScale = autoScale ? calculatedScale : gridScale; // Use auto or manual scale
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -1174,18 +1299,39 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               <label className="text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap">
                 Grid Scale:
               </label>
-              <input
-                type="range"
-                min={GRID_SCALE_MIN}
-                max={GRID_SCALE_MAX}
-                step={GRID_SCALE_STEP}
-                value={gridScale}
-                onChange={(e) => setGridScale(parseFloat(e.target.value))}
-                className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                title="Adjust grid size"
-              />
+
+              {/* Auto-scale toggle */}
+              <button
+                onClick={() => setAutoScale(!autoScale)}
+                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  autoScale
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+                title={autoScale ? 'Auto-fit enabled' : 'Manual scale'}
+              >
+                {autoScale ? 'Auto' : 'Manual'}
+              </button>
+
+              {/* Manual scale slider - only show when auto-scale is off */}
+              {!autoScale && (
+                <>
+                  <input
+                    type="range"
+                    min={GRID_SCALE_MIN}
+                    max={GRID_SCALE_MAX}
+                    step={GRID_SCALE_STEP}
+                    value={gridScale}
+                    onChange={(e) => setGridScale(parseFloat(e.target.value))}
+                    className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                    title="Adjust grid size"
+                  />
+                </>
+              )}
+
+              {/* Display current scale */}
               <span className="text-sm font-medium text-gray-700 dark:text-gray-200 w-12">
-                {Math.round(gridScale * 100)}%
+                {Math.round(currentScale * 100)}%
               </span>
             </div>
 
@@ -1234,7 +1380,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       {/* Main Grid Area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Grid Display */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div
+          ref={gridContainerRef}
+          className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-800 shadow-sm"
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Engraving Grid
@@ -1267,10 +1416,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
           {/* Grid Container with Scaling */}
           <div className="relative inline-block" style={{
-            transform: `scale(${gridScale})`,
+            transform: `scale(${currentScale})`,
             transformOrigin: 'top left',
-            marginBottom: `${(gridScale - 1) * GRID_SCALE_MARGIN_MULTIPLIER}px`,
-            marginRight: `${(gridScale - 1) * GRID_SCALE_MARGIN_MULTIPLIER}px`
+            marginBottom: `${(currentScale - 1) * GRID_SCALE_MARGIN_MULTIPLIER}px`,
+            marginRight: `${(currentScale - 1) * GRID_SCALE_MARGIN_MULTIPLIER}px`
           }}>
             <div
               ref={gridRef}
@@ -1873,17 +2022,39 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Piece Inventory ({INVENTORY_SIZE} Slots)
             </h2>
-            <button
-              onClick={handleRandomizeInventory}
-              className="flex items-center gap-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>Randomize</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Preset dropdown */}
+              <select
+                onChange={(e) => {
+                  if (e.target.value) {
+                    handleLoadPreset(e.target.value);
+                    e.target.value = ''; // Reset after selection
+                  }
+                }}
+                value=""
+                className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm font-medium transition-colors cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                title="Load preset inventory"
+              >
+                <option value="" disabled>Load Preset</option>
+                {INVENTORY_PRESETS.map(preset => (
+                  <option key={preset.id} value={preset.id} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                    {preset.name}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={handleRandomizeInventory}
+                className="flex items-center gap-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span>Randomize</span>
+              </button>
+            </div>
           </div>
 
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Drag pieces onto the grid to place them
+            Drag pieces onto the grid to place them. Click level to edit or scroll to adjust.
           </p>
 
           <div className="grid grid-cols-4 gap-3">
@@ -1956,10 +2127,24 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                         }}
                       />
 
-                      {/* Level */}
-                      <div className="absolute bottom-0 right-0 bg-black/70 text-white text-xs px-1 rounded-tl z-10">
+                      {/* Level - Interactive */}
+                      <div
+                        className="absolute bottom-0 right-0 bg-black/70 hover:bg-black/90 text-white text-xs px-1.5 py-0.5 rounded-tl z-10 cursor-pointer select-none transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenLevelEditor(index, piece.level);
+                        }}
+                        onWheel={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const delta = e.deltaY > 0 ? -1 : 1;
+                          handleChangePieceLevel(index, piece.level + delta);
+                        }}
+                        title="Click to edit level or scroll to adjust"
+                      >
                         Lv.{piece.level}
                       </div>
+
                     </div>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-gray-600 dark:text-gray-500">
@@ -1973,6 +2158,80 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           </div>
         </div>
       </div>
+
+      {/* Level Editor Widget - Fixed Overlay */}
+      {editingLevelSlot !== null && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={handleCloseLevelEditor}
+        >
+          <div
+            className="bg-gray-800 dark:bg-gray-900 border-2 border-blue-500 rounded-lg p-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-white text-sm font-semibold mb-3 text-center">
+              Set Level
+            </div>
+            <div className="flex items-center gap-2">
+              {/* Decrement button */}
+              <button
+                onClick={() => {
+                  const newVal = Math.max(MIN_PIECE_LEVEL, parseInt(levelInputValue) - 1);
+                  setLevelInputValue(newVal.toString());
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white rounded px-3 py-2 text-sm font-bold transition-colors"
+              >
+                -
+              </button>
+
+              {/* Level input */}
+              <input
+                type="number"
+                min={MIN_PIECE_LEVEL}
+                max={MAX_PIECE_LEVEL}
+                value={levelInputValue}
+                onChange={(e) => setLevelInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleApplyLevel();
+                  } else if (e.key === 'Escape') {
+                    handleCloseLevelEditor();
+                  }
+                }}
+                autoFocus
+                className="w-20 bg-gray-700 dark:bg-gray-800 text-white text-center rounded px-3 py-2 text-base border border-gray-600 dark:border-gray-700 focus:border-blue-500 focus:outline-none"
+              />
+
+              {/* Increment button */}
+              <button
+                onClick={() => {
+                  const newVal = Math.min(MAX_PIECE_LEVEL, parseInt(levelInputValue) + 1);
+                  setLevelInputValue(newVal.toString());
+                }}
+                className="bg-green-600 hover:bg-green-700 text-white rounded px-3 py-2 text-sm font-bold transition-colors"
+              >
+                +
+              </button>
+            </div>
+            <div className="flex gap-2 mt-3">
+              {/* Apply button */}
+              <button
+                onClick={handleApplyLevel}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded px-4 py-2 text-sm font-medium transition-colors"
+              >
+                Apply
+              </button>
+              {/* Cancel button */}
+              <button
+                onClick={handleCloseLevelEditor}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white rounded px-4 py-2 text-sm font-medium transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Piece Selection Modal */}
       {showPieceSelector && (
