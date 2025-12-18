@@ -38,8 +38,8 @@
         "description": "Configure and save complete battle loadouts"
       },
       {
-        "title": "Soul Weapon Engravings",
-        "path": "/soul-weapon-engravings",
+        "title": "Soul Weapon Engraving",
+        "path": "/soul-weapon-engraving",
         "icon": "🗡️",
         "description": "Plan and visualize soul weapon engraving layouts"
       }
