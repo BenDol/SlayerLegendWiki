@@ -183,6 +183,93 @@ The framework router automatically includes all registered custom routes at runt
 
 **IMPORTANT:** Never import parent routes/pages in framework router. Always use the route registry pattern.
 
+## Framework React Hooks
+
+The framework provides reusable React hooks that are generic and can be used by any wiki project. These hooks live in `wiki-framework/src/hooks/` and should be imported from there.
+
+### useDraftStorage Hook
+
+**Location:** `wiki-framework/src/hooks/useDraftStorage.js`
+
+A generic hook for localStorage-based draft auto-save functionality. Perfect for builders, forms, or any component that needs to preserve user input across sessions.
+
+**Features:**
+- Debounced auto-save (configurable delay, default 1 second)
+- User-specific storage keys (supports anonymous users)
+- Modal mode (disable auto-save/load when in modal)
+- Auto-load on mount
+- Manual clear functionality
+
+**Usage Example:**
+```javascript
+import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
+import { useAuthStore } from '../../wiki-framework/src/store/authStore';
+
+const MyBuilder = ({ isModal = false }) => {
+  const { user } = useAuthStore();
+  const [buildName, setBuildName] = useState('');
+  const [buildData, setBuildData] = useState({});
+
+  // Initialize draft storage
+  const { loadDraft, clearDraft, isDraftAvailable } = useDraftStorage(
+    'myBuilder',           // Storage key prefix
+    user,                  // User object (or null for anonymous)
+    isModal,              // Disable in modal mode
+    { buildName, buildData }, // Data to auto-save
+    1000                  // Debounce delay (ms)
+  );
+
+  // Load draft on mount
+  useEffect(() => {
+    const draft = loadDraft();
+    if (draft) {
+      setBuildName(draft.buildName || '');
+      setBuildData(draft.buildData || {});
+    }
+  }, []);
+
+  // Clear draft after successful save
+  const handleSave = async () => {
+    await saveToBackend();
+    clearDraft(); // Remove draft from localStorage
+  };
+
+  // Clear draft on reset
+  const handleClear = () => {
+    setBuildName('');
+    setBuildData({});
+    clearDraft();
+  };
+};
+```
+
+**Parameters:**
+- `storageKey` (string) - Base key for localStorage (e.g., 'skillBuilder', 'spiritBuilder')
+- `user` (object|null) - User object with `id` property, or null for anonymous
+- `isModal` (boolean) - If true, disables auto-save/load (for modal mode)
+- `draftData` (object) - Data to save to localStorage (auto-saved on change)
+- `debounceMs` (number) - Debounce delay in milliseconds (default: 1000)
+
+**Returns:**
+- `loadDraft()` - Function to load draft from localStorage
+- `clearDraft()` - Function to clear draft from localStorage
+- `isDraftAvailable()` - Function to check if draft exists
+
+**Storage Key Format:**
+`{storageKey}_draft_{userId}` (e.g., `skillBuilder_draft_123456` or `skillBuilder_draft_anonymous`)
+
+**When to Use:**
+- Form builders (skill, spirit, loadout builders)
+- Multi-step wizards
+- Content editors
+- Any component where losing user input would be frustrating
+
+**Important Notes:**
+- This hook was moved from parent project to framework to avoid code duplication
+- Used by SkillBuilder, SpiritBuilder, and BattleLoadouts in the parent project
+- Modal mode disables auto-save to prevent conflicts with parent page state
+- Always clear draft after successful backend save to avoid stale data
+
 ## Common Development Commands
 
 ```bash

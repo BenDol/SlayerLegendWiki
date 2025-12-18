@@ -9,7 +9,8 @@
       "Bash(sort:*)",
       "Bash(find:*)",
       "WebSearch",
-      "WebFetch(domain:sites.google.com)"
+      "WebFetch(domain:sites.google.com)",
+      "WebFetch(domain:docs.google.com)"
     ]
   }
 }

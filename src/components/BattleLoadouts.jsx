@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useBlocker } from 'react-router-dom';
 import { Share2, Download, Upload, Trash2, Copy, Check, Edit, Plus, Save, Loader, CheckCircle2, X, Move } from 'lucide-react';
 import SkillBuilderModal from './SkillBuilderModal';
 import SkillSlot from './SkillSlot';
@@ -143,48 +142,6 @@ const BattleLoadouts = () => {
       }
     }
   }, [skills, loadDraft]);
-
-  // Check if there are actual meaningful changes
-  const hasActualChanges = hasUnsavedChanges && (
-    loadoutName.trim() !== '' ||
-    currentLoadout.skillBuild !== null ||
-    currentLoadout.spiritBuild !== null
-  );
-
-  // Use React Router's useBlocker for navigation blocking
-  const blocker = useBlocker(hasActualChanges);
-
-  // Handle the blocker state
-  useEffect(() => {
-    if (blocker.state === 'blocked') {
-      const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.'
-      );
-
-      if (confirmed) {
-        blocker.proceed();
-      } else {
-        blocker.reset();
-      }
-    }
-  }, [blocker.state]);
-
-  // Warn before leaving page with unsaved changes (browser close/refresh)
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (hasActualChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [hasActualChanges]);
 
   const loadSkills = async () => {
     try {
@@ -391,15 +348,8 @@ const BattleLoadouts = () => {
 
   // Load saved loadout
   const handleLoadLoadout = (loadout) => {
-    // Check if there are actual meaningful changes (not just initial state)
-    const hasActualChanges = hasUnsavedChanges && (
-      loadoutName.trim() !== '' ||
-      currentLoadout.skillBuild !== null ||
-      currentLoadout.spiritBuild !== null
-    );
-
     // Check for unsaved changes before loading
-    if (hasActualChanges) {
+    if (hasUnsavedChanges) {
       const confirmed = window.confirm(
         'You have unsaved changes. Loading this loadout will discard your current changes. Continue?'
       );
@@ -588,15 +538,8 @@ const BattleLoadouts = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check if there are actual meaningful changes (not just initial state)
-    const hasActualChanges = hasUnsavedChanges && (
-      loadoutName.trim() !== '' ||
-      currentLoadout.skillBuild !== null ||
-      currentLoadout.spiritBuild !== null
-    );
-
     // Check for unsaved changes before importing
-    if (hasActualChanges) {
+    if (hasUnsavedChanges) {
       const confirmed = window.confirm(
         'You have unsaved changes. Importing a loadout will discard your current changes. Continue?'
       );
@@ -813,7 +756,7 @@ const BattleLoadouts = () => {
                   {/* Save Button with Unsaved Changes Indicator */}
                   <div className="flex items-center gap-3">
                     {/* Unsaved Changes Indicator */}
-                    {hasActualChanges && (
+                    {hasUnsavedChanges && (
                       <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

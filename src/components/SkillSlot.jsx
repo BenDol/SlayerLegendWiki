@@ -177,7 +177,7 @@ const SkillSlot = ({
             <img
               src={getElementIcon(skill.attribute)}
               alt={skill.attribute}
-              className="absolute -top-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+              className="absolute -top-1 -left-1 w-7 h-7 sm:w-8 sm:h-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
             />
           )}
         </div>

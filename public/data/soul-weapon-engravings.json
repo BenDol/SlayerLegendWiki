@@ -1,0 +1,428 @@
+{
+  "$schema": "soul-weapon-engravings-schema",
+  "version": "1.0.0",
+  "description": "Soul weapon engraving pieces (Soul Gems) for Slayer Legend. These tetris-style pieces fit into soul weapon grids to provide stat bonuses. Higher rarity and level increase stat percentages.",
+  "system": {
+    "unlockStage": 320,
+    "unlockWeapon": "Pride",
+    "consumable": "Chaos Soul",
+    "totalSlots": 8,
+    "mechanics": {
+      "rotation": "Pieces can be rotated to fit the grid",
+      "completionBonus": "Filling all grid slots without gaps grants additional completion effect",
+      "randomization": "Using Chaos Soul changes pieces to random shapes and rarities",
+      "dropRates": "Higher soul weapon level increases drop rates for higher rarity pieces"
+    }
+  },
+  "rarityTiers": [
+    {
+      "id": 0,
+      "name": "Common",
+      "color": "#9CA3AF",
+      "dropWeight": "Very High"
+    },
+    {
+      "id": 1,
+      "name": "Great",
+      "color": "#10B981",
+      "dropWeight": "High"
+    },
+    {
+      "id": 2,
+      "name": "Rare",
+      "color": "#3B82F6",
+      "dropWeight": "Medium"
+    },
+    {
+      "id": 3,
+      "name": "Epic",
+      "color": "#8B5CF6",
+      "dropWeight": "Low"
+    },
+    {
+      "id": 4,
+      "name": "Legendary",
+      "color": "#F59E0B",
+      "dropWeight": "Very Low"
+    },
+    {
+      "id": 5,
+      "name": "Mythic",
+      "color": "#EF4444",
+      "dropWeight": "Extremely Low"
+    }
+  ],
+  "shapes": [
+    {
+      "id": 1,
+      "name": "L-Shape",
+      "stat": "ATK",
+      "statName": "Attack",
+      "description": "L-shaped piece providing Attack bonus",
+      "gridSize": "3x1",
+      "pattern": [
+        [1, 0],
+        [1, 0],
+        [1, 1]
+      ],
+      "image": "SoulGem_{rarity}_1.png",
+      "baseStats": {
+        "common": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "great": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "rare": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "epic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "legendary": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "mythic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "Reverse L-Shape",
+      "stat": "HP",
+      "statName": "Health Points",
+      "description": "Reverse L-shaped piece providing HP bonus",
+      "gridSize": "3x1",
+      "pattern": [
+        [0, 1],
+        [0, 1],
+        [1, 1]
+      ],
+      "image": "SoulGem_{rarity}_2.png",
+      "baseStats": {
+        "common": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "great": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "rare": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "epic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "legendary": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "mythic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "name": "T-Shape",
+      "stat": "HP_RECOVERY",
+      "statName": "HP Recovery",
+      "description": "T-shaped piece providing HP Recovery bonus",
+      "gridSize": "3x1",
+      "pattern": [
+        [0, 1, 0],
+        [1, 1, 1]
+      ],
+      "image": "SoulGem_{rarity}_3.png",
+      "baseStats": {
+        "common": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "great": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "rare": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "epic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "legendary": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "mythic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "Square",
+      "stat": "CRIT_DMG",
+      "statName": "Critical Damage",
+      "description": "Square piece providing Critical Damage bonus",
+      "gridSize": "2x2",
+      "pattern": [
+        [1, 1],
+        [1, 1]
+      ],
+      "image": "SoulGem_{rarity}_4.png",
+      "baseStats": {
+        "common": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "great": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "rare": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "epic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "legendary": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "mythic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "name": "Line",
+      "stat": "EXTRA_GOLD",
+      "statName": "Extra Gold",
+      "description": "Line piece providing Extra Gold bonus",
+      "gridSize": "4x1",
+      "pattern": [
+        [1, 1, 1, 1]
+      ],
+      "image": "SoulGem_{rarity}_5.png",
+      "baseStats": {
+        "common": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "great": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "rare": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "epic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "legendary": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "mythic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "name": "Squiggle",
+      "stat": "ACCURACY",
+      "statName": "Accuracy",
+      "description": "Squiggle-shaped piece providing Accuracy bonus",
+      "gridSize": "3x2",
+      "pattern": [
+        [0, 1, 1],
+        [1, 1, 0]
+      ],
+      "image": "SoulGem_{rarity}_6.png",
+      "baseStats": {
+        "common": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "great": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "rare": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "epic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "legendary": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "mythic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "name": "Reverse Squiggle",
+      "stat": "DODGE",
+      "statName": "Dodge",
+      "description": "Reverse squiggle-shaped piece providing Dodge bonus",
+      "gridSize": "3x2",
+      "pattern": [
+        [1, 1, 0],
+        [0, 1, 1]
+      ],
+      "image": "SoulGem_{rarity}_7.png",
+      "baseStats": {
+        "common": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "great": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "rare": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "epic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "legendary": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        },
+        "mythic": {
+          "level1": "TBD",
+          "maxLevel": "TBD",
+          "levelScaling": "TBD"
+        }
+      }
+    }
+  ],
+  "recommendations": {
+    "priority": [
+      {
+        "rank": 1,
+        "stat": "ATK",
+        "reason": "Attack is the most important stat for damage output in most situations"
+      },
+      {
+        "rank": 2,
+        "stat": "CRIT_DMG",
+        "reason": "Critical damage multiplies attack power effectively, especially early game"
+      },
+      {
+        "rank": 3,
+        "stat": "HP",
+        "reason": "Survivability becomes important in later stages"
+      },
+      {
+        "rank": 4,
+        "stat": "DODGE",
+        "reason": "Dodge helps avoid damage entirely"
+      },
+      {
+        "rank": 5,
+        "stat": "ACCURACY",
+        "reason": "Ensures hits land consistently"
+      },
+      {
+        "rank": 6,
+        "stat": "HP_RECOVERY",
+        "reason": "Healing over time for sustained fights"
+      },
+      {
+        "rank": 7,
+        "stat": "EXTRA_GOLD",
+        "reason": "Useful for farming but less impactful in combat"
+      }
+    ],
+    "strategy": {
+      "earlyGame": "Focus on ATK and CRIT_DMG pieces for maximum damage output",
+      "midGame": "Balance ATK with HP and DODGE for survivability",
+      "lateGame": "Optimize for grid completion bonuses while maintaining high ATK",
+      "farming": "Include EXTRA_GOLD pieces when farming for resources"
+    }
+  },
+  "_metadata": {
+    "lastUpdated": "2025-12-17",
+    "dataCompleteness": "Structure complete, stat values need to be populated",
+    "notes": "Stat percentages marked as TBD require in-game data collection or screenshots showing actual values per rarity and level. Level scaling formulas also need verification.",
+    "sources": [
+      "https://en.namu.wiki/w/슬레이어%20키우기/소울웨폰",
+      "https://sites.google.com/view/slayerlegends/data-formulas",
+      "In-game image assets from public/images/equipment/soul-weapons/"
+    ]
+  }
+}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { useBlocker } from 'react-router-dom';
 import { Share2, Download, Upload, Trash2, Check, Save, Loader, CheckCircle2 } from 'lucide-react';
 import SpiritSlot from './SpiritSlot';
 import SpiritSelector from './SpiritSelector';
@@ -21,7 +20,7 @@ import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage'
  * - URL sharing with encoded build data
  * - Import/Export builds as JSON
  * - Save system with GitHub backend
- * - Unsaved changes detection and navigation blocking
+ * - Draft auto-save to localStorage
  *
  * @param {boolean} isModal - If true, renders in modal mode with Save button
  * @param {object} initialBuild - Initial build data to load (for modal mode)
@@ -152,51 +151,6 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     setBuild({ slots: deserializedBuild.slots });
     setHasUnsavedChanges(true); // Mark as having changes to block navigation
   }, [spirits, isModal, initialBuild]);
-
-  // Check if there are actual meaningful changes
-  const hasActualChanges = hasUnsavedChanges && (
-    buildName.trim() !== '' ||
-    build.slots.some(slot => slot.spirit !== null)
-  );
-
-  // Use React Router's useBlocker for navigation blocking (only in page mode, not modal)
-  const blocker = useBlocker(!isModal && hasActualChanges);
-
-  // Handle the blocker state
-  useEffect(() => {
-    if (isModal) return; // Skip for modal mode
-
-    if (blocker.state === 'blocked') {
-      const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.'
-      );
-
-      if (confirmed) {
-        blocker.proceed();
-      } else {
-        blocker.reset();
-      }
-    }
-  }, [blocker, isModal]);
-
-  // Warn before leaving page with unsaved changes (browser close/refresh, only in page mode)
-  useEffect(() => {
-    if (isModal) return; // Skip for modal mode
-
-    const handleBeforeUnload = (e) => {
-      if (hasActualChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [hasActualChanges, isModal]);
 
   const loadSpirits = async () => {
     try {
