@@ -6,7 +6,7 @@ import SoulWeaponEngravingBuilder from '../components/SoulWeaponEngravingBuilder
  */
 const SoulWeaponEngravingBuilderPage = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       <SoulWeaponEngravingBuilder />
     </div>
   );

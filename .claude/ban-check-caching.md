@@ -1,7 +1,11 @@
-# Ban Check Caching Implementation
+# Time-Based Caching Implementation
 
 ## Overview
-Implemented 10-minute browser cache for `isBanned()` checks to reduce GitHub API calls.
+Implemented unified time-based localStorage cache (`timeCache`) to reduce GitHub API calls across the application.
+
+## Caches Replaced
+1. Ban check caching (10-minute TTL)
+2. Prestige data caching (5-minute TTL)
 
 ## Problem
 The `isBanned()` function was being called frequently throughout the application (15 usages found), making excessive GitHub API calls to check if users are banned.
