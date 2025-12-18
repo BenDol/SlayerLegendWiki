@@ -10,7 +10,8 @@
       "Bash(find:*)",
       "WebSearch",
       "WebFetch(domain:sites.google.com)",
-      "WebFetch(domain:docs.google.com)"
+      "WebFetch(domain:docs.google.com)",
+      "Bash(cat:*)"
     ]
   }
 }

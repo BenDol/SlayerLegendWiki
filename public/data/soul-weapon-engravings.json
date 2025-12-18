@@ -151,10 +151,11 @@
       "stat": "HP_RECOVERY",
       "statName": "HP Recovery",
       "description": "T-shaped piece providing HP Recovery bonus",
-      "gridSize": "3x1",
+      "gridSize": "2x3",
       "pattern": [
-        [0, 1, 0],
-        [1, 1, 1]
+        [1, 0],
+        [1, 1],
+        [1, 0]
       ],
       "image": "SoulGem_{rarity}_3.png",
       "baseStats": {
@@ -243,7 +244,10 @@
       "description": "Line piece providing Extra Gold bonus",
       "gridSize": "4x1",
       "pattern": [
-        [1, 1, 1, 1]
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0]
       ],
       "image": "SoulGem_{rarity}_5.png",
       "baseStats": {
@@ -287,8 +291,9 @@
       "description": "Squiggle-shaped piece providing Accuracy bonus",
       "gridSize": "3x2",
       "pattern": [
-        [0, 1, 1],
-        [1, 1, 0]
+        [1, 0],
+        [1, 1],
+        [0, 1]
       ],
       "image": "SoulGem_{rarity}_6.png",
       "baseStats": {
@@ -332,8 +337,9 @@
       "description": "Reverse squiggle-shaped piece providing Dodge bonus",
       "gridSize": "3x2",
       "pattern": [
-        [1, 1, 0],
-        [0, 1, 1]
+        [0, 1],
+        [1, 1],
+        [1, 0]
       ],
       "image": "SoulGem_{rarity}_7.png",
       "baseStats": {

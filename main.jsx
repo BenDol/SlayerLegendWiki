@@ -199,6 +199,38 @@ dataRegistry.register('equipment', {
   type: 'array'
 });
 
+dataRegistry.register('soul-weapon-grids', {
+  file: '/data/soul-weapon-grids.json',
+  label: 'Soul Weapon Grids',
+  idField: 'id',
+  display: {
+    primary: 'name',
+    secondary: ['gridType', 'totalActiveSlots'],
+    badges: ['gridType']
+  },
+  dataPath: 'weapons',
+  searchFields: ['name', 'gridType'],
+  icon: '🎯',
+  description: 'Soul weapon engraving grid layouts with completion effects',
+  type: 'array'
+});
+
+dataRegistry.register('soul-weapon-engravings', {
+  file: '/data/soul-weapon-engravings.json',
+  label: 'Soul Weapon Engravings',
+  idField: 'id',
+  display: {
+    primary: 'name',
+    secondary: ['stat', 'gridSize'],
+    badges: ['stat']
+  },
+  dataPath: 'shapes',
+  searchFields: ['name', 'stat', 'statName', 'description'],
+  icon: '💠',
+  description: 'Soul weapon engraving piece shapes with stat bonuses',
+  type: 'array'
+});
+
 dataRegistry.register('relics', {
   file: '/data/relics.json',
   label: 'Relics',
@@ -324,6 +356,7 @@ const BattleLoadoutsPage = React.lazy(() => import('./src/pages/BattleLoadoutsPa
 const SpiritSpriteDemoPage = React.lazy(() => import('./src/pages/SpiritSpriteDemoPage.jsx'));
 const SpiritBuilderPage = React.lazy(() => import('./src/pages/SpiritBuilderPage.jsx'));
 const MySpiritCollectionPage = React.lazy(() => import('./src/pages/MySpiritCollectionPage.jsx'));
+const SoulWeaponEngravingBuilderPage = React.lazy(() => import('./src/pages/SoulWeaponEngravingBuilderPage.jsx'));
 
 registerCustomRoutes([
   {
@@ -344,6 +377,11 @@ registerCustomRoutes([
   {
     path: 'battle-loadouts',
     component: <BattleLoadoutsPage />,
+    suspense: true
+  },
+  {
+    path: 'soul-weapon-engraving',
+    component: <SoulWeaponEngravingBuilderPage />,
     suspense: true
   },
   {
