@@ -197,6 +197,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const SUBMISSION_CACHE_KEY = 'soulWeaponEngraving_submissionsCache';
   const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
+  // Best Weapon cache constants
+  const BEST_WEAPON_CACHE_KEY = 'soulWeaponEngraving_bestWeaponCache';
+  const BEST_WEAPON_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
   // Helper functions for localStorage-based submission cache
   const getSubmissionCache = () => {
     try {
@@ -253,6 +257,73 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       }
     } catch (error) {
       console.error('[Cache] Failed to clean expired cache:', error);
+    }
+  };
+
+  // Helper functions for best weapon cache
+  const getBestWeaponCache = () => {
+    try {
+      const cached = localStorage.getItem(BEST_WEAPON_CACHE_KEY);
+      if (!cached) return null;
+
+      const { results, timestamp, inventorySignature, highestUnlockedWeapon: cachedHighestWeapon } = JSON.parse(cached);
+      const now = Date.now();
+
+      // Check if cache is expired
+      if (now - timestamp > BEST_WEAPON_CACHE_TTL) {
+        console.log('[Best Weapon Cache] Cache expired');
+        localStorage.removeItem(BEST_WEAPON_CACHE_KEY);
+        return null;
+      }
+
+      // Generate current inventory signature
+      const currentInventorySignature = inventory
+        .filter(p => p !== null)
+        .map(p => `${p.shapeId}-${p.rarity}-${p.level}`)
+        .sort()
+        .join('|');
+
+      // Check if inventory has changed
+      if (inventorySignature !== currentInventorySignature) {
+        console.log('[Best Weapon Cache] Inventory changed, cache invalid');
+        localStorage.removeItem(BEST_WEAPON_CACHE_KEY);
+        return null;
+      }
+
+      // Check if highest unlocked weapon has changed
+      if (cachedHighestWeapon !== highestUnlockedWeapon) {
+        console.log('[Best Weapon Cache] Highest unlocked weapon changed, cache invalid');
+        localStorage.removeItem(BEST_WEAPON_CACHE_KEY);
+        return null;
+      }
+
+      console.log('[Best Weapon Cache] Valid cache found');
+      return results;
+    } catch (error) {
+      console.error('[Best Weapon Cache] Failed to read cache:', error);
+      return null;
+    }
+  };
+
+  const setBestWeaponCache = (results) => {
+    try {
+      const inventorySignature = inventory
+        .filter(p => p !== null)
+        .map(p => `${p.shapeId}-${p.rarity}-${p.level}`)
+        .sort()
+        .join('|');
+
+      const cacheData = {
+        results,
+        timestamp: Date.now(),
+        inventorySignature,
+        highestUnlockedWeapon
+      };
+
+      localStorage.setItem(BEST_WEAPON_CACHE_KEY, JSON.stringify(cacheData));
+      console.log('[Best Weapon Cache] Cached results for current inventory');
+    } catch (error) {
+      console.error('[Best Weapon Cache] Failed to write cache:', error);
     }
   };
 
@@ -2642,6 +2713,15 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       return;
     }
 
+    // Check for valid cache first
+    const cachedResults = getBestWeaponCache();
+    if (cachedResults) {
+      console.log('🔍 Using cached best weapon results');
+      setBestWeaponResults(cachedResults);
+      setShowBestWeaponModal(true);
+      return;
+    }
+
     // Filter weapons from allWeapons (which has correct IDs) up to highestUnlockedWeapon
     const unlockedAllWeapons = allWeapons.filter(w => w.id <= highestUnlockedWeapon);
 
@@ -2661,7 +2741,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // Find highest unlocked weapon name for display
     const highestWeaponName = allWeapons.find(w => w.id === highestUnlockedWeapon)?.name || 'Unknown';
 
-    // Confirmation prompt
+    // Confirmation prompt (only shown if no cache)
     const confirmed = window.confirm(
       `Finding the best weapon will test ${unlockedWeapons.length} unlocked weapon${unlockedWeapons.length !== 1 ? 's' : ''} with your current inventory.\n\n` +
       `Highest unlocked: ${highestWeaponName}\n\n` +
@@ -2792,6 +2872,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         if (results.length === 0) {
           alert('No weapons found that can fit your current inventory pieces');
         } else {
+          // Cache the results
+          setBestWeaponCache(results);
           setBestWeaponResults(results);
           setShowBestWeaponModal(true);
         }
@@ -4159,7 +4241,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               <div className="mt-2 p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400 rounded-lg" style={{
                 maxWidth: `${gridSize * adjustedCellSize + (gridSize - 1) * GAP_SIZE + GRID_PADDING * 2}px`
               }}>
-                <p className="text-center text-cyan-400 font-semibold text-xs leading-tight">
+                <p className="text-center text-cyan-400 font-semibold text-[10px] leading-tight">
                   ✓ Completion Effect: ATK +{completionBonus.atk}, HP +{completionBonus.hp}
                 </p>
               </div>
