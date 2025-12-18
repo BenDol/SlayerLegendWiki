@@ -16,16 +16,38 @@ import { saveBuild as saveSharedBuild, generateShareUrl } from '../../wiki-frame
  * - Piece rotation with confirmation UI
  * - Grid completion bonus display
  * - Share/save builds
- * - 8 piece inventory slots
+ * - Configurable piece inventory slots
  */
 const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSave = null, allowSavingBuilds = true }) => {
   const { isAuthenticated, user } = useAuthStore();
   const gridRef = useRef(null);
 
+  // ===== CONSTANTS =====
+  // Grid configuration
+  const GAP_SIZE = 4; // Gap between grid cells in pixels
+  const GRID_PADDING = 8; // Padding inside grid container (affects all positioning)
+  const LINE_THICKNESS = 8; // Thickness of connecting lines between gems
+
+  // Grid scaling
+  const GRID_SCALE_DEFAULT = 1.5; // Default scale (150%)
+  const GRID_SCALE_MIN = 0.5; // Minimum scale (50%)
+  const GRID_SCALE_MAX = 2.4; // Maximum scale (240%)
+  const GRID_SCALE_STEP = 0.1; // Scale slider step size
+  const GRID_SCALE_MARGIN_MULTIPLIER = 300; // Multiplier for calculating margins during scaling
+
+  // Inventory
+  const INVENTORY_SIZE = 8; // Number of piece inventory slots
+
+  // Piece levels
+  const MIN_PIECE_LEVEL = 1;
+  const MAX_PIECE_LEVEL = 50;
+
+  // Rarity tiers
+  const RARITY_COUNT = 6; // Common, Great, Rare, Epic, Legendary, Mythic (0-5)
+
   // Natural image sizing - calculated from actual piece images
   const [cellSize, setCellSize] = useState(45); // Will be set from image dimensions
   const [imageSizesCache, setImageSizesCache] = useState({}); // Cache of natural image sizes
-  const GAP_SIZE = 4; // Gap between grid cells in pixels
 
   // Data loading states
   const [weapons, setWeapons] = useState([]);
@@ -36,7 +58,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const [selectedWeapon, setSelectedWeapon] = useState(null);
   const [buildName, setBuildName] = useState('');
   const [gridState, setGridState] = useState([]); // Grid with placed pieces
-  const [inventory, setInventory] = useState(Array(8).fill(null)); // 8 piece slots
+  const [inventory, setInventory] = useState(Array(INVENTORY_SIZE).fill(null)); // Inventory slots
   const [lockedInventoryIndices, setLockedInventoryIndices] = useState([]); // Tracks which inventory pieces are placed
 
   // Drag and placement states
@@ -61,12 +83,15 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   // Debug mode
   const [debugMode, setDebugMode] = useState(false);
 
+  // Grid scaling state (1.0 = 100%, 2.0 = 200%, etc.)
+  const [gridScale, setGridScale] = useState(GRID_SCALE_DEFAULT);
+
   // Piece selection modal states
   const [showPieceSelector, setShowPieceSelector] = useState(false);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState(null);
   const [selectedShape, setSelectedShape] = useState(null);
   const [selectedRarity, setSelectedRarity] = useState(0);
-  const [selectedLevel, setSelectedLevel] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState(MIN_PIECE_LEVEL);
 
   // Draft storage hook
   const { loadDraft, clearDraft } = useDraftStorage(
@@ -286,10 +311,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleRandomizeInventory = () => {
-    const newInventory = Array(8).fill(null).map(() => {
+    const newInventory = Array(INVENTORY_SIZE).fill(null).map(() => {
       const randomShape = engravings[Math.floor(Math.random() * engravings.length)];
-      const randomRarity = Math.floor(Math.random() * 6);
-      const randomLevel = Math.floor(Math.random() * 50) + 1;
+      const randomRarity = Math.floor(Math.random() * RARITY_COUNT);
+      const randomLevel = Math.floor(Math.random() * MAX_PIECE_LEVEL) + MIN_PIECE_LEVEL;
 
       return {
         shapeId: randomShape.id,
@@ -1144,6 +1169,26 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               <span>Clear</span>
             </button>
 
+            {/* Grid Scale Control */}
+            <div className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap">
+                Grid Scale:
+              </label>
+              <input
+                type="range"
+                min={GRID_SCALE_MIN}
+                max={GRID_SCALE_MAX}
+                step={GRID_SCALE_STEP}
+                value={gridScale}
+                onChange={(e) => setGridScale(parseFloat(e.target.value))}
+                className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                title="Adjust grid size"
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 w-12">
+                {Math.round(gridScale * 100)}%
+              </span>
+            </div>
+
             {/* Debug button - only in development */}
             {import.meta.env.DEV && (
               <button
@@ -1220,11 +1265,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             </div>
           )}
 
-          {/* Grid Container */}
-          <div className="relative inline-block">
+          {/* Grid Container with Scaling */}
+          <div className="relative inline-block" style={{
+            transform: `scale(${gridScale})`,
+            transformOrigin: 'top left',
+            marginBottom: `${(gridScale - 1) * GRID_SCALE_MARGIN_MULTIPLIER}px`,
+            marginRight: `${(gridScale - 1) * GRID_SCALE_MARGIN_MULTIPLIER}px`
+          }}>
             <div
               ref={gridRef}
-              className={`grid gap-1 p-4 rounded-lg relative ${isGridComplete() ? 'bg-gradient-to-br from-cyan-400/20 to-blue-500/20 ring-2 ring-cyan-400' : 'bg-gray-900 dark:bg-black'}`}
+              className={`grid gap-1 p-2 rounded-lg relative ${isGridComplete() ? 'bg-gradient-to-br from-cyan-400/20 to-blue-500/20 ring-1 ring-cyan-400' : 'bg-gray-900 dark:bg-black'}`}
               style={{
                 gridTemplateColumns: `repeat(${gridSize}, ${adjustedCellSize}px)`,
                 gridTemplateRows: `repeat(${gridSize}, ${adjustedCellSize}px)`
@@ -1313,12 +1363,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                       filledCells.slice(idx1 + 1).map((cell2, idx2) => {
                         if (areAdjacent(cell1.row, cell1.col, cell2.row, cell2.col)) {
                           const isHorizontal = cell1.row === cell2.row;
-                          const lineThickness = 8;
+                          const lineThickness = LINE_THICKNESS;
 
                           if (isHorizontal) {
                             const leftCol = Math.min(cell1.col, cell2.col);
-                            const x = 16 + (leftCol + 0.5) * (adjustedCellSize + GAP_SIZE);
-                            const y = 16 + cell1.row * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                            const x = GRID_PADDING + leftCol * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                            const y = GRID_PADDING + cell1.row * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
                             const width = adjustedCellSize + GAP_SIZE;
 
                             return (
@@ -1341,8 +1391,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             );
                           } else {
                             const topRow = Math.min(cell1.row, cell2.row);
-                            const x = 16 + cell1.col * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
-                            const y = 16 + (topRow + 0.5) * (adjustedCellSize + GAP_SIZE);
+                            const x = GRID_PADDING + cell1.col * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                            const y = GRID_PADDING + topRow * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
                             const height = adjustedCellSize + GAP_SIZE;
 
                             return (
@@ -1378,8 +1428,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                           key={`drag-gem-${filledCell.row}-${filledCell.col}`}
                           className="absolute pointer-events-none"
                           style={{
-                            left: `${16 + filledCell.col * (adjustedCellSize + GAP_SIZE)}px`,
-                            top: `${16 + filledCell.row * (adjustedCellSize + GAP_SIZE)}px`,
+                            left: `${GRID_PADDING + filledCell.col * (adjustedCellSize + GAP_SIZE)}px`,
+                            top: `${GRID_PADDING + filledCell.row * (adjustedCellSize + GAP_SIZE)}px`,
                             width: `${adjustedCellSize}px`,
                             height: `${adjustedCellSize}px`,
                             zIndex: 21,
@@ -1423,12 +1473,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                       filledCells.slice(idx1 + 1).map((cell2, idx2) => {
                         if (areAdjacent(cell1.row, cell1.col, cell2.row, cell2.col)) {
                           const isHorizontal = cell1.row === cell2.row;
-                          const lineThickness = 8;
+                          const lineThickness = LINE_THICKNESS;
 
                           if (isHorizontal) {
                             const leftCol = Math.min(cell1.col, cell2.col);
-                            const x = 16 + (leftCol + 0.5) * (adjustedCellSize + GAP_SIZE);
-                            const y = 16 + cell1.row * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                            const x = GRID_PADDING + leftCol * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                            const y = GRID_PADDING + cell1.row * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
                             const width = adjustedCellSize + GAP_SIZE;
 
                             return (
@@ -1451,8 +1501,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             );
                           } else {
                             const topRow = Math.min(cell1.row, cell2.row);
-                            const x = 16 + cell1.col * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
-                            const y = 16 + (topRow + 0.5) * (adjustedCellSize + GAP_SIZE);
+                            const x = GRID_PADDING + cell1.col * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                            const y = GRID_PADDING + topRow * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
                             const height = adjustedCellSize + GAP_SIZE;
 
                             return (
@@ -1511,8 +1561,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                         onDragEnd={handleDragEnd}
                         className="absolute cursor-grab active:cursor-grabbing hover:opacity-90 transition-opacity"
                         style={{
-                          left: `${16 + filledCell.col * (adjustedCellSize + GAP_SIZE)}px`,
-                          top: `${16 + filledCell.row * (adjustedCellSize + GAP_SIZE)}px`,
+                          left: `${GRID_PADDING + filledCell.col * (adjustedCellSize + GAP_SIZE)}px`,
+                          top: `${GRID_PADDING + filledCell.row * (adjustedCellSize + GAP_SIZE)}px`,
                           width: `${adjustedCellSize}px`,
                           height: `${adjustedCellSize}px`,
                           zIndex: 10,
@@ -1586,13 +1636,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             if (areAdjacent(cell1.row, cell1.col, cell2.row, cell2.col)) {
                               // Calculate line position and orientation
                               const isHorizontal = cell1.row === cell2.row;
-                              const lineThickness = 8;
+                              const lineThickness = LINE_THICKNESS;
 
                               if (isHorizontal) {
                                 // Horizontal line
                                 const leftCol = Math.min(cell1.col, cell2.col);
-                                const x = 16 + (leftCol + 0.5) * (adjustedCellSize + GAP_SIZE);
-                                const y = 16 + cell1.row * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                                const x = GRID_PADDING + leftCol * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                                const y = GRID_PADDING + cell1.row * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
                                 const width = adjustedCellSize + GAP_SIZE;
 
                                 return (
@@ -1612,8 +1662,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                               } else {
                                 // Vertical line
                                 const topRow = Math.min(cell1.row, cell2.row);
-                                const x = 16 + cell1.col * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
-                                const y = 16 + (topRow + 0.5) * (adjustedCellSize + GAP_SIZE);
+                                const x = GRID_PADDING + cell1.col * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
+                                const y = GRID_PADDING + topRow * (adjustedCellSize + GAP_SIZE) + adjustedCellSize / 2;
                                 const height = adjustedCellSize + GAP_SIZE;
 
                                 return (
@@ -1652,8 +1702,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                               }}
                               className="absolute cursor-grab active:cursor-grabbing hover:opacity-90 transition-opacity"
                               style={{
-                                left: `${16 + filledCell.col * (adjustedCellSize + GAP_SIZE)}px`,
-                                top: `${16 + filledCell.row * (adjustedCellSize + GAP_SIZE)}px`,
+                                left: `${GRID_PADDING + filledCell.col * (adjustedCellSize + GAP_SIZE)}px`,
+                                top: `${GRID_PADDING + filledCell.row * (adjustedCellSize + GAP_SIZE)}px`,
                                 width: `${adjustedCellSize}px`,
                                 height: `${adjustedCellSize}px`,
                                 zIndex: 5,
@@ -1693,8 +1743,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 <div
                   className="absolute pointer-events-none z-50"
                   style={{
-                    left: `${16 + previewPosition.col * (adjustedCellSize + GAP_SIZE)}px`,
-                    top: `${16 + previewPosition.row * (adjustedCellSize + GAP_SIZE)}px`,
+                    left: `${GRID_PADDING + previewPosition.col * (adjustedCellSize + GAP_SIZE)}px`,
+                    top: `${GRID_PADDING + previewPosition.row * (adjustedCellSize + GAP_SIZE)}px`,
                   }}
                 >
                   {/* Draw the pattern grid */}
@@ -1760,8 +1810,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 <div
                   className="absolute flex gap-2 z-10"
                   style={{
-                    left: `${16 + placingPosition.col * (adjustedCellSize + GAP_SIZE)}px`,
-                    top: `${16 + (placingPosition.row + getRotatedPattern(placingPiece.shape.pattern, placingRotation).length) * (adjustedCellSize + GAP_SIZE) + 8}px`,
+                    left: `${GRID_PADDING + placingPosition.col * (adjustedCellSize + GAP_SIZE)}px`,
+                    top: `${GRID_PADDING + (placingPosition.row + getRotatedPattern(placingPiece.shape.pattern, placingRotation).length) * (adjustedCellSize + GAP_SIZE) + GRID_PADDING}px`,
                   }}
                 >
                   <button
@@ -1793,16 +1843,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 </div>
               );
             })()}
-          </div>
 
-          {/* Completion Effect */}
-          {completionBonus && (
-            <div className="mt-4 p-3 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400 rounded-lg">
-              <p className="text-center text-cyan-400 font-semibold text-lg">
-                ✓ Completion Effect: ATK +{completionBonus.atk}, HP +{completionBonus.hp}
-              </p>
-            </div>
-          )}
+            {/* Completion Effect - Inside scaling wrapper */}
+            {completionBonus && (
+              <div className="mt-2 p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400 rounded-lg">
+                <p className="text-center text-cyan-400 font-semibold text-sm">
+                  ✓ Completion Effect: ATK +{completionBonus.atk}, HP +{completionBonus.hp}
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* Grid Actions */}
           <div className="mt-4">
@@ -1821,7 +1871,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         <div className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Piece Inventory (8 Slots)
+              Piece Inventory ({INVENTORY_SIZE} Slots)
             </h2>
             <button
               onClick={handleRandomizeInventory}
@@ -1993,14 +2043,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               {/* Level Input */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Level (1-50)
+                  Level ({MIN_PIECE_LEVEL}-{MAX_PIECE_LEVEL})
                 </label>
                 <input
                   type="number"
-                  min="1"
-                  max="50"
+                  min={MIN_PIECE_LEVEL}
+                  max={MAX_PIECE_LEVEL}
                   value={selectedLevel}
-                  onChange={(e) => setSelectedLevel(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
+                  onChange={(e) => setSelectedLevel(Math.max(MIN_PIECE_LEVEL, Math.min(MAX_PIECE_LEVEL, parseInt(e.target.value) || MIN_PIECE_LEVEL)))}
                   className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
