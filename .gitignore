@@ -51,3 +51,4 @@ external/backups/excluded-images/
 .netlify
 
 /.dev.vars
+/.wrangler/

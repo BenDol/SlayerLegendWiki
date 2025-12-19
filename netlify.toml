@@ -14,6 +14,7 @@
   NODE_VERSION = "20"
 
 # Redirect rules for SPA routing (handles React Router)
+# Note: Netlify functions automatically take precedence over these redirects
 [[redirects]]
   from = "/*"
   to = "/index.html"

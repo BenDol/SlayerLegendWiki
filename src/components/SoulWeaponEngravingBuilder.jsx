@@ -194,6 +194,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const [weaponsWithSubmissions, setWeaponsWithSubmissions] = useState(new Set()); // Set of weapon names that have community submissions
   const [currentSubmissionMeta, setCurrentSubmissionMeta] = useState(null); // Metadata for currently loaded submission
   const [loadingSharedBuild, setLoadingSharedBuild] = useState(false); // True while loading a shared build (prevents grid initialization)
+  const hasInitializedGridForWeapon = useRef(null); // Track which weapon we've initialized the grid for
 
   // Submission cache constants
   const SUBMISSION_CACHE_KEY = 'soulWeaponEngraving_submissionsCache';
@@ -329,12 +330,45 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     }
   };
 
+  // Serialize gridState and inventory for draft storage (remove complex shape objects)
+  const serializedDraftData = React.useMemo(() => {
+    // Serialize gridState: Only include serializable piece data
+    const serializedGridState = gridState.map(row =>
+      row.map(cell => ({
+        active: cell.active,
+        piece: cell.piece ? {
+          shapeId: cell.piece.shapeId,
+          rarity: cell.piece.rarity,
+          level: cell.piece.level,
+          rotation: cell.piece.rotation,
+          anchorRow: cell.piece.anchorRow,
+          anchorCol: cell.piece.anchorCol
+        } : null
+      }))
+    );
+
+    // Serialize inventory: Only include serializable piece data
+    const serializedInventory = inventory.map(item => item ? {
+      shapeId: item.shapeId,
+      rarity: item.rarity,
+      level: item.level
+    } : null);
+
+    return {
+      buildName,
+      selectedWeapon,
+      gridState: serializedGridState,
+      inventory: serializedInventory,
+      highestUnlockedWeapon
+    };
+  }, [buildName, selectedWeapon, gridState, inventory, highestUnlockedWeapon]);
+
   // Draft storage hook
   const { loadDraft, clearDraft } = useDraftStorage(
     'soulWeaponEngraving',
     user,
     isModal,
-    { buildName, selectedWeapon, gridState, inventory }
+    serializedDraftData
   );
 
   // Load data
@@ -375,6 +409,122 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             // Load the build data
             setBuildName(buildData.data.name || '');
 
+            console.log('[SoulWeaponEngravingBuilder] Build data received:', {
+              hasWeaponId: !!buildData.data.weaponId,
+              weaponId: buildData.data.weaponId,
+              hasGridState: !!buildData.data.gridState,
+              hasInventory: !!buildData.data.inventory,
+              gridStateLength: buildData.data.gridState?.length,
+              inventoryLength: buildData.data.inventory?.length
+            });
+
+            // IMPORTANT: Load grid state and inventory BEFORE setting weapon
+            // This prevents the weapon change effect from reinitializing an empty grid
+
+            // Support both old format (gridState) and new optimized format (pieces)
+            if (buildData.data.pieces) {
+              // New optimized format: pieces array with anchor coordinates
+              console.log('[SoulWeaponEngravingBuilder] Loading pieces from shared build (optimized format)');
+
+              // First, get the weapon to know the grid structure
+              const gridWeapon = weapons.find(w => w.id === buildData.data.weaponId);
+              if (gridWeapon) {
+                // Initialize grid with weapon's active slots
+                const gridSize = gridWeapon.gridType === '4x4' ? 4 : 5;
+                const newGrid = Array(gridSize).fill(null).map(() =>
+                  Array(gridSize).fill(null).map(() => ({
+                    active: false,
+                    piece: null
+                  }))
+                );
+
+                // Mark active slots
+                gridWeapon.activeSlots.forEach(slot => {
+                  if (slot.row < gridSize && slot.col < gridSize) {
+                    newGrid[slot.row][slot.col].active = true;
+                  }
+                });
+
+                // Place pieces on the grid
+                buildData.data.pieces.forEach(piece => {
+                  const shape = engravings.find(e => e.id === piece.shapeId);
+                  if (shape) {
+                    const pattern = getRotatedPattern(shape.pattern, piece.rotation);
+
+                    // Place piece at all occupied cells
+                    for (let pRow = 0; pRow < pattern.length; pRow++) {
+                      for (let pCol = 0; pCol < pattern[pRow].length; pCol++) {
+                        if (pattern[pRow][pCol] === 1) {
+                          const gridRow = piece.row + pRow;
+                          const gridCol = piece.col + pCol;
+
+                          if (gridRow < gridSize && gridCol < gridSize) {
+                            newGrid[gridRow][gridCol].piece = {
+                              shapeId: piece.shapeId,
+                              shape: shape,
+                              rarity: piece.rarity,
+                              level: piece.level,
+                              rotation: piece.rotation,
+                              anchorRow: piece.row,
+                              anchorCol: piece.col
+                            };
+                          }
+                        }
+                      }
+                    }
+                  }
+                });
+
+                setGridState(newGrid);
+              }
+            } else if (buildData.data.gridState) {
+              // Legacy format: full gridState array (backward compatibility)
+              console.log('[SoulWeaponEngravingBuilder] Loading grid state from shared build (legacy format)');
+
+              const deserializedGridState = buildData.data.gridState.map(row =>
+                row.map(cell => ({
+                  active: cell.active,
+                  piece: cell.piece ? {
+                    ...cell.piece,
+                    shape: engravings.find(e => e.id === cell.piece.shapeId)
+                  } : null
+                }))
+              );
+
+              setGridState(deserializedGridState);
+            }
+
+            if (buildData.data.inventory) {
+              console.log('[SoulWeaponEngravingBuilder] Loading inventory from shared build');
+
+              // Handle both array of items and array with slot indices
+              let deserializedInventory = Array(8).fill(null);
+
+              if (Array.isArray(buildData.data.inventory)) {
+                if (buildData.data.inventory.length > 0 && buildData.data.inventory[0]?.slot !== undefined) {
+                  // New format: array of {slot, shapeId, rarity, level}
+                  buildData.data.inventory.forEach(item => {
+                    if (item && item.slot !== undefined && item.slot < 8) {
+                      deserializedInventory[item.slot] = {
+                        shapeId: item.shapeId,
+                        rarity: item.rarity,
+                        level: item.level,
+                        shape: engravings.find(e => e.id === item.shapeId)
+                      };
+                    }
+                  });
+                } else {
+                  // Legacy format: array with nulls
+                  deserializedInventory = buildData.data.inventory.map(item => item ? {
+                    ...item,
+                    shape: engravings.find(e => e.id === item.shapeId)
+                  } : null);
+                }
+              }
+
+              setInventory(deserializedInventory);
+            }
+
             // Find and set the weapon (merge grid data with base weapon data)
             if (buildData.data.weaponId) {
               const baseWeapon = allWeapons.find(w => w.id === buildData.data.weaponId);
@@ -388,29 +538,46 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                   attack: baseWeapon.attack,
                   requirements: baseWeapon.requirements
                 };
-                console.log('[SoulWeaponEngravingBuilder] Loaded weapon from shared build (with grid data):', {
+                console.log('[SoulWeaponEngravingBuilder] Loaded weapon from shared build (merged grid + base):', {
                   name: mergedWeapon.name,
                   id: mergedWeapon.id,
                   hasImage: !!mergedWeapon.image
                 });
+                // Mark this weapon as already initialized to prevent re-initialization
+                hasInitializedGridForWeapon.current = `${mergedWeapon.id}-${mergedWeapon.name}`;
                 setSelectedWeapon(mergedWeapon);
+              } else if (gridWeapon) {
+                // Has grid data but no base weapon data - use grid weapon (contains all essential data)
+                console.log('[SoulWeaponEngravingBuilder] Loaded weapon from shared build (grid data only):', {
+                  name: gridWeapon.name,
+                  id: gridWeapon.id,
+                  hasImage: !!gridWeapon.image,
+                  hasGridType: !!gridWeapon.gridType,
+                  hasActiveSlots: !!gridWeapon.activeSlots
+                });
+                // Mark this weapon as already initialized to prevent re-initialization
+                hasInitializedGridForWeapon.current = `${gridWeapon.id}-${gridWeapon.name}`;
+                setSelectedWeapon(gridWeapon);
               } else if (baseWeapon) {
                 // No grid data, use base weapon
-                console.log('[SoulWeaponEngravingBuilder] Loaded weapon from shared build (no grid data):', {
+                console.log('[SoulWeaponEngravingBuilder] Loaded weapon from shared build (base data only):', {
                   name: baseWeapon.name,
                   id: baseWeapon.id,
                   hasImage: !!baseWeapon.image
                 });
+                // Mark this weapon as already initialized to prevent re-initialization
+                hasInitializedGridForWeapon.current = `${baseWeapon.id}-${baseWeapon.name}`;
                 setSelectedWeapon(baseWeapon);
+              } else {
+                console.error('[SoulWeaponEngravingBuilder] Could not find weapon with ID:', buildData.data.weaponId, {
+                  hasBaseWeapon: !!baseWeapon,
+                  hasGridWeapon: !!gridWeapon,
+                  allWeaponsCount: allWeapons.length,
+                  weaponsWithGridCount: weapons.length
+                });
               }
-            }
-
-            // Load grid state and inventory
-            if (buildData.data.gridState) {
-              setGridState(buildData.data.gridState);
-            }
-            if (buildData.data.inventory) {
-              setInventory(buildData.data.inventory);
+            } else {
+              console.warn('[SoulWeaponEngravingBuilder] No weaponId in shared build data');
             }
 
             // Force normal mode (not designer mode) when loading shared builds
@@ -465,20 +632,39 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     }
   }, [engravings]);
 
-  // Initialize grid when weapon changes (skip if loading shared build or grid already populated)
+  // Initialize grid when weapon changes (skip if loading shared build or already initialized for this weapon)
   useEffect(() => {
     if (selectedWeapon && !loadingSharedBuild) {
+      // Check if we've already initialized the grid for this weapon
+      const weaponKey = `${selectedWeapon.id}-${selectedWeapon.name}`;
+
       // Check if grid is already populated (from shared build or draft)
-      // If grid has pieces, don't reinitialize
       const hasPlacedPieces = gridState.some(row =>
         row.some(cell => cell.piece !== null && cell.piece !== undefined)
       );
 
-      if (!hasPlacedPieces || gridState.length === 0) {
+      console.log('[SoulWeaponEngravingBuilder] Weapon change effect triggered:', {
+        weapon: selectedWeapon.name,
+        weaponKey,
+        lastInitialized: hasInitializedGridForWeapon.current,
+        loadingSharedBuild,
+        gridStateLength: gridState.length,
+        hasPlacedPieces
+      });
+
+      // If weapon actually changed (different weapon key)
+      if (hasInitializedGridForWeapon.current !== weaponKey) {
+        // If there are placed pieces, unsocket them all first
+        if (hasPlacedPieces) {
+          console.log('[SoulWeaponEngravingBuilder] Weapon changed - unsocketing all pieces');
+          unsocketAllPieces();
+        }
+
         console.log('[SoulWeaponEngravingBuilder] Initializing grid for weapon change');
+        hasInitializedGridForWeapon.current = weaponKey;
         initializeGrid();
       } else {
-        console.log('[SoulWeaponEngravingBuilder] Skipping grid initialization - grid already populated');
+        console.log('[SoulWeaponEngravingBuilder] Skipping grid initialization - already initialized for this weapon');
       }
     }
   }, [selectedWeapon, loadingSharedBuild]);
@@ -725,14 +911,21 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Weapons before first grid entry don't have grid layouts (can't use engravings)
       let filteredAllWeapons = allWeaponsData || [];
       if (weaponsData.weapons && weaponsData.weapons.length > 0) {
-        const firstGridWeaponName = weaponsData.weapons[0].name;
-        const firstGridWeapon = allWeaponsData.find(w => w.name === firstGridWeaponName);
+        const minWeaponId = weaponsData.weapons[0].id;
 
-        if (firstGridWeapon) {
-          // Only include weapons with id >= first grid weapon id
-          filteredAllWeapons = allWeaponsData.filter(w => w.id >= firstGridWeapon.id);
-          console.log(`Filtered weapons: Showing ${filteredAllWeapons.length} weapons from "${firstGridWeaponName}" (id ${firstGridWeapon.id}) onward`);
-        }
+        console.log('[SoulWeaponEngravingBuilder] Filtering weapons:', {
+          totalWeapons: allWeaponsData.length,
+          minWeaponId: minWeaponId,
+          firstGridWeapon: weaponsData.weapons[0].name
+        });
+
+        // Only include weapons with id >= first grid weapon id
+        filteredAllWeapons = allWeaponsData.filter(w => w.id >= minWeaponId);
+
+        console.log('[SoulWeaponEngravingBuilder] Filtered weapons:', {
+          filtered: filteredAllWeapons.length,
+          showing: `${weaponsData.weapons[0].name} (ID ${minWeaponId}) and onwards`
+        });
       }
 
       setAllWeapons(filteredAllWeapons);
@@ -765,16 +958,43 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Try to load draft
       const draft = loadDraft();
       if (draft && !initialBuild) {
+        console.log('[SoulWeaponEngravingBuilder] Loading draft from localStorage');
+
         setBuildName(draft.buildName || '');
+
         if (draft.selectedWeapon) {
           setSelectedWeapon(draft.selectedWeapon);
         }
+
+        // Deserialize gridState: Reconstruct pieces with full shape data
         if (draft.gridState) {
-          setGridState(draft.gridState);
+          const deserializedGridState = draft.gridState.map(row =>
+            row.map(cell => ({
+              active: cell.active,
+              piece: cell.piece ? {
+                ...cell.piece,
+                shape: engravingsData.shapes.find(e => e.id === cell.piece.shapeId)
+              } : null
+            }))
+          );
+          setGridState(deserializedGridState);
         }
+
+        // Deserialize inventory: Reconstruct pieces with full shape data
         if (draft.inventory) {
-          setInventory(draft.inventory);
+          const deserializedInventory = draft.inventory.map(item => item ? {
+            ...item,
+            shape: engravingsData.shapes.find(e => e.id === item.shapeId)
+          } : null);
+          setInventory(deserializedInventory);
         }
+
+        // Load highest unlocked weapon
+        if (draft.highestUnlockedWeapon !== undefined) {
+          setHighestUnlockedWeapon(draft.highestUnlockedWeapon);
+        }
+
+        console.log('[SoulWeaponEngravingBuilder] Draft loaded and deserialized');
       }
 
     } catch (error) {
@@ -2244,31 +2464,6 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     };
   };
 
-  // Unsocket all pieces from grid without returning to inventory
-  const unsocketAllPieces = () => {
-    // Create new grid with all pieces removed
-    const newGrid = gridState.map(row =>
-      row.map(cell => ({
-        ...cell,
-        piece: null
-      }))
-    );
-
-    setGridState(newGrid);
-
-    // Clear all placement and drag states
-    setPlacingPiece(null);
-    setPlacingPosition(null);
-    setPlacingRotation(0);
-    setPlacingInventoryIndex(null);
-    setPlacingButtonPosition(null);
-    setDraggingFromGrid(null);
-    setDraggingPiece(null);
-    setDraggingIndex(null);
-    setPreviewPosition(null);
-    setDragPreviewCells([]);
-  };
-
   const handleClearGrid = () => {
     if (confirm('Clear all placed pieces? They will be returned to inventory if space available.')) {
       // Return pieces to inventory where possible
@@ -2304,6 +2499,45 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       initializeGrid();
       setHasUnsavedChanges(true);
     }
+  };
+
+  // Unsocket all pieces from grid (called when changing weapons)
+  const unsocketAllPieces = () => {
+    // Return all placed pieces to inventory where possible
+    const piecesToReturn = [];
+    gridState.forEach(row => {
+      row.forEach(cell => {
+        if (cell.piece) {
+          const exists = piecesToReturn.some(p =>
+            p.anchorRow === cell.piece.anchorRow &&
+            p.anchorCol === cell.piece.anchorCol
+          );
+          if (!exists) {
+            piecesToReturn.push(cell.piece);
+          }
+        }
+      });
+    });
+
+    console.log('[SoulWeaponEngravingBuilder] Unsocketing pieces:', piecesToReturn.length);
+
+    const newInventory = [...inventory];
+    piecesToReturn.forEach(piece => {
+      const emptySlot = newInventory.findIndex(slot => slot === null);
+      if (emptySlot !== -1) {
+        newInventory[emptySlot] = {
+          shapeId: piece.shapeId,
+          shape: piece.shape,
+          rarity: piece.rarity,
+          level: piece.level
+        };
+      } else {
+        console.warn('[SoulWeaponEngravingBuilder] No inventory space for piece:', piece.shapeId);
+      }
+    });
+
+    setInventory(newInventory);
+    setHasUnsavedChanges(true);
   };
 
   const handleClearBuild = () => {
@@ -2998,12 +3232,55 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       setSharing(true);
       setShareError(null);
 
+      // Optimized serialization: Only store placed pieces with anchor coordinates
+      // This eliminates storing empty cells and redundant data
+      const placedPieces = [];
+      const seenPieces = new Set(); // Track unique pieces by anchor position
+
+      gridState.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          if (cell.piece) {
+            const pieceKey = `${cell.piece.anchorRow},${cell.piece.anchorCol}`;
+
+            // Only store each piece once (at its anchor position)
+            if (!seenPieces.has(pieceKey)) {
+              seenPieces.add(pieceKey);
+              placedPieces.push({
+                row: cell.piece.anchorRow,
+                col: cell.piece.anchorCol,
+                shapeId: cell.piece.shapeId,
+                rarity: cell.piece.rarity,
+                level: cell.piece.level,
+                rotation: cell.piece.rotation
+              });
+            }
+          }
+        });
+      });
+
+      // Optimized inventory: Only store non-null items with their slot index
+      const inventoryItems = inventory
+        .map((item, index) => item ? {
+          slot: index,
+          shapeId: item.shapeId,
+          rarity: item.rarity,
+          level: item.level
+        } : null)
+        .filter(item => item !== null);
+
       const buildData = {
         name: buildName || 'Unnamed Build',
         weaponId: selectedWeapon?.id,
-        gridState: gridState,
-        inventory: inventory
+        pieces: placedPieces,
+        inventory: inventoryItems
       };
+
+      console.log('[SoulWeaponEngravingBuilder] Sharing build:', {
+        name: buildData.name,
+        weaponId: buildData.weaponId,
+        placedPieces: gridState.flatMap(row => row.filter(cell => cell.piece !== null)).length,
+        inventoryItems: inventory.filter(i => i !== null).length
+      });
 
       const configResponse = await fetch('/wiki-config.json');
       const config = await configResponse.json();
@@ -3034,12 +3311,45 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleExportBuild = () => {
+    // Optimized serialization (same as share logic)
+    const placedPieces = [];
+    const seenPieces = new Set();
+
+    gridState.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        if (cell.piece) {
+          const pieceKey = `${cell.piece.anchorRow},${cell.piece.anchorCol}`;
+
+          if (!seenPieces.has(pieceKey)) {
+            seenPieces.add(pieceKey);
+            placedPieces.push({
+              row: cell.piece.anchorRow,
+              col: cell.piece.anchorCol,
+              shapeId: cell.piece.shapeId,
+              rarity: cell.piece.rarity,
+              level: cell.piece.level,
+              rotation: cell.piece.rotation
+            });
+          }
+        }
+      });
+    });
+
+    const inventoryItems = inventory
+      .map((item, index) => item ? {
+        slot: index,
+        shapeId: item.shapeId,
+        rarity: item.rarity,
+        level: item.level
+      } : null)
+      .filter(item => item !== null);
+
     const buildData = {
       name: buildName || 'Unnamed Build',
       weaponId: selectedWeapon?.id,
       weaponName: selectedWeapon?.name,
-      gridState: gridState,
-      inventory: inventory,
+      pieces: placedPieces,
+      inventory: inventoryItems,
       exportDate: new Date().toISOString()
     };
 
@@ -3082,8 +3392,98 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         }
 
         if (data.name) setBuildName(data.name);
-        if (data.gridState) setGridState(data.gridState);
-        if (data.inventory) setInventory(data.inventory);
+
+        // Support both old format (gridState) and new optimized format (pieces)
+        if (data.pieces) {
+          // New optimized format
+          const gridWeapon = weapons.find(w => w.id === data.weaponId);
+          if (gridWeapon) {
+            const gridSize = gridWeapon.gridType === '4x4' ? 4 : 5;
+            const newGrid = Array(gridSize).fill(null).map(() =>
+              Array(gridSize).fill(null).map(() => ({
+                active: false,
+                piece: null
+              }))
+            );
+
+            gridWeapon.activeSlots.forEach(slot => {
+              if (slot.row < gridSize && slot.col < gridSize) {
+                newGrid[slot.row][slot.col].active = true;
+              }
+            });
+
+            data.pieces.forEach(piece => {
+              const shape = engravings.find(e => e.id === piece.shapeId);
+              if (shape) {
+                const pattern = getRotatedPattern(shape.pattern, piece.rotation);
+
+                for (let pRow = 0; pRow < pattern.length; pRow++) {
+                  for (let pCol = 0; pCol < pattern[pRow].length; pCol++) {
+                    if (pattern[pRow][pCol] === 1) {
+                      const gridRow = piece.row + pRow;
+                      const gridCol = piece.col + pCol;
+
+                      if (gridRow < gridSize && gridCol < gridSize) {
+                        newGrid[gridRow][gridCol].piece = {
+                          shapeId: piece.shapeId,
+                          shape: shape,
+                          rarity: piece.rarity,
+                          level: piece.level,
+                          rotation: piece.rotation,
+                          anchorRow: piece.row,
+                          anchorCol: piece.col
+                        };
+                      }
+                    }
+                  }
+                }
+              }
+            });
+
+            setGridState(newGrid);
+          }
+        } else if (data.gridState) {
+          // Legacy format (backward compatibility)
+          const deserializedGridState = data.gridState.map(row =>
+            row.map(cell => ({
+              active: cell.active,
+              piece: cell.piece ? {
+                ...cell.piece,
+                shape: engravings.find(e => e.id === cell.piece.shapeId)
+              } : null
+            }))
+          );
+          setGridState(deserializedGridState);
+        }
+
+        // Handle both array of items and array with slot indices
+        if (data.inventory) {
+          let deserializedInventory = Array(8).fill(null);
+
+          if (Array.isArray(data.inventory)) {
+            if (data.inventory.length > 0 && data.inventory[0]?.slot !== undefined) {
+              // New format
+              data.inventory.forEach(item => {
+                if (item && item.slot !== undefined && item.slot < 8) {
+                  deserializedInventory[item.slot] = {
+                    shapeId: item.shapeId,
+                    rarity: item.rarity,
+                    level: item.level,
+                    shape: engravings.find(e => e.id === item.shapeId)
+                  };
+                }
+              });
+            } else {
+              // Legacy format
+              deserializedInventory = data.inventory.map(item => item ? {
+                ...item,
+                shape: engravings.find(e => e.id === item.shapeId)
+              } : null);
+            }
+          }
+
+          setInventory(deserializedInventory);
+        }
 
         setHasUnsavedChanges(true);
       } catch (error) {

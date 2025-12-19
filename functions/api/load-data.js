@@ -1,6 +1,6 @@
 /**
- * Cloudflare Pages Function: Load Data (Universal)
- * Handles loading skill builds, battle loadouts, spirit collection, and spirit builds
+ * Cloudflare Function: Load Data (Universal)
+ * Handles loading skill builds, battle loadouts, and spirit collection
  *
  * GET /api/load-data?type=TYPE&userId=USER_ID
  * Query Params:
@@ -8,8 +8,7 @@
  *   userId: number
  */
 
-import { loadData } from '../../netlify/functions/shared/dataOperations.js';
-import { validateDataType, validateLoadData, getEnvConfig } from '../../netlify/functions/shared/utils.js';
+import { Octokit } from '@octokit/rest';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -31,23 +30,10 @@ export async function onRequest(context) {
     const type = url.searchParams.get('type');
     const userId = url.searchParams.get('userId');
 
-    // Validate type
-    const typeValidation = validateDataType(type);
-    if (!typeValidation.valid) {
-      return new Response(
-        JSON.stringify({ error: typeValidation.error }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
     // Validate required fields
-    const dataValidation = validateLoadData({ type, userId });
-    if (!dataValidation.valid) {
+    if (!type || !userId) {
       return new Response(
-        JSON.stringify({ error: dataValidation.error }),
+        JSON.stringify({ error: 'Missing required parameters: type, userId' }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -55,10 +41,22 @@ export async function onRequest(context) {
       );
     }
 
-    // Get environment configuration
-    const envConfig = getEnvConfig(env);
-    if (envConfig.error) {
-      console.error('[load-data]', envConfig.error);
+    // Validate type
+    const validTypes = ['skill-build', 'battle-loadout', 'my-spirit', 'spirit-build'];
+    if (!validTypes.includes(type)) {
+      return new Response(
+        JSON.stringify({ error: `Invalid type. Must be one of: ${validTypes.join(', ')}` }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Get bot token from environment
+    const botToken = env.WIKI_BOT_TOKEN;
+    if (!botToken) {
+      console.error('[load-data] WIKI_BOT_TOKEN not configured');
       return new Response(
         JSON.stringify({ error: 'Server configuration error' }),
         {
@@ -68,21 +66,84 @@ export async function onRequest(context) {
       );
     }
 
-    const { botToken, owner, repo } = envConfig;
+    // Initialize Octokit with bot token
+    const octokit = new Octokit({ auth: botToken });
 
-    // Load data
-    const result = await loadData({
-      botToken,
+    // Get repo info from environment
+    const owner = env.WIKI_REPO_OWNER || env.VITE_WIKI_REPO_OWNER;
+    const repo = env.WIKI_REPO_NAME || env.VITE_WIKI_REPO_NAME;
+
+    if (!owner || !repo) {
+      console.error('[load-data] Repository config missing');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Set type-specific constants
+    const configs = {
+      'skill-build': {
+        label: 'skill-builds',
+        itemsName: 'builds',
+      },
+      'battle-loadout': {
+        label: 'battle-loadouts',
+        itemsName: 'loadouts',
+      },
+      'my-spirit': {
+        label: 'my-spirits',
+        itemsName: 'spirits',
+      },
+      'spirit-build': {
+        label: 'spirit-builds',
+        itemsName: 'builds',
+      },
+    };
+    const config = configs[type];
+
+    // Get existing items
+    const { data: issues } = await octokit.rest.issues.listForRepo({
       owner,
       repo,
-      type,
-      userId
+      labels: config.label,
+      state: 'open',
+      per_page: 100,
     });
 
+    // Search by user ID label
+    const existingIssue = issues.find(issue =>
+      issue.labels.some(label =>
+        (typeof label === 'string' && label === `user-id:${userId}`) ||
+        (typeof label === 'object' && label.name === `user-id:${userId}`)
+      )
+    );
+
+    // Parse existing items
+    let items = [];
+    if (existingIssue) {
+      try {
+        items = JSON.parse(existingIssue.body || '[]');
+        if (!Array.isArray(items)) items = [];
+      } catch (e) {
+        console.error('[load-data] Failed to parse issue body:', e);
+        items = [];
+      }
+    }
+
+    // Return response with dynamic key names
+    const response = {
+      success: true,
+    };
+    response[config.itemsName] = items;
+
     return new Response(
-      JSON.stringify(result.body),
+      JSON.stringify(response),
       {
-        status: result.statusCode,
+        status: 200,
         headers: { 'Content-Type': 'application/json' }
       }
     );

@@ -32,11 +32,7 @@ const DataInjector = ({ source, id, fieldOrTemplate = 'card', showId = true }) =
         setLoading(true);
         setError(null);
 
-        console.log(`[DataInjector] Loading data - source: "${source}", id: "${id}", attempt: ${retryCount + 1}`);
-
         const item = await dataRegistry.findItem(source, id);
-
-        console.log(`[DataInjector] Found item:`, item);
 
         if (!isMounted) return;
 

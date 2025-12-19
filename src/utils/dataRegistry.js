@@ -18,6 +18,9 @@ const dataRegistry = {
   // Registered data sources
   sources: {},
 
+  // In-flight fetch promises (for request deduplication)
+  inflightRequests: new Map(),
+
   /**
    * Register a data source with enhanced configuration
    * @param {string} key - Unique identifier (e.g., 'spirits', 'skills')
@@ -105,22 +108,41 @@ const dataRegistry = {
       return source.cache;
     }
 
-    // Fetch from file
-    const response = await fetch(source.file);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch data from ${source.file}`);
+    // Check if there's already an in-flight request for this file
+    // This prevents multiple simultaneous fetches of the same file (ERR_INSUFFICIENT_RESOURCES)
+    if (this.inflightRequests.has(source.file)) {
+      return this.inflightRequests.get(source.file);
     }
 
-    const data = await response.json();
+    // Create and cache the fetch promise
+    const fetchPromise = (async () => {
+      try {
+        // Fetch from file
+        const response = await fetch(source.file);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data from ${source.file}`);
+        }
 
-    // Extract and normalize data based on type
-    let items = this.normalizeData(data, source);
+        const data = await response.json();
 
-    // Cache the result
-    source.cache = items;
-    source.cacheTime = now;
+        // Extract and normalize data based on type
+        let items = this.normalizeData(data, source);
 
-    return items;
+        // Cache the result
+        source.cache = items;
+        source.cacheTime = now;
+
+        return items;
+      } finally {
+        // Remove from in-flight requests when done
+        this.inflightRequests.delete(source.file);
+      }
+    })();
+
+    // Cache the promise so concurrent requests can reuse it
+    this.inflightRequests.set(source.file, fetchPromise);
+
+    return fetchPromise;
   },
 
   /**

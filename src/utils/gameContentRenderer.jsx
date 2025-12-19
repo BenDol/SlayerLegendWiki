@@ -26,35 +26,29 @@ import SpiritCard from '../components/SpiritCard';
 export const processGameSyntax = (content) => {
   if (!content) return content;
 
-  console.log('[Game Content] processGameSyntax called, content length:', content.length);
-
   let processed = content;
 
   // Process {{skill:...}} format (already in final format, convert to uppercase marker)
   processed = processed.replace(/\{\{\s*skill:\s*([^:}]+?)\s*(?::\s*(\w+?)\s*)?\}\}/gi, (match, name, mode) => {
     const modeStr = mode || 'detailed';
-    console.log('[Game Content] Converting {{skill}}:', match, '→', `{{SKILL:${name}:${modeStr}}}`);
     return `{{SKILL:${name}:${modeStr}}}`;
   });
 
   // Process <!-- skill:... --> format (legacy support)
   processed = processed.replace(/<!--\s*skill:\s*([^:]+?)(?::(\w+?))?\s*-->/gi, (match, name, mode) => {
     const modeStr = mode || 'detailed';
-    console.log('[Game Content] Converting <!-- skill -->:', match, '→', `{{SKILL:${name}:${modeStr}}}`);
     return `{{SKILL:${name}:${modeStr}}}`;
   });
 
   // Process {{equipment:...}} format
   processed = processed.replace(/\{\{\s*equipment:\s*([^:}]+?)\s*(?::\s*(\w+?)\s*)?\}\}/gi, (match, name, mode) => {
     const modeStr = mode || 'detailed';
-    console.log('[Game Content] Converting {{equipment}}:', match, '→', `{{EQUIPMENT:${name}:${modeStr}}}`);
     return `{{EQUIPMENT:${name}:${modeStr}}}`;
   });
 
   // Process <!-- equipment:... --> format (legacy)
   processed = processed.replace(/<!--\s*equipment:\s*([^:]+?)(?::(\w+?))?\s*-->/gi, (match, name, mode) => {
     const modeStr = mode || 'detailed';
-    console.log('[Game Content] Converting <!-- equipment -->:', match, '→', `{{EQUIPMENT:${name}:${modeStr}}}`);
     return `{{EQUIPMENT:${name}:${modeStr}}}`;
   });
 
@@ -65,7 +59,6 @@ export const processGameSyntax = (content) => {
     const modeStr = mode || 'detailed';
     const levelStr = level || '0';
     const displayStr = display || 'inline';
-    console.log('[Game Content] Converting {{spirit}}:', match, '→', `{{SPIRIT:${name}:${modeStr}:${levelStr}:${displayStr}}}`);
     return `{{SPIRIT:${name}:${modeStr}:${levelStr}:${displayStr}}}`;
   });
 
@@ -74,18 +67,14 @@ export const processGameSyntax = (content) => {
     const modeStr = mode || 'detailed';
     const levelStr = level || '0';
     const displayStr = display || 'inline';
-    console.log('[Game Content] Converting <!-- spirit -->:', match, '→', `{{SPIRIT:${name}:${modeStr}:${levelStr}:${displayStr}}}`);
     return `{{SPIRIT:${name}:${modeStr}:${levelStr}:${displayStr}}}`;
   });
 
   // Process {{data:...}} format (this is the autocomplete output, needs uppercase conversion)
   // Match lowercase 'data:' and convert to uppercase 'DATA:'
-  let dataConversions = 0;
   processed = processed.replace(/\{\{\s*data:\s*([^:}]+?)\s*:\s*([^:}]+?)\s*(?::\s*([^:}]+?)\s*)?(?::\s*([^}]+?)\s*)?\}\}/gi, (match, source, id, fieldOrTemplate, showId) => {
     const thirdParam = (fieldOrTemplate || 'card').trim();
     const fourthParam = showId !== undefined ? showId.trim() : 'true';
-    console.log('[Game Content] Converting {{data}}:', match, '→', `{{DATA:${source}:${id}:${thirdParam}:${fourthParam}}}`);
-    dataConversions++;
     return `{{DATA:${source}:${id}:${thirdParam}:${fourthParam}}}`;
   });
 
@@ -93,13 +82,10 @@ export const processGameSyntax = (content) => {
   processed = processed.replace(/<!--\s*data:\s*([^:]+?):([^:]+?)(?::([^:]+?))?(?::([^-]+?))?\s*-->/gi, (match, source, id, fieldOrTemplate, showId) => {
     const thirdParam = (fieldOrTemplate || 'card').trim();
     const fourthParam = showId !== undefined ? showId.trim() : 'true';
-    console.log('[Game Content] Converting <!-- data -->:', match, '→', `{{DATA:${source}:${id}:${thirdParam}:${fourthParam}}}`);
-    dataConversions++;
     return `{{DATA:${source}:${id}:${thirdParam}:${fourthParam}}}`;
   });
 
   // Process {{spirit-sprite:...}} format
-  let spriteConversions = 0;
   processed = processed.replace(/\{\{\s*spirit-sprite:\s*(\d+)\s*(?::\s*(\d+)\s*)?(?::\s*([^:}]+?)\s*)?(?::\s*([^:}]+?)\s*)?(?::\s*([^:}]+?)\s*)?(?::\s*([^:}]+?)\s*)?(?::\s*([^}]+?)\s*)?\}\}/gi,
     (match, id, level, size, animated, showInfo, fps, animationType) => {
       const params = [
@@ -111,8 +97,6 @@ export const processGameSyntax = (content) => {
         fps || '',
         animationType || ''
       ].join(':');
-      console.log('[Game Content] Converting {{spirit-sprite}}:', match, '→', `{{SPIRIT_SPRITE:${params}}}`);
-      spriteConversions++;
       return `{{SPIRIT_SPRITE:${params}}}`;
     }
   );
@@ -129,15 +113,9 @@ export const processGameSyntax = (content) => {
         fps || '',
         animationType || ''
       ].join(':');
-      console.log('[Game Content] Converting <!-- spirit-sprite -->:', match, '→', `{{SPIRIT_SPRITE:${params}}}`);
-      spriteConversions++;
       return `{{SPIRIT_SPRITE:${params}}}`;
     }
   );
-
-  console.log('[Game Content] Conversion complete - converted', dataConversions, 'data markers and', spriteConversions, 'spirit-sprite markers');
-  const hasConvertedMarkers = processed.includes('{{DATA:') || processed.includes('{{SKILL:') || processed.includes('{{EQUIPMENT:') || processed.includes('{{SPIRIT_SPRITE:') || processed.includes('{{SPIRIT:');
-  console.log('[Game Content] Processed content contains converted markers:', hasConvertedMarkers);
 
   return processed;
 };
@@ -179,16 +157,12 @@ export const CustomParagraph = ({ node, children, ...props }) => {
   // Extract full text content including markers from potentially nested children
   const content = extractTextContent(children).trim();
 
-  console.log('[Game Content] CustomParagraph called, raw children:', children);
-  console.log('[Game Content] CustomParagraph extracted content:', content);
-
   // Check for standalone skill marker (entire paragraph is just a marker)
   const skillMatch = content.match(/^\{\{SKILL:([^:]+?)(?::(\w+?))?\}\}$/);
   if (skillMatch) {
     const skillIdentifier = skillMatch[1].trim();
     const mode = skillMatch[2] || 'detailed';
     const isId = /^\d+$/.test(skillIdentifier);
-    console.log('[Game Content] Rendering standalone SkillCard:', skillIdentifier, 'mode:', mode, 'isId:', isId);
 
     // Render SkillCard with name or id prop and mode
     const cardProps = isId
@@ -203,7 +177,6 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     const equipmentIdentifier = equipmentMatch[1].trim();
     const mode = equipmentMatch[2] || 'detailed';
     const isId = /^\d+$/.test(equipmentIdentifier);
-    console.log('[Game Content] Rendering standalone EquipmentCard:', equipmentIdentifier, 'mode:', mode, 'isId:', isId);
 
     // Render EquipmentCard with name or id prop and mode
     const cardProps = isId
@@ -221,7 +194,6 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     const display = spiritMatch[4] || 'inline';
     const inline = display === 'inline';
     const isId = /^\d+$/.test(spiritIdentifier);
-    console.log('[Game Content] Rendering standalone SpiritCard:', spiritIdentifier, 'mode:', mode, 'level:', level, 'display:', display, 'isId:', isId);
 
     // Render SpiritCard with name or id prop, mode, level, and inline
     const cardProps = isId
@@ -237,7 +209,6 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     const id = dataMatch[2].trim();
     const fieldOrTemplate = (dataMatch[3] || 'card').trim();
     const showId = dataMatch[4] !== undefined ? dataMatch[4].trim() === 'true' : true;
-    console.log('[Game Content] Rendering standalone DataInjector:', source, id, 'field/template:', fieldOrTemplate, 'showId:', showId);
 
     return <DataInjector source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} />;
   }
@@ -253,10 +224,6 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     const showInfo = params[4] ? params[4] === 'true' : true;
     const fps = params[5] ? parseInt(params[5]) : 8;
     const animationType = params[6] || 'idle';
-
-    console.log('[Game Content] Rendering standalone SpiritSprite:', {
-      spiritId, level, size, animated, showInfo, fps, animationType
-    });
 
     return (
       <div className="my-4 flex justify-center">
@@ -275,8 +242,6 @@ export const CustomParagraph = ({ node, children, ...props }) => {
 
   // Check for inline markers (markers mixed with text)
   if (content.includes('{{')) {
-    console.log('[Game Content] Processing inline markers in paragraph:', content);
-
     const parts = [];
     let lastIndex = 0;
 
@@ -464,15 +429,10 @@ export const CustomTableCell = ({ node, children, ...props }) => {
     content = String(children).trim();
   }
 
-  console.log('[Game Content] CustomTableCell called with content:', content);
-
   // Check if contains markers
   if (!content.includes('{{')) {
-    console.log('[Game Content] No markers found in table cell');
     return <td {...props}>{children}</td>;
   }
-
-  console.log('[Game Content] Processing markers in table cell');
 
   // Split by markers and process each part
   const parts = [];
@@ -547,12 +507,8 @@ export const CustomListItem = ({ node, children, ...props }) => {
   // Extract full text content including markers from potentially nested children
   const content = extractTextContent(children).trim();
 
-  console.log('[Game Content] CustomListItem called, raw children:', children);
-  console.log('[Game Content] CustomListItem extracted content:', content);
-
   // Check for inline markers (markers mixed with text)
   if (content.includes('{{')) {
-    console.log('[Game Content] Processing inline markers in list item:', content);
 
     const parts = [];
     let lastIndex = 0;
@@ -659,15 +615,10 @@ export const CustomTableHeaderCell = ({ node, children, ...props }) => {
     content = String(children).trim();
   }
 
-  console.log('[Game Content] CustomTableHeaderCell called with content:', content);
-
   // Check if contains markers
   if (!content.includes('{{')) {
-    console.log('[Game Content] No markers found in table header cell');
     return <th {...props}>{children}</th>;
   }
-
-  console.log('[Game Content] Processing markers in table header cell');
 
   // Split by markers and process each part
   const parts = [];

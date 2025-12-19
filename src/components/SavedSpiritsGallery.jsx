@@ -19,6 +19,7 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
   const [spirits, setSpirits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -48,15 +49,29 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
 
       // Fetch from API
       const response = await fetch(`${getLoadDataEndpoint()}?type=my-spirit&userId=${user.id}`);
+
+      // Check if response is HTML (likely 404 page) instead of JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        throw new Error('Serverless functions not available. Make sure to run "npm run dev" (Netlify dev server) instead of "npm run dev:vite".');
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to load spirits: ${response.status} ${response.statusText}`);
+      }
+
       const data = await response.json();
 
       if (data.success) {
         const loadedSpirits = data.spirits || [];
         setSpirits(loadedSpirits);
         setCache('my-spirits', user.id, loadedSpirits);
+      } else {
+        console.warn('API returned unsuccessful response:', data);
       }
     } catch (error) {
       console.error('Failed to load spirits:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -82,6 +97,19 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
     return (
       <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-8 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
         <Loader className="w-6 h-6 text-blue-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
+        <p className="text-sm text-red-800 dark:text-red-200 mb-2">
+          Failed to load spirits
+        </p>
+        <p className="text-xs text-red-600 dark:text-red-300">
+          {error}
+        </p>
       </div>
     );
   }

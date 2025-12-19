@@ -722,8 +722,8 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           currentBuild={build}
           buildName={buildName}
           onLoadBuild={handleLoadBuild}
-          currentLoadedBuildId={currentLoadedBuildId}
           onBuildsChange={setSavedBuilds}
+          currentLoadedBuildId={currentLoadedBuildId}
           defaultExpanded={!isModal}
         />
       </div>

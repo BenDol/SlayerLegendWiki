@@ -3,12 +3,20 @@
   "version": "1.0.0",
   "description": "Soul weapon emblem grid layouts for Slayer Legend. Each weapon has a unique grid pattern that determines where emblems can be placed.",
   "gridTypes": {
-    "4x4": { "rows": 4, "columns": 4, "totalSlots": 16 },
-    "5x5": { "rows": 5, "columns": 5, "totalSlots": 25 }
+    "4x4": {
+      "rows": 4,
+      "columns": 4,
+      "totalSlots": 16
+    },
+    "5x5": {
+      "rows": 5,
+      "columns": 5,
+      "totalSlots": 25
+    }
   },
   "weapons": [
     {
-      "id": 1,
+      "id": 13,
       "name": "Pride",
       "gridType": "4x4",
       "completionEffect": {
@@ -16,15 +24,60 @@
         "hp": "5.6%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 13
     },
     {
-      "id": 2,
+      "id": 14,
       "name": "Bravery",
       "gridType": "4x4",
       "completionEffect": {
@@ -32,15 +85,60 @@
         "hp": "7.8%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 14
     },
     {
-      "id": 3,
+      "id": 15,
       "name": "Runaway",
       "gridType": "4x4",
       "completionEffect": {
@@ -48,15 +146,60 @@
         "hp": "10.7%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 15
     },
     {
-      "id": 4,
+      "id": 16,
       "name": "Dullness",
       "gridType": "4x4",
       "completionEffect": {
@@ -64,15 +207,60 @@
         "hp": "15.6%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 16
     },
     {
-      "id": 5,
+      "id": 17,
       "name": "Exciting",
       "gridType": "4x4",
       "completionEffect": {
@@ -80,15 +268,60 @@
         "hp": "18.5%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 2 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 17
     },
     {
-      "id": 6,
+      "id": 18,
       "name": "Corruption",
       "gridType": "4x4",
       "completionEffect": {
@@ -96,15 +329,60 @@
         "hp": "20%"
       },
       "activeSlots": [
-        { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 18
     },
     {
-      "id": 7,
+      "id": 19,
       "name": "Romance",
       "gridType": "4x4",
       "completionEffect": {
@@ -112,15 +390,60 @@
         "hp": "25.9%"
       },
       "activeSlots": [
-        { "row": 0, "col": 2 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 19
     },
     {
-      "id": 8,
+      "id": 20,
       "name": "Silence",
       "gridType": "4x4",
       "completionEffect": {
@@ -128,15 +451,60 @@
         "hp": "32.6%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 20
     },
     {
-      "id": 9,
+      "id": 21,
       "name": "Oblivion",
       "gridType": "4x4",
       "completionEffect": {
@@ -144,15 +512,60 @@
         "hp": "39.9%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 21
     },
     {
-      "id": 10,
+      "id": 22,
       "name": "Regret",
       "gridType": "4x4",
       "completionEffect": {
@@ -160,15 +573,60 @@
         "hp": "38.8%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 22
     },
     {
-      "id": 11,
+      "id": 23,
       "name": "Willingness",
       "gridType": "4x4",
       "completionEffect": {
@@ -176,15 +634,60 @@
         "hp": "46%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 23
     },
     {
-      "id": 12,
+      "id": 24,
       "name": "Grit",
       "gridType": "4x4",
       "completionEffect": {
@@ -192,15 +695,60 @@
         "hp": "73%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 12
+      "totalActiveSlots": 12,
+      "weaponId": 24
     },
     {
-      "id": 13,
+      "id": 25,
       "name": "Hope",
       "gridType": "4x4",
       "completionEffect": {
@@ -208,15 +756,76 @@
         "hp": "73.1%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 25
     },
     {
-      "id": 14,
+      "id": 26,
       "name": "Calmness",
       "gridType": "5x5",
       "completionEffect": {
@@ -224,16 +833,76 @@
         "hp": "79.9%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-                                { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-                                                        { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-                                                                                                        { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 26
     },
     {
-      "id": 15,
+      "id": 27,
       "name": "Dream",
       "gridType": "5x5",
       "completionEffect": {
@@ -241,16 +910,76 @@
         "hp": "90.8%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 2 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 27
     },
     {
-      "id": 16,
+      "id": 28,
       "name": "Faith",
       "gridType": "5x5",
       "completionEffect": {
@@ -258,16 +987,76 @@
         "hp": "84.1%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 },
-        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 28
     },
     {
-      "id": 17,
+      "id": 29,
       "name": "Temptation",
       "gridType": "5x5",
       "completionEffect": {
@@ -275,16 +1064,76 @@
         "hp": "89.5%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 },
-        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 29
     },
     {
-      "id": 18,
+      "id": 30,
       "name": "Wound",
       "gridType": "5x5",
       "completionEffect": {
@@ -292,15 +1141,76 @@
         "hp": "97.1%"
       },
       "activeSlots": [
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 30
     },
     {
-      "id": 19,
+      "id": 31,
       "name": "Wild",
       "gridType": "5x5",
       "completionEffect": {
@@ -308,16 +1218,76 @@
         "hp": "102.3%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 15
+      "totalActiveSlots": 15,
+      "weaponId": 31
     },
     {
-      "id": 20,
+      "id": 32,
       "name": "Ambition",
       "gridType": "5x5",
       "completionEffect": {
@@ -325,16 +1295,76 @@
         "hp": "112.3%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 32
     },
     {
-      "id": 21,
+      "id": 33,
       "name": "Solitude",
       "gridType": "5x5",
       "completionEffect": {
@@ -342,16 +1372,76 @@
         "hp": "120.7%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 33
     },
     {
-      "id": 22,
+      "id": 34,
       "name": "Envy",
       "gridType": "5x5",
       "completionEffect": {
@@ -359,16 +1449,76 @@
         "hp": "122.3%"
       },
       "activeSlots": [
-                                                                                { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-                                                                                { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-                                                                                { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 34
     },
     {
-      "id": 23,
+      "id": 35,
       "name": "Wisdom",
       "gridType": "5x5",
       "completionEffect": {
@@ -376,16 +1526,76 @@
         "hp": "131.3%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 35
     },
     {
-      "id": 24,
+      "id": 36,
       "name": "Vision",
       "gridType": "5x5",
       "completionEffect": {
@@ -393,16 +1603,76 @@
         "hp": "140.5%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-                                { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-                                { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 36
     },
     {
-      "id": 25,
+      "id": 37,
       "name": "Ordeal",
       "gridType": "5x5",
       "completionEffect": {
@@ -410,16 +1680,76 @@
         "hp": "131.7%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 37
     },
     {
-      "id": 26,
+      "id": 38,
       "name": "Friendship",
       "gridType": "5x5",
       "completionEffect": {
@@ -427,16 +1757,76 @@
         "hp": "141%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 38
     },
     {
-      "id": 27,
+      "id": 39,
       "name": "Skilfulness",
       "gridType": "5x5",
       "completionEffect": {
@@ -444,16 +1834,76 @@
         "hp": "150.5%"
       },
       "activeSlots": [
-        { "row": 0, "col": 2 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }, { "row": 4, "col": 2 }
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 39
     },
     {
-      "id": 28,
+      "id": 40,
       "name": "Relax",
       "gridType": "5x5",
       "completionEffect": {
@@ -461,16 +1911,76 @@
         "hp": "157%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 40
     },
     {
-      "id": 29,
+      "id": 41,
       "name": "Conceit",
       "gridType": "5x5",
       "completionEffect": {
@@ -478,16 +1988,76 @@
         "hp": "165.5%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 },                         { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-                                { "row": 4, "col": 1 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 41
     },
     {
-      "id": 30,
+      "id": 42,
       "name": "Instinct",
       "gridType": "5x5",
       "completionEffect": {
@@ -495,16 +2065,76 @@
         "hp": "174.4%"
       },
       "activeSlots": [
-        { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 2 }
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 42
     },
     {
-      "id": 31,
+      "id": 43,
       "name": "Ecstasy",
       "gridType": "5x5",
       "completionEffect": {
@@ -512,15 +2142,76 @@
         "hp": "169.9%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 4 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 43
     },
     {
-      "id": 32,
+      "id": 44,
       "name": "Honor",
       "gridType": "5x5",
       "completionEffect": {
@@ -528,16 +2219,76 @@
         "hp": "182.7%"
       },
       "activeSlots": [
-        { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 1 }
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 1
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 44
     },
     {
-      "id": 33,
+      "id": 45,
       "name": "Grand",
       "gridType": "5x5",
       "completionEffect": {
@@ -545,16 +2296,76 @@
         "hp": "199.7%"
       },
       "activeSlots": [
-        { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 2 }, { "row": 1, "col": 3 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 45
     },
     {
-      "id": 34,
+      "id": 46,
       "name": "Blessing",
       "gridType": "5x5",
       "completionEffect": {
@@ -562,15 +2373,76 @@
         "hp": "187.8%"
       },
       "activeSlots": [
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 0 }, { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 2 }
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 46
     },
     {
-      "id": 35,
+      "id": 47,
       "name": "Fighting Will",
       "gridType": "5x5",
       "completionEffect": {
@@ -578,16 +2450,76 @@
         "hp": "214.9%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 }, 
-        { "row": 3, "col": 4 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 15
+      "totalActiveSlots": 15,
+      "weaponId": 47
     },
     {
-      "id": 36,
+      "id": 48,
       "name": "Transition",
       "gridType": "5x5",
       "completionEffect": {
@@ -595,16 +2527,76 @@
         "hp": "227.4%"
       },
       "activeSlots": [
-        { "row": 0, "col": 4 },
-        { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }, { "row": 3, "col": 4 },
-        { "row": 4, "col": 0 }, { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 48
     },
     {
-      "id": 37,
+      "id": 49,
       "name": "Interest",
       "gridType": "5x5",
       "completionEffect": {
@@ -612,16 +2604,76 @@
         "hp": "213.5%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }, { "row": 4, "col": 3 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 49
     },
     {
-      "id": 38,
+      "id": 50,
       "name": "Intelligence",
       "gridType": "5x5",
       "completionEffect": {
@@ -629,16 +2681,76 @@
         "hp": "224.6%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 },
-        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 50
     },
     {
-      "id": 39,
+      "id": 51,
       "name": "Greed",
       "gridType": "5x5",
       "completionEffect": {
@@ -646,15 +2758,76 @@
         "hp": "237.5%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 0 },                         { "row": 1, "col": 2 },                         { "row": 1, "col": 4 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-                                { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 17
+      "totalActiveSlots": 17,
+      "weaponId": 51
     },
     {
-      "id": 40,
+      "id": 52,
       "name": "Vow",
       "gridType": "5x5",
       "completionEffect": {
@@ -662,16 +2835,76 @@
         "hp": "233.7%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 }, { "row": 0, "col": 4 },
-        { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 },
-        { "row": 4, "col": 1 }, { "row": 4, "col": 2 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        }
       ],
-      "totalActiveSlots": 15
+      "totalActiveSlots": 15,
+      "weaponId": 52
     },
     {
-      "id": 41,
+      "id": 53,
       "name": "Anxiety",
       "gridType": "5x5",
       "completionEffect": {
@@ -679,16 +2912,76 @@
         "hp": "247.3%"
       },
       "activeSlots": [
-        { "row": 0, "col": 0 }, { "row": 0, "col": 1 }, { "row": 0, "col": 2 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 },
-        { "row": 4, "col": 2 }, { "row": 4, "col": 3 }, { "row": 4, "col": 4 }
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 53
     },
     {
-      "id": 42,
+      "id": 54,
       "name": "Vigor",
       "gridType": "5x5",
       "completionEffect": {
@@ -696,12 +2989,73 @@
         "hp": "258%"
       },
       "activeSlots": [
-        { "row": 0, "col": 1 }, { "row": 0, "col": 2 }, { "row": 0, "col": 3 },
-        { "row": 1, "col": 0 }, { "row": 1, "col": 1 }, { "row": 1, "col": 2 }, { "row": 1, "col": 3 }, { "row": 1, "col": 4 },
-        { "row": 2, "col": 0 }, { "row": 2, "col": 1 }, { "row": 2, "col": 2 }, { "row": 2, "col": 3 }, { "row": 2, "col": 4 },
-        { "row": 3, "col": 1 }, { "row": 3, "col": 2 }, { "row": 3, "col": 3 }
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 1
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
       ],
-      "totalActiveSlots": 16
+      "totalActiveSlots": 16,
+      "weaponId": 54
     }
   ],
   "_metadata": {

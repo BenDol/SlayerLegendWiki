@@ -44,9 +44,8 @@ function getFunctionsBaseUrl() {
 
   switch (platform) {
     case 'dev':
-      // In development, data operations use direct URLs (same as production)
-      // OAuth uses Vite proxy
-      return '';
+      // In development with Netlify dev server, functions are at /.netlify/functions
+      return '/.netlify/functions';
 
     case 'cloudflare':
       return '/api';

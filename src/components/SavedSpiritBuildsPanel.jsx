@@ -20,6 +20,7 @@ import { getLoadDataEndpoint, getDeleteDataEndpoint } from '../utils/apiEndpoint
  * @param {function} onBuildsChange - Callback when builds list changes
  * @param {string} currentLoadedBuildId - ID of currently loaded build
  * @param {boolean} defaultExpanded - Whether panel should be expanded by default
+ * @param {array} savedBuilds - External saved builds list (optional, for controlled mode)
  */
 const SavedSpiritBuildsPanel = ({
   currentBuild,
@@ -27,14 +28,18 @@ const SavedSpiritBuildsPanel = ({
   onLoadBuild,
   onBuildsChange = null,
   currentLoadedBuildId = null,
-  defaultExpanded = false
+  defaultExpanded = false,
+  savedBuilds: externalSavedBuilds = null
 }) => {
   const { isAuthenticated, user } = useAuthStore();
-  const [savedBuilds, setSavedBuilds] = useState([]);
+  const [internalSavedBuilds, setInternalSavedBuilds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [deletingId, setDeletingId] = useState(null);
+
+  // Use external builds if provided (controlled mode), otherwise use internal state
+  const savedBuilds = externalSavedBuilds !== null ? externalSavedBuilds : internalSavedBuilds;
 
   // Load saved builds
   useEffect(() => {
@@ -43,8 +48,14 @@ const SavedSpiritBuildsPanel = ({
       return;
     }
 
+    // If in controlled mode (external builds provided), don't load
+    if (externalSavedBuilds !== null) {
+      setLoading(false);
+      return;
+    }
+
     loadSavedBuilds();
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, externalSavedBuilds]);
 
   const loadSavedBuilds = async () => {
     if (!user || !isAuthenticated) return;
@@ -56,7 +67,7 @@ const SavedSpiritBuildsPanel = ({
       // Try cache first
       const cached = getCache('spirit-builds', user.id);
       if (cached) {
-        setSavedBuilds(cached);
+        setInternalSavedBuilds(cached);
         if (onBuildsChange) onBuildsChange(cached);
         setLoading(false);
         return;
@@ -70,6 +81,12 @@ const SavedSpiritBuildsPanel = ({
         },
       });
 
+      // Check if response is HTML (likely 404 page) instead of JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        throw new Error('Serverless functions not available. Make sure to run "npm run dev" (Netlify dev server) instead of "npm run dev:vite".');
+      }
+
       if (!response.ok) {
         throw new Error('Failed to load builds');
       }
@@ -80,7 +97,7 @@ const SavedSpiritBuildsPanel = ({
       // Sort by updatedAt (newest first)
       const sortedBuilds = builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-      setSavedBuilds(sortedBuilds);
+      setInternalSavedBuilds(sortedBuilds);
       if (onBuildsChange) onBuildsChange(sortedBuilds);
 
       // Cache the builds
@@ -108,7 +125,7 @@ const SavedSpiritBuildsPanel = ({
           type: 'spirit-build',
           username: user.login,
           userId: user.id,
-          buildId: buildId,
+          itemId: buildId,
         }),
       });
 
@@ -116,9 +133,25 @@ const SavedSpiritBuildsPanel = ({
         throw new Error('Failed to delete build');
       }
 
-      // Reload builds after deletion
+      const data = await response.json();
+      const updatedBuilds = data.builds || [];
+
+      // Clear cache
       clearCache('spirit-builds', user.id);
-      await loadSavedBuilds();
+
+      // Update state based on mode
+      if (externalSavedBuilds !== null) {
+        // Controlled mode: update parent via callback
+        if (onBuildsChange) {
+          onBuildsChange(updatedBuilds);
+        }
+      } else {
+        // Uncontrolled mode: update internal state
+        setInternalSavedBuilds(updatedBuilds);
+        if (onBuildsChange) {
+          onBuildsChange(updatedBuilds);
+        }
+      }
     } catch (err) {
       console.error('[SavedSpiritBuildsPanel] Failed to delete build:', err);
       alert('Failed to delete build: ' + err.message);

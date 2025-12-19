@@ -13,7 +13,8 @@
       "WebFetch(domain:docs.google.com)",
       "Bash(cat:*)",
       "Bash(node -e:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(curl:*)"
     ]
   }
 }

@@ -1,19 +1,18 @@
 /**
- * Cloudflare Pages Function: Delete Data (Universal)
- * Handles deleting skill builds, battle loadouts, spirit collection, and spirit builds
+ * Cloudflare Function: Delete Data (Universal)
+ * Handles deleting skill builds, battle loadouts, and spirit collection
  *
  * POST /api/delete-data
  * Body: {
  *   type: 'skill-build' | 'battle-loadout' | 'my-spirit' | 'spirit-build',
  *   username: string,
  *   userId: number,
- *   itemId?: string (for skill-build/battle-loadout/spirit-build),
- *   spiritId?: string (for my-spirit)
+ *   itemId: string (for skill-build/battle-loadout/spirit-build),
+ *   spiritId: string (for my-spirit)
  * }
  */
 
-import { deleteData } from '../../netlify/functions/shared/dataOperations.js';
-import { validateDataType, validateDeleteData, getEnvConfig } from '../../netlify/functions/shared/utils.js';
+import { Octokit } from '@octokit/rest';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -31,26 +30,13 @@ export async function onRequest(context) {
 
   try {
     // Parse request body
-    const data = await request.json();
-    const { type, username, userId, itemId, spiritId } = data;
-
-    // Validate type
-    const typeValidation = validateDataType(type);
-    if (!typeValidation.valid) {
-      return new Response(
-        JSON.stringify({ error: typeValidation.error }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    const { type, username, userId, itemId, spiritId } = await request.json();
 
     // Validate required fields
-    const dataValidation = validateDeleteData(data, type);
-    if (!dataValidation.valid) {
+    const deleteId = type === 'my-spirit' ? spiritId : itemId;
+    if (!type || !username || !userId || !deleteId) {
       return new Response(
-        JSON.stringify({ error: dataValidation.error }),
+        JSON.stringify({ error: `Missing required fields: type, username, userId, ${type === 'my-spirit' ? 'spiritId' : 'itemId'}` }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -58,10 +44,22 @@ export async function onRequest(context) {
       );
     }
 
-    // Get environment configuration
-    const envConfig = getEnvConfig(env);
-    if (envConfig.error) {
-      console.error('[delete-data]', envConfig.error);
+    // Validate type
+    const validTypes = ['skill-build', 'battle-loadout', 'my-spirit', 'spirit-build'];
+    if (!validTypes.includes(type)) {
+      return new Response(
+        JSON.stringify({ error: `Invalid type. Must be one of: ${validTypes.join(', ')}` }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Get bot token from environment
+    const botToken = env.WIKI_BOT_TOKEN;
+    if (!botToken) {
+      console.error('[delete-data] WIKI_BOT_TOKEN not configured');
       return new Response(
         JSON.stringify({ error: 'Server configuration error' }),
         {
@@ -71,26 +69,137 @@ export async function onRequest(context) {
       );
     }
 
-    const { botToken, owner, repo } = envConfig;
+    // Initialize Octokit with bot token
+    const octokit = new Octokit({ auth: botToken });
 
-    // Determine delete ID based on type
-    const deleteId = type === 'my-spirit' ? spiritId : itemId;
+    // Get repo info from environment
+    // Try both VITE_ prefixed (for local dev) and non-prefixed (for Cloudflare)
+    const owner = env.WIKI_REPO_OWNER || env.VITE_WIKI_REPO_OWNER;
+    const repo = env.WIKI_REPO_NAME || env.VITE_WIKI_REPO_NAME;
 
-    // Delete data
-    const result = await deleteData({
-      botToken,
+    if (!owner || !repo) {
+      console.error('[delete-data] Repository config missing');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Set type-specific constants
+    const configs = {
+      'skill-build': {
+        label: 'skill-builds',
+        titlePrefix: '[Skill Builds]',
+        itemsName: 'builds',
+      },
+      'battle-loadout': {
+        label: 'battle-loadouts',
+        titlePrefix: '[Battle Loadouts]',
+        itemsName: 'loadouts',
+      },
+      'my-spirit': {
+        label: 'my-spirits',
+        titlePrefix: '[My Spirits]',
+        itemsName: 'spirits',
+      },
+      'spirit-build': {
+        label: 'spirit-builds',
+        titlePrefix: '[Spirit Builds]',
+        itemsName: 'builds',
+      },
+    };
+    const config = configs[type];
+
+    // Get existing items
+    const { data: issues } = await octokit.rest.issues.listForRepo({
       owner,
       repo,
-      type,
-      username,
-      userId,
-      deleteId
+      labels: config.label,
+      state: 'open',
+      per_page: 100,
     });
 
+    // Find user's issue
+    const existingIssue = issues.find(issue =>
+      issue.labels.some(label =>
+        (typeof label === 'string' && label === `user-id:${userId}`) ||
+        (typeof label === 'object' && label.name === `user-id:${userId}`)
+      )
+    );
+
+    if (!existingIssue) {
+      return new Response(
+        JSON.stringify({ error: 'No items found for this user' }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Parse existing items
+    let items = [];
+    try {
+      items = JSON.parse(existingIssue.body || '[]');
+      if (!Array.isArray(items)) items = [];
+    } catch (e) {
+      items = [];
+    }
+
+    // Find and remove the item
+    const itemIndex = items.findIndex(item => item.id === deleteId);
+
+    if (itemIndex === -1) {
+      return new Response(
+        JSON.stringify({ error: 'Item not found' }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Remove the item
+    items.splice(itemIndex, 1);
+
+    // Update or close the issue
+    if (items.length === 0) {
+      // Close the issue if no items left
+      await octokit.rest.issues.update({
+        owner,
+        repo,
+        issue_number: existingIssue.number,
+        state: 'closed',
+      });
+
+      console.log(`[delete-data] Closed empty ${config.itemsName} issue for ${username}`);
+    } else {
+      // Update the issue with remaining items
+      const issueBody = JSON.stringify(items, null, 2);
+
+      await octokit.rest.issues.update({
+        owner,
+        repo,
+        issue_number: existingIssue.number,
+        body: issueBody,
+      });
+
+      console.log(`[delete-data] Updated ${config.itemsName} for ${username}`);
+    }
+
+    // Return response with dynamic key name
+    const response = {
+      success: true,
+    };
+    response[config.itemsName] = items;
+
     return new Response(
-      JSON.stringify(result.body),
+      JSON.stringify(response),
       {
-        status: result.statusCode,
+        status: 200,
         headers: { 'Content-Type': 'application/json' }
       }
     );
