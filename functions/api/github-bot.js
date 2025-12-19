@@ -1286,6 +1286,23 @@ Submitted: ${new Date(timestamp).toISOString()}
 
 Co-Authored-By: Wiki Bot <bot@slayerlegend.wiki>`;
 
+    // Check if file exists on main branch to get its sha
+    let fileSha;
+    try {
+      const { data: existingFile } = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path: filePath,
+        ref: 'main',
+      });
+      fileSha = existingFile.sha;
+      console.log('[github-bot] File exists on main, using sha:', fileSha);
+    } catch (error) {
+      // File doesn't exist, that's fine (new page)
+      console.log('[github-bot] File does not exist on main (new page)');
+      fileSha = undefined;
+    }
+
     // Convert content to base64
     const encoder = new TextEncoder();
     const contentBytes = encoder.encode(content);
@@ -1298,6 +1315,7 @@ Co-Authored-By: Wiki Bot <bot@slayerlegend.wiki>`;
       message: commitMessage,
       content: contentBase64,
       branch: branchName,
+      ...(fileSha && { sha: fileSha }), // Include sha if updating existing file
     });
 
     // 8. Create PR
