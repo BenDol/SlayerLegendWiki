@@ -25,6 +25,7 @@
     "@sendgrid/mail": "^8.1.6",
     "@uiw/react-codemirror": "^4.21.21",
     "clsx": "^2.0.0",
+    "leo-profanity": "^1.7.0",
     "date-fns": "^3.0.0",
     "fuse.js": "^7.0.0",
     "gray-matter": "^4.0.3",

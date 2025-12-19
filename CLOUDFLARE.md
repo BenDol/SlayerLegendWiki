@@ -22,7 +22,9 @@ netlify/functions/            # Netlify Functions (Netlify-specific adapters)
 └── device-code.js
 
 functions/api/                # Cloudflare Pages Functions (Cloudflare-specific adapters)
-├── github-bot.js
+├── github-bot.js             ✅ Ready (with email handlers)
+├── emailTemplates/
+│   └── verificationEmail.js  ✅ Ready (imported by github-bot)
 ├── save-data.js
 ├── load-data.js
 ├── delete-data.js
@@ -58,7 +60,7 @@ The system automatically detects the platform at runtime:
 3. Connect your GitHub repository
 4. Configure build settings:
    - **Framework preset**: Vite
-   - **Build command**: `npm run build`
+   - **Build command**: `npm run build` or `npm run build:cloudflare`
    - **Build output directory**: `dist`
    - **Root directory**: (leave empty)
 
@@ -66,23 +68,47 @@ The system automatically detects the platform at runtime:
 
 In Cloudflare Pages project settings → **Environment variables**, add:
 
+#### Basic Configuration
+
 ```bash
-# Required
+# Required - GitHub Bot
 WIKI_BOT_TOKEN=<your_bot_github_token>
 WIKI_REPO_OWNER=<your_github_username>
 WIKI_REPO_NAME=<your_repo_name>
+
+# Required - OAuth
 VITE_GITHUB_CLIENT_ID=<your_github_oauth_client_id>
-
-# Cloudflare-specific
-VITE_PLATFORM=cloudflare
-VITE_CF_PAGES=1
-
-# Optional (if different from production)
 VITE_WIKI_REPO_OWNER=<your_github_username>
 VITE_WIKI_REPO_NAME=<your_repo_name>
+
+# Cloudflare-specific (REQUIRED)
+VITE_PLATFORM=cloudflare
+VITE_CF_PAGES=1
 ```
 
 **Important**: Cloudflare Pages automatically sets `CF_PAGES=1` at build time, but you need to expose it to Vite by setting `VITE_CF_PAGES=1` in environment variables.
+
+#### Anonymous Editing (Optional)
+
+If you want to enable anonymous editing with email verification:
+
+```bash
+# SendGrid (Email Verification)
+SENDGRID_API_KEY=SG.your_sendgrid_api_key_here
+SENDGRID_FROM_EMAIL=noreply@yourdomain.com
+
+# reCAPTCHA v3 (Bot Protection)
+RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key_here
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
+
+# Email Verification (JWT Secret)
+EMAIL_VERIFICATION_SECRET=your_random_secret_here
+```
+
+Generate the email verification secret:
+```bash
+openssl rand -hex 32
+```
 
 ### 3. Update GitHub OAuth App
 
@@ -96,6 +122,55 @@ Push to your repository's main branch. Cloudflare Pages will automatically:
 1. Build your application
 2. Deploy Cloudflare Functions from `functions/api/`
 3. Serve your static assets
+
+## Anonymous Editing Setup
+
+If you want to enable anonymous editing with email verification, follow these additional steps:
+
+### 1. Configure SendGrid Domain Authentication
+
+For production email sending:
+
+1. Go to [SendGrid Sender Authentication](https://app.sendgrid.com/settings/sender_auth)
+2. Click **"Authenticate Your Domain"**
+3. Domain: `yourdomain.com`
+4. Add DNS records to your domain (in Cloudflare DNS):
+   - CNAME records provided by SendGrid
+   - Wait for verification (can take a few hours)
+5. Once verified, update `SENDGRID_FROM_EMAIL=noreply@yourdomain.com`
+
+### 2. Configure reCAPTCHA v3
+
+1. Go to [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
+2. Create new site or add domain:
+   - Type: **reCAPTCHA v3**
+   - Domains: Add your production domain and `localhost` (for testing)
+3. Copy **Site Key** → `VITE_RECAPTCHA_SITE_KEY`
+4. Copy **Secret Key** → `RECAPTCHA_SECRET_KEY`
+5. Add both to Cloudflare environment variables
+6. Update `wiki-config.json` with site key:
+
+```json
+"reCaptcha": {
+  "enabled": true,
+  "siteKey": "your_recaptcha_site_key_here",
+  "minimumScore": 0.5
+}
+```
+
+### 3. Testing Anonymous Edit Flow
+
+Once deployed:
+
+1. Open incognito window: `https://your-site.com`
+2. Navigate to any wiki page
+3. Click **"Edit"** button
+4. Choose **"Edit Anonymously"**
+5. Make an edit and click **"Save"**
+6. Fill in email, display name, reason
+7. Check email for verification code
+8. Enter code and submit
+9. Verify PR is created on GitHub
 
 ## Netlify Setup (Existing)
 
@@ -129,6 +204,14 @@ VITE_PLATFORM=netlify
 ```
 
 ## Function Differences
+
+### What's Different in Cloudflare Functions
+
+1. **Function Location:** `functions/api/` instead of `netlify/functions/`
+2. **Export Format:** `export async function onRequest(context)` instead of `export async function handler(event)`
+3. **Environment Variables:** Accessed via `env` object: `env.WIKI_BOT_TOKEN`
+4. **IP Detection:** Uses `CF-Connecting-IP` header (Cloudflare-specific)
+5. **Crypto API:** Uses Web Crypto API (`crypto.subtle.digest`) instead of Node.js crypto
 
 ### Netlify Functions
 
@@ -205,7 +288,7 @@ fetch(getSaveDataEndpoint(), {
 
 ## Testing Locally
 
-### Netlify Dev
+### Option 1: Netlify Dev (Default)
 
 ```bash
 npm run dev
@@ -215,56 +298,50 @@ netlify dev
 
 This runs both Vite and Netlify Functions locally at `http://localhost:8888`.
 
-### Cloudflare Wrangler (Coming Soon)
+### Option 2: Cloudflare Wrangler
 
-```bash
-# Install Wrangler
-npm install -g wrangler
+Create `.dev.vars` in project root:
 
-# Run Pages locally
-wrangler pages dev dist --compatibility-date=2024-01-01
+```env
+# GitHub Bot
+WIKI_BOT_TOKEN=ghp_your_github_token_here
 
-# Note: You may need to build first
-npm run build
+# SendGrid (if testing email)
+SENDGRID_API_KEY=SG.your_sendgrid_api_key_here
+SENDGRID_FROM_EMAIL=your@email.com
+
+# reCAPTCHA (if testing)
+RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key_here
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
+
+# Email Verification
+EMAIL_VERIFICATION_SECRET=your_random_secret_here
+
+# OAuth
+VITE_GITHUB_CLIENT_ID=your_github_client_id_here
+VITE_WIKI_REPO_OWNER=your_username
+VITE_WIKI_REPO_NAME=your_repo
 ```
 
-## Migration Checklist
+Then run:
+```bash
+npm run dev:cloudflare:serve
+```
 
-### From Netlify to Cloudflare Pages
+This uses `wrangler pages dev` which simulates the Cloudflare Workers environment locally.
 
-- [x] All serverless functions ported to Cloudflare Pages format
-- [x] Shared business logic layer created
-- [x] API endpoint utilities implemented
-- [x] Framework services updated
-- [x] Parent project components updated
-- [ ] Test all features on Cloudflare Pages staging
-- [ ] Update DNS settings (if using custom domain)
-- [ ] Update GitHub OAuth callback URLs
-- [ ] Monitor for any platform-specific issues
+## Monitoring & Debugging
 
-### Maintaining Both Platforms
+### Cloudflare Logs
 
-To support both Netlify and Cloudflare deployments:
+View function logs in Cloudflare Dashboard:
+- **Pages** → Your Project → **Functions** → View Logs
+- Shows console.log outputs from serverless functions
+- Check for errors in email sending, rate limiting, etc.
 
-1. **Keep both function directories**:
-   - `netlify/functions/` for Netlify
-   - `functions/api/` for Cloudflare
+### Common Issues
 
-2. **Update shared logic first**:
-   - Make changes in `netlify/functions/shared/`
-   - Both platforms use the same business logic
-
-3. **Test on both platforms**:
-   - Deploy to Netlify staging/production
-   - Deploy to Cloudflare Pages preview/production
-
-4. **Use platform detection**:
-   - Never hardcode platform-specific URLs
-   - Always use `apiEndpoints.js` utilities
-
-## Troubleshooting
-
-### "Server configuration error" in Functions
+**1. "Server configuration error" in Functions**
 
 **Problem**: Functions return 500 error with "Server configuration error"
 
@@ -273,7 +350,7 @@ To support both Netlify and Cloudflare deployments:
 - `WIKI_REPO_OWNER`
 - `WIKI_REPO_NAME`
 
-### OAuth Not Working
+**2. OAuth Not Working**
 
 **Problem**: GitHub OAuth fails or redirects incorrectly
 
@@ -282,7 +359,7 @@ To support both Netlify and Cloudflare deployments:
 2. Check GitHub OAuth App callback URL includes your domain
 3. Ensure `VITE_PLATFORM` is set correctly
 
-### Functions Not Found (404)
+**3. Functions Not Found (404)**
 
 **Problem**: Fetch calls return 404 for function endpoints
 
@@ -290,8 +367,36 @@ To support both Netlify and Cloudflare deployments:
 - **Cloudflare**: Ensure `VITE_CF_PAGES=1` is set
 - **Netlify**: Verify `netlify.toml` has correct `functions` path
 - Check platform detection logs in browser console
+- Verify build output includes `functions/api/` directory
 
-### Wrong Endpoints in Production
+**4. Email not sending**
+
+**Problem**: Anonymous editing emails not being sent
+
+**Solution**:
+- Check `SENDGRID_API_KEY` and `SENDGRID_FROM_EMAIL` in Cloudflare env vars
+- Verify sender domain is authenticated in SendGrid
+- Check Cloudflare function logs for SendGrid errors
+
+**5. reCAPTCHA failing**
+
+**Problem**: reCAPTCHA verification fails
+
+**Solution**:
+- Check `RECAPTCHA_SECRET_KEY` in Cloudflare env vars
+- Check `VITE_RECAPTCHA_SITE_KEY` in Cloudflare env vars
+- Verify domain is added to reCAPTCHA console
+- Check browser console for reCAPTCHA errors
+
+**6. Rate limiting not working**
+
+**Problem**: Rate limits not being enforced
+
+**Note**: Rate limit state is stored in-memory (resets on cold starts). This is acceptable for MVP. For persistent rate limiting, consider:
+- **Cloudflare KV**: Persistent key-value storage (~$5/month for 10GB)
+- **Cloudflare Durable Objects**: More expensive but more powerful
+
+**7. Wrong Endpoints in Production**
 
 **Problem**: Production site uses development endpoints
 
@@ -325,6 +430,68 @@ To support both Netlify and Cloudflare deployments:
 **Limitations**:
 - **Request Limits**: 125,000 requests/month on free tier
 - **Cold Starts**: Slightly slower than Cloudflare
+
+## Migration Checklist
+
+### From Netlify to Cloudflare Pages
+
+- [x] All serverless functions ported to Cloudflare Pages format
+- [x] Shared business logic layer created
+- [x] API endpoint utilities implemented
+- [x] Framework services updated
+- [x] Parent project components updated
+- [ ] All environment variables added to Cloudflare Pages
+- [ ] Test all features on Cloudflare Pages staging
+- [ ] Update DNS settings (if using custom domain)
+- [ ] Update GitHub OAuth callback URLs
+- [ ] Monitor for any platform-specific issues
+
+### Maintaining Both Platforms
+
+To support both Netlify and Cloudflare deployments:
+
+1. **Keep both function directories**:
+   - `netlify/functions/` for Netlify
+   - `functions/api/` for Cloudflare
+
+2. **Update shared logic first**:
+   - Make changes in `netlify/functions/shared/`
+   - Both platforms use the same business logic
+
+3. **Test on both platforms**:
+   - Deploy to Netlify staging/production
+   - Deploy to Cloudflare Pages preview/production
+
+4. **Use platform detection**:
+   - Never hardcode platform-specific URLs
+   - Always use `apiEndpoints.js` utilities
+
+## Deployment Checklist
+
+### Basic Deployment
+
+- [ ] Cloudflare Pages project created
+- [ ] GitHub repository connected
+- [ ] Build settings configured
+- [ ] Basic environment variables added (`WIKI_BOT_TOKEN`, `VITE_GITHUB_CLIENT_ID`, etc.)
+- [ ] `VITE_PLATFORM=cloudflare` and `VITE_CF_PAGES=1` set
+- [ ] GitHub OAuth app callback URL updated
+- [ ] Code committed and pushed to GitHub
+- [ ] Cloudflare Pages build succeeds
+- [ ] Test basic wiki functionality
+
+### Anonymous Editing (Optional)
+
+- [ ] SendGrid API key obtained
+- [ ] SendGrid domain authenticated
+- [ ] reCAPTCHA v3 configured with production domain
+- [ ] Email verification secret generated and added
+- [ ] `wiki-config.json` updated with reCAPTCHA site key
+- [ ] All anonymous editing environment variables added
+- [ ] Test anonymous edit flow on production
+- [ ] Verify email is received
+- [ ] Verify PR is created on GitHub
+- [ ] Check Cloudflare function logs for errors
 
 ## Support
 

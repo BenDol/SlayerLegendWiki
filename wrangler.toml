@@ -2,7 +2,8 @@
 # Used for local development with Wrangler
 
 name = "slayer-legend-wiki"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs"]
 
 # Pages configuration
 pages_build_output_dir = "dist"

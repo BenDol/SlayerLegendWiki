@@ -92,9 +92,11 @@ export const verifyCode = async (owner, repo, email, code) => {
 
 /**
  * Check rate limit status
+ * @param {string} owner - Repository owner
+ * @param {string} repo - Repository name
  * @returns {Promise<{allowed: boolean, remaining?: number, remainingMs?: number, error?: string}>}
  */
-export const checkRateLimit = async () => {
+export const checkRateLimit = async (owner, repo) => {
   try {
     const response = await fetch(getGithubBotEndpoint(), {
       method: 'POST',
@@ -103,6 +105,8 @@ export const checkRateLimit = async () => {
       },
       body: JSON.stringify({
         action: 'check-rate-limit',
+        owner,
+        repo,
         maxEdits: 5,
         windowMinutes: 60,
       }),

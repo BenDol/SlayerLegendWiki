@@ -41,3 +41,9 @@ EMAIL_VALIDATION_API_KEY=your_email_validation_api_key_here
 
 # Secret key for signing verification tokens
 EMAIL_VERIFICATION_SECRET=your_random_secret_key_here
+
+# OpenAI API Key (optional - for profanity/toxicity detection)
+# Get started: https://platform.openai.com/api-keys
+# FREE unlimited moderation requests (moderation endpoint has no cost)
+# Fallback: If not configured, uses leo-profanity package (simple word list)
+OPENAI_API_KEY=your_openai_api_key_here

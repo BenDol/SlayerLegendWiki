@@ -14,7 +14,69 @@
 import { Octokit } from '@octokit/rest';
 import sgMail from '@sendgrid/mail';
 import jwt from 'jsonwebtoken';
+import * as LeoProfanity from 'leo-profanity';
 import { generateVerificationEmail, generateVerificationEmailText } from './emailTemplates/verificationEmail.js';
+
+/**
+ * Check text for profanity using OpenAI Moderation API (primary) with leo-profanity fallback
+ * @param {string} text - Text to check
+ * @param {string} apiKey - OpenAI API key
+ * @returns {Promise<{containsProfanity: boolean, method: string, categories?: object}>}
+ */
+async function checkProfanity(text, apiKey) {
+  // Try OpenAI Moderation API first (if configured)
+  if (apiKey) {
+    try {
+      console.log('[Profanity] Checking with OpenAI Moderation API...');
+      const response = await fetch(
+        'https://api.openai.com/v1/moderations',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            input: text
+          })
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const result = data.results[0];
+
+        // OpenAI returns flagged=true if content violates policies
+        // Categories: hate, harassment, self-harm, sexual, violence
+        const containsProfanity = result.flagged;
+
+        console.log('[Profanity] OpenAI Moderation result:', {
+          flagged: result.flagged,
+          categories: result.categories,
+          category_scores: result.category_scores
+        });
+
+        return {
+          containsProfanity,
+          method: 'openai-moderation',
+          categories: result.categories,
+          scores: result.category_scores
+        };
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.warn('[Profanity] OpenAI API request failed:', response.status, errorData, 'falling back to leo-profanity');
+      }
+    } catch (error) {
+      console.warn('[Profanity] OpenAI API error:', error.message, 'falling back to leo-profanity');
+    }
+  }
+
+  // Fallback to leo-profanity package
+  console.log('[Profanity] Using leo-profanity package...');
+  const containsProfanity = LeoProfanity.check(text);
+  console.log('[Profanity] leo-profanity result:', containsProfanity);
+  return { containsProfanity, method: 'leo-profanity' };
+}
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -838,7 +900,19 @@ async function handleCreateAnonymousPR(octokit, context, env, {
       };
     }
 
-    // 5. Create branch
+    // 5. Check display name for profanity
+    const profanityCheck = await checkProfanity(displayName, env.OPENAI_API_KEY);
+    if (profanityCheck.containsProfanity) {
+      console.log(`[github-bot] Display name rejected due to profanity (method: ${profanityCheck.method}):`, displayName);
+      return {
+        statusCode: 400,
+        body: {
+          error: 'Display name contains inappropriate language. Please choose a respectful name.'
+        }
+      };
+    }
+
+    // 6. Create branch
     const timestamp = Date.now();
     const branchName = `anonymous-edit/${section}/${pageId}/${timestamp}`;
 
@@ -856,7 +930,7 @@ async function handleCreateAnonymousPR(octokit, context, env, {
       sha: mainBranch.commit.sha,
     });
 
-    // 6. Commit file
+    // 7. Commit file
     const filePath = `public/content/${section}/${pageId}.md`;
     const commitMessage = `Update ${pageTitle}
 
@@ -884,7 +958,7 @@ Co-Authored-By: Wiki Bot <bot@slayerlegend.wiki>`;
       branch: branchName,
     });
 
-    // 7. Create PR
+    // 8. Create PR
     const prBody = `## Anonymous Edit Submission
 
 **Submitted by:** ${displayName}
@@ -908,7 +982,7 @@ ${reason ? `**Reason:** ${reason}` : ''}
       base: 'main',
     });
 
-    // 8. Add labels
+    // 9. Add labels
     await octokit.rest.issues.addLabels({
       owner,
       repo,
@@ -916,7 +990,7 @@ ${reason ? `**Reason:** ${reason}` : ''}
       labels: ['anonymous-edit', 'needs-review', section],
     });
 
-    // 9. Record submission for rate limiting
+    // 10. Record submission for rate limiting
     await recordSubmission(context);
 
     console.log(`[github-bot] Anonymous PR created: #${pr.number} by ${displayName} (${email})`);

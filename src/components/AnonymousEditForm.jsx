@@ -73,13 +73,13 @@ export default function AnonymousEditForm({
 
   // Check rate limit on mount
   useEffect(() => {
-    checkRateLimit().then((result) => {
+    checkRateLimit(owner, repo).then((result) => {
       if (!result.allowed) {
         setIsRateLimited(true);
         setRateLimitRemaining(result.remainingMs || 0);
       }
     });
-  }, []);
+  }, [owner, repo]);
 
   const validateForm = () => {
     let isValid = true;
