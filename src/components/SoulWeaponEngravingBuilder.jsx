@@ -3383,14 +3383,19 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
           if (gridWeapon && baseWeapon) {
             // Merge grid data with base weapon data
-            setSelectedWeapon({
+            const mergedWeapon = {
               ...gridWeapon,
               image: baseWeapon.image,
               attack: baseWeapon.attack,
               requirements: baseWeapon.requirements
-            });
+            };
+            // Mark this weapon as already initialized to prevent re-initialization
+            hasInitializedGridForWeapon.current = `${mergedWeapon.id}-${mergedWeapon.name}`;
+            setSelectedWeapon(mergedWeapon);
           } else if (baseWeapon) {
             // No grid data, use base weapon
+            // Mark this weapon as already initialized to prevent re-initialization
+            hasInitializedGridForWeapon.current = `${baseWeapon.id}-${baseWeapon.name}`;
             setSelectedWeapon(baseWeapon);
           }
         }
