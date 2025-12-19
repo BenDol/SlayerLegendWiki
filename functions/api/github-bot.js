@@ -1027,11 +1027,7 @@ async function handleVerifyEmail(octokit, env, { owner, repo, email, code }) {
       console.warn('[github-bot] Failed to delete verified comment or update index:', deleteError.message);
     }
 
-    // Generate verification token
-    const secret = env.EMAIL_VERIFICATION_SECRET;
-    if (!secret) {
-      throw new Error('EMAIL_VERIFICATION_SECRET not configured');
-    }
+    // Generate verification token (secret already declared above)
     const token = await createVerificationToken(email, secret);
 
     console.log(`[github-bot] Email verified: ${email}`);
