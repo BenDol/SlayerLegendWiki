@@ -159,7 +159,7 @@ export async function onRequest(context) {
         result = await handleSendVerificationEmail(octokit, env, body);
         break;
       case 'verify-email':
-        result = await handleVerifyEmail(octokit, body);
+        result = await handleVerifyEmail(octokit, env, body);
         break;
       case 'check-rate-limit':
         result = await handleCheckRateLimit(context, body);
@@ -669,7 +669,7 @@ async function handleSendVerificationEmail(octokit, env, { owner, repo, email })
 /**
  * Verify email code and return verification token
  */
-async function handleVerifyEmail(octokit, { owner, repo, email, code }) {
+async function handleVerifyEmail(octokit, env, { owner, repo, email, code }) {
   if (!email || !code) {
     return {
       statusCode: 400,
@@ -728,7 +728,7 @@ async function handleVerifyEmail(octokit, { owner, repo, email, code }) {
     }
 
     // Generate verification token
-    const secret = process.env.EMAIL_VERIFICATION_SECRET;
+    const secret = env.EMAIL_VERIFICATION_SECRET;
     if (!secret) {
       throw new Error('EMAIL_VERIFICATION_SECRET not configured');
     }
