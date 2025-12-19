@@ -31,6 +31,7 @@ jobs:
 
     env:
       WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username (anonymous contributions)
+      VITE_RELEASE_DATE: ${{ vars.VITE_RELEASE_DATE }}  # Release date for filtering commits (optional)
 
     steps:
       - name: Checkout repository
@@ -48,31 +49,30 @@ jobs:
             const CACHE_ISSUE_TITLE = '[Cache] Contributor Highscore';
             const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
 
-            // Read wiki config to get the configured branch and release date
+            // Read wiki config to get the configured branch
             let configuredBranch = 'main'; // default
-            let releaseDate = null; // null = no filtering
             try {
               const configPath = path.join(process.env.GITHUB_WORKSPACE, 'wiki-config.json');
               const configContent = fs.readFileSync(configPath, 'utf8');
               const config = JSON.parse(configContent);
               configuredBranch = config?.wiki?.repository?.branch || 'main';
-
-              // Read release date from config
-              const releaseDateStr = config?.wiki?.repository?.releaseDate;
-              if (releaseDateStr && releaseDateStr.trim() !== '') {
-                releaseDate = new Date(releaseDateStr);
-                if (isNaN(releaseDate.getTime())) {
-                  console.warn('⚠️ Invalid releaseDate in wiki-config.json:', releaseDateStr);
-                  releaseDate = null;
-                } else {
-                  console.log(`📅 Release date configured: ${releaseDate.toISOString()}`);
-                  console.log(`   Only activity after this date will be counted`);
-                }
-              }
-
               console.log(`📋 Using configured branch from wiki-config.json: ${configuredBranch}`);
             } catch (error) {
               console.warn('⚠️ Failed to read wiki-config.json, using default branch: main');
+            }
+
+            // Read release date from environment variable
+            let releaseDate = null; // null = no filtering
+            const releaseDateStr = process.env.VITE_RELEASE_DATE;
+            if (releaseDateStr && releaseDateStr.trim() !== '') {
+              releaseDate = new Date(releaseDateStr);
+              if (isNaN(releaseDate.getTime())) {
+                console.warn('⚠️ Invalid VITE_RELEASE_DATE format:', releaseDateStr);
+                releaseDate = null;
+              } else {
+                console.log(`📅 Release date configured: ${releaseDate.toISOString()}`);
+                console.log(`   Only activity after this date will be counted`);
+              }
             }
 
             /**

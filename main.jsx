@@ -9,6 +9,11 @@ import { Ghost, Sparkles, Sword } from 'lucide-react';
 import { initializeBotOctokit } from './wiki-framework/src/services/github/api.js';
 initializeBotOctokit();
 
+// Register game-specific storage migrations
+import { registerMigrations } from './wiki-framework/src/utils/storageMigration.js';
+import { gameMigrations } from './src/utils/gameMigrations.js';
+registerMigrations(gameMigrations);
+
 // Register game-specific content renderers
 import { registerContentProcessor, registerCustomComponents, registerSkillPreview, registerEquipmentPreview, registerDataAutocompleteSearch, registerPicker } from './wiki-framework/src/utils/contentRendererRegistry.js';
 import { registerDataSelector } from './wiki-framework/src/utils/dataSelectorRegistry.js';

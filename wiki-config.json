@@ -86,20 +86,23 @@
         "icon": "🏠"
       },
       {
-        "title": "Contributing",
-        "path": "/meta/contributing",
-        "icon": "✍️",
-        "showInHeader": false
+        "title": "Highscore",
+        "path": "/highscore",
+        "icon": "🏆"
       },
       {
         "title": "Guidelines",
         "path": "/meta/guidelines",
-        "icon": "📋"
+        "icon": "📋",
+        "showInHeader": false,
+        "position": "bottom"
       },
       {
-        "title": "Highscore",
-        "path": "/highscore",
-        "icon": "🏆"
+        "title": "Contributing",
+        "path": "/meta/contributing",
+        "icon": "✍️",
+        "showInHeader": false,
+        "position": "bottom"
       }
     ]
   },
@@ -223,6 +226,8 @@
     "calculators": true,
     "progressTracking": true,
     "autoFormatPageTitles": true,
+    "purgeClientCacheOnUpdate": false,
+    "preserveDraftsOnUpdate": true,
     "developmentBanner": {
       "enabled": true,
       "expiryMinutes": 60
