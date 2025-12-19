@@ -17,15 +17,18 @@
     "preview": "vite preview",
     "preview:cloudflare": "npm run build:cloudflare && npx wrangler pages dev dist",
     "build:search": "node scripts/buildSearchIndex.js",
-    "validate:html": "node wiki-framework/scripts/validateHtml.js"
+    "validate:html": "node wiki-framework/scripts/validateHtml.js",
+    "test:sendgrid": "node scripts/testSendGrid.js"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.2.3",
+    "@sendgrid/mail": "^8.1.6",
     "@uiw/react-codemirror": "^4.21.21",
     "clsx": "^2.0.0",
     "date-fns": "^3.0.0",
     "fuse.js": "^7.0.0",
     "gray-matter": "^4.0.3",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.263.1",
     "octokit": "^3.1.2",
     "react": "^18.2.0",
@@ -48,6 +51,7 @@
     "autoprefixer": "^10.4.16",
     "concurrently": "^9.2.1",
     "cross-env": "^7.0.3",
+    "dotenv": "^17.2.3",
     "netlify-cli": "^17.0.0",
     "postcss": "^8.4.32",
     "sharp": "^0.33.0",

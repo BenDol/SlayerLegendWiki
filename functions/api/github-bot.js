@@ -12,6 +12,9 @@
  */
 
 import { Octokit } from '@octokit/rest';
+import sgMail from '@sendgrid/mail';
+import jwt from 'jsonwebtoken';
+import { generateVerificationEmail, generateVerificationEmailText } from './emailTemplates/verificationEmail.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -87,6 +90,18 @@ export async function onRequest(context) {
         break;
       case 'update-admin-issue':
         result = await handleUpdateAdminIssue(octokit, body);
+        break;
+      case 'send-verification-email':
+        result = await handleSendVerificationEmail(octokit, env, body);
+        break;
+      case 'verify-email':
+        result = await handleVerifyEmail(octokit, body);
+        break;
+      case 'check-rate-limit':
+        result = await handleCheckRateLimit(context, body);
+        break;
+      case 'create-anonymous-pr':
+        result = await handleCreateAnonymousPR(octokit, context, env, body);
         break;
       default:
         return new Response(
@@ -426,4 +441,502 @@ async function handleUpdateAdminIssue(octokit, { owner, repo, issueNumber, body,
       },
     }
   };
+}
+
+/**
+ * Helper: Hash IP address for privacy
+ */
+async function hashIP(ip) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(ip);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Helper: Get client IP address from request
+ */
+function getClientIP(context) {
+  const { request } = context;
+  // Cloudflare provides the real IP in CF-Connecting-IP header
+  return request.headers.get('CF-Connecting-IP') ||
+         request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
+         'unknown';
+}
+
+/**
+ * Helper: Generate verification code
+ */
+function generateVerificationCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+/**
+ * Helper: Create verification token (JWT)
+ */
+function createVerificationToken(email, secret) {
+  return jwt.sign(
+    {
+      email,
+      timestamp: Date.now(),
+      type: 'email-verification'
+    },
+    secret,
+    { expiresIn: '24h' }
+  );
+}
+
+/**
+ * Helper: Verify verification token
+ */
+function verifyVerificationToken(token, secret) {
+  try {
+    const decoded = jwt.verify(token, secret);
+    return decoded;
+  } catch (error) {
+    console.error('[github-bot] Token verification failed:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Send verification email
+ */
+async function handleSendVerificationEmail(octokit, env, { owner, repo, email }) {
+  if (!email) {
+    return {
+      statusCode: 400,
+      body: { error: 'Missing required field: email' }
+    };
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return {
+      statusCode: 400,
+      body: { error: 'Invalid email format' }
+    };
+  }
+
+  // Check SendGrid configuration
+  const sendGridKey = env.SENDGRID_API_KEY;
+  const fromEmail = env.SENDGRID_FROM_EMAIL;
+  if (!sendGridKey || !fromEmail) {
+    console.error('[github-bot] SendGrid not configured');
+    return {
+      statusCode: 503,
+      body: { error: 'Email service not configured' }
+    };
+  }
+
+  try {
+    // Generate verification code
+    const code = generateVerificationCode();
+    const timestamp = Date.now();
+
+    // Hash email for privacy
+    const emailHash = await hashIP(email);
+
+    // Store code in GitHub Issue (private, closed, locked)
+    const issueTitle = `[Email Verification] ${emailHash}`;
+    const issueBody = JSON.stringify({
+      code,
+      timestamp,
+      expiresAt: timestamp + 10 * 60 * 1000, // 10 minutes
+    });
+
+    const { data: issue } = await octokit.rest.issues.create({
+      owner,
+      repo,
+      title: issueTitle,
+      body: issueBody,
+      labels: ['email-verification'],
+    });
+
+    // Close and lock the issue
+    await octokit.rest.issues.update({
+      owner,
+      repo,
+      issue_number: issue.number,
+      state: 'closed',
+    });
+
+    await octokit.rest.issues.lock({
+      owner,
+      repo,
+      issue_number: issue.number,
+      lock_reason: 'off-topic',
+    });
+
+    // Send email with SendGrid
+    sgMail.setApiKey(sendGridKey);
+
+    const msg = {
+      to: email,
+      from: {
+        email: fromEmail,
+        name: 'Slayer Legend Wiki'
+      },
+      subject: 'Verify your email - Slayer Legend Wiki',
+      text: generateVerificationEmailText(code),
+      html: generateVerificationEmail(code),
+    };
+
+    await sgMail.send(msg);
+
+    console.log(`[github-bot] Verification email sent to ${email}`);
+
+    return {
+      statusCode: 200,
+      body: {
+        message: 'Verification code sent',
+        issueNumber: issue.number,
+      }
+    };
+  } catch (error) {
+    console.error('[github-bot] Failed to send verification email:', error);
+    return {
+      statusCode: 500,
+      body: { error: 'Failed to send verification email' }
+    };
+  }
+}
+
+/**
+ * Verify email code and return verification token
+ */
+async function handleVerifyEmail(octokit, { owner, repo, email, code }) {
+  if (!email || !code) {
+    return {
+      statusCode: 400,
+      body: { error: 'Missing required fields: email, code' }
+    };
+  }
+
+  try {
+    // Hash email
+    const emailHash = await hashIP(email);
+    const issueTitle = `[Email Verification] ${emailHash}`;
+
+    // Find the verification issue
+    const { data: issues } = await octokit.rest.issues.listForRepo({
+      owner,
+      repo,
+      labels: 'email-verification',
+      state: 'closed',
+      per_page: 100,
+    });
+
+    const verificationIssue = issues.find(issue => issue.title === issueTitle);
+
+    if (!verificationIssue) {
+      return {
+        statusCode: 404,
+        body: { error: 'Verification code not found or expired' }
+      };
+    }
+
+    // Parse issue body
+    let storedData;
+    try {
+      storedData = JSON.parse(verificationIssue.body);
+    } catch (parseError) {
+      return {
+        statusCode: 500,
+        body: { error: 'Invalid verification data' }
+      };
+    }
+
+    // Check expiration
+    if (Date.now() > storedData.expiresAt) {
+      return {
+        statusCode: 403,
+        body: { error: 'Verification code expired' }
+      };
+    }
+
+    // Verify code
+    if (storedData.code !== code) {
+      return {
+        statusCode: 403,
+        body: { error: 'Invalid verification code' }
+      };
+    }
+
+    // Generate verification token
+    const secret = process.env.EMAIL_VERIFICATION_SECRET;
+    if (!secret) {
+      throw new Error('EMAIL_VERIFICATION_SECRET not configured');
+    }
+    const token = createVerificationToken(email, secret);
+
+    console.log(`[github-bot] Email verified: ${email}`);
+
+    return {
+      statusCode: 200,
+      body: {
+        verified: true,
+        token,
+      }
+    };
+  } catch (error) {
+    console.error('[github-bot] Email verification failed:', error);
+    return {
+      statusCode: 500,
+      body: { error: 'Verification failed' }
+    };
+  }
+}
+
+/**
+ * Check rate limit for IP address
+ * Note: For Cloudflare, this would ideally use KV storage
+ * This implementation uses in-memory storage (resets on cold starts)
+ */
+const rateLimitStore = new Map();
+
+async function handleCheckRateLimit(context, { maxEdits = 5, windowMinutes = 60 }) {
+  const clientIP = getClientIP(context);
+  const ipHash = await hashIP(clientIP);
+
+  const windowMs = windowMinutes * 60 * 1000;
+  const now = Date.now();
+
+  // Get existing submissions
+  let submissions = rateLimitStore.get(ipHash) || [];
+
+  // Filter to submissions within window
+  submissions = submissions.filter(timestamp => now - timestamp < windowMs);
+
+  // Check if limit exceeded
+  if (submissions.length >= maxEdits) {
+    const oldestSubmission = submissions[0];
+    const remainingMs = windowMs - (now - oldestSubmission);
+
+    return {
+      statusCode: 429,
+      body: {
+        allowed: false,
+        remainingMs,
+        message: `Rate limit exceeded. Please try again in ${Math.ceil(remainingMs / 1000 / 60)} minutes.`,
+      }
+    };
+  }
+
+  return {
+    statusCode: 200,
+    body: {
+      allowed: true,
+      remaining: maxEdits - submissions.length,
+    }
+  };
+}
+
+/**
+ * Record a submission for rate limiting
+ */
+async function recordSubmission(context) {
+  const clientIP = getClientIP(context);
+  const ipHash = await hashIP(clientIP);
+
+  let submissions = rateLimitStore.get(ipHash) || [];
+  submissions.push(Date.now());
+
+  // Keep only last 10 submissions
+  if (submissions.length > 10) {
+    submissions = submissions.slice(-10);
+  }
+
+  rateLimitStore.set(ipHash, submissions);
+}
+
+/**
+ * Validate reCAPTCHA token
+ */
+async function validateRecaptcha(token, ip, secret) {
+  const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      secret,
+      response: token,
+      remoteip: ip,
+    }),
+  });
+
+  const result = await response.json();
+
+  if (!result.success) {
+    console.error('[github-bot] reCAPTCHA validation failed:', result['error-codes']);
+    return { valid: false, score: 0 };
+  }
+
+  return { valid: true, score: result.score || 1.0 };
+}
+
+/**
+ * Create anonymous PR
+ */
+async function handleCreateAnonymousPR(octokit, context, env, {
+  owner, repo, section, pageId, pageTitle,
+  content, email, displayName, reason = '',
+  verificationToken, captchaToken
+}) {
+  // Validate required fields
+  if (!owner || !repo || !section || !pageId || !pageTitle || !content || !email || !displayName || !verificationToken || !captchaToken) {
+    return {
+      statusCode: 400,
+      body: { error: 'Missing required fields' }
+    };
+  }
+
+  try {
+    // 1. Verify email verification token
+    const secret = env.EMAIL_VERIFICATION_SECRET;
+    if (!secret) {
+      throw new Error('EMAIL_VERIFICATION_SECRET not configured');
+    }
+    const decoded = verifyVerificationToken(verificationToken, secret);
+    if (!decoded || decoded.email !== email) {
+      return {
+        statusCode: 403,
+        body: { error: 'Email verification expired or invalid' }
+      };
+    }
+
+    // 2. Validate reCAPTCHA
+    const clientIP = getClientIP(context);
+    const recaptchaSecret = env.RECAPTCHA_SECRET_KEY;
+    if (!recaptchaSecret) {
+      throw new Error('RECAPTCHA_SECRET_KEY not configured');
+    }
+    const captchaResult = await validateRecaptcha(captchaToken, clientIP, recaptchaSecret);
+
+    if (!captchaResult.valid || captchaResult.score < 0.5) {
+      return {
+        statusCode: 403,
+        body: { error: 'CAPTCHA validation failed', score: captchaResult.score }
+      };
+    }
+
+    // 3. Check rate limit
+    const rateCheck = await handleCheckRateLimit(context, { maxEdits: 5, windowMinutes: 60 });
+    if (rateCheck.statusCode === 429) {
+      return rateCheck;
+    }
+
+    // 4. Sanitize inputs
+    displayName = displayName.replace(/<[^>]*>/g, '').substring(0, 50).trim();
+    reason = reason.replace(/<[^>]*>/g, '').substring(0, 500).trim();
+
+    if (displayName.length < 2) {
+      return {
+        statusCode: 400,
+        body: { error: 'Display name must be at least 2 characters' }
+      };
+    }
+
+    // 5. Create branch
+    const timestamp = Date.now();
+    const branchName = `anonymous-edit/${section}/${pageId}/${timestamp}`;
+
+    // Get main branch SHA
+    const { data: mainBranch } = await octokit.rest.repos.getBranch({
+      owner,
+      repo,
+      branch: 'main',
+    });
+
+    await octokit.rest.git.createRef({
+      owner,
+      repo,
+      ref: `refs/heads/${branchName}`,
+      sha: mainBranch.commit.sha,
+    });
+
+    // 6. Commit file
+    const filePath = `public/content/${section}/${pageId}.md`;
+    const commitMessage = `Update ${pageTitle}
+
+Anonymous contribution by: ${displayName}
+Email: ${email} (verified ✓)
+${reason ? `Reason: ${reason}` : ''}
+
+Submitted: ${new Date(timestamp).toISOString()}
+
+🤖 Generated with [Anonymous Wiki Editor](https://slayerlegend.wiki)
+
+Co-Authored-By: Wiki Bot <bot@slayerlegend.wiki>`;
+
+    // Convert content to base64
+    const encoder = new TextEncoder();
+    const contentBytes = encoder.encode(content);
+    const contentBase64 = btoa(String.fromCharCode(...contentBytes));
+
+    await octokit.rest.repos.createOrUpdateFileContents({
+      owner,
+      repo,
+      path: filePath,
+      message: commitMessage,
+      content: contentBase64,
+      branch: branchName,
+    });
+
+    // 7. Create PR
+    const prBody = `## Anonymous Edit Submission
+
+**Submitted by:** ${displayName}
+**Email:** ${email} (verified ✓)
+${reason ? `**Reason:** ${reason}` : ''}
+**Timestamp:** ${new Date(timestamp).toISOString()}
+**reCAPTCHA Score:** ${captchaResult.score.toFixed(2)}
+
+---
+
+*This edit was submitted anonymously via the wiki editor.*
+*The submitter's email address has been verified.*
+*Automated submission by wiki bot.*`;
+
+    const { data: pr } = await octokit.rest.pulls.create({
+      owner,
+      repo,
+      title: `[Anonymous] Update ${pageTitle}`,
+      body: prBody,
+      head: branchName,
+      base: 'main',
+    });
+
+    // 8. Add labels
+    await octokit.rest.issues.addLabels({
+      owner,
+      repo,
+      issue_number: pr.number,
+      labels: ['anonymous-edit', 'needs-review', section],
+    });
+
+    // 9. Record submission for rate limiting
+    await recordSubmission(context);
+
+    console.log(`[github-bot] Anonymous PR created: #${pr.number} by ${displayName} (${email})`);
+
+    return {
+      statusCode: 200,
+      body: {
+        success: true,
+        pr: {
+          number: pr.number,
+          url: pr.html_url,
+          branch: branchName,
+        },
+      }
+    };
+  } catch (error) {
+    console.error('[github-bot] Failed to create anonymous PR:', error);
+    return {
+      statusCode: 500,
+      body: { error: error.message || 'Failed to create pull request' }
+    };
+  }
 }

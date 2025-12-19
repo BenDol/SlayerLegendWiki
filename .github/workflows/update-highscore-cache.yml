@@ -29,6 +29,9 @@ jobs:
       contents: read
       issues: write  # Need write permission to update cache issue
 
+    env:
+      WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username (anonymous contributions)
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,8 +43,10 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
+            const crypto = require('crypto');
 
             const CACHE_ISSUE_TITLE = '[Cache] Contributor Highscore';
+            const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
 
             // Read wiki config to get the configured branch
             let configuredBranch = 'main'; // default
@@ -86,6 +91,33 @@ jobs:
             }
 
             /**
+             * Hash email for privacy (consistent hashing for aggregation)
+             */
+            function hashEmail(email) {
+              return crypto.createHash('sha256').update(email.toLowerCase().trim()).digest('hex');
+            }
+
+            /**
+             * Parse anonymous contribution from bot commit message
+             * Returns { name, email, verified } or null if not anonymous/verified
+             */
+            function parseAnonymousContribution(commitMessage) {
+              // Check for verified anonymous contribution
+              const nameMatch = commitMessage.match(/Anonymous contribution by:\s*(.+)/);
+              const emailMatch = commitMessage.match(/Email:\s*(.+?)\s*\(verified\s*✓\)/);
+
+              if (nameMatch && emailMatch) {
+                return {
+                  name: nameMatch[1].trim(),
+                  email: emailMatch[1].trim(),
+                  verified: true
+                };
+              }
+
+              return null;
+            }
+
+            /**
              * Fetch all-time contributor stats
              * Enhanced with PR data for additions/deletions
              */
@@ -101,9 +133,17 @@ jobs:
 
               console.log(`✅ Found ${contributors.length} all-time contributors`);
 
-              // Create map with base stats
+              // Create map with base stats (exclude bot)
               const contributorMap = new Map();
+              const anonymousMap = new Map(); // Anonymous contributors keyed by hashed email
+
               contributors.forEach(contributor => {
+                // Skip bot account - its contributions will be attributed to anonymous users
+                if (contributor.login === BOT_USERNAME) {
+                  console.log(`   ⏭️  Skipping bot account: ${BOT_USERNAME} (will process as anonymous)`);
+                  return;
+                }
+
                 contributorMap.set(contributor.id, {
                   userId: contributor.id,
                   login: contributor.login,
@@ -141,23 +181,55 @@ jobs:
                 for (const commit of commits) {
                   const author = commit.author || commit.commit.author;
                   const userId = author?.id;
+                  const login = author?.login;
 
-                  if (userId && contributorMap.has(userId)) {
-                    try {
-                      // repos.listCommits() doesn't include additions/deletions, need repos.getCommit()
-                      const { data: detailedCommit } = await github.rest.repos.getCommit({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        ref: commit.sha,
-                      });
+                  try {
+                    // repos.listCommits() doesn't include additions/deletions, need repos.getCommit()
+                    const { data: detailedCommit } = await github.rest.repos.getCommit({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      ref: commit.sha,
+                    });
 
-                      const stats = detailedCommit.stats || {};
+                    const stats = detailedCommit.stats || {};
+                    const additions = stats.additions || 0;
+                    const deletions = stats.deletions || 0;
+
+                    // Check if this is a bot commit (anonymous contribution)
+                    if (login === BOT_USERNAME) {
+                      const anonData = parseAnonymousContribution(detailedCommit.commit.message);
+                      if (anonData && anonData.verified) {
+                        const emailHash = hashEmail(anonData.email);
+
+                        if (anonymousMap.has(emailHash)) {
+                          const anon = anonymousMap.get(emailHash);
+                          anon.contributions++;
+                          anon.additions += additions;
+                          anon.deletions += deletions;
+                        } else {
+                          anonymousMap.set(emailHash, {
+                            userId: null,
+                            login: anonData.name, // Display name from contribution
+                            avatarUrl: null,
+                            contributions: 1,
+                            additions,
+                            deletions,
+                            profileUrl: null,
+                            prestige: 0,
+                            type: 'Anonymous',
+                            isAnonymous: true,
+                            emailHash: emailHash
+                          });
+                        }
+                      }
+                    } else if (userId && contributorMap.has(userId)) {
+                      // Regular contributor
                       const contributor = contributorMap.get(userId);
-                      contributor.additions += stats.additions || 0;
-                      contributor.deletions += stats.deletions || 0;
-                    } catch (error) {
-                      console.warn(`   ⚠️ Failed to fetch details for commit ${commit.sha.substring(0, 7)}:`, error.message);
+                      contributor.additions += additions;
+                      contributor.deletions += deletions;
                     }
+                  } catch (error) {
+                    console.warn(`   ⚠️ Failed to fetch details for commit ${commit.sha.substring(0, 7)}:`, error.message);
                   }
                 }
 
@@ -171,8 +243,14 @@ jobs:
                 }
               }
 
-              // Convert to array and calculate scores
-              const formatted = Array.from(contributorMap.values()).map(contributor => {
+              // Merge regular contributors and anonymous contributors
+              const allContributors = [
+                ...Array.from(contributorMap.values()),
+                ...Array.from(anonymousMap.values())
+              ];
+
+              // Calculate scores for all contributors
+              const formatted = allContributors.map(contributor => {
                 contributor.score = calculateContributorScore(contributor);
                 return contributor;
               });
@@ -185,7 +263,8 @@ jobs:
                 return b.contributions - a.contributions;
               });
 
-              console.log(`✅ Enhanced ${formatted.length} contributors with commit data`);
+              console.log(`✅ Enhanced ${contributorMap.size} registered + ${anonymousMap.size} anonymous contributors`);
+              console.log(`   Total: ${formatted.length} contributors`);
 
               return formatted;
             }
@@ -225,6 +304,7 @@ jobs:
 
               // Aggregate commits by author (use user ID as key for permanent identification)
               const contributorMap = new Map();
+              const anonymousMap = new Map(); // Anonymous contributors keyed by hashed email
 
               // Fetch detailed commit data to get additions/deletions
               console.log(`   Fetching detailed stats for ${commits.length} commits...`);
@@ -235,6 +315,13 @@ jobs:
 
                 // Skip commits without a GitHub user (e.g., local git commits)
                 if (!login) continue;
+
+                // Skip bot account - will be processed as anonymous
+                if (login === BOT_USERNAME) {
+                  // Will be handled below
+                } else {
+                  // Continue with normal processing for non-bot users
+                }
 
                 try {
                   // repos.listCommits() doesn't include additions/deletions, need repos.getCommit()
@@ -249,36 +336,72 @@ jobs:
                   const additions = stats.additions || 0;
                   const deletions = stats.deletions || 0;
 
-                  // Use user ID as key (permanent), fallback to login
-                  const key = userId ? userId.toString() : `legacy:${login}`;
+                  // Check if this is a bot commit (anonymous contribution)
+                  if (login === BOT_USERNAME) {
+                    const anonData = parseAnonymousContribution(detailedCommit.commit.message);
+                    if (anonData && anonData.verified) {
+                      const emailHash = hashEmail(anonData.email);
 
-                  if (contributorMap.has(key)) {
-                    const existing = contributorMap.get(key);
-                    existing.contributions++;
-                    existing.additions += additions;
-                    existing.deletions += deletions;
-                    // Update login in case username changed
-                    existing.login = login;
+                      if (anonymousMap.has(emailHash)) {
+                        const anon = anonymousMap.get(emailHash);
+                        anon.contributions++;
+                        anon.additions += additions;
+                        anon.deletions += deletions;
+                      } else {
+                        anonymousMap.set(emailHash, {
+                          userId: null,
+                          login: anonData.name, // Display name from contribution
+                          avatarUrl: null,
+                          contributions: 1,
+                          additions,
+                          deletions,
+                          profileUrl: null,
+                          prestige: 0,
+                          type: 'Anonymous',
+                          isAnonymous: true,
+                          emailHash: emailHash
+                        });
+                      }
+                    }
                   } else {
-                    contributorMap.set(key, {
-                      userId: userId || null,
-                      login: login,
-                      avatarUrl: author.avatar_url,
-                      contributions: 1,
-                      additions,
-                      deletions,
-                      profileUrl: author.html_url,
-                      prestige: 0,
-                      type: author.type || 'User',
-                    });
+                    // Regular contributor
+                    // Use user ID as key (permanent), fallback to login
+                    const key = userId ? userId.toString() : `legacy:${login}`;
+
+                    if (contributorMap.has(key)) {
+                      const existing = contributorMap.get(key);
+                      existing.contributions++;
+                      existing.additions += additions;
+                      existing.deletions += deletions;
+                      // Update login in case username changed
+                      existing.login = login;
+                    } else {
+                      contributorMap.set(key, {
+                        userId: userId || null,
+                        login: login,
+                        avatarUrl: author.avatar_url,
+                        contributions: 1,
+                        additions,
+                        deletions,
+                        profileUrl: author.html_url,
+                        prestige: 0,
+                        type: author.type || 'User',
+                      });
+                    }
                   }
                 } catch (error) {
                   console.warn(`⚠️ Failed to fetch details for commit ${commit.sha.substring(0, 7)}:`, error.message);
                 }
               }
 
-              // Convert to array and calculate scores
-              const contributors = Array.from(contributorMap.values()).map(contributor => {
+              // Merge regular contributors and anonymous contributors
+              const allContributors = [
+                ...Array.from(contributorMap.values()),
+                ...Array.from(anonymousMap.values())
+              ];
+
+              // Calculate scores for all contributors
+              const contributors = allContributors.map(contributor => {
                 contributor.score = calculateContributorScore(contributor);
                 return contributor;
               });
@@ -291,7 +414,8 @@ jobs:
                 return b.contributions - a.contributions;
               });
 
-              console.log(`✅ Found ${contributors.length} unique contributors from commits`);
+              console.log(`✅ Found ${contributorMap.size} registered + ${anonymousMap.size} anonymous contributors`);
+              console.log(`   Total: ${contributors.length} contributors`);
               return contributors;
             }
 

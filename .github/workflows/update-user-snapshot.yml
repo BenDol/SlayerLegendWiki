@@ -55,6 +55,9 @@ jobs:
       issues: write  # Need write permission to create/update snapshot issues
       pull-requests: read  # Need read permission to fetch PR data
 
+    env:
+      WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username (anonymous contributions)
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -79,6 +82,7 @@ jobs:
           script: |
             const SNAPSHOT_LABEL = 'user-snapshot';
             const SNAPSHOT_TITLE_PREFIX = '[User Snapshot]';
+            const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
 
             // Determine mode
             const mode = context.payload.inputs?.mode || 'single';
@@ -104,6 +108,12 @@ jobs:
              */
             async function buildUserSnapshot(username) {
               console.log(`\n🔍 Building profile snapshot for @${username}...`);
+
+              // Skip bot account - no snapshots for service accounts
+              if (username === BOT_USERNAME) {
+                console.log(`⏭️  Skipping bot account: ${BOT_USERNAME} (anonymous contributions tracked separately)`);
+                return null;
+              }
 
               // Fetch user data (this gives us the permanent user ID)
               const { data: userData } = await github.rest.users.getByUsername({
@@ -370,6 +380,11 @@ jobs:
 
                 for (const pr of prs) {
                   if (pr.user && pr.user.login && pr.user.id) {
+                    // Skip bot account - no snapshots for service accounts
+                    if (pr.user.login === BOT_USERNAME) {
+                      continue;
+                    }
+
                     // Store by user ID (permanent), keep latest username
                     contributorsMap.set(pr.user.id.toString(), {
                       id: pr.user.id,
@@ -397,6 +412,12 @@ jobs:
               }
 
               const snapshot = await buildUserSnapshot(inputUsername);
+
+              // Skip if bot account (buildUserSnapshot returns null for bot)
+              if (!snapshot) {
+                console.log('✅ Skipped snapshot creation (bot account)');
+                return;
+              }
 
               // Find existing snapshot issue by user ID (permanent identifier)
               const existingSnapshots = await getExistingSnapshots();
@@ -431,6 +452,12 @@ jobs:
               for (const contributor of usersWithoutSnapshots) {
                 try {
                   const snapshot = await buildUserSnapshot(contributor.login);
+
+                  // Skip if bot account
+                  if (!snapshot) {
+                    continue;
+                  }
+
                   await saveSnapshot(snapshot, null); // No existing issue
                   successCount++;
 
@@ -462,6 +489,12 @@ jobs:
               for (const contributor of contributors) {
                 try {
                   const snapshot = await buildUserSnapshot(contributor.login);
+
+                  // Skip if bot account
+                  if (!snapshot) {
+                    continue;
+                  }
+
                   // Look up existing issue by user ID (permanent identifier)
                   const existingIssue = existingSnapshots.get(contributor.id.toString()) ||
                                          existingSnapshots.get(`legacy:${contributor.login}`); // Fallback for legacy

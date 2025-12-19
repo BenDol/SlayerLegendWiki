@@ -14,7 +14,11 @@
       "Bash(cat:*)",
       "Bash(node -e:*)",
       "Bash(grep:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(node -c:*)",
+      "Bash(node --check:*)"
     ]
   }
 }

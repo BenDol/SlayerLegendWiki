@@ -252,13 +252,40 @@
         "keepForkUpdated": true
       },
       "anonymous": {
-        "enabled": false,
+        "enabled": true,
         "mode": "server",
+        "requireEmailVerification": true,
         "serverEndpoint": "",
-        "attributionFormat": "Contributed anonymously via wiki editor"
+        "attributionFormat": "Contributed anonymously via wiki editor",
+        "reCaptcha": {
+          "enabled": true,
+          "siteKey": "",
+          "minimumScore": 0.5
+        },
+        "rateLimit": {
+          "enabled": true,
+          "maxEditsPerHour": 5,
+          "windowMinutes": 60
+        },
+        "emailVerification": {
+          "codeExpiryMinutes": 10,
+          "tokenExpiryHours": 24,
+          "codeLength": 6
+        },
+        "emailService": {
+          "provider": "sendgrid",
+          "fromEmail": "noreply@slayerlegend.wiki",
+          "fromName": "Slayer Legend Wiki"
+        },
+        "storage": {
+          "provider": "github-issues",
+          "verificationLabel": "email-verification",
+          "cleanupDays": 1
+        },
+        "labels": ["anonymous-edit", "needs-review"]
       },
       "permissions": {
-        "requireAuth": true,
+        "requireAuth": false,
         "fallbackToFork": true,
         "allowDirectCommit": true,
         "allowDirectCommitDelete": false
