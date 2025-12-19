@@ -963,6 +963,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         setBuildName(draft.buildName || '');
 
         if (draft.selectedWeapon) {
+          // Mark this weapon as already initialized BEFORE setting it
+          // This prevents the weapon change effect from re-initializing the grid
+          const weaponKey = `${draft.selectedWeapon.id}-${draft.selectedWeapon.name}`;
+          hasInitializedGridForWeapon.current = weaponKey;
           setSelectedWeapon(draft.selectedWeapon);
         }
 
