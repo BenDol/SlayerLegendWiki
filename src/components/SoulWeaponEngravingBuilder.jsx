@@ -1319,8 +1319,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     if (!submission) return;
 
     setGridType(submission.gridType);
-    setCompletionAtk(submission.completionEffect.atk);
-    setCompletionHp(submission.completionEffect.hp);
+    // Convert float values to strings with % for display in input fields
+    setCompletionAtk(typeof submission.completionEffect.atk === 'number' ? `${submission.completionEffect.atk}%` : submission.completionEffect.atk);
+    setCompletionHp(typeof submission.completionEffect.hp === 'number' ? `${submission.completionEffect.hp}%` : submission.completionEffect.hp);
 
     // Initialize grid from submission
     const size = submission.gridType === '4x4' ? 4 : 5;
@@ -1424,14 +1425,21 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     setSubmitting(true);
     try {
+      // Parse completion effect values (remove % if present, convert to float)
+      const parsePercentage = (value) => {
+        if (typeof value === 'number') return value;
+        const str = String(value).trim().replace('%', '');
+        return parseFloat(str);
+      };
+
       // Create submission data
       const submission = {
         weaponId: selectedWeapon.id,
         weaponName: selectedWeapon.name,
         gridType: gridType,
         completionEffect: {
-          atk: completionAtk,
-          hp: completionHp
+          atk: parsePercentage(completionAtk),
+          hp: parsePercentage(completionHp)
         },
         activeSlots: activeSlots,
         totalActiveSlots: activeSlots.length
@@ -1566,6 +1574,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleWeaponChange = (weaponId) => {
+    console.log('[Weapon Change] Switching weapon to ID:', weaponId);
+
     // First, find the weapon in allWeapons (basic weapon data with image)
     const baseWeapon = allWeapons.find(w => w.id === parseInt(weaponId));
     if (!baseWeapon) return;
@@ -1574,6 +1584,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     const gridWeapon = weapons.find(w => w.name === baseWeapon.name);
 
     if (gridWeapon) {
+      // Weapon has grid data - normal mode
+      console.log('[Weapon Change] Weapon has grid data, using normal mode');
+
+      // Unsocket all pieces from current weapon (try to return to inventory)
+      unsocketAllPieces();
+      console.log('[Weapon Change] Unsocketed all pieces from previous weapon');
+
       // Merge grid data with base weapon data (to get image field)
       setSelectedWeapon({
         ...gridWeapon,
@@ -1581,9 +1598,21 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         attack: baseWeapon.attack,
         requirements: baseWeapon.requirements
       });
+      setForceDesignMode(false); // Ensure we exit design mode
     } else {
-      // No grid data - use base weapon (will show grid designer)
+      // No grid data - Grid Designer Mode
+      console.log('[Weapon Change] Weapon has NO grid data, will enter Grid Designer Mode');
+      console.log('[Weapon Change] Force clearing grid and inventory for fresh start');
+
+      // Force clear everything for Grid Designer Mode
+      // Clear inventory completely (don't try to save pieces)
+      setInventory(Array(INVENTORY_SIZE).fill(null));
+
+      // Force clear grid state (this will be handled by the useEffect that initializes the grid)
+      // But we need to ensure the weapon change triggers a fresh grid initialization
+
       setSelectedWeapon(baseWeapon);
+      // Grid Designer Mode will be triggered by isGridDesigner computed value
     }
 
     setHasUnsavedChanges(true);
@@ -2469,7 +2498,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleClearGrid = () => {
+    console.log('[Clear Grid] Button clicked');
+    console.log('[Clear Grid] Grid state has pieces:', gridState.some(row => row.some(cell => cell.piece)));
+
     if (confirm('Clear all placed pieces? They will be returned to inventory if space available.')) {
+      console.log('[Clear Grid] User confirmed, clearing grid...');
+
       // Return pieces to inventory where possible
       const piecesToReturn = [];
       gridState.forEach(row => {
@@ -2486,6 +2520,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         });
       });
 
+      console.log('[Clear Grid] Pieces to return:', piecesToReturn.length);
+
       const newInventory = [...inventory];
       piecesToReturn.forEach(piece => {
         const emptySlot = newInventory.findIndex(slot => slot === null);
@@ -2499,9 +2535,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         }
       });
 
+      console.log('[Clear Grid] Updated inventory, initializing grid...');
       setInventory(newInventory);
       initializeGrid();
       setHasUnsavedChanges(true);
+      console.log('[Clear Grid] Grid cleared successfully');
+    } else {
+      console.log('[Clear Grid] User cancelled');
     }
   };
 
@@ -2540,6 +2580,17 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       }
     });
 
+    // CRITICAL: Clear the grid state after collecting pieces
+    // This ensures the grid is completely empty after unsocketing
+    const clearedGrid = gridState.map(row =>
+      row.map(cell => ({
+        ...cell,
+        piece: null
+      }))
+    );
+    console.log('[SoulWeaponEngravingBuilder] Grid state cleared after unsocketing');
+
+    setGridState(clearedGrid);
     setInventory(newInventory);
     setHasUnsavedChanges(true);
   };
@@ -3870,7 +3921,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             </div>
             <p className="text-sm text-gray-700 dark:text-gray-300">
               <strong>{selectedWeapon.name}</strong> doesn't have grid layout data yet.
-              Click cells to toggle active slots, enter completion effects, and submit your layout.
+              Click cells to toggle active slots, enter completion effects, and submit the layout.
+            </p>
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-2 italic">
+              Your help is greatly appreciated in building this community resource!
             </p>
 
             {/* Error Loading Submissions */}
@@ -4010,45 +4064,59 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             </div>
           </div>
 
-          {/* Submit Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2">
+          {/* Action Buttons */}
+          <div className="space-y-2">
+            {/* Clear Grid Button for Designer Mode */}
             <button
-              onClick={() => submitGridLayout(false)}
-              disabled={submitting || loadingSubmissions}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleClearGrid}
+              disabled={!designerGrid.some(row => row.some(cell => cell.active))}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors"
+              title="Clear all active cells"
             >
-              {submitting ? (
-                <>
-                  <Loader className="w-5 h-5 animate-spin" />
-                  <span>Submitting...</span>
-                </>
-              ) : (
-                <>
-                  <Send className="w-5 h-5" />
-                  <span>Submit Grid Layout</span>
-                </>
-              )}
+              <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <span>Clear Grid</span>
             </button>
 
-            {existingSubmissions.length > 0 && (
+            {/* Submit Buttons */}
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
-                onClick={() => submitGridLayout(true)}
+                onClick={() => submitGridLayout(false)}
                 disabled={submitting || loadingSubmissions}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <>
                     <Loader className="w-5 h-5 animate-spin" />
-                    <span>Updating...</span>
+                    <span>Submitting...</span>
                   </>
                 ) : (
                   <>
-                    <RefreshCw className="w-5 h-5" />
-                    <span>Submit and Replace</span>
+                    <Send className="w-5 h-5" />
+                    <span>Submit Grid Layout</span>
                   </>
                 )}
               </button>
-            )}
+
+              {existingSubmissions.length > 0 && (
+                <button
+                  onClick={() => submitGridLayout(true)}
+                  disabled={submitting || loadingSubmissions}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader className="w-5 h-5 animate-spin" />
+                      <span>Updating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-5 h-5" />
+                      <span>Submit and Replace</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           </div>
 
           {!isAuthenticated && (
@@ -4739,7 +4807,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 maxWidth: `${gridSize * adjustedCellSize + (gridSize - 1) * GAP_SIZE + GRID_PADDING * 2}px`
               }}>
                 <p className="text-center text-cyan-400 font-semibold text-[10px] leading-tight">
-                  ✓ Completion Effect: ATK +{completionBonus.atk}, HP +{completionBonus.hp}
+                  ✓ Completion Effect: ATK +{completionBonus.atk}%, HP +{completionBonus.hp}%
                 </p>
               </div>
             )}
@@ -5452,8 +5520,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                           {(() => {
                             const ce = result.weapon.completionEffect;
                             // Handle both official format {atkPercent, hpPercent} and community format {atk, hp}
-                            const atk = ce.atkPercent !== undefined ? `${ce.atkPercent}%` : (ce.atk || 'N/A');
-                            const hp = ce.hpPercent !== undefined ? `${ce.hpPercent}%` : (ce.hp || 'N/A');
+                            const atk = ce.atkPercent !== undefined ? `${ce.atkPercent}%` : (ce.atk !== undefined ? `${ce.atk}%` : 'N/A');
+                            const hp = ce.hpPercent !== undefined ? `${ce.hpPercent}%` : (ce.hp !== undefined ? `${ce.hp}%` : 'N/A');
                             return `ATK +${atk} • HP +${hp}`;
                           })()}
                         </div>

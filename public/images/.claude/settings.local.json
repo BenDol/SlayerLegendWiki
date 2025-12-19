@@ -18,7 +18,8 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(node -c:*)",
-      "Bash(node --check:*)"
+      "Bash(node --check:*)",
+      "Bash(gh issue list:*)"
     ]
   }
 }
