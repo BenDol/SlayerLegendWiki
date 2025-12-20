@@ -356,9 +356,9 @@ dataRegistry.register('drop-tables', {
 import { registerBuildTypes } from './wiki-framework/src/utils/buildTypeRegistry.js';
 
 registerBuildTypes({
-  'skill-build': '/skill-builder',
-  'spirit-build': '/spirit-builder',
-  'battle-loadout': '/battle-loadouts',
+  'skill-builds': '/skill-builder',
+  'spirit-builds': '/spirit-builder',
+  'battle-loadouts': '/battle-loadouts',
   'soul-weapon-engraving': '/soul-weapon-engraving',
 });
 

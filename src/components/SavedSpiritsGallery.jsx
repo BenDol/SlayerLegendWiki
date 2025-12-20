@@ -4,6 +4,8 @@ import SpiritComponent from './SpiritComponent';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { getCache, setCache, clearCache } from '../utils/buildCache';
 import { getLoadDataEndpoint } from '../utils/apiEndpoints.js';
+import { useSpiritsData } from '../hooks/useSpiritsData';
+import { deserializeSpirit } from '../utils/spiritSerialization';
 
 /**
  * SavedSpiritsGallery Component
@@ -16,18 +18,19 @@ import { getLoadDataEndpoint } from '../utils/apiEndpoints.js';
  */
 const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
   const { isAuthenticated, user } = useAuthStore();
+  const { spiritsData } = useSpiritsData(); // Load spirits database
   const [spirits, setSpirits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && spiritsData.length > 0) {
       loadSpirits();
-    } else {
+    } else if (!isAuthenticated) {
       setLoading(false);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, spiritsData]);
 
   const loadSpirits = async (forceRefresh = false) => {
     try {
@@ -39,16 +42,20 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
 
       if (!forceRefresh) {
         // Try cache first
-        const cached = getCache('my-spirits', user.id);
+        const cached = getCache('my_spirits', user.id);
         if (cached) {
-          setSpirits(cached);
+          // Deserialize cached spirits
+          const deserializedSpirits = cached
+            .map(s => deserializeSpirit(s, spiritsData, s.id))
+            .filter(s => s !== null && s.spirit !== null);
+          setSpirits(deserializedSpirits);
           setLoading(false);
           return;
         }
       }
 
       // Fetch from API
-      const response = await fetch(`${getLoadDataEndpoint()}?type=my-spirit&userId=${user.id}`);
+      const response = await fetch(`${getLoadDataEndpoint()}?type=my-spirits&userId=${user.id}`);
 
       // Check if response is HTML (likely 404 page) instead of JSON
       const contentType = response.headers.get('content-type');
@@ -64,8 +71,12 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
 
       if (data.success) {
         const loadedSpirits = data.spirits || [];
-        setSpirits(loadedSpirits);
-        setCache('my-spirits', user.id, loadedSpirits);
+        // Deserialize loaded spirits
+        const deserializedSpirits = loadedSpirits
+          .map(s => deserializeSpirit(s, spiritsData, s.id))
+          .filter(s => s !== null && s.spirit !== null);
+        setSpirits(deserializedSpirits);
+        setCache('my_spirits', user.id, loadedSpirits); // Cache serialized version
       } else {
         console.warn('API returned unsuccessful response:', data);
       }
@@ -79,7 +90,7 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
   };
 
   const handleRefresh = () => {
-    clearCache('my-spirits', user.id);
+    clearCache('my_spirits', user.id);
     loadSpirits(true);
   };
 
@@ -207,3 +218,4 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
 };
 
 export default SavedSpiritsGallery;
+

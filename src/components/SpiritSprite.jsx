@@ -1,5 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import spiritData from '../../public/data/spirit-characters.json';
+import { cacheName } from '../../wiki-framework/src/utils/storageManager';
+
+// LocalStorage keys for cache persistence
+const ANIMATION_CACHE_KEY = cacheName('spirit_sprite_animation');
+const IMAGE_CACHE_META_KEY = cacheName('spirit_sprite_image_meta');
+
+// Cache TTL (time-to-live) - images are valid for 10 minutes before re-fetching
+// This completely eliminates network requests (even 304 checks) within the TTL window
+const IMAGE_CACHE_TTL = 10 * 60 * 1000; // 10 minutes in milliseconds
+
+// Cache size limits to prevent unbounded memory growth
+const MAX_ANIMATION_CACHE_SIZE = 200; // Max spirit+level combinations (12 spirits × 8 levels × 2 for safety)
+const MAX_IMAGE_CACHE_SIZE = 2000; // Max images (12 spirits × 8 levels × 16 frames × ~1.3 for overhead)
 
 // Module-level cache for animation type detection results
 // Prevents re-detecting frames for the same spirit+level combination
@@ -10,16 +23,118 @@ const animationDetectionCache = new Map();
 // Key format: "spiritId_level_frameNumber" -> { img: Image, timestamp: number }
 const imageCache = new Map();
 
-// Cache TTL (time-to-live) - images are valid for 10 minutes before re-fetching
-// This completely eliminates network requests (even 304 checks) within the TTL window
-const IMAGE_CACHE_TTL = 10 * 60 * 1000; // 10 minutes in milliseconds
-
-// Cache size limits to prevent unbounded memory growth
-const MAX_ANIMATION_CACHE_SIZE = 200; // Max spirit+level combinations (12 spirits × 8 levels × 2 for safety)
-const MAX_IMAGE_CACHE_SIZE = 2000; // Max images (12 spirits × 8 levels × 16 frames × ~1.3 for overhead)
-
 // Track cache access for LRU eviction
 const imageCacheAccess = new Map(); // Key -> timestamp of last access
+
+// Load animation detection cache from localStorage on module initialization
+const loadAnimationCacheFromStorage = () => {
+  try {
+    const stored = localStorage.getItem(ANIMATION_CACHE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const now = Date.now();
+      let loaded = 0;
+      let expired = 0;
+
+      for (const [key, value] of Object.entries(parsed)) {
+        // Check if cache entry is still valid (respect TTL)
+        if (value.timestamp && now - value.timestamp < IMAGE_CACHE_TTL) {
+          animationDetectionCache.set(key, value.data);
+          loaded++;
+        } else {
+          expired++;
+        }
+      }
+
+      if (loaded > 0) {
+        console.log(`[SpiritSprite] Loaded ${loaded} animation detection entries from localStorage (${expired} expired)`);
+      }
+    }
+  } catch (e) {
+    console.warn('[SpiritSprite] Failed to load animation cache from localStorage:', e);
+  }
+};
+
+// Save animation detection cache to localStorage
+const saveAnimationCacheToStorage = () => {
+  try {
+    const now = Date.now();
+    const toStore = {};
+
+    for (const [key, value] of animationDetectionCache.entries()) {
+      toStore[key] = {
+        data: value,
+        timestamp: now
+      };
+    }
+
+    localStorage.setItem(ANIMATION_CACHE_KEY, JSON.stringify(toStore));
+  } catch (e) {
+    console.warn('[SpiritSprite] Failed to save animation cache to localStorage:', e);
+  }
+};
+
+// Load image cache metadata from localStorage on module initialization
+const loadImageCacheMetaFromStorage = () => {
+  try {
+    const stored = localStorage.getItem(IMAGE_CACHE_META_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const now = Date.now();
+      let loaded = 0;
+      let expired = 0;
+
+      for (const [key, value] of Object.entries(parsed)) {
+        // Check if cache entry is still valid (respect TTL)
+        if (value.timestamp && now - value.timestamp < IMAGE_CACHE_TTL) {
+          // Store metadata indicating this image is likely in browser cache
+          // We don't store the actual Image object, just the metadata
+          imageCacheAccess.set(key, value.timestamp);
+          loaded++;
+        } else {
+          expired++;
+        }
+      }
+
+      if (loaded > 0) {
+        console.log(`[SpiritSprite] Loaded ${loaded} image cache metadata entries from localStorage (${expired} expired)`);
+      }
+    }
+  } catch (e) {
+    console.warn('[SpiritSprite] Failed to load image cache metadata from localStorage:', e);
+  }
+};
+
+// Save image cache metadata to localStorage
+const saveImageCacheMetaToStorage = () => {
+  try {
+    const toStore = {};
+
+    // Save metadata for all cached images
+    for (const [key, cached] of imageCache.entries()) {
+      toStore[key] = {
+        timestamp: cached.timestamp,
+        // Could also store: width, height, src if needed
+      };
+    }
+
+    localStorage.setItem(IMAGE_CACHE_META_KEY, JSON.stringify(toStore));
+  } catch (e) {
+    console.warn('[SpiritSprite] Failed to save image cache metadata to localStorage:', e);
+  }
+};
+
+// Initialize caches from localStorage when module loads
+loadAnimationCacheFromStorage();
+loadImageCacheMetaFromStorage();
+
+// Save caches to localStorage before page unload to prevent data loss
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    saveAnimationCacheToStorage();
+    saveImageCacheMetaToStorage();
+  });
+}
 
 // Clean up old cache entries when limits are exceeded
 const cleanupCache = (cache, accessMap, maxSize) => {
@@ -48,7 +163,15 @@ export const clearSpiritCaches = () => {
   imageCacheAccess.clear();
   animationDetectionCache.clear();
 
-  console.log(`[SpiritSprite] Cleared all caches: ${imageCount} images, ${animationCount} animation detections`);
+  // Clear localStorage as well
+  try {
+    localStorage.removeItem(ANIMATION_CACHE_KEY);
+    localStorage.removeItem(IMAGE_CACHE_META_KEY);
+  } catch (e) {
+    console.warn('[SpiritSprite] Failed to clear localStorage caches:', e);
+  }
+
+  console.log(`[SpiritSprite] Cleared all caches (memory + localStorage): ${imageCount} images, ${animationCount} animation detections`);
   return { imageCount, animationCount };
 };
 
@@ -97,6 +220,11 @@ export const cleanupExpiredImages = () => {
     }
   });
 
+  if (removed > 0) {
+    // Update localStorage to reflect cleanup
+    saveImageCacheMetaToStorage();
+  }
+
   console.log(`[SpiritSprite] Cleaned up ${removed} expired images`);
   return removed;
 };
@@ -135,6 +263,14 @@ const getCachedImage = (spiritId, level, frameNumber, framePath) => {
       // Store image with timestamp
       imageCache.set(cacheKey, { img, timestamp: now });
       imageCacheAccess.set(cacheKey, now);
+
+      // Persist image cache metadata to localStorage
+      // We do this periodically to avoid too many writes
+      // Use a simple throttle: only save every 10th image load
+      if (imageCache.size % 10 === 0) {
+        saveImageCacheMetaToStorage();
+      }
+
       resolve(img);
     };
     img.onerror = () => {
@@ -280,7 +416,7 @@ const SpiritSprite = ({
       const cachedResults = animationDetectionCache.get(cacheKey);
 
       if (cachedResults) {
-        console.log(`[SpiritSprite] Using cached animation types for spirit ${spiritId} level ${level}`);
+        // console.log(`[SpiritSprite] Using cached animation types for spirit ${spiritId} level ${level}`);
         setAvailableAnimationTypes(cachedResults);
         detectionCompleteRef.current = true;
 
@@ -432,6 +568,9 @@ const SpiritSprite = ({
       animationDetectionCache.set(cacheKey, results);
       console.log(`[SpiritSprite] Cached animation types for spirit ${spiritId} level ${level}`, results);
 
+      // Persist animation cache to localStorage
+      saveAnimationCacheToStorage();
+
       setAvailableAnimationTypes(results);
       detectionCompleteRef.current = true;
 
@@ -487,6 +626,10 @@ const SpiritSprite = ({
       // Store the indices (0, 1, 2...) for animation loop
       setValidFrames(validIndices);
       setFramesDetected(true);
+
+      // Save image cache metadata to localStorage after loading all frames
+      // This ensures we don't lose cached images on reload
+      saveImageCacheMetaToStorage();
     };
 
     // Reset state and start loading

@@ -36,6 +36,9 @@ const SkillSelector = ({ isOpen, onClose, onSelectSkill, skills, currentBuild })
       // Skip skills without icons (passive skills usually)
       if (!skill.icon) return false;
 
+      // Skip non-equippable skills (e.g., Mantra - passive effects only)
+      if (skill.equippable === false) return false;
+
       // Search by name
       if (searchQuery && !skill.name.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;

@@ -59,10 +59,10 @@ Functions in this directory:
 ### save-data.js
 
 Universal data saving function that handles multiple types:
-- `skill-build` - Skill builder configurations
-- `battle-loadout` - Battle loadout configurations
-- `my-spirit` - Spirit collection data
-- `spirit-build` - Spirit builder configurations
+- `skill-builds` - Skill builder configurations
+- `battle-loadouts` - Battle loadout configurations
+- `my-spirits` - Spirit collection data
+- `spirit-builds` - Spirit builder configurations
 - **`grid-submission`** - Soul weapon engraving grid submissions (weapon-centric)
 
 **Grid Submissions:**

@@ -21,6 +21,12 @@ on:
     - cron: '0 2 * * *'  # Daily at 2 AM UTC
   workflow_dispatch:  # Allow manual trigger from Actions tab
 
+# Prevent race conditions: Only one workflow run at a time
+# If a new run is triggered while one is running, cancel the old one
+concurrency:
+  group: update-highscore-cache
+  cancel-in-progress: false  # Let running job finish, queue new one
+
 jobs:
   update-cache:
     runs-on: ubuntu-latest
@@ -621,6 +627,62 @@ jobs:
               });
 
               issueNumber = newIssue.number;
+
+              // CRITICAL: Check for duplicate issues created by race condition
+              console.log('🔍 Verifying no duplicate issues...');
+              const { data: verifyIssues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'highscore-cache',
+                per_page: 100
+              });
+
+              const duplicates = verifyIssues.filter(issue => issue.title === CACHE_ISSUE_TITLE);
+
+              if (duplicates.length > 1) {
+                console.warn('⚠️ Multiple cache issues detected! Closing newer duplicates...');
+                console.log('   Found issues:', duplicates.map(i => `#${i.number}`).join(', '));
+
+                // Sort by issue number (oldest first)
+                duplicates.sort((a, b) => a.number - b.number);
+                const primaryIssue = duplicates[0];
+                const duplicatesToClose = duplicates.slice(1);
+
+                console.log(`   Primary issue: #${primaryIssue.number}`);
+                console.log(`   Duplicates to close: ${duplicatesToClose.map(i => `#${i.number}`).join(', ')}`);
+
+                // Close duplicate issues
+                for (const duplicate of duplicatesToClose) {
+                  try {
+                    await github.rest.issues.update({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: duplicate.number,
+                      state: 'closed',
+                      state_reason: 'not_planned'
+                    });
+
+                    // Add comment explaining why it was closed
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: duplicate.number,
+                      body: '🤖 This issue was automatically closed because it is a duplicate. The primary cache issue is #' + primaryIssue.number + '.\n\nThis can happen when multiple workflow runs execute simultaneously.'
+                    });
+
+                    console.log(`   ✓ Closed duplicate issue #${duplicate.number}`);
+                  } catch (closeError) {
+                    console.error(`   ✗ Failed to close duplicate issue #${duplicate.number}:`, closeError.message);
+                  }
+                }
+
+                // Use the primary (oldest) issue
+                issueNumber = primaryIssue.number;
+                console.log(`✅ Using primary issue #${issueNumber}`);
+              } else {
+                console.log('✓ No duplicates found');
+              }
 
               // Lock the issue to prevent unwanted comments
               try {

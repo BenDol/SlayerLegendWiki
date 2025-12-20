@@ -1,0 +1,247 @@
+name: Delete Closed Issues (Permanent)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "PERMANENTLY DELETE" to confirm permanent deletion'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (list issues without deleting)'
+        required: false
+        type: boolean
+        default: true
+      exclude_labels:
+        description: 'Comma-separated labels to exclude (e.g., "wiki-comments,keep")'
+        required: false
+        type: string
+        default: 'wiki-comments'
+      older_than_days:
+        description: 'Only delete issues closed more than X days ago (0 = all)'
+        required: false
+        type: number
+        default: 0
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  delete-closed-issues:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if user is repository owner
+        if: github.actor != github.repository_owner
+        run: |
+          echo "❌ Access denied. Only the repository owner can execute this workflow."
+          echo "   Actor: ${{ github.actor }}"
+          echo "   Owner: ${{ github.repository_owner }}"
+          exit 1
+
+      - name: Validate confirmation
+        if: github.event.inputs.confirm != 'PERMANENTLY DELETE'
+        run: |
+          echo "❌ Deletion not confirmed. You must type 'PERMANENTLY DELETE' to proceed."
+          exit 1
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Delete closed issues permanently
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const isDryRun = ${{ github.event.inputs.dry_run }};
+            const excludeLabelsInput = '${{ github.event.inputs.exclude_labels }}';
+            const excludeLabels = excludeLabelsInput ? excludeLabelsInput.split(',').map(l => l.trim()) : [];
+            const olderThanDays = ${{ github.event.inputs.older_than_days }};
+
+            console.log('🔍 Starting closed issues permanent deletion...');
+            console.log(`📋 Mode: ${isDryRun ? 'DRY RUN (no deletions)' : '⚠️  PERMANENT DELETION'}`);
+            if (excludeLabels.length > 0) {
+              console.log(`🏷️  Excluding issues with labels: ${excludeLabels.join(', ')}`);
+            }
+            if (olderThanDays > 0) {
+              console.log(`📅 Only deleting issues closed more than ${olderThanDays} days ago`);
+            }
+            console.log('---');
+
+            // Calculate cutoff date if specified
+            let cutoffDate = null;
+            if (olderThanDays > 0) {
+              cutoffDate = new Date();
+              cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
+              console.log(`📅 Cutoff date: ${cutoffDate.toISOString()}`);
+            }
+
+            let page = 1;
+            let hasMore = true;
+            let totalFound = 0;
+            let totalDeleted = 0;
+            let totalSkipped = 0;
+            const skippedReasons = {
+              pullRequest: 0,
+              excludedLabel: 0,
+              tooRecent: 0,
+              error: 0
+            };
+
+            while (hasMore) {
+              console.log(`📄 Fetching page ${page}...`);
+
+              // Fetch closed issues (100 per page, GitHub's max)
+              const { data: issues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed',
+                per_page: 100,
+                page: page
+              });
+
+              if (issues.length === 0) {
+                hasMore = false;
+                break;
+              }
+
+              console.log(`   Found ${issues.length} closed issues on page ${page}`);
+              totalFound += issues.length;
+
+              for (const issue of issues) {
+                // Skip pull requests
+                if (issue.pull_request) {
+                  totalSkipped++;
+                  skippedReasons.pullRequest++;
+                  continue;
+                }
+
+                // Check if issue has any excluded labels
+                const issueLabels = issue.labels.map(l => l.name);
+                const hasExcludedLabel = excludeLabels.some(excludeLabel =>
+                  issueLabels.includes(excludeLabel)
+                );
+
+                if (hasExcludedLabel) {
+                  console.log(`   ⏭️  Skipping #${issue.number} (excluded label: ${issueLabels.filter(l => excludeLabels.includes(l)).join(', ')})`);
+                  totalSkipped++;
+                  skippedReasons.excludedLabel++;
+                  continue;
+                }
+
+                // Check if issue was closed recently
+                if (cutoffDate && issue.closed_at) {
+                  const closedDate = new Date(issue.closed_at);
+                  if (closedDate > cutoffDate) {
+                    console.log(`   ⏭️  Skipping #${issue.number} (closed too recently: ${issue.closed_at})`);
+                    totalSkipped++;
+                    skippedReasons.tooRecent++;
+                    continue;
+                  }
+                }
+
+                if (isDryRun) {
+                  console.log(`   🔍 Would permanently delete #${issue.number}: ${issue.title}`);
+                  totalDeleted++;
+                } else {
+                  try {
+                    // Use GraphQL API to permanently delete the issue
+                    // Note: This requires admin permissions and will permanently remove the issue
+                    const mutation = `
+                      mutation($issueId: ID!) {
+                        deleteIssue(input: {issueId: $issueId}) {
+                          clientMutationId
+                        }
+                      }
+                    `;
+
+                    await github.graphql(mutation, {
+                      issueId: issue.node_id
+                    });
+
+                    console.log(`   ✅ Permanently deleted #${issue.number}: ${issue.title}`);
+                    totalDeleted++;
+
+                    // Rate limiting: wait 200ms between deletions
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                  } catch (error) {
+                    console.log(`   ❌ Failed to delete #${issue.number}: ${error.message}`);
+
+                    // Check if error is due to insufficient permissions
+                    if (error.message.includes('was submitted too quickly') || error.message.includes('secondary rate limit')) {
+                      console.log(`   ⏸️  Rate limited, waiting 10 seconds...`);
+                      await new Promise(resolve => setTimeout(resolve, 10000));
+
+                      // Retry once
+                      try {
+                        await github.graphql(mutation, {
+                          issueId: issue.node_id
+                        });
+                        console.log(`   ✅ Permanently deleted #${issue.number} (retry succeeded)`);
+                        totalDeleted++;
+                      } catch (retryError) {
+                        console.log(`   ❌ Retry failed for #${issue.number}: ${retryError.message}`);
+                        totalSkipped++;
+                        skippedReasons.error++;
+                      }
+                    } else {
+                      totalSkipped++;
+                      skippedReasons.error++;
+                    }
+                  }
+                }
+              }
+
+              page++;
+
+              // Add delay between pages
+              if (hasMore && !isDryRun) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+              }
+            }
+
+            // Summary
+            console.log('---');
+            console.log('📊 Summary:');
+            console.log(`   Total closed issues found: ${totalFound}`);
+            console.log(`   ${isDryRun ? 'Would permanently delete' : 'Permanently deleted'}: ${totalDeleted}`);
+            console.log(`   Skipped: ${totalSkipped}`);
+            if (skippedReasons.pullRequest > 0) {
+              console.log(`      - Pull requests: ${skippedReasons.pullRequest}`);
+            }
+            if (skippedReasons.excludedLabel > 0) {
+              console.log(`      - Excluded labels: ${skippedReasons.excludedLabel}`);
+            }
+            if (skippedReasons.tooRecent > 0) {
+              console.log(`      - Too recently closed: ${skippedReasons.tooRecent}`);
+            }
+            if (skippedReasons.error > 0) {
+              console.log(`      - Errors: ${skippedReasons.error}`);
+            }
+
+            if (!isDryRun && totalDeleted > 0) {
+              console.log('');
+              console.log('⚠️  WARNING: These issues have been PERMANENTLY deleted and cannot be recovered!');
+            }
+            console.log('✅ Done!');
+
+            // Create job summary
+            await core.summary
+              .addHeading(isDryRun ? '🔍 Dry Run Summary' : '⚠️  Permanent Deletion Summary')
+              .addRaw(isDryRun ? '' : '**WARNING: Issues have been permanently deleted and cannot be recovered!**\n\n')
+              .addTable([
+                [{data: 'Metric', header: true}, {data: 'Count', header: true}],
+                ['Total closed issues found', totalFound.toString()],
+                [isDryRun ? 'Would delete' : '⚠️ DELETED', totalDeleted.toString()],
+                ['Skipped (Pull Requests)', skippedReasons.pullRequest.toString()],
+                ['Skipped (Excluded Labels)', skippedReasons.excludedLabel.toString()],
+                ['Skipped (Too Recent)', skippedReasons.tooRecent.toString()],
+                ['Skipped (Errors)', skippedReasons.error.toString()]
+              ])
+              .write();

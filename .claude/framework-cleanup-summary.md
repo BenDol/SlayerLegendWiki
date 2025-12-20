@@ -34,9 +34,9 @@ This document tracks all instances where game-specific data was removed from the
 **Before:** Hardcoded build types and routes:
 ```javascript
 const routes = {
-  'battle-loadout': '/battle-loadouts',
-  'skill-build': '/skill-builder',
-  'spirit-build': '/spirit-builder',
+  'battle-loadouts': '/battle-loadouts',
+  'skill-builds': '/skill-builder',
+  'spirit-builds': '/spirit-builder',
   'soul-weapon-engraving': '/soul-weapon-engraving-builder',
 };
 ```
@@ -68,9 +68,9 @@ All game-specific data now registered in one place:
 // Build types for build sharing
 import { registerBuildTypes } from './wiki-framework/src/utils/buildTypeRegistry.js';
 registerBuildTypes({
-  'skill-build': '/skill-builder',
-  'spirit-build': '/spirit-builder',
-  'battle-loadout': '/battle-loadouts',
+  'skill-builds': '/skill-builder',
+  'spirit-builds': '/spirit-builder',
+  'battle-loadouts': '/battle-loadouts',
   'soul-weapon-engraving': '/soul-weapon-engraving',
 });
 
@@ -127,3 +127,4 @@ The wiki-framework can now be used by any wiki project by simply registering the
 4. Custom components/renderers (already supported via registries)
 
 No framework code needs to be modified for different wiki topics!
+

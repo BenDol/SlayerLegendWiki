@@ -21,20 +21,19 @@ export const gameMigrations = [
   },
   {
     name: 'soulWeapon_highestUnlocked',
-    matcher: (key) => key === 'soulWeapon_highestUnlocked',
+    matcher: (key) => key === 'soulWeapon_highestUnlocked' || key === 'soul_weapon_highest',
     migrator: (key) => {
-      // This needs user context, we'll use 'anonymous' as fallback
-      // In actual usage, this should be migrated with proper user context
-      return 'cache:anonymous:soul_weapon_highest';
+      // This is global (not user-specific) configuration
+      return 'config:soul_weapon_highest';
     },
   },
 
-  // Builder draft keys (Skill Builder, Spirit Builder, Battle Loadouts)
+  // Builder draft keys (Skill Builder, Spirit Builder, Battle Loadouts, Soul Weapon Engraving)
   {
-    name: 'draft keys (skillBuilder, spiritBuilder, battleLoadouts)',
-    matcher: (key) => /^(skillBuilder|spiritBuilder|battleLoadouts)_draft_(.+)$/.test(key),
+    name: 'draft keys (old format: builderName_draft_userId)',
+    matcher: (key) => /^(skillBuilder|spiritBuilder|battleLoadouts|soulWeaponEngraving)_draft_(.+)$/.test(key),
     migrator: (key) => {
-      const match = key.match(/^(skillBuilder|spiritBuilder|battleLoadouts)_draft_(.+)$/);
+      const match = key.match(/^(skillBuilder|spiritBuilder|battleLoadouts|soulWeaponEngraving)_draft_(.+)$/);
       if (!match) return key;
 
       const [, builder, userId] = match;
@@ -42,22 +41,45 @@ export const gameMigrations = [
         .replace(/([A-Z])/g, '_$1')
         .toLowerCase()
         .replace(/^_/, '');
-      return `cache:${userId}:${builderName}_draft`;
+      return `cache:${userId}:draft:${builderName}`;
+    },
+  },
+  {
+    name: 'draft keys (current format: cache:userId:name_draft)',
+    matcher: (key) => /^cache:(.+?):(skill_builder|spirit_builder|battle_loadouts|soul_weapon_engraving)_draft$/.test(key),
+    migrator: (key) => {
+      const match = key.match(/^cache:(.+?):(skill_builder|spirit_builder|battle_loadouts|soul_weapon_engraving)_draft$/);
+      if (!match) return key;
+
+      const [, userId, cacheName] = match;
+      return `cache:${userId}:draft:${cacheName}`;
     },
   },
 
-  // Build cache keys (skill-builds, battle-loadouts)
+  // Build cache keys (skill-builds, battle-loadouts, spirit-builds, my-spirits)
   {
-    name: 'build cache keys (skill-builds, battle-loadouts)',
-    matcher: (key) => /^(skill-builds|battle-loadouts):(.+)$/.test(key),
+    name: 'build cache keys (skill-builds, battle-loadouts, spirit-builds, my-spirits)',
+    matcher: (key) => /^(skill-builds|battle-loadouts|spirit-builds|my-spirits):(.+)$/.test(key),
     migrator: (key) => {
-      const match = key.match(/^(skill-builds|battle-loadouts):(.+)$/);
+      const match = key.match(/^(skill-builds|battle-loadouts|spirit-builds|my-spirits):(.+)$/);
       if (!match) return key;
 
       const [, type, userId] = match;
       const cacheName = type.replace(/-/g, '_');
       return `cache:${userId}:${cacheName}`;
     },
+  },
+
+  // Spirit sprite cache keys
+  {
+    name: 'spirit sprite animation cache',
+    matcher: (key) => key === 'spiritSprite_animationCache',
+    migrator: (key) => 'cache:spirit_sprite_animation',
+  },
+  {
+    name: 'spirit sprite image meta cache',
+    matcher: (key) => key === 'spiritSprite_imageCacheMeta',
+    migrator: (key) => 'cache:spirit_sprite_image_meta',
   },
 ];
 

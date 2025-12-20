@@ -8,13 +8,21 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 /**
  * Cache structure:
  * {
- *   'skill-builds:userId': {
+ *   'cache:userId:skill_builds': {
  *     timestamp: number,
  *     builds: array
  *   },
- *   'battle-loadouts:userId': {
+ *   'cache:userId:battle_loadouts': {
  *     timestamp: number,
  *     loadouts: array
+ *   },
+ *   'cache:userId:spirit_builds': {
+ *     timestamp: number,
+ *     builds: array
+ *   },
+ *   'cache:userId:my_spirits': {
+ *     timestamp: number,
+ *     spirits: array
  *   }
  * }
  */
@@ -23,7 +31,9 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
  * Get cache key for user builds/loadouts
  */
 const getCacheKey = (type, userId) => {
-  return `${type}:${userId}`;
+  // Ensure type uses underscores (handles legacy kebab-case if any exists)
+  const cacheName = type.replace(/-/g, '_');
+  return `cache:${userId}:${cacheName}`;
 };
 
 /**
@@ -94,7 +104,10 @@ export const clearAllCaches = () => {
   try {
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
-      if (key.includes('skill-builds:') || key.includes('battle-loadouts:')) {
+      if (key.includes(':skill_builds') ||
+          key.includes(':battle_loadouts') ||
+          key.includes(':spirit_builds') ||
+          key.includes(':my_spirits')) {
         localStorage.removeItem(key);
       }
     });

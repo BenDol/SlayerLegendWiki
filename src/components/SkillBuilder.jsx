@@ -3,12 +3,14 @@ import { Share2, Download, Upload, Settings, Trash2, Copy, Check, Save, Loader, 
 import SkillSlot from './SkillSlot';
 import SkillSelector from './SkillSelector';
 import SavedBuildsPanel from './SavedBuildsPanel';
+import ValidatedInput from './ValidatedInput';
 import { encodeBuild, decodeBuild } from '../../wiki-framework/src/components/wiki/BuildEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
 import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
 import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
+import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 
 /**
  * SkillBuilder Component
@@ -85,7 +87,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
           const buildData = await loadSharedBuild(owner, repo, shareChecksum);
 
-          if (buildData.type === 'skill-build') {
+          if (buildData.type === 'skill-builds') {
             const deserializedBuild = deserializeBuild(buildData.data, skills);
             setBuildName(buildData.data.name || '');
             setMaxSlots(buildData.data.maxSlots || 10);
@@ -168,12 +170,12 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
    * Serialize build for URL encoding (skill objects -> skill IDs only)
    * This makes URLs resilient to skill data changes
    */
-  const serializeBuild = (build) => {
+  const serializeBuild = (buildToSerialize) => {
     return {
-      name: buildName,
-      maxSlots,
-      slots: build.slots.map(slot => ({
-        skillId: slot.skill?.id || null,
+      name: buildToSerialize.name || buildName,
+      maxSlots: buildToSerialize.maxSlots || maxSlots,
+      slots: buildToSerialize.slots.map(slot => ({
+        skillId: slot.skillId !== undefined ? slot.skillId : (slot.skill?.id || null),
         level: slot.level
       }))
     };
@@ -224,19 +226,18 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     if (savedBuild.name !== buildName) return false;
     if (savedBuild.maxSlots !== maxSlots) return false;
 
-    // Check if all slots match
-    for (let i = 0; i < maxSlots; i++) {
-      const currentSlot = build.slots[i];
-      const savedSlot = savedBuild.slots[i];
+    // Serialize both for consistent comparison (handles both serialized and deserialized formats)
+    const currentSerialized = serializeBuild({ ...build, name: buildName, maxSlots });
+    const savedSerialized = serializeBuild(savedBuild);
 
-      // Both empty
-      if (!currentSlot?.skill && !savedSlot?.skill) continue;
+    // Compare serialized slots
+    if (currentSerialized.slots.length !== savedSerialized.slots.length) return false;
 
-      // One empty, one not
-      if (!currentSlot?.skill || !savedSlot?.skill) return false;
+    for (let i = 0; i < currentSerialized.slots.length; i++) {
+      const currentSlot = currentSerialized.slots[i];
+      const savedSlot = savedSerialized.slots[i];
 
-      // Check skill ID and level
-      if (currentSlot.skill.id !== savedSlot.skill?.id) return false;
+      if (currentSlot.skillId !== savedSlot.skillId) return false;
       if (currentSlot.level !== savedSlot.level) return false;
     }
 
@@ -364,21 +365,21 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       const repo = config.wiki.repository.repo;
 
       // Serialize build to only include skill IDs
-      const serializedBuild = serializeBuild(build);
+      const serializedBuild = serializeBuild({ ...build, name: buildName, maxSlots });
       const buildData = {
-        name: buildName,
-        maxSlots,
+        name: serializedBuild.name,
+        maxSlots: serializedBuild.maxSlots,
         slots: serializedBuild.slots
       };
 
       // Save build and get checksum
-      const checksum = await saveSharedBuild(owner, repo, 'skill-build', buildData);
+      const checksum = await saveSharedBuild(owner, repo, 'skill-builds', buildData);
 
       console.log('[SkillBuilder] Generated checksum:', checksum);
 
       // Generate share URL
       const baseURL = window.location.origin + window.location.pathname;
-      const shareURL = generateShareUrl(baseURL, 'skill-build', checksum);
+      const shareURL = generateShareUrl(baseURL, 'skill-builds', checksum);
 
       await navigator.clipboard.writeText(shareURL);
 
@@ -393,7 +394,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       // Fallback to old method if share service fails
       try {
         console.log('[SkillBuilder] Falling back to old encoding method...');
-        const serializedBuild = serializeBuild(build);
+        const serializedBuild = serializeBuild({ ...build, name: buildName, maxSlots });
         const encoded = encodeBuild(serializedBuild);
         if (encoded) {
           const baseURL = window.location.origin + window.location.pathname;
@@ -523,10 +524,12 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     setSaveSuccess(false);
 
     try {
+      // Serialize build to only store IDs (reduces storage and is resilient to data changes)
+      const serializedBuild = serializeBuild({ ...build, name: buildName, maxSlots });
       const buildData = {
-        name: buildName,
-        maxSlots,
-        slots: build.slots,
+        name: serializedBuild.name,
+        maxSlots: serializedBuild.maxSlots,
+        slots: serializedBuild.slots, // Only store { skillId, level }
       };
 
       const response = await fetch(getSaveDataEndpoint(), {
@@ -535,7 +538,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'skill-build',
+          type: 'skill-builds',
           username: user.login,
           userId: user.id,
           data: buildData,
@@ -550,11 +553,18 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       const data = await response.json();
       const sortedBuilds = data.builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       setSavedBuilds(sortedBuilds);
+
+      // Find the saved build ID (it's the one with the matching name)
+      const savedBuild = sortedBuilds.find(b => b.name === buildName);
+      if (savedBuild) {
+        setCurrentLoadedBuildId(savedBuild.id);
+      }
+
       setSaveSuccess(true);
       setHasUnsavedChanges(false); // Clear unsaved changes after successful save
 
       // Cache the updated builds
-      setCache('skill-builds', user.id, sortedBuilds);
+      setCache('skill_builds', user.id, sortedBuilds);
 
       // Clear localStorage draft after successful save
       clearDraft();
@@ -607,7 +617,10 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     build.slots.forEach(slot => {
       if (slot.skill) {
         const attr = slot.skill.attribute;
-        distribution[attr] = (distribution[attr] || 0) + 1;
+        // Only count skills with valid element types (exclude null, undefined, or empty string)
+        if (attr && attr !== '') {
+          distribution[attr] = (distribution[attr] || 0) + 1;
+        }
       }
     });
     return distribution;
@@ -646,6 +659,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           currentLoadedBuildId={currentLoadedBuildId}
           onBuildsChange={setSavedBuilds}
           defaultExpanded={!isModal}
+          externalBuilds={savedBuilds}
         />
       </div>
 
@@ -654,17 +668,21 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         {/* Build Name Panel - Controlled by allowSavingBuilds */}
         {allowSavingBuilds && (
           <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Build Name:</label>
-              <input
-                type="text"
-                value={buildName}
-                onChange={(e) => {
-                  setBuildName(e.target.value);
-                }}
-                className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-                placeholder="Enter build name..."
-              />
+            <div className="flex flex-col sm:flex-row sm:items-start gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap pt-2">Build Name:</label>
+              <div className="flex-1">
+                <ValidatedInput
+                  value={buildName}
+                  onChange={(e) => setBuildName(e.target.value)}
+                  validator={validateBuildName}
+                  placeholder="Enter build name..."
+                  maxLength={STRING_LIMITS.BUILD_NAME_MAX}
+                  required={isAuthenticated}
+                  showCounter={true}
+                  validateOnBlur={false}
+                  className="w-full"
+                />
+              </div>
               {isAuthenticated && (
                 <button
                   onClick={saveBuild}
@@ -910,3 +928,6 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 SkillBuilder.displayName = 'SkillBuilder';
 
 export default SkillBuilder;
+
+
+

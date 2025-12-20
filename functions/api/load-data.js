@@ -4,11 +4,17 @@
  *
  * GET /api/load-data?type=TYPE&userId=USER_ID
  * Query Params:
- *   type: 'skill-build' | 'battle-loadout' | 'my-spirit' | 'spirit-build'
+ *   type: 'skill-builds' | 'battle-loadouts' | 'my-spirits' | 'spirit-builds'
  *   userId: number
  */
 
-import { Octokit } from '@octokit/rest';
+import StorageFactory from '../../../wiki-framework/src/services/storage/StorageFactory.js';
+import {
+  DATA_TYPE_CONFIGS,
+  createErrorResponse,
+  createSuccessResponse,
+} from './_lib/utils.js';
+import wikiConfig from '../../../wiki-config.json' with { type: 'json' };
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -42,7 +48,7 @@ export async function onRequest(context) {
     }
 
     // Validate type
-    const validTypes = ['skill-build', 'battle-loadout', 'my-spirit', 'spirit-build'];
+    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds'];
     if (!validTypes.includes(type)) {
       return new Response(
         JSON.stringify({ error: `Invalid type. Must be one of: ${validTypes.join(', ')}` }),
@@ -52,6 +58,9 @@ export async function onRequest(context) {
         }
       );
     }
+
+    // Get configuration
+    const config = DATA_TYPE_CONFIGS[type];
 
     // Get bot token from environment
     const botToken = env.WIKI_BOT_TOKEN;
@@ -65,9 +74,6 @@ export async function onRequest(context) {
         }
       );
     }
-
-    // Initialize Octokit with bot token
-    const octokit = new Octokit({ auth: botToken });
 
     // Get repo info from environment
     const owner = env.WIKI_REPO_OWNER || env.VITE_WIKI_REPO_OWNER;
@@ -84,67 +90,25 @@ export async function onRequest(context) {
       );
     }
 
-    // Set type-specific constants
-    const configs = {
-      'skill-build': {
-        label: 'skill-builds',
-        itemsName: 'builds',
-      },
-      'battle-loadout': {
-        label: 'battle-loadouts',
-        itemsName: 'loadouts',
-      },
-      'my-spirit': {
-        label: 'my-spirits',
-        itemsName: 'spirits',
-      },
-      'spirit-build': {
-        label: 'spirit-builds',
-        itemsName: 'builds',
-      },
+    // Create storage adapter
+    const storageConfig = wikiConfig.storage || {
+      backend: 'github',
+      version: 'v1',
+      github: { owner, repo },
     };
-    const config = configs[type];
 
-    // Get existing items
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: config.label,
-      state: 'open',
-      per_page: 100,
-    });
-
-    // Search by user ID label
-    const existingIssue = issues.find(issue =>
-      issue.labels.some(label =>
-        (typeof label === 'string' && label === `user-id:${userId}`) ||
-        (typeof label === 'object' && label.name === `user-id:${userId}`)
-      )
+    const storage = StorageFactory.create(
+      storageConfig,
+      {
+        WIKI_BOT_TOKEN: botToken,
+        SLAYER_WIKI_DATA: env.SLAYER_WIKI_DATA, // KV namespace binding
+      }
     );
 
-    // Parse existing items
-    let items = [];
-    if (existingIssue) {
-      // Security: Verify issue was created by bot account
-      const botUsername = env.WIKI_BOT_USERNAME;
-      if (existingIssue.user.login !== botUsername) {
-        console.warn(`[load-data] Security: Issue #${existingIssue.number} created by ${existingIssue.user.login}, expected ${botUsername}`);
-        return new Response(
-          JSON.stringify({ error: 'Invalid data source' }),
-          {
-            status: 403,
-            headers: { 'Content-Type': 'application/json' }
-          }
-        );
-      }
-      try {
-        items = JSON.parse(existingIssue.body || '[]');
-        if (!Array.isArray(items)) items = [];
-      } catch (e) {
-        console.error('[load-data] Failed to parse issue body:', e);
-        items = [];
-      }
-    }
+    // Load items
+    const items = await storage.load(type, userId);
+
+    console.log(`[load-data] Loaded ${items.length} ${config.itemsName} for user ${userId}`);
 
     // Return response with dynamic key names
     const response = {
@@ -159,6 +123,7 @@ export async function onRequest(context) {
         headers: { 'Content-Type': 'application/json' }
       }
     );
+
   } catch (error) {
     console.error('[load-data] Error:', error);
     return new Response(

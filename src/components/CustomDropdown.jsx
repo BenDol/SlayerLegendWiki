@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Loader } from 'lucide-react';
 
 /**
  * CustomDropdown Component
@@ -22,12 +23,30 @@ const CustomDropdown = ({
   className = ''
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [loadingImages, setLoadingImages] = useState(new Set());
   const dropdownRef = useRef(null);
   const menuRef = useRef(null);
 
   // Find the selected option (handle null/undefined values)
   // Use override if provided, otherwise find in options
   const selectedOption = selectedOptionOverride || (value != null ? options.find(opt => opt.value === value) : null);
+
+  // Mark all images as loading when dropdown opens or options change
+  useEffect(() => {
+    if (isOpen) {
+      const imageSrcs = new Set(options.filter(opt => opt.image).map(opt => opt.image));
+      setLoadingImages(imageSrcs);
+    }
+  }, [isOpen, options]);
+
+  // Handle image load complete
+  const handleImageLoad = (imageSrc) => {
+    setLoadingImages(prev => {
+      const next = new Set(prev);
+      next.delete(imageSrc);
+      return next;
+    });
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -89,11 +108,14 @@ const CustomDropdown = ({
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {selectedOption?.image && (
-            <img
-              src={selectedOption.image}
-              alt=""
-              className="w-6 h-6 flex-shrink-0 object-contain"
-            />
+            <div className="relative w-6 h-6 flex-shrink-0">
+              <img
+                src={selectedOption.image}
+                alt=""
+                className="w-full h-full object-contain"
+                onLoad={() => handleImageLoad(selectedOption.image)}
+              />
+            </div>
           )}
           <span className="truncate text-sm md:text-base">
             {selectedOption ? selectedOption.label : placeholder}
@@ -138,11 +160,20 @@ const CustomDropdown = ({
               }`}
             >
               {option.image && (
-                <img
-                  src={option.image}
-                  alt=""
-                  className="w-6 h-6 md:w-6 md:h-6 flex-shrink-0 object-contain"
-                />
+                <div className="relative w-6 h-6 md:w-6 md:h-6 flex-shrink-0">
+                  {loadingImages.has(option.image) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded">
+                      <Loader className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  )}
+                  <img
+                    src={option.image}
+                    alt=""
+                    className="w-full h-full object-contain"
+                    onLoad={() => handleImageLoad(option.image)}
+                    style={{ opacity: loadingImages.has(option.image) ? 0 : 1 }}
+                  />
+                </div>
               )}
               <div className="flex-1 min-w-0">
                 <div className="font-medium truncate text-sm md:text-base">{option.label}</div>

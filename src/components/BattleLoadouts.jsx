@@ -6,12 +6,15 @@ import SkillInformation from './SkillInformation';
 import SpiritBuilderModal from './SpiritBuilderModal';
 import SpiritComponent from './SpiritComponent';
 import SavedLoadoutsPanel from './SavedLoadoutsPanel';
+import ValidatedInput from './ValidatedInput';
 import { encodeLoadout, decodeLoadout } from '../../wiki-framework/src/utils/battleLoadoutEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
 import { saveBuild, loadBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
 import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
+import { serializeBuild, deserializeBuild } from '../utils/spiritSerialization';
+import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 
 /**
  * BattleLoadouts Component
@@ -32,6 +35,7 @@ const BattleLoadouts = () => {
   const [loadoutName, setLoadoutName] = useState('');
   const [currentLoadout, setCurrentLoadout] = useState(createEmptyLoadout(''));
   const [skills, setSkills] = useState([]);
+  const [spirits, setSpirits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSkillBuilder, setShowSkillBuilder] = useState(false);
   const [showSpiritBuilder, setShowSpiritBuilder] = useState(false);
@@ -59,14 +63,17 @@ const BattleLoadouts = () => {
     { loadoutName, currentLoadout }
   );
 
-  // Load skills data
+  // Load skills and spirits data
   useEffect(() => {
-    loadSkills();
+    const loadData = async () => {
+      await Promise.all([loadSkills(), loadSpirits()]);
+    };
+    loadData();
   }, []);
 
   // Load loadout from URL
   useEffect(() => {
-    if (skills.length === 0) return; // Wait for skills to load
+    if (skills.length === 0 || spirits.length === 0) return; // Wait for skills and spirits to load
 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
     const shareChecksum = urlParams.get('share');
@@ -87,11 +94,12 @@ const BattleLoadouts = () => {
 
           const buildData = await loadBuild(owner, repo, shareChecksum);
 
-          if (buildData.type === 'battle-loadout') {
-            // Deserialize skill build
+          if (buildData.type === 'battle-loadouts') {
+            // Deserialize skill build and spirit build
             const deserializedLoadout = {
               ...buildData.data,
-              skillBuild: buildData.data.skillBuild ? deserializeSkillBuild(buildData.data.skillBuild, skills) : null
+              skillBuild: buildData.data.skillBuild ? deserializeSkillBuild(buildData.data.skillBuild, skills) : null,
+              spiritBuild: buildData.data.spiritBuild ? deserializeSpiritBuild(buildData.data.spiritBuild, spirits) : null
             };
             setCurrentLoadout(deserializedLoadout);
             setLoadoutName(deserializedLoadout.name || '');
@@ -115,10 +123,11 @@ const BattleLoadouts = () => {
       try {
         const decodedLoadout = decodeLoadout(encodedLoadout);
         if (decodedLoadout) {
-          // Deserialize skill build
+          // Deserialize skill build and spirit build
           const deserializedLoadout = {
             ...decodedLoadout,
-            skillBuild: decodedLoadout.skillBuild ? deserializeSkillBuild(decodedLoadout.skillBuild, skills) : null
+            skillBuild: decodedLoadout.skillBuild ? deserializeSkillBuild(decodedLoadout.skillBuild, skills) : null,
+            spiritBuild: decodedLoadout.spiritBuild ? deserializeSpiritBuild(decodedLoadout.spiritBuild, spirits) : null
           };
           setCurrentLoadout(deserializedLoadout);
           setLoadoutName(deserializedLoadout.name || '');
@@ -134,16 +143,17 @@ const BattleLoadouts = () => {
       if (draft) {
         setLoadoutName(draft.loadoutName || '');
 
-        // Deserialize loadout to ensure skill objects are current
+        // Deserialize loadout to ensure skill and spirit objects are current
         const deserializedLoadout = {
           ...draft.currentLoadout,
-          skillBuild: draft.currentLoadout.skillBuild ? deserializeSkillBuild(draft.currentLoadout.skillBuild, skills) : null
+          skillBuild: draft.currentLoadout.skillBuild ? deserializeSkillBuild(draft.currentLoadout.skillBuild, skills) : null,
+          spiritBuild: draft.currentLoadout.spiritBuild ? deserializeSpiritBuild(draft.currentLoadout.spiritBuild, spirits) : null
         };
         setCurrentLoadout(deserializedLoadout);
         setHasUnsavedChanges(true);
       }
     }
-  }, [skills, loadDraft]);
+  }, [skills, spirits, loadDraft]);
 
   const loadSkills = async () => {
     try {
@@ -154,6 +164,16 @@ const BattleLoadouts = () => {
       console.error('Failed to load skills:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadSpirits = async () => {
+    try {
+      const response = await fetch('/data/spirit-characters.json');
+      const data = await response.json();
+      setSpirits(data.spirits);
+    } catch (error) {
+      console.error('Failed to load spirits:', error);
     }
   };
 
@@ -195,9 +215,42 @@ const BattleLoadouts = () => {
       name: build.name,
       maxSlots: build.maxSlots,
       slots: build.slots.map(slot => ({
-        skillId: slot.skill?.id || null,
+        skillId: slot.skillId !== undefined ? slot.skillId : (slot.skill?.id || null),
         level: slot.level
       }))
+    };
+  };
+
+  /**
+   * Serialize spirit build for storage (spirit objects -> spirit IDs)
+   * Uses shared serialization utility
+   */
+  const serializeSpiritBuild = (build) => {
+    if (!build) return null;
+    return serializeBuild(build);
+  };
+
+  /**
+   * Deserialize spirit build (spirit IDs -> full spirit objects)
+   * Uses shared deserialization utility
+   */
+  const deserializeSpiritBuild = (build, spiritsArray) => {
+    if (!build) return null;
+    return deserializeBuild(build, spiritsArray);
+  };
+
+  /**
+   * Serialize entire loadout for storage (only store IDs)
+   */
+  const serializeLoadout = (loadout) => {
+    return {
+      name: loadout.name,
+      skillBuild: serializeSkillBuild(loadout.skillBuild),
+      spiritBuild: serializeSpiritBuild(loadout.spiritBuild),
+      spirit: loadout.spirit ? { spiritId: loadout.spirit.id } : null,
+      skillStone: loadout.skillStone, // Assuming this is already simple data
+      promotionAbility: loadout.promotionAbility, // Assuming this is already simple data
+      familiar: loadout.familiar // Assuming this is already simple data
     };
   };
 
@@ -208,13 +261,15 @@ const BattleLoadouts = () => {
     if (!savedLoadout) return false;
     if (savedLoadout.name !== loadoutName) return false;
 
-    // Compare skill build
+    // Compare skill build (serialize both for consistent comparison)
     const currentSkillBuild = serializeSkillBuild(currentLoadout.skillBuild);
     const savedSkillBuild = serializeSkillBuild(savedLoadout.skillBuild);
     if (JSON.stringify(currentSkillBuild) !== JSON.stringify(savedSkillBuild)) return false;
 
-    // Compare spirit build (basic comparison)
-    if (JSON.stringify(currentLoadout.spiritBuild) !== JSON.stringify(savedLoadout.spiritBuild)) return false;
+    // Compare spirit build (serialize both for consistent comparison)
+    const currentSpiritBuild = serializeSpiritBuild(currentLoadout.spiritBuild);
+    const savedSpiritBuild = serializeSpiritBuild(savedLoadout.spiritBuild);
+    if (JSON.stringify(currentSpiritBuild) !== JSON.stringify(savedSpiritBuild)) return false;
 
     // Compare other properties
     if (JSON.stringify(currentLoadout.spirit) !== JSON.stringify(savedLoadout.spirit)) return false;
@@ -407,10 +462,11 @@ const BattleLoadouts = () => {
       if (!confirmed) return;
     }
 
-    // Deserialize the skill build if it exists
+    // Deserialize the skill build and spirit build if they exist
     const deserializedLoadout = {
       ...loadout,
-      skillBuild: loadout.skillBuild ? deserializeSkillBuild(loadout.skillBuild, skills) : null
+      skillBuild: loadout.skillBuild ? deserializeSkillBuild(loadout.skillBuild, skills) : null,
+      spiritBuild: loadout.spiritBuild ? deserializeSpiritBuild(loadout.spiritBuild, spirits) : null
     };
 
     setCurrentLoadout(deserializedLoadout);
@@ -428,15 +484,8 @@ const BattleLoadouts = () => {
     setSaveSuccess(false);
 
     try {
-      const loadoutData = {
-        name: currentLoadout.name,
-        skillBuild: currentLoadout.skillBuild,
-        spiritBuild: currentLoadout.spiritBuild,
-        spirit: currentLoadout.spirit,
-        skillStone: currentLoadout.skillStone,
-        promotionAbility: currentLoadout.promotionAbility,
-        familiar: currentLoadout.familiar,
-      };
+      // Serialize loadout to only store IDs (reduces storage and is resilient to data changes)
+      const loadoutData = serializeLoadout(currentLoadout);
 
       const response = await fetch(getSaveDataEndpoint(), {
         method: 'POST',
@@ -444,7 +493,7 @@ const BattleLoadouts = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'battle-loadout',
+          type: 'battle-loadouts',
           username: user.login,
           userId: user.id,
           data: loadoutData,
@@ -460,7 +509,13 @@ const BattleLoadouts = () => {
 
       // Cache the updated loadouts
       if (data.loadouts) {
-        setCache('battle-loadouts', user.id, data.loadouts);
+        setCache('battle_loadouts', user.id, data.loadouts);
+      }
+
+      // Find the saved loadout ID (it's the one with the matching name)
+      const savedLoadout = data.loadouts?.find(l => l.name === loadoutName);
+      if (savedLoadout) {
+        setCurrentLoadedLoadoutId(savedLoadout.id);
       }
 
       setSaveSuccess(true);
@@ -512,18 +567,15 @@ const BattleLoadouts = () => {
       const owner = config.wiki.repository.owner;
       const repo = config.wiki.repository.repo;
 
-      // Serialize the loadout
-      const serializedLoadout = {
-        ...currentLoadout,
-        skillBuild: serializeSkillBuild(currentLoadout.skillBuild)
-      };
+      // Serialize the loadout (only store IDs)
+      const serializedLoadout = serializeLoadout(currentLoadout);
 
       // Save build and get checksum
-      const checksum = await saveBuild(owner, repo, 'battle-loadout', serializedLoadout);
+      const checksum = await saveBuild(owner, repo, 'battle-loadouts', serializedLoadout);
 
       // Generate share URL
       const baseURL = window.location.origin + window.location.pathname;
-      const shareURL = generateShareUrl(baseURL, 'battle-loadout', checksum);
+      const shareURL = generateShareUrl(baseURL, 'battle-loadouts', checksum);
 
       console.log('[BattleLoadouts] ✓ Share URL generated:', shareURL);
 
@@ -538,10 +590,7 @@ const BattleLoadouts = () => {
 
       // Fallback to old method if share service fails
       try {
-        const serializedLoadout = {
-          ...currentLoadout,
-          skillBuild: serializeSkillBuild(currentLoadout.skillBuild)
-        };
+        const serializedLoadout = serializeLoadout(currentLoadout);
 
         const encoded = encodeLoadout(serializedLoadout);
         if (encoded) {
@@ -606,10 +655,11 @@ const BattleLoadouts = () => {
       try {
         const data = JSON.parse(e.target.result);
 
-        // Deserialize skill build
+        // Deserialize skill build and spirit build
         const deserializedLoadout = {
           ...data,
-          skillBuild: data.skillBuild ? deserializeSkillBuild(data.skillBuild, skills) : null
+          skillBuild: data.skillBuild ? deserializeSkillBuild(data.skillBuild, skills) : null,
+          spiritBuild: data.spiritBuild ? deserializeSpiritBuild(data.spiritBuild, spirits) : null
         };
 
         setCurrentLoadout(deserializedLoadout);
@@ -666,20 +716,26 @@ const BattleLoadouts = () => {
           onLoadLoadout={handleLoadLoadout}
           currentLoadedLoadoutId={currentLoadedLoadoutId}
           onLoadoutsChange={setSavedLoadouts}
+          externalLoadouts={savedLoadouts}
         />
 
         {/* Loadout Name Panel */}
         <div className={`bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm transition-all ${highlightNameField ? 'ring-4 ring-red-500 ring-opacity-50' : ''}`}>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Loadout Name:</label>
-            <input
-              ref={loadoutNameInputRef}
-              type="text"
-              value={loadoutName}
-              onChange={(e) => setLoadoutName(e.target.value)}
-              className={`flex-1 px-3 py-2 bg-white dark:bg-gray-800 border rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all ${highlightNameField ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
-              placeholder="Enter loadout name..."
-            />
+          <div className="flex flex-col sm:flex-row sm:items-start gap-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap pt-2">Loadout Name:</label>
+            <div className="flex-1">
+              <ValidatedInput
+                value={loadoutName}
+                onChange={(e) => setLoadoutName(e.target.value)}
+                validator={validateBuildName}
+                placeholder="Enter loadout name..."
+                maxLength={STRING_LIMITS.BUILD_NAME_MAX}
+                required={isAuthenticated}
+                showCounter={true}
+                validateOnBlur={false}
+                className="w-full"
+              />
+            </div>
           </div>
         </div>
 
@@ -1140,3 +1196,6 @@ function createEmptyLoadout(name) {
 }
 
 export default BattleLoadouts;
+
+
+

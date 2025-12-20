@@ -45,13 +45,53 @@ export default createWikiConfigSync({
     // SPA fallback: Always serve index.html for client-side routing
     historyApiFallback: true,
     watch: {
-      // Exclude images from file watching to improve startup performance
+      // Exclude images and other static files from file watching
       // With 12,000+ images, watching them adds significant overhead
-      // Images are static assets that don't need hot module replacement
       ignored: [
         '**/public/images/**',
         '**/external/**',
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/.git/**',
       ],
+    },
+    // Improve HMR performance
+    hmr: {
+      overlay: true,
+    },
+  },
+
+  // Optimize dependency pre-bundling
+  optimizeDeps: {
+    exclude: [
+      // Exclude framework from pre-bundling to avoid conflicts
+      'wiki-framework',
+    ],
+    include: [
+      // Pre-bundle common dependencies
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'zustand',
+    ],
+  },
+
+  // Build optimizations
+  build: {
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // Manual chunking for better caching
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+          if (id.includes('wiki-framework')) {
+            return 'framework';
+          }
+        },
+      },
     },
   },
 });

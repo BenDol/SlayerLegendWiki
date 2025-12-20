@@ -1,0 +1,261 @@
+name: Delete Closed Pull Requests (Permanent)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "PERMANENTLY DELETE" to confirm permanent deletion'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (list PRs without deleting)'
+        required: false
+        type: boolean
+        default: true
+      state_filter:
+        description: 'Filter by state (closed, merged, or all)'
+        required: false
+        type: choice
+        options:
+          - closed
+          - merged
+          - all
+        default: 'closed'
+      older_than_days:
+        description: 'Only delete PRs closed more than X days ago (0 = all)'
+        required: false
+        type: number
+        default: 30
+      exclude_authors:
+        description: 'Comma-separated usernames to exclude (e.g., "dependabot,renovate")'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  delete-closed-prs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if user is repository owner
+        if: github.actor != github.repository_owner
+        run: |
+          echo "❌ Access denied. Only the repository owner can execute this workflow."
+          echo "   Actor: ${{ github.actor }}"
+          echo "   Owner: ${{ github.repository_owner }}"
+          exit 1
+
+      - name: Validate confirmation
+        if: github.event.inputs.confirm != 'PERMANENTLY DELETE'
+        run: |
+          echo "❌ Deletion not confirmed. You must type 'PERMANENTLY DELETE' to proceed."
+          exit 1
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Delete closed pull requests permanently
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const isDryRun = ${{ github.event.inputs.dry_run }};
+            const stateFilter = '${{ github.event.inputs.state_filter }}';
+            const excludeAuthorsInput = '${{ github.event.inputs.exclude_authors }}';
+            const excludeAuthors = excludeAuthorsInput ? excludeAuthorsInput.split(',').map(a => a.trim()) : [];
+            const olderThanDays = ${{ github.event.inputs.older_than_days }};
+
+            console.log('🔍 Starting closed pull requests permanent deletion...');
+            console.log(`📋 Mode: ${isDryRun ? 'DRY RUN (no deletions)' : '⚠️  PERMANENT DELETION'}`);
+            console.log(`🎯 Filter: ${stateFilter === 'all' ? 'all closed PRs' : stateFilter === 'merged' ? 'merged only' : 'closed (not merged) only'}`);
+            if (excludeAuthors.length > 0) {
+              console.log(`👤 Excluding PRs by: ${excludeAuthors.join(', ')}`);
+            }
+            if (olderThanDays > 0) {
+              console.log(`📅 Only deleting PRs closed more than ${olderThanDays} days ago`);
+            }
+            console.log('---');
+
+            // Calculate cutoff date if specified
+            let cutoffDate = null;
+            if (olderThanDays > 0) {
+              cutoffDate = new Date();
+              cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
+              console.log(`📅 Cutoff date: ${cutoffDate.toISOString()}`);
+            }
+
+            let page = 1;
+            let hasMore = true;
+            let totalFound = 0;
+            let totalDeleted = 0;
+            let totalSkipped = 0;
+            const skippedReasons = {
+              wrongState: 0,
+              excludedAuthor: 0,
+              tooRecent: 0,
+              error: 0
+            };
+
+            while (hasMore) {
+              console.log(`📄 Fetching page ${page}...`);
+
+              // Fetch closed pull requests (100 per page, GitHub's max)
+              const { data: pullRequests } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed',
+                per_page: 100,
+                page: page,
+                sort: 'updated',
+                direction: 'desc'
+              });
+
+              if (pullRequests.length === 0) {
+                hasMore = false;
+                break;
+              }
+
+              console.log(`   Found ${pullRequests.length} closed PRs on page ${page}`);
+              totalFound += pullRequests.length;
+
+              for (const pr of pullRequests) {
+                // Filter by state (merged vs not merged)
+                const isMerged = pr.merged_at !== null;
+                if (stateFilter === 'merged' && !isMerged) {
+                  totalSkipped++;
+                  skippedReasons.wrongState++;
+                  continue;
+                } else if (stateFilter === 'closed' && isMerged) {
+                  totalSkipped++;
+                  skippedReasons.wrongState++;
+                  continue;
+                }
+
+                // Check if PR author is excluded
+                const author = pr.user?.login || '';
+                if (excludeAuthors.includes(author)) {
+                  console.log(`   ⏭️  Skipping #${pr.number} (excluded author: ${author})`);
+                  totalSkipped++;
+                  skippedReasons.excludedAuthor++;
+                  continue;
+                }
+
+                // Check if PR was closed recently
+                if (cutoffDate && pr.closed_at) {
+                  const closedDate = new Date(pr.closed_at);
+                  if (closedDate > cutoffDate) {
+                    totalSkipped++;
+                    skippedReasons.tooRecent++;
+                    continue;
+                  }
+                }
+
+                const statusLabel = isMerged ? '(merged)' : '(closed)';
+
+                if (isDryRun) {
+                  console.log(`   🔍 Would permanently delete #${pr.number} ${statusLabel}: ${pr.title}`);
+                  totalDeleted++;
+                } else {
+                  try {
+                    // Use GraphQL API to permanently delete the pull request
+                    const mutation = `
+                      mutation($pullRequestId: ID!) {
+                        deletePullRequest(input: {pullRequestId: $pullRequestId}) {
+                          clientMutationId
+                        }
+                      }
+                    `;
+
+                    await github.graphql(mutation, {
+                      pullRequestId: pr.node_id
+                    });
+
+                    console.log(`   ✅ Permanently deleted #${pr.number} ${statusLabel}: ${pr.title}`);
+                    totalDeleted++;
+
+                    // Rate limiting: wait 200ms between deletions
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                  } catch (error) {
+                    console.log(`   ❌ Failed to delete #${pr.number}: ${error.message}`);
+
+                    // Check if error is due to rate limiting
+                    if (error.message.includes('was submitted too quickly') || error.message.includes('secondary rate limit')) {
+                      console.log(`   ⏸️  Rate limited, waiting 10 seconds...`);
+                      await new Promise(resolve => setTimeout(resolve, 10000));
+
+                      // Retry once
+                      try {
+                        await github.graphql(mutation, {
+                          pullRequestId: pr.node_id
+                        });
+                        console.log(`   ✅ Permanently deleted #${pr.number} (retry succeeded)`);
+                        totalDeleted++;
+                      } catch (retryError) {
+                        console.log(`   ❌ Retry failed for #${pr.number}: ${retryError.message}`);
+                        totalSkipped++;
+                        skippedReasons.error++;
+                      }
+                    } else {
+                      totalSkipped++;
+                      skippedReasons.error++;
+                    }
+                  }
+                }
+              }
+
+              page++;
+
+              // Add delay between pages
+              if (hasMore && !isDryRun) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+              }
+            }
+
+            // Summary
+            console.log('---');
+            console.log('📊 Summary:');
+            console.log(`   Total closed PRs found: ${totalFound}`);
+            console.log(`   ${isDryRun ? 'Would permanently delete' : 'Permanently deleted'}: ${totalDeleted}`);
+            console.log(`   Skipped: ${totalSkipped}`);
+            if (skippedReasons.wrongState > 0) {
+              console.log(`      - Wrong state (filtered): ${skippedReasons.wrongState}`);
+            }
+            if (skippedReasons.excludedAuthor > 0) {
+              console.log(`      - Excluded authors: ${skippedReasons.excludedAuthor}`);
+            }
+            if (skippedReasons.tooRecent > 0) {
+              console.log(`      - Too recently closed: ${skippedReasons.tooRecent}`);
+            }
+            if (skippedReasons.error > 0) {
+              console.log(`      - Errors: ${skippedReasons.error}`);
+            }
+
+            if (!isDryRun && totalDeleted > 0) {
+              console.log('');
+              console.log('⚠️  WARNING: These PRs have been PERMANENTLY deleted and cannot be recovered!');
+            }
+            console.log('✅ Done!');
+
+            // Create job summary
+            await core.summary
+              .addHeading(isDryRun ? '🔍 Dry Run Summary' : '⚠️  Permanent Deletion Summary')
+              .addRaw(isDryRun ? '' : '**WARNING: Pull requests have been permanently deleted and cannot be recovered!**\n\n')
+              .addTable([
+                [{data: 'Metric', header: true}, {data: 'Count', header: true}],
+                ['Total closed PRs found', totalFound.toString()],
+                [isDryRun ? 'Would delete' : '⚠️ DELETED', totalDeleted.toString()],
+                ['Skipped (Wrong State)', skippedReasons.wrongState.toString()],
+                ['Skipped (Excluded Authors)', skippedReasons.excludedAuthor.toString()],
+                ['Skipped (Too Recent)', skippedReasons.tooRecent.toString()],
+                ['Skipped (Errors)', skippedReasons.error.toString()]
+              ])
+              .write();

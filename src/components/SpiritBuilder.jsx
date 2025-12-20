@@ -4,12 +4,15 @@ import SpiritSlot from './SpiritSlot';
 import SpiritSelector from './SpiritSelector';
 import SavedSpiritBuildsPanel from './SavedSpiritBuildsPanel';
 import SavedSpiritsGallery from './SavedSpiritsGallery';
+import ValidatedInput from './ValidatedInput';
 import { encodeBuild, decodeBuild } from '../../wiki-framework/src/components/wiki/BuildEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
 import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
 import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
+import { serializeBuild, deserializeBuild } from '../utils/spiritSerialization';
+import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 
 /**
  * SpiritBuilder Component
@@ -48,7 +51,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [draggedSlotIndex, setDraggedSlotIndex] = useState(null);
   const [currentLoadedBuildId, setCurrentLoadedBuildId] = useState(null);
-  const [savedBuilds, setSavedBuilds] = useState([]);
+  const [savedBuilds, setSavedBuilds] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(null);
@@ -91,7 +94,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
           const buildData = await loadSharedBuild(owner, repo, shareChecksum);
 
-          if (buildData.type === 'spirit-build') {
+          if (buildData.type === 'spirit-builds') {
             const deserializedBuild = deserializeBuild(buildData.data, spirits);
             setBuildName(buildData.data.name || '');
             setBuild({ slots: deserializedBuild.slots });
@@ -166,63 +169,13 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
   };
 
   /**
-   * Serialize build for URL encoding (spirit objects -> spirit IDs only)
+   * Wrapper for serializeBuild that includes build name
    */
-  const serializeBuild = (build) => {
+  const serializeBuildWithName = (buildToSerialize) => {
+    const serialized = serializeBuild(buildToSerialize);
     return {
-      name: buildName,
-      slots: build.slots.map(slot => ({
-        spiritId: slot.spirit?.id || null,
-        level: slot.level,
-        awakeningLevel: slot.awakeningLevel,
-        evolutionLevel: slot.evolutionLevel,
-        skillEnhancementLevel: slot.skillEnhancementLevel
-      }))
-    };
-  };
-
-  /**
-   * Deserialize build after decoding (spirit IDs -> full spirit objects)
-   */
-  const deserializeBuild = (serializedBuild, spiritsArray) => {
-    return {
-      slots: serializedBuild.slots.map(slot => {
-        // Handle new format (spiritId)
-        if (slot.spiritId !== undefined) {
-          const spirit = spiritsArray.find(s => s.id === slot.spiritId);
-          return {
-            spirit: spirit || null,
-            level: slot.level || 1,
-            awakeningLevel: slot.awakeningLevel || 0,
-            evolutionLevel: slot.evolutionLevel || 4,
-            skillEnhancementLevel: slot.skillEnhancementLevel || 0
-          };
-        }
-        // Handle old format (full spirit object) for backward compatibility
-        else if (slot.spirit) {
-          let spirit = spiritsArray.find(s => s.id === slot.spirit.id);
-          if (!spirit) {
-            spirit = spiritsArray.find(s => s.name === slot.spirit.name);
-          }
-          return {
-            spirit: spirit || slot.spirit,
-            level: slot.level || 1,
-            awakeningLevel: slot.awakeningLevel || 0,
-            evolutionLevel: slot.evolutionLevel || 4,
-            skillEnhancementLevel: slot.skillEnhancementLevel || 0
-          };
-        }
-        // Empty slot
-        else {
-          return {
-            spirit: null,
-            level: 1,
-            awakeningLevel: 0,
-            evolutionLevel: 4,
-            skillEnhancementLevel: 0
-          };
-        }
-      })
+      ...serialized,
+      name: buildToSerialize.name || buildName,
     };
   };
 
@@ -230,30 +183,60 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
    * Compare current build with a saved build to check if they match
    */
   const buildsMatch = (savedBuild) => {
-    if (!savedBuild) return false;
-
-    // Check name
-    if (savedBuild.name !== buildName) return false;
-
-    // Check if all slots match
-    for (let i = 0; i < 3; i++) {
-      const currentSlot = build.slots[i];
-      const savedSlot = savedBuild.slots[i];
-
-      // Both empty
-      if (!currentSlot?.spirit && !savedSlot?.spirit) continue;
-
-      // One empty, one not
-      if (!currentSlot?.spirit || !savedSlot?.spirit) return false;
-
-      // Check spirit ID and levels
-      if (currentSlot.spirit.id !== savedSlot.spirit?.id) return false;
-      if (currentSlot.level !== savedSlot.level) return false;
-      if (currentSlot.awakeningLevel !== savedSlot.awakeningLevel) return false;
-      if (currentSlot.evolutionLevel !== savedSlot.evolutionLevel) return false;
-      if (currentSlot.skillEnhancementLevel !== savedSlot.skillEnhancementLevel) return false;
+    if (!savedBuild) {
+      console.log('[SpiritBuilder] buildsMatch: savedBuild is null/undefined');
+      return false;
     }
 
+    // Check name
+    if (savedBuild.name !== buildName) {
+      console.log('[SpiritBuilder] buildsMatch: name mismatch', { savedName: savedBuild.name, currentName: buildName });
+      return false;
+    }
+
+    // Serialize both for consistent comparison (handles both serialized and deserialized formats)
+    const currentSerialized = serializeBuildWithName(build);
+    const savedSerialized = serializeBuildWithName(savedBuild);
+
+    console.log('[SpiritBuilder] buildsMatch: comparing builds', {
+      savedBuildId: savedBuild.id,
+      currentSlots: currentSerialized.slots,
+      savedSlots: savedSerialized.slots
+    });
+
+    // Compare serialized slots
+    if (currentSerialized.slots.length !== savedSerialized.slots.length) {
+      console.log('[SpiritBuilder] buildsMatch: slot length mismatch');
+      return false;
+    }
+
+    for (let i = 0; i < currentSerialized.slots.length; i++) {
+      const currentSlot = currentSerialized.slots[i];
+      const savedSlot = savedSerialized.slots[i];
+
+      if (currentSlot.spiritId !== savedSlot.spiritId) {
+        console.log(`[SpiritBuilder] buildsMatch: slot ${i} spiritId mismatch`, { current: currentSlot.spiritId, saved: savedSlot.spiritId });
+        return false;
+      }
+      if (currentSlot.level !== savedSlot.level) {
+        console.log(`[SpiritBuilder] buildsMatch: slot ${i} level mismatch`, { current: currentSlot.level, saved: savedSlot.level });
+        return false;
+      }
+      if (currentSlot.awakeningLevel !== savedSlot.awakeningLevel) {
+        console.log(`[SpiritBuilder] buildsMatch: slot ${i} awakeningLevel mismatch`, { current: currentSlot.awakeningLevel, saved: savedSlot.awakeningLevel });
+        return false;
+      }
+      if (currentSlot.evolutionLevel !== savedSlot.evolutionLevel) {
+        console.log(`[SpiritBuilder] buildsMatch: slot ${i} evolutionLevel mismatch`, { current: currentSlot.evolutionLevel, saved: savedSlot.evolutionLevel });
+        return false;
+      }
+      if (currentSlot.skillEnhancementLevel !== savedSlot.skillEnhancementLevel) {
+        console.log(`[SpiritBuilder] buildsMatch: slot ${i} skillEnhancementLevel mismatch`, { current: currentSlot.skillEnhancementLevel, saved: savedSlot.skillEnhancementLevel });
+        return false;
+      }
+    }
+
+    console.log('[SpiritBuilder] buildsMatch: MATCH FOUND for build', savedBuild.id);
     return true;
   };
 
@@ -261,9 +244,17 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
    * Check if current build matches any saved build and update highlighting
    */
   useEffect(() => {
+    console.log('[SpiritBuilder] useEffect: checking for build match', {
+      buildName,
+      hasUnsavedChanges,
+      savedBuildsCount: savedBuilds?.length || 0,
+      currentLoadedBuildId
+    });
+
     const hasContent = buildName.trim() !== '' || build.slots.some(slot => slot.spirit !== null);
 
-    if (!isAuthenticated || savedBuilds.length === 0) {
+    if (!isAuthenticated || !savedBuilds || savedBuilds.length === 0) {
+      console.log('[SpiritBuilder] useEffect: early return - no saved builds or not authenticated');
       if (currentLoadedBuildId !== null) {
         setCurrentLoadedBuildId(null);
       }
@@ -276,11 +267,14 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     }
 
     // Find matching build
+    console.log('[SpiritBuilder] useEffect: searching for matching build among', savedBuilds.length, 'builds');
     const matchingBuild = savedBuilds.find(savedBuild => buildsMatch(savedBuild));
 
     if (matchingBuild) {
+      console.log('[SpiritBuilder] useEffect: MATCH FOUND - setting currentLoadedBuildId to', matchingBuild.id);
       setCurrentLoadedBuildId(matchingBuild.id);
     } else {
+      console.log('[SpiritBuilder] useEffect: NO MATCH - setting currentLoadedBuildId to null');
       setCurrentLoadedBuildId(null);
       if (hasContent && !hasUnsavedChanges) {
         setHasUnsavedChanges(true);
@@ -487,13 +481,13 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       };
 
       // Save build and get checksum
-      const checksum = await saveSharedBuild(owner, repo, 'spirit-build', buildData);
+      const checksum = await saveSharedBuild(owner, repo, 'spirit-builds', buildData);
 
       console.log('[SpiritBuilder] Generated checksum:', checksum);
 
       // Generate share URL
       const baseURL = window.location.origin + window.location.pathname;
-      const shareURL = generateShareUrl(baseURL, 'spirit-build', checksum);
+      const shareURL = generateShareUrl(baseURL, 'spirit-builds', checksum);
 
       await navigator.clipboard.writeText(shareURL);
 
@@ -634,9 +628,11 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     setSaveSuccess(false);
 
     try {
+      // Serialize build to only store IDs (reduces storage and is resilient to data changes)
+      const serializedBuild = serializeBuildWithName(build);
       const buildData = {
-        name: buildName,
-        slots: build.slots,
+        name: serializedBuild.name,
+        slots: serializedBuild.slots, // Only store { spiritId, level, awakeningLevel, etc. }
       };
 
       const response = await fetch(getSaveDataEndpoint(), {
@@ -645,7 +641,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'spirit-build',
+          type: 'spirit-builds',
           username: user.login,
           userId: user.id,
           data: buildData,
@@ -659,12 +655,25 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
       const data = await response.json();
       const sortedBuilds = data.builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      console.log('[SpiritBuilder] After save - sortedBuilds:', sortedBuilds);
+      console.log('[SpiritBuilder] Current buildName:', buildName);
+
       setSavedBuilds(sortedBuilds);
       setSaveSuccess(true);
       setHasUnsavedChanges(false);
 
+      // Find the saved build ID (it's the one with the matching name)
+      const savedBuild = sortedBuilds.find(b => b.name === buildName);
+      console.log('[SpiritBuilder] Found saved build:', savedBuild);
+      if (savedBuild) {
+        console.log('[SpiritBuilder] Setting currentLoadedBuildId to:', savedBuild.id);
+        setCurrentLoadedBuildId(savedBuild.id);
+      } else {
+        console.warn('[SpiritBuilder] Could not find saved build with name:', buildName);
+      }
+
       // Cache the updated builds
-      setCache('spirit-builds', user.id, sortedBuilds);
+      setCache('spirit_builds', user.id, sortedBuilds);
 
       // Clear localStorage draft after successful save
       clearDraft();
@@ -725,6 +734,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           onBuildsChange={setSavedBuilds}
           currentLoadedBuildId={currentLoadedBuildId}
           defaultExpanded={!isModal}
+          savedBuilds={savedBuilds}
         />
       </div>
 
@@ -733,17 +743,21 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
         {/* Build Name Panel */}
         {allowSavingBuilds && (
           <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Build Name:</label>
-              <input
-                type="text"
-                value={buildName}
-                onChange={(e) => {
-                  setBuildName(e.target.value);
-                }}
-                className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-                placeholder="Enter build name..."
-              />
+            <div className="flex flex-col sm:flex-row sm:items-start gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap pt-2">Build Name:</label>
+              <div className="flex-1">
+                <ValidatedInput
+                  value={buildName}
+                  onChange={(e) => setBuildName(e.target.value)}
+                  validator={validateBuildName}
+                  placeholder="Enter build name..."
+                  maxLength={STRING_LIMITS.BUILD_NAME_MAX}
+                  required={isAuthenticated}
+                  showCounter={true}
+                  validateOnBlur={false}
+                  className="w-full"
+                />
+              </div>
               {isAuthenticated && (
                 <button
                   onClick={saveBuild}
@@ -950,3 +964,6 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 SpiritBuilder.displayName = 'SpiritBuilder';
 
 export default SpiritBuilder;
+
+
+

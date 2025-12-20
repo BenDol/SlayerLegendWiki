@@ -4,23 +4,38 @@
  *
  * POST /.netlify/functions/delete-data
  * Body: {
- *   type: 'skill-build' | 'battle-loadout' | 'my-spirit' | 'spirit-build',
+ *   type: 'skill-builds' | 'battle-loadouts' | 'my-spirits' | 'spirit-builds',
  *   username: string,
  *   userId: number,
- *   itemId: string (for skill-build/battle-loadout/spirit-build),
- *   spiritId: string (for my-spirit)
+ *   itemId: string (for skill-builds/battle-loadouts/spirit-builds),
+ *   spiritId: string (for my-spirits)
  * }
  */
 
-import { Octokit } from '@octokit/rest';
+import StorageFactory from '../../wiki-framework/src/services/storage/StorageFactory.js';
+import {
+  DATA_TYPE_CONFIGS,
+  createErrorResponse,
+  createSuccessResponse,
+} from './shared/utils.js';
+import {
+  validateUsername,
+  validateUserId,
+  validateItemId,
+} from './shared/validation.js';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Lazy-load config to avoid Vite HMR issues
+// Use process.cwd() to get project root (works in both dev and production)
+function getWikiConfig() {
+  return JSON.parse(readFileSync(join(process.cwd(), 'wiki-config.json'), 'utf-8'));
+}
 
 export async function handler(event) {
   // Only allow POST
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+    return createErrorResponse(405, 'Method not allowed');
   }
 
   try {
@@ -28,170 +43,88 @@ export async function handler(event) {
     const { type, username, userId, itemId, spiritId } = JSON.parse(event.body);
 
     // Validate required fields
-    const deleteId = type === 'my-spirit' ? spiritId : itemId;
+    const deleteId = type === 'my-spirits' ? spiritId : itemId;
     if (!type || !username || !userId || !deleteId) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: `Missing required fields: type, username, userId, ${type === 'my-spirit' ? 'spiritId' : 'itemId'}` }),
-      };
+      return createErrorResponse(
+        400,
+        `Missing required fields: type, username, userId, ${type === 'my-spirits' ? 'spiritId' : 'itemId'}`
+      );
     }
 
     // Validate type
-    const validTypes = ['skill-build', 'battle-loadout', 'my-spirit', 'spirit-build'];
+    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds'];
     if (!validTypes.includes(type)) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: `Invalid type. Must be one of: ${validTypes.join(', ')}` }),
-      };
+      return createErrorResponse(400, `Invalid type. Must be one of: ${validTypes.join(', ')}`);
     }
+
+    // Validate username
+    const usernameResult = validateUsername(username);
+    if (!usernameResult.valid) {
+      return createErrorResponse(400, usernameResult.error);
+    }
+
+    // Validate userId
+    const userIdResult = validateUserId(userId);
+    if (!userIdResult.valid) {
+      return createErrorResponse(400, userIdResult.error);
+    }
+
+    // Validate deleteId (itemId or spiritId)
+    const idFieldName = type === 'my-spirits' ? 'Spirit ID' : 'Item ID';
+    const deleteIdResult = validateItemId(deleteId, idFieldName);
+    if (!deleteIdResult.valid) {
+      return createErrorResponse(400, deleteIdResult.error);
+    }
+
+    // Get configuration
+    const config = DATA_TYPE_CONFIGS[type];
 
     // Get bot token from environment
     const botToken = process.env.WIKI_BOT_TOKEN;
     if (!botToken) {
       console.error('[delete-data] WIKI_BOT_TOKEN not configured');
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Server configuration error' }),
-      };
+      return createErrorResponse(500, 'Server configuration error');
     }
 
-    // Initialize Octokit with bot token
-    const octokit = new Octokit({ auth: botToken });
-
     // Get repo info from environment
-    // Try both VITE_ prefixed (for local dev) and non-prefixed (for Netlify)
     const owner = process.env.WIKI_REPO_OWNER || process.env.VITE_WIKI_REPO_OWNER;
     const repo = process.env.WIKI_REPO_NAME || process.env.VITE_WIKI_REPO_NAME;
 
     if (!owner || !repo) {
       console.error('[delete-data] Repository config missing');
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Server configuration error' }),
-      };
+      return createErrorResponse(500, 'Server configuration error');
     }
 
-    // Set type-specific constants
-    const configs = {
-      'skill-build': {
-        label: 'skill-builds',
-        titlePrefix: '[Skill Builds]',
-        itemsName: 'builds',
-      },
-      'battle-loadout': {
-        label: 'battle-loadouts',
-        titlePrefix: '[Battle Loadouts]',
-        itemsName: 'loadouts',
-      },
-      'my-spirit': {
-        label: 'my-spirits',
-        titlePrefix: '[My Spirits]',
-        itemsName: 'spirits',
-      },
-      'spirit-build': {
-        label: 'spirit-builds',
-        titlePrefix: '[Spirit Builds]',
-        itemsName: 'builds',
-      },
+    // Create storage adapter
+    const wikiConfig = getWikiConfig();
+    const storageConfig = wikiConfig.storage || {
+      backend: 'github',
+      version: 'v1',
+      github: { owner, repo },
     };
-    const config = configs[type];
 
-    // Get existing items
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: config.label,
-      state: 'open',
-      per_page: 100,
-    });
-
-    // Find user's issue
-    const existingIssue = issues.find(issue =>
-      issue.labels.some(label =>
-        (typeof label === 'string' && label === `user-id:${userId}`) ||
-        (typeof label === 'object' && label.name === `user-id:${userId}`)
-      )
+    const storage = StorageFactory.create(
+      storageConfig,
+      { WIKI_BOT_TOKEN: botToken }
     );
 
-    if (!existingIssue) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: 'No items found for this user' }),
-      };
-    }
+    // Delete the item
+    const remainingItems = await storage.delete(type, username, userId, deleteId);
 
-    // Security: Verify issue was created by bot account
-    const botUsername = process.env.WIKI_BOT_USERNAME;
-    if (existingIssue.user.login !== botUsername) {
-      console.warn(`[delete-data] Security: Issue #${existingIssue.number} created by ${existingIssue.user.login}, expected ${botUsername}`);
-      return {
-        statusCode: 403,
-        body: JSON.stringify({ error: 'Invalid data source' }),
-      };
-    }
-
-    // Parse existing items
-    let items = [];
-    try {
-      items = JSON.parse(existingIssue.body || '[]');
-      if (!Array.isArray(items)) items = [];
-    } catch (e) {
-      items = [];
-    }
-
-    // Find and remove the item
-    const itemIndex = items.findIndex(item => item.id === deleteId);
-
-    if (itemIndex === -1) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: 'Item not found' }),
-      };
-    }
-
-    // Remove the item
-    items.splice(itemIndex, 1);
-
-    // Update or close the issue
-    if (items.length === 0) {
-      // Close the issue if no items left
-      await octokit.rest.issues.update({
-        owner,
-        repo,
-        issue_number: existingIssue.number,
-        state: 'closed',
-      });
-
-      console.log(`[delete-data] Closed empty ${config.itemsName} issue for ${username}`);
-    } else {
-      // Update the issue with remaining items
-      const issueBody = JSON.stringify(items, null, 2);
-
-      await octokit.rest.issues.update({
-        owner,
-        repo,
-        issue_number: existingIssue.number,
-        body: issueBody,
-      });
-
-      console.log(`[delete-data] Updated ${config.itemsName} for ${username}`);
-    }
+    console.log(`[delete-data] Deleted item ${deleteId} for ${username}, ${remainingItems.length} items remaining`);
 
     // Return response with dynamic key name
     const response = {
       success: true,
     };
-    response[config.itemsName] = items;
+    response[config.itemsName] = remainingItems;
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(response),
-    };
+    return createSuccessResponse(response);
+
   } catch (error) {
     console.error('[delete-data] Error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message || 'Internal server error' }),
-    };
+    return createErrorResponse(500, error.message || 'Internal server error');
   }
 }
+
+

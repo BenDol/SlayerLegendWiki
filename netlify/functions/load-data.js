@@ -4,19 +4,29 @@
  *
  * GET /.netlify/functions/load-data?type=TYPE&userId=USER_ID
  * Query Params:
- *   type: 'skill-build' | 'battle-loadout' | 'my-spirit' | 'spirit-build'
+ *   type: 'skill-builds' | 'battle-loadouts' | 'my-spirits' | 'spirit-builds'
  *   userId: number
  */
 
-import { Octokit } from '@octokit/rest';
+import StorageFactory from '../../wiki-framework/src/services/storage/StorageFactory.js';
+import {
+  DATA_TYPE_CONFIGS,
+  createErrorResponse,
+  createSuccessResponse,
+} from './shared/utils.js';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Lazy-load config to avoid Vite HMR issues
+// Use process.cwd() to get project root (works in both dev and production)
+function getWikiConfig() {
+  return JSON.parse(readFileSync(join(process.cwd(), 'wiki-config.json'), 'utf-8'));
+}
 
 export async function handler(event) {
   // Only allow GET
   if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+    return createErrorResponse(405, 'Method not allowed');
   }
 
   try {
@@ -26,33 +36,24 @@ export async function handler(event) {
 
     // Validate required fields
     if (!type || !userId) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Missing required parameters: type, userId' }),
-      };
+      return createErrorResponse(400, 'Missing required parameters: type, userId');
     }
 
     // Validate type
-    const validTypes = ['skill-build', 'battle-loadout', 'my-spirit', 'spirit-build'];
+    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds'];
     if (!validTypes.includes(type)) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: `Invalid type. Must be one of: ${validTypes.join(', ')}` }),
-      };
+      return createErrorResponse(400, `Invalid type. Must be one of: ${validTypes.join(', ')}`);
     }
+
+    // Get configuration
+    const config = DATA_TYPE_CONFIGS[type];
 
     // Get bot token from environment
     const botToken = process.env.WIKI_BOT_TOKEN;
     if (!botToken) {
       console.error('[load-data] WIKI_BOT_TOKEN not configured');
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Server configuration error' }),
-      };
+      return createErrorResponse(500, 'Server configuration error');
     }
-
-    // Initialize Octokit with bot token
-    const octokit = new Octokit({ auth: botToken });
 
     // Get repo info from environment
     const owner = process.env.WIKI_REPO_OWNER || process.env.VITE_WIKI_REPO_OWNER;
@@ -60,71 +61,26 @@ export async function handler(event) {
 
     if (!owner || !repo) {
       console.error('[load-data] Repository config missing');
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Server configuration error' }),
-      };
+      return createErrorResponse(500, 'Server configuration error');
     }
 
-    // Set type-specific constants
-    const configs = {
-      'skill-build': {
-        label: 'skill-builds',
-        itemsName: 'builds',
-      },
-      'battle-loadout': {
-        label: 'battle-loadouts',
-        itemsName: 'loadouts',
-      },
-      'my-spirit': {
-        label: 'my-spirits',
-        itemsName: 'spirits',
-      },
-      'spirit-build': {
-        label: 'spirit-builds',
-        itemsName: 'builds',
-      },
+    // Create storage adapter
+    const wikiConfig = getWikiConfig();
+    const storageConfig = wikiConfig.storage || {
+      backend: 'github',
+      version: 'v1',
+      github: { owner, repo },
     };
-    const config = configs[type];
 
-    // Get existing items
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: config.label,
-      state: 'open',
-      per_page: 100,
-    });
-
-    // Search by user ID label
-    const existingIssue = issues.find(issue =>
-      issue.labels.some(label =>
-        (typeof label === 'string' && label === `user-id:${userId}`) ||
-        (typeof label === 'object' && label.name === `user-id:${userId}`)
-      )
+    const storage = StorageFactory.create(
+      storageConfig,
+      { WIKI_BOT_TOKEN: botToken }
     );
 
-    // Parse existing items
-    let items = [];
-    if (existingIssue) {
-      // Security: Verify issue was created by bot account
-      const botUsername = process.env.WIKI_BOT_USERNAME;
-      if (existingIssue.user.login !== botUsername) {
-        console.warn(`[load-data] Security: Issue #${existingIssue.number} created by ${existingIssue.user.login}, expected ${botUsername}`);
-        return {
-          statusCode: 403,
-          body: JSON.stringify({ error: 'Invalid data source' }),
-        };
-      }
+    // Load items
+    const items = await storage.load(type, userId);
 
-      try {
-        items = JSON.parse(existingIssue.body || '[]');
-        if (!Array.isArray(items)) items = [];
-      } catch (e) {
-        console.error('[load-data] Failed to parse issue body:', e);
-        items = [];
-      }
-    }
+    console.log(`[load-data] Loaded ${items.length} ${config.itemsName} for user ${userId}`);
 
     // Return response with dynamic key names
     const response = {
@@ -132,15 +88,11 @@ export async function handler(event) {
     };
     response[config.itemsName] = items;
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(response),
-    };
+    return createSuccessResponse(response);
+
   } catch (error) {
     console.error('[load-data] Error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message || 'Internal server error' }),
-    };
+    return createErrorResponse(500, error.message || 'Internal server error');
   }
 }
+

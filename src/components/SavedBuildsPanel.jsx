@@ -18,16 +18,19 @@ import { getSaveDataEndpoint, getDeleteDataEndpoint } from '../utils/apiEndpoint
  * - Delete builds
  * - Mobile-friendly UI
  */
-const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allowSavingBuilds = true, currentLoadedBuildId = null, onBuildsChange = null, defaultExpanded = true }) => {
+const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allowSavingBuilds = true, currentLoadedBuildId = null, onBuildsChange = null, defaultExpanded = true, externalBuilds = null }) => {
   const { isAuthenticated, user } = useAuthStore();
   const { config } = useWikiConfig();
   const loginFlow = useLoginFlow();
-  const [savedBuilds, setSavedBuilds] = useState([]);
+  const [internalSavedBuilds, setInternalSavedBuilds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+
+  // Use external builds if provided (controlled mode), otherwise use internal state
+  const savedBuilds = externalBuilds !== null ? externalBuilds : internalSavedBuilds;
 
   // Load saved builds on mount
   useEffect(() => {
@@ -35,13 +38,6 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
       loadBuilds();
     }
   }, [isAuthenticated, user]);
-
-  // Notify parent when builds change
-  useEffect(() => {
-    if (onBuildsChange) {
-      onBuildsChange(savedBuilds);
-    }
-  }, [savedBuilds, onBuildsChange]);
 
   const loadBuilds = async () => {
     if (!user || !config) return;
@@ -51,7 +47,7 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
 
     try {
       // Get cached builds
-      const cachedBuilds = getCache('skill-builds', user.id);
+      const cachedBuilds = getCache('skill_builds', user.id);
 
       // Fetch from GitHub
       const githubBuilds = await getUserBuilds(
@@ -63,20 +59,20 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
 
       // Merge cached data with GitHub data, prioritizing cache for recent updates
       const mergedBuilds = mergeCacheWithGitHub(cachedBuilds, githubBuilds);
+      const sortedBuilds = mergedBuilds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-      setSavedBuilds(mergedBuilds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
+      setInternalSavedBuilds(sortedBuilds);
+
+      // Notify parent of the loaded builds
+      if (onBuildsChange) {
+        onBuildsChange(sortedBuilds);
+      }
 
       // Update cache with merged results
-      setCache('skill-builds', user.id, mergedBuilds);
+      setCache('skill_builds', user.id, mergedBuilds);
     } catch (err) {
       console.error('[SavedBuilds] Failed to load builds:', err);
       setError('Failed to load saved builds');
-
-      // Fall back to cached data if GitHub fetch fails
-      const cachedBuilds = getCache('skill-builds', user.id);
-      if (cachedBuilds) {
-        setSavedBuilds(cachedBuilds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
-      }
     } finally {
       setLoading(false);
     }
@@ -102,7 +98,7 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'skill-build',
+          type: 'skill-builds',
           username: user.login,
           userId: user.id,
           data: buildData,
@@ -116,11 +112,17 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
 
       const data = await response.json();
       const sortedBuilds = data.builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-      setSavedBuilds(sortedBuilds);
+
+      setInternalSavedBuilds(sortedBuilds);
       setSaveSuccess(true);
 
+      // Notify parent of the updated builds
+      if (onBuildsChange) {
+        onBuildsChange(sortedBuilds);
+      }
+
       // Cache the updated builds
-      setCache('skill-builds', user.id, sortedBuilds);
+      setCache('skill_builds', user.id, sortedBuilds);
 
       // Hide success message after 2 seconds
       setTimeout(() => setSaveSuccess(false), 2000);
@@ -145,7 +147,7 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'skill-build',
+          type: 'skill-builds',
           username: user.login,
           userId: user.id,
           itemId: buildId,
@@ -159,10 +161,16 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
 
       const data = await response.json();
       const sortedBuilds = data.builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-      setSavedBuilds(sortedBuilds);
+
+      setInternalSavedBuilds(sortedBuilds);
+
+      // Notify parent of the updated builds
+      if (onBuildsChange) {
+        onBuildsChange(sortedBuilds);
+      }
 
       // Update cache after deletion
-      setCache('skill-builds', user.id, sortedBuilds);
+      setCache('skill_builds', user.id, sortedBuilds);
     } catch (err) {
       console.error('[SavedBuilds] Failed to delete build:', err);
       setError(err.message || 'Failed to delete build');
@@ -335,8 +343,8 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
                       onClick={() => handleLoadBuild(build)}
                       className="flex-1 text-left min-w-0"
                     >
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className={`font-semibold truncate ${
+                      <div className="flex items-center gap-2 mb-1 min-w-0">
+                        <h4 className={`font-semibold truncate max-w-[140px] sm:max-w-[200px] md:max-w-none ${
                           isCurrentlyLoaded
                             ? 'text-blue-900 dark:text-blue-100'
                             : 'text-gray-900 dark:text-white'
@@ -387,3 +395,4 @@ const SavedBuildsPanel = ({ currentBuild, buildName, maxSlots, onLoadBuild, allo
 };
 
 export default SavedBuildsPanel;
+

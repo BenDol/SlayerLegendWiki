@@ -37,3 +37,20 @@
 
   # Node bundler (use esbuild for fast builds)
   node_bundler = "esbuild"
+
+  # External packages (don't bundle these)
+  external_node_modules = ["@octokit/rest", "octokit"]
+
+  # Increase bundle timeout for first load
+  included_files = ["../../wiki-config.json"]
+
+# Dev server configuration
+[dev]
+  # Use faster settings for local dev
+  functions = "netlify/functions"
+
+  # Disable function bundling cache issues
+  functionsPort = 34567
+
+  # Target Vite dev server
+  targetPort = 5173

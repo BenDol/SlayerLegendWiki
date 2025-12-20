@@ -21,3 +21,14 @@ VITE_CF_PAGES = "1"
 # VITE_GITHUB_CLIENT_ID=your_github_client_id
 # VITE_WIKI_REPO_OWNER=your_github_username
 # VITE_WIKI_REPO_NAME=your_repo_name
+
+# Cloudflare KV Storage (optional - for faster storage backend)
+# Uncomment the section below to enable Cloudflare KV storage
+# 1. Create KV namespace: wrangler kv:namespace create "SLAYER_WIKI_DATA"
+# 2. Copy the namespace ID from the output
+# 3. Uncomment and update the id field below
+# 4. Update wiki-config.json storage.backend to "cloudflare-kv"
+#
+# [[kv_namespaces]]
+# binding = "SLAYER_WIKI_DATA"
+# id = "your-kv-namespace-id-here"

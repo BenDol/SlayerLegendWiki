@@ -168,7 +168,13 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     const cardProps = isId
       ? { id: parseInt(skillIdentifier), mode }
       : { name: skillIdentifier, mode };
-    return <SkillCard {...cardProps} />;
+
+    // Wrap in div to avoid <p><div> nesting warning (cards render block-level divs)
+    return (
+      <div>
+        <SkillCard {...cardProps} />
+      </div>
+    );
   }
 
   // Check for standalone equipment marker
@@ -182,7 +188,13 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     const cardProps = isId
       ? { id: parseInt(equipmentIdentifier), mode }
       : { name: equipmentIdentifier, mode };
-    return <EquipmentCard {...cardProps} />;
+
+    // Wrap in div to avoid <p><div> nesting warning (cards render block-level divs)
+    return (
+      <div>
+        <EquipmentCard {...cardProps} />
+      </div>
+    );
   }
 
   // Check for standalone spirit marker
@@ -199,7 +211,13 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     const cardProps = isId
       ? { id: parseInt(spiritIdentifier), mode, level, inline }
       : { name: spiritIdentifier, mode, level, inline };
-    return <SpiritCard {...cardProps} />;
+
+    // Wrap in div to avoid <p><div> nesting warning (cards render block-level divs)
+    return (
+      <div>
+        <SpiritCard {...cardProps} />
+      </div>
+    );
   }
 
   // Check for standalone data injection marker
@@ -210,7 +228,12 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     const fieldOrTemplate = (dataMatch[3] || 'card').trim();
     const showId = dataMatch[4] !== undefined ? dataMatch[4].trim() === 'true' : true;
 
-    return <DataInjector source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} />;
+    // Wrap in div to avoid <p><div> nesting warning (card/table templates render block-level divs)
+    return (
+      <div>
+        <DataInjector source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} />
+      </div>
+    );
   }
 
   // Check for standalone spirit sprite marker

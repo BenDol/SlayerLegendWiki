@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Trash2, Download, Upload, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ChevronDown, ChevronUp, Trash2, Download, Upload, AlertCircle, Tag } from 'lucide-react';
+import SpiritSprite from './SpiritSprite';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { getCache, setCache, clearCache } from '../utils/buildCache';
 import { getLoadDataEndpoint, getDeleteDataEndpoint } from '../utils/apiEndpoints.js';
+import { useSpiritsData } from '../hooks/useSpiritsData';
+import { deserializeBuild } from '../utils/spiritSerialization';
 
 /**
  * SavedSpiritBuildsPanel Component
@@ -32,14 +35,13 @@ const SavedSpiritBuildsPanel = ({
   savedBuilds: externalSavedBuilds = null
 }) => {
   const { isAuthenticated, user } = useAuthStore();
+  const { spiritsData } = useSpiritsData(); // Load spirits database
   const [internalSavedBuilds, setInternalSavedBuilds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [deletingId, setDeletingId] = useState(null);
-
-  // Use external builds if provided (controlled mode), otherwise use internal state
-  const savedBuilds = externalSavedBuilds !== null ? externalSavedBuilds : internalSavedBuilds;
+  const [showEnhancementTags, setShowEnhancementTags] = useState(false);
 
   // Load saved builds
   useEffect(() => {
@@ -54,8 +56,19 @@ const SavedSpiritBuildsPanel = ({
       return;
     }
 
-    loadSavedBuilds();
-  }, [isAuthenticated, user, externalSavedBuilds]);
+    // Wait for spirits data to load before loading builds
+    if (spiritsData.length > 0) {
+      loadSavedBuilds();
+    }
+  }, [isAuthenticated, user, externalSavedBuilds, spiritsData]);
+
+  // Use external builds if provided (controlled mode), otherwise use internal state
+  // Deserialize whichever builds we're using
+  const savedBuilds = useMemo(() => {
+    const builds = externalSavedBuilds !== null ? externalSavedBuilds : internalSavedBuilds;
+    if (spiritsData.length === 0) return builds; // Can't deserialize without spirits data
+    return builds.map(build => deserializeBuild(build, spiritsData));
+  }, [externalSavedBuilds, internalSavedBuilds, spiritsData]);
 
   const loadSavedBuilds = async () => {
     if (!user || !isAuthenticated) return;
@@ -65,16 +78,20 @@ const SavedSpiritBuildsPanel = ({
       setError(null);
 
       // Try cache first
-      const cached = getCache('spirit-builds', user.id);
+      const cached = getCache('spirit_builds', user.id);
       if (cached) {
+        // Store serialized builds (will be deserialized by useMemo)
         setInternalSavedBuilds(cached);
-        if (onBuildsChange) onBuildsChange(cached);
+        // Notify parent component of loaded builds
+        if (onBuildsChange) {
+          onBuildsChange(cached);
+        }
         setLoading(false);
         return;
       }
 
       // Fetch from API
-      const response = await fetch(`${getLoadDataEndpoint()}?type=spirit-build&userId=${user.id}`, {
+      const response = await fetch(`${getLoadDataEndpoint()}?type=spirit-builds&userId=${user.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -97,11 +114,16 @@ const SavedSpiritBuildsPanel = ({
       // Sort by updatedAt (newest first)
       const sortedBuilds = builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
+      // Store serialized builds (will be deserialized by useMemo)
       setInternalSavedBuilds(sortedBuilds);
-      if (onBuildsChange) onBuildsChange(sortedBuilds);
 
-      // Cache the builds
-      setCache('spirit-builds', user.id, sortedBuilds);
+      // Notify parent component of loaded builds
+      if (onBuildsChange) {
+        onBuildsChange(sortedBuilds);
+      }
+
+      // Cache the serialized builds
+      setCache('spirit_builds', user.id, sortedBuilds);
     } catch (err) {
       console.error('[SavedSpiritBuildsPanel] Failed to load builds:', err);
       setError(err.message || 'Failed to load builds');
@@ -122,7 +144,7 @@ const SavedSpiritBuildsPanel = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'spirit-build',
+          type: 'spirit-builds',
           username: user.login,
           userId: user.id,
           itemId: buildId,
@@ -137,9 +159,9 @@ const SavedSpiritBuildsPanel = ({
       const updatedBuilds = data.builds || [];
 
       // Clear cache
-      clearCache('spirit-builds', user.id);
+      clearCache('spirit_builds', user.id);
 
-      // Update state based on mode
+      // Update state based on mode (store serialized, will be deserialized by useMemo)
       if (externalSavedBuilds !== null) {
         // Controlled mode: update parent via callback
         if (onBuildsChange) {
@@ -148,9 +170,6 @@ const SavedSpiritBuildsPanel = ({
       } else {
         // Uncontrolled mode: update internal state
         setInternalSavedBuilds(updatedBuilds);
-        if (onBuildsChange) {
-          onBuildsChange(updatedBuilds);
-        }
       }
     } catch (err) {
       console.error('[SavedSpiritBuildsPanel] Failed to delete build:', err);
@@ -174,6 +193,63 @@ const SavedSpiritBuildsPanel = ({
     URL.revokeObjectURL(url);
   };
 
+  // Compact Spirit Preview Component
+  const CompactSpiritPreview = ({ slot }) => {
+    if (!slot.spirit) return null;
+
+    const { spirit, level, awakeningLevel, evolutionLevel, skillEnhancementLevel } = slot;
+
+    // Calculate effective evolution level
+    const effectiveEvolutionLevel = evolutionLevel >= 4 && awakeningLevel > 0
+      ? evolutionLevel + Math.floor(awakeningLevel / 6)
+      : evolutionLevel;
+    const cappedEvolutionLevel = Math.min(effectiveEvolutionLevel, 7);
+
+    // Calculate awakening stars (0-5)
+    const awakeningStars = awakeningLevel > 0 ? awakeningLevel % 6 : 0;
+
+    return (
+      <div className="flex flex-col items-center gap-0.5">
+        {/* Sprite with awakening stars */}
+        <div className="relative w-10 h-10 [&_.spirit-sprite-container>div>div]:!border-0 [&_.spirit-sprite-container>div>div]:!bg-transparent [&_.spirit-sprite-container>div>div]:!rounded-none">
+          <SpiritSprite
+            spiritId={spirit.id}
+            level={cappedEvolutionLevel}
+            animationType="idle"
+            animated={true}
+            fps={8}
+            size="100%"
+            showInfo={false}
+            displayLevel={null}
+            displayAwakeningLevel={null}
+            displaySkillEnhancement={null}
+          />
+
+          {/* Awakening Stars */}
+          {awakeningStars > 0 && (
+            <div className="flex items-center justify-center gap-0.5 absolute -bottom-1 left-1/2 -translate-x-1/2">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <img
+                  key={index}
+                  src="/images/other/Star_1.png"
+                  alt="star"
+                  className={`w-2 h-2 ${index < awakeningStars ? 'opacity-100' : 'opacity-20'}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Skill Enhancement Tag (Toggleable) */}
+        {showEnhancementTags && skillEnhancementLevel > 0 && (
+          <div className="px-0.5 bg-purple-500 text-white text-[9px] font-semibold rounded">
+            +{skillEnhancementLevel}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (!isAuthenticated) {
     return null; // Don't show if not authenticated
   }
@@ -181,11 +257,11 @@ const SavedSpiritBuildsPanel = ({
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
       {/* Header */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-      >
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex-1 flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
           <span className="text-lg font-semibold text-gray-900 dark:text-white">
             Saved Spirit Builds
           </span>
@@ -197,17 +273,33 @@ const SavedSpiritBuildsPanel = ({
               ({savedBuilds.length})
             </span>
           )}
-        </div>
-        {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-        )}
-      </button>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          )}
+        </button>
+
+        {/* Toggle Enhancement Tags Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowEnhancementTags(!showEnhancementTags);
+          }}
+          className={`p-2 rounded transition-colors ${
+            showEnhancementTags
+              ? 'bg-purple-500 text-white'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+          }`}
+          title={showEnhancementTags ? 'Hide enhancement tags' : 'Show enhancement tags'}
+        >
+          <Tag className="w-4 h-4" />
+        </button>
+      </div>
 
       {/* Content */}
       {isExpanded && (
-        <div className="p-4 pt-0 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4">
           {error && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
@@ -226,12 +318,12 @@ const SavedSpiritBuildsPanel = ({
             <div className="space-y-2">
               {savedBuilds.map(build => {
                 const isCurrentlyLoaded = currentLoadedBuildId === build.id;
-                const spiritCount = build.slots?.filter(s => s.spirit !== null).length || 0;
+                const spirits = build.slots?.filter(s => s.spirit !== null) || [];
 
                 return (
                   <div
                     key={build.id}
-                    className={`p-3 rounded-lg border-2 transition-all ${
+                    className={`p-3 rounded-lg border transition-all ${
                       isCurrentlyLoaded
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                         : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
@@ -243,19 +335,39 @@ const SavedSpiritBuildsPanel = ({
                         onClick={() => onLoadBuild(build)}
                         className="flex-1 text-left hover:opacity-80 transition-opacity"
                       >
-                        <div className="font-semibold text-gray-900 dark:text-white">
-                          {build.name || 'Unnamed Build'}
-                          {isCurrentlyLoaded && (
-                            <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
-                              Loaded
-                            </span>
+                        <div className="flex items-center justify-between gap-3">
+                          {/* Left Side: Name and Date */}
+                          <div className="flex flex-col gap-1 min-w-0 flex-shrink">
+                            {/* Name and Loaded Badge */}
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="font-semibold text-gray-900 dark:text-white truncate max-w-[120px] sm:max-w-none">
+                                {build.name || 'Unnamed Build'}
+                              </div>
+                              {isCurrentlyLoaded && (
+                                <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full flex-shrink-0">
+                                  Loaded
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Date */}
+                            <div className="text-xs text-gray-500 dark:text-gray-500 flex-shrink-0">
+                              {new Date(build.updatedAt || build.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+
+                          {/* Right Side: Spirit Previews */}
+                          {spirits.length > 0 ? (
+                            <div className="flex items-center gap-2">
+                              {spirits.map((slot, index) => (
+                                <CompactSpiritPreview key={index} slot={slot} />
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-sm text-gray-500 dark:text-gray-500 italic">
+                              Empty build
+                            </div>
                           )}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          {spiritCount} {spiritCount === 1 ? 'spirit' : 'spirits'}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                          {new Date(build.updatedAt || build.createdAt).toLocaleDateString()}
                         </div>
                       </button>
 
@@ -294,3 +406,4 @@ const SavedSpiritBuildsPanel = ({
 };
 
 export default SavedSpiritBuildsPanel;
+

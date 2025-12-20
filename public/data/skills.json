@@ -733,6 +733,7 @@
     "upgradeValue": 10,
     "cooldown": 0,
     "range": 0,
-    "icon": "/images/skills/icons/16_BlazeDance.png"
+    "icon": "/images/skills/icons/16_BlazeDance.png",
+    "equippable": false
   }
 ]

@@ -17,14 +17,17 @@ import { getDeleteDataEndpoint } from '../utils/apiEndpoints.js';
  * - Delete loadouts
  * - Mobile-friendly UI
  */
-const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadoutId = null, onLoadoutsChange }) => {
+const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadoutId = null, onLoadoutsChange, externalLoadouts = null }) => {
   const { isAuthenticated, user } = useAuthStore();
   const { config } = useWikiConfig();
   const loginFlow = useLoginFlow();
-  const [savedLoadouts, setSavedLoadouts] = useState([]);
+  const [internalSavedLoadouts, setInternalSavedLoadouts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(true);
+
+  // Use external loadouts if provided (controlled mode), otherwise use internal state
+  const savedLoadouts = externalLoadouts !== null ? externalLoadouts : internalSavedLoadouts;
 
   // Load saved loadouts on mount
   useEffect(() => {
@@ -32,13 +35,6 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
       loadLoadouts();
     }
   }, [isAuthenticated, user]);
-
-  // Notify parent when savedLoadouts change
-  useEffect(() => {
-    if (onLoadoutsChange) {
-      onLoadoutsChange(savedLoadouts);
-    }
-  }, [savedLoadouts, onLoadoutsChange]);
 
   const loadLoadouts = async () => {
     if (!user || !config) return;
@@ -48,7 +44,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
 
     try {
       // Get cached loadouts
-      const cachedLoadouts = getCache('battle-loadouts', user.id);
+      const cachedLoadouts = getCache('battle_loadouts', user.id);
 
       // Fetch from GitHub
       const githubLoadouts = await getUserLoadouts(
@@ -60,20 +56,20 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
 
       // Merge cached data with GitHub data, prioritizing cache for recent updates
       const mergedLoadouts = mergeCacheWithGitHub(cachedLoadouts, githubLoadouts);
+      const sortedLoadouts = mergedLoadouts.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-      setSavedLoadouts(mergedLoadouts.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
+      setInternalSavedLoadouts(sortedLoadouts);
+
+      // Notify parent of the loaded loadouts
+      if (onLoadoutsChange) {
+        onLoadoutsChange(sortedLoadouts);
+      }
 
       // Update cache with merged results
-      setCache('battle-loadouts', user.id, mergedLoadouts);
+      setCache('battle_loadouts', user.id, mergedLoadouts);
     } catch (err) {
       console.error('[SavedLoadouts] Failed to load loadouts:', err);
       setError('Failed to load saved loadouts');
-
-      // Fall back to cached data if GitHub fetch fails
-      const cachedLoadouts = getCache('battle-loadouts', user.id);
-      if (cachedLoadouts) {
-        setSavedLoadouts(cachedLoadouts.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
-      }
     } finally {
       setLoading(false);
     }
@@ -92,7 +88,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'battle-loadout',
+          type: 'battle-loadouts',
           username: user.login,
           userId: user.id,
           itemId: loadoutId,
@@ -106,10 +102,16 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
 
       const data = await response.json();
       const sortedLoadouts = data.loadouts.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-      setSavedLoadouts(sortedLoadouts);
+
+      setInternalSavedLoadouts(sortedLoadouts);
+
+      // Notify parent of the updated loadouts
+      if (onLoadoutsChange) {
+        onLoadoutsChange(sortedLoadouts);
+      }
 
       // Update cache after deletion
-      setCache('battle-loadouts', user.id, sortedLoadouts);
+      setCache('battle_loadouts', user.id, sortedLoadouts);
     } catch (err) {
       console.error('[SavedLoadouts] Failed to delete loadout:', err);
       setError(err.message || 'Failed to delete loadout');
@@ -248,8 +250,8 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
                   onClick={() => handleLoadLoadout(loadout)}
                   className="flex-1 text-left min-w-0"
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className={`font-semibold truncate ${
+                  <div className="flex items-center gap-2 mb-1 min-w-0">
+                    <h4 className={`font-semibold truncate max-w-[140px] sm:max-w-[200px] md:max-w-none ${
                       isCurrentlyLoaded
                         ? 'text-blue-900 dark:text-blue-100'
                         : 'text-gray-900 dark:text-white'
@@ -291,3 +293,4 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
 };
 
 export default SavedLoadoutsPanel;
+

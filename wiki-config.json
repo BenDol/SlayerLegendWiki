@@ -74,7 +74,7 @@
       "title": "Tools",
       "icon": "🛠️",
       "order": 4,
-      "expandedByDefault": true,
+      "expandedByDefault": false,
       "sections": ["tools"]
     }
   ],
@@ -204,7 +204,29 @@
       "icon": "🛠️",
       "allowContributions": false,
       "hideTitleInSidebar": true,
-      "order": 11
+      "order": 11,
+      "pages": [
+        {
+          "title": "Skill Builder",
+          "path": "/skill-builder",
+          "icon": "⚔️"
+        },
+        {
+          "title": "Spirit Builder",
+          "path": "/spirit-builder",
+          "icon": "🔮"
+        },
+        {
+          "title": "Battle Loadouts",
+          "path": "/battle-loadouts",
+          "icon": "📖"
+        },
+        {
+          "title": "Soul Weapon Engraving",
+          "path": "/soul-weapon-engraving",
+          "icon": "🗡️"
+        }
+      ]
     },
     {
       "id": "meta",
@@ -215,6 +237,21 @@
       "order": 12
     }
   ],
+  "storage": {
+    "backend": "github",
+    "version": "v1",
+    "migration": {
+      "enabled": false
+    },
+    "github": {
+      "owner": "BenDol",
+      "repo": "SlayerLegendWiki"
+    },
+    "cloudflare": {
+      "keyPrefix": "slayerwiki",
+      "namespaceName": "SLAYER_WIKI_DATA"
+    }
+  },
   "features": {
     "search": true,
     "tableOfContents": true,
@@ -228,6 +265,8 @@
     "autoFormatPageTitles": true,
     "purgeClientCacheOnUpdate": false,
     "preserveDraftsOnUpdate": true,
+    "forceRelogOnUpdate": false,
+    "enableRemoteLoggingInDev": true,
     "developmentBanner": {
       "enabled": true,
       "expiryMinutes": 60
@@ -311,6 +350,17 @@
       "displayLimit": 100,
       "ignoreRepositoryOwner": true,
       "ignoreMainContributors": false
+    },
+    "maintenance": {
+      "enabled": false,
+      "title": "Maintenance in Progress",
+      "message": "We're currently performing scheduled maintenance to improve your experience.",
+      "details": null,
+      "estimatedReturn": null,
+      "contactEmail": null,
+      "showContactInfo": false,
+      "allowAdminBypass": true,
+      "customHtml": null
     }
   },
   "theme": {

@@ -5,6 +5,7 @@
  */
 
 import { getGithubBotEndpoint } from '../utils/apiEndpoints';
+import { cacheName } from '../../wiki-framework/src/utils/storageManager';
 
 /**
  * Send verification code to email
@@ -226,7 +227,7 @@ export const submitAnonymousEdit = async ({
  */
 export const getCachedVerificationToken = (email) => {
   try {
-    const key = `anon-edit-token-${email}`;
+    const key = cacheName('anon_edit_token', email);
     const cached = localStorage.getItem(key);
 
     if (!cached) return null;
@@ -254,7 +255,7 @@ export const getCachedVerificationToken = (email) => {
  */
 export const cacheVerificationToken = (email, token) => {
   try {
-    const key = `anon-edit-token-${email}`;
+    const key = cacheName('anon_edit_token', email);
     localStorage.setItem(
       key,
       JSON.stringify({
@@ -273,7 +274,7 @@ export const cacheVerificationToken = (email, token) => {
  */
 export const clearCachedVerificationToken = (email) => {
   try {
-    const key = `anon-edit-token-${email}`;
+    const key = cacheName('anon_edit_token', email);
     localStorage.removeItem(key);
   } catch (error) {
     console.error('[AnonymousEdit] Failed to clear token:', error);

@@ -1,0 +1,381 @@
+name: Delete All Closed Items (Issues + PRs)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "PERMANENTLY DELETE ALL" to confirm'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (list items without deleting)'
+        required: false
+        type: boolean
+        default: true
+      delete_issues:
+        description: 'Delete closed issues'
+        required: false
+        type: boolean
+        default: true
+      delete_pull_requests:
+        description: 'Delete closed pull requests'
+        required: false
+        type: boolean
+        default: true
+      exclude_issue_labels:
+        description: 'Issue labels to exclude (comma-separated)'
+        required: false
+        type: string
+        default: 'wiki-comments'
+      exclude_pr_authors:
+        description: 'PR authors to exclude (comma-separated)'
+        required: false
+        type: string
+        default: ''
+      older_than_days:
+        description: 'Only delete items closed more than X days ago'
+        required: false
+        type: number
+        default: 30
+      pr_state_filter:
+        description: 'PR state filter (closed, merged, or all)'
+        required: false
+        type: choice
+        options:
+          - closed
+          - merged
+          - all
+        default: 'all'
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  delete-all-closed:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if user is repository owner
+        if: github.actor != github.repository_owner
+        run: |
+          echo "❌ Access denied. Only the repository owner can execute this workflow."
+          echo "   Actor: ${{ github.actor }}"
+          echo "   Owner: ${{ github.repository_owner }}"
+          exit 1
+
+      - name: Validate confirmation
+        if: github.event.inputs.confirm != 'PERMANENTLY DELETE ALL'
+        run: |
+          echo "❌ Deletion not confirmed. You must type 'PERMANENTLY DELETE ALL' to proceed."
+          exit 1
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Delete closed items
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const isDryRun = ${{ github.event.inputs.dry_run }};
+            const deleteIssues = ${{ github.event.inputs.delete_issues }};
+            const deletePRs = ${{ github.event.inputs.delete_pull_requests }};
+            const excludeIssueLabelsInput = '${{ github.event.inputs.exclude_issue_labels }}';
+            const excludeIssueLabels = excludeIssueLabelsInput ? excludeIssueLabelsInput.split(',').map(l => l.trim()) : [];
+            const excludePRAuthorsInput = '${{ github.event.inputs.exclude_pr_authors }}';
+            const excludePRAuthors = excludePRAuthorsInput ? excludePRAuthorsInput.split(',').map(a => a.trim()) : [];
+            const olderThanDays = ${{ github.event.inputs.older_than_days }};
+            const prStateFilter = '${{ github.event.inputs.pr_state_filter }}';
+
+            console.log('🔍 Starting cleanup of closed items...');
+            console.log(`📋 Mode: ${isDryRun ? 'DRY RUN (no deletions)' : '⚠️  PERMANENT DELETION'}`);
+            console.log(`🎯 Targets: ${deleteIssues ? 'Issues' : ''}${deleteIssues && deletePRs ? ' + ' : ''}${deletePRs ? 'PRs' : ''}`);
+            if (olderThanDays > 0) {
+              console.log(`📅 Only deleting items closed more than ${olderThanDays} days ago`);
+            }
+            console.log('---');
+
+            // Calculate cutoff date
+            let cutoffDate = null;
+            if (olderThanDays > 0) {
+              cutoffDate = new Date();
+              cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
+              console.log(`📅 Cutoff date: ${cutoffDate.toISOString()}\n`);
+            }
+
+            const stats = {
+              issues: { found: 0, deleted: 0, skipped: 0, reasons: { pullRequest: 0, excludedLabel: 0, tooRecent: 0, error: 0 } },
+              prs: { found: 0, deleted: 0, skipped: 0, reasons: { wrongState: 0, excludedAuthor: 0, tooRecent: 0, error: 0 } }
+            };
+
+            // Helper to handle rate limiting
+            const executeWithRetry = async (mutation, variables, itemType, itemNumber) => {
+              try {
+                await github.graphql(mutation, variables);
+                return { success: true };
+              } catch (error) {
+                if (error.message.includes('was submitted too quickly') || error.message.includes('secondary rate limit')) {
+                  console.log(`   ⏸️  Rate limited on ${itemType} #${itemNumber}, waiting 10 seconds...`);
+                  await new Promise(resolve => setTimeout(resolve, 10000));
+                  try {
+                    await github.graphql(mutation, variables);
+                    return { success: true, retried: true };
+                  } catch (retryError) {
+                    return { success: false, error: retryError.message };
+                  }
+                }
+                return { success: false, error: error.message };
+              }
+            };
+
+            // ========== DELETE ISSUES ==========
+            if (deleteIssues) {
+              console.log('📋 Processing Issues...\n');
+              let page = 1;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: issues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'closed',
+                  per_page: 100,
+                  page: page
+                });
+
+                if (issues.length === 0) {
+                  hasMore = false;
+                  break;
+                }
+
+                stats.issues.found += issues.length;
+
+                for (const issue of issues) {
+                  // Skip PRs (they appear in issues API)
+                  if (issue.pull_request) {
+                    stats.issues.skipped++;
+                    stats.issues.reasons.pullRequest++;
+                    continue;
+                  }
+
+                  // Check excluded labels
+                  const issueLabels = issue.labels.map(l => l.name);
+                  const hasExcludedLabel = excludeIssueLabels.some(el => issueLabels.includes(el));
+                  if (hasExcludedLabel) {
+                    console.log(`   ⏭️  Issue #${issue.number}: excluded label`);
+                    stats.issues.skipped++;
+                    stats.issues.reasons.excludedLabel++;
+                    continue;
+                  }
+
+                  // Check date
+                  if (cutoffDate && issue.closed_at) {
+                    const closedDate = new Date(issue.closed_at);
+                    if (closedDate > cutoffDate) {
+                      stats.issues.skipped++;
+                      stats.issues.reasons.tooRecent++;
+                      continue;
+                    }
+                  }
+
+                  if (isDryRun) {
+                    console.log(`   🔍 Would delete issue #${issue.number}: ${issue.title}`);
+                    stats.issues.deleted++;
+                  } else {
+                    const mutation = `
+                      mutation($issueId: ID!) {
+                        deleteIssue(input: {issueId: $issueId}) {
+                          clientMutationId
+                        }
+                      }
+                    `;
+
+                    const result = await executeWithRetry(mutation, { issueId: issue.node_id }, 'issue', issue.number);
+
+                    if (result.success) {
+                      console.log(`   ✅ Deleted issue #${issue.number}${result.retried ? ' (retried)' : ''}`);
+                      stats.issues.deleted++;
+                      await new Promise(resolve => setTimeout(resolve, 200));
+                    } else {
+                      console.log(`   ❌ Failed to delete issue #${issue.number}: ${result.error}`);
+                      stats.issues.skipped++;
+                      stats.issues.reasons.error++;
+                    }
+                  }
+                }
+
+                page++;
+                if (hasMore && !isDryRun) {
+                  await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+              }
+
+              console.log('\n✅ Issues processing complete\n');
+            }
+
+            // ========== DELETE PULL REQUESTS ==========
+            if (deletePRs) {
+              console.log('🔀 Processing Pull Requests...\n');
+              let page = 1;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: pullRequests } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'closed',
+                  per_page: 100,
+                  page: page,
+                  sort: 'updated',
+                  direction: 'desc'
+                });
+
+                if (pullRequests.length === 0) {
+                  hasMore = false;
+                  break;
+                }
+
+                stats.prs.found += pullRequests.length;
+
+                for (const pr of pullRequests) {
+                  // Filter by state
+                  const isMerged = pr.merged_at !== null;
+                  if (prStateFilter === 'merged' && !isMerged) {
+                    stats.prs.skipped++;
+                    stats.prs.reasons.wrongState++;
+                    continue;
+                  } else if (prStateFilter === 'closed' && isMerged) {
+                    stats.prs.skipped++;
+                    stats.prs.reasons.wrongState++;
+                    continue;
+                  }
+
+                  // Check excluded authors
+                  const author = pr.user?.login || '';
+                  if (excludePRAuthors.includes(author)) {
+                    console.log(`   ⏭️  PR #${pr.number}: excluded author (${author})`);
+                    stats.prs.skipped++;
+                    stats.prs.reasons.excludedAuthor++;
+                    continue;
+                  }
+
+                  // Check date
+                  if (cutoffDate && pr.closed_at) {
+                    const closedDate = new Date(pr.closed_at);
+                    if (closedDate > cutoffDate) {
+                      stats.prs.skipped++;
+                      stats.prs.reasons.tooRecent++;
+                      continue;
+                    }
+                  }
+
+                  const statusLabel = isMerged ? 'merged' : 'closed';
+
+                  if (isDryRun) {
+                    console.log(`   🔍 Would delete PR #${pr.number} (${statusLabel}): ${pr.title}`);
+                    stats.prs.deleted++;
+                  } else {
+                    const mutation = `
+                      mutation($pullRequestId: ID!) {
+                        deletePullRequest(input: {pullRequestId: $pullRequestId}) {
+                          clientMutationId
+                        }
+                      }
+                    `;
+
+                    const result = await executeWithRetry(mutation, { pullRequestId: pr.node_id }, 'PR', pr.number);
+
+                    if (result.success) {
+                      console.log(`   ✅ Deleted PR #${pr.number} (${statusLabel})${result.retried ? ' (retried)' : ''}`);
+                      stats.prs.deleted++;
+                      await new Promise(resolve => setTimeout(resolve, 200));
+                    } else {
+                      console.log(`   ❌ Failed to delete PR #${pr.number}: ${result.error}`);
+                      stats.prs.skipped++;
+                      stats.prs.reasons.error++;
+                    }
+                  }
+                }
+
+                page++;
+                if (hasMore && !isDryRun) {
+                  await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+              }
+
+              console.log('\n✅ Pull requests processing complete\n');
+            }
+
+            // ========== SUMMARY ==========
+            console.log('='.repeat(60));
+            console.log('📊 FINAL SUMMARY');
+            console.log('='.repeat(60));
+
+            if (deleteIssues) {
+              console.log('\n📋 Issues:');
+              console.log(`   Found: ${stats.issues.found}`);
+              console.log(`   ${isDryRun ? 'Would delete' : 'Deleted'}: ${stats.issues.deleted}`);
+              console.log(`   Skipped: ${stats.issues.skipped}`);
+              if (stats.issues.reasons.pullRequest > 0) console.log(`      - Pull requests: ${stats.issues.reasons.pullRequest}`);
+              if (stats.issues.reasons.excludedLabel > 0) console.log(`      - Excluded labels: ${stats.issues.reasons.excludedLabel}`);
+              if (stats.issues.reasons.tooRecent > 0) console.log(`      - Too recent: ${stats.issues.reasons.tooRecent}`);
+              if (stats.issues.reasons.error > 0) console.log(`      - Errors: ${stats.issues.reasons.error}`);
+            }
+
+            if (deletePRs) {
+              console.log('\n🔀 Pull Requests:');
+              console.log(`   Found: ${stats.prs.found}`);
+              console.log(`   ${isDryRun ? 'Would delete' : 'Deleted'}: ${stats.prs.deleted}`);
+              console.log(`   Skipped: ${stats.prs.skipped}`);
+              if (stats.prs.reasons.wrongState > 0) console.log(`      - Wrong state: ${stats.prs.reasons.wrongState}`);
+              if (stats.prs.reasons.excludedAuthor > 0) console.log(`      - Excluded authors: ${stats.prs.reasons.excludedAuthor}`);
+              if (stats.prs.reasons.tooRecent > 0) console.log(`      - Too recent: ${stats.prs.reasons.tooRecent}`);
+              if (stats.prs.reasons.error > 0) console.log(`      - Errors: ${stats.prs.reasons.error}`);
+            }
+
+            const totalDeleted = stats.issues.deleted + stats.prs.deleted;
+            console.log(`\n📊 Total ${isDryRun ? 'would delete' : 'deleted'}: ${totalDeleted}`);
+
+            if (!isDryRun && totalDeleted > 0) {
+              console.log('\n⚠️  WARNING: Items have been PERMANENTLY deleted and cannot be recovered!');
+            }
+
+            console.log('\n✅ Done!');
+
+            // Create job summary
+            const summaryTable = [];
+            if (deleteIssues) {
+              summaryTable.push(
+                [{data: 'Issues', header: true, colspan: '2'}],
+                ['Found', stats.issues.found.toString()],
+                [isDryRun ? 'Would Delete' : '⚠️ Deleted', stats.issues.deleted.toString()],
+                ['Skipped (PRs)', stats.issues.reasons.pullRequest.toString()],
+                ['Skipped (Labels)', stats.issues.reasons.excludedLabel.toString()],
+                ['Skipped (Recent)', stats.issues.reasons.tooRecent.toString()],
+                ['Skipped (Errors)', stats.issues.reasons.error.toString()]
+              );
+            }
+            if (deletePRs) {
+              summaryTable.push(
+                [{data: 'Pull Requests', header: true, colspan: '2'}],
+                ['Found', stats.prs.found.toString()],
+                [isDryRun ? 'Would Delete' : '⚠️ Deleted', stats.prs.deleted.toString()],
+                ['Skipped (State)', stats.prs.reasons.wrongState.toString()],
+                ['Skipped (Authors)', stats.prs.reasons.excludedAuthor.toString()],
+                ['Skipped (Recent)', stats.prs.reasons.tooRecent.toString()],
+                ['Skipped (Errors)', stats.prs.reasons.error.toString()]
+              );
+            }
+
+            await core.summary
+              .addHeading(isDryRun ? '🔍 Dry Run Summary' : '⚠️  Permanent Deletion Summary')
+              .addRaw(isDryRun ? '' : '**WARNING: Items have been permanently deleted and cannot be recovered!**\n\n')
+              .addTable(summaryTable)
+              .write();

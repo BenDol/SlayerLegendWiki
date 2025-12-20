@@ -6,9 +6,12 @@ import { encodeBuild, decodeBuild } from '../../wiki-framework/src/components/wi
 import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { createGitHubIssue, searchGitHubIssues, getGitHubIssue, updateGitHubIssue, getOctokit } from '../../wiki-framework/src/services/github/api';
 import { retryGitHubAPI } from '../../wiki-framework/src/utils/retryWithBackoff';
+import { persistName, getItem, setItem, cacheName, configName } from '../../wiki-framework/src/utils/storageManager';
 import EngravingPiece from './EngravingPiece';
 import CustomDropdown from './CustomDropdown';
+import ValidatedInput from './ValidatedInput';
 import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
+import { validateBuildName, validateCompletionEffect, STRING_LIMITS } from '../utils/validation';
 
 /**
  * SoulWeaponEngravingBuilder Component
@@ -195,13 +198,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const [currentSubmissionMeta, setCurrentSubmissionMeta] = useState(null); // Metadata for currently loaded submission
   const [loadingSharedBuild, setLoadingSharedBuild] = useState(false); // True while loading a shared build (prevents grid initialization)
   const hasInitializedGridForWeapon = useRef(null); // Track which weapon we've initialized the grid for
+  const hasLoadedSubmissionsForWeapon = useRef(null); // Track which weapon we've loaded submissions for
 
   // Submission cache constants
-  const SUBMISSION_CACHE_KEY = 'soulWeaponEngraving_submissionsCache';
+  const SUBMISSION_CACHE_KEY = cacheName('soul_weapon_submissions');
   const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
   // Best Weapon cache constants
-  const BEST_WEAPON_CACHE_KEY = 'soulWeaponEngraving_bestWeaponCache';
+  const BEST_WEAPON_CACHE_KEY = cacheName('soul_weapon_best');
   const BEST_WEAPON_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
   // Helper functions for localStorage-based submission cache
@@ -359,9 +363,15 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       selectedWeapon,
       gridState: serializedGridState,
       inventory: serializedInventory,
-      highestUnlockedWeapon
+      highestUnlockedWeapon,
+      isGridDesigner,
+      forceDesignMode,
+      designerGrid,
+      gridType,
+      completionAtk,
+      completionHp
     };
-  }, [buildName, selectedWeapon, gridState, inventory, highestUnlockedWeapon]);
+  }, [buildName, selectedWeapon, gridState, inventory, highestUnlockedWeapon, isGridDesigner, forceDesignMode, designerGrid, gridType, completionAtk, completionHp]);
 
   // Draft storage hook
   const { loadDraft, clearDraft } = useDraftStorage(
@@ -602,27 +612,28 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     }
   }, [weapons, engravings, allWeapons, wikiConfig]);
 
-  // Load all weapons with submissions after config loads
+  // Load all weapons with submissions after config and weapons load
   useEffect(() => {
-    if (wikiConfig) {
+    if (wikiConfig && allWeapons.length > 0) {
       loadAllWeaponsWithSubmissions();
     }
-  }, [wikiConfig]);
+  }, [wikiConfig, allWeapons]);
 
   // Load highest unlocked weapon from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('soulWeapon_highestUnlocked');
-    if (saved) {
-      const parsed = parseInt(saved, 10);
-      if (!isNaN(parsed) && parsed >= 1 && parsed <= 57) {
-        setHighestUnlockedWeapon(parsed);
+    const key = configName('soul_weapon_highest');
+    const saved = getItem(key);
+    if (saved && typeof saved === 'number') {
+      if (saved >= 1 && saved <= 57) {
+        setHighestUnlockedWeapon(saved);
       }
     }
   }, []);
 
   // Save highest unlocked weapon to localStorage
   useEffect(() => {
-    localStorage.setItem('soulWeapon_highestUnlocked', highestUnlockedWeapon.toString());
+    const key = configName('soul_weapon_highest');
+    setItem(key, highestUnlockedWeapon);
   }, [highestUnlockedWeapon]);
 
   // Calculate natural cell size from piece images
@@ -683,13 +694,24 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       submissionsCount: existingSubmissions.length,
       forceDesignMode,
       loadingSharedBuild,
-      hasPlacedPieces
+      hasPlacedPieces,
+      loadingSubmissions
     });
 
     // Skip if loading shared build, no weapon, weapon has official grid data, or grid already populated
     if (loadingSharedBuild || !selectedWeapon || weaponHasGridData() || hasPlacedPieces) {
       console.log('[SoulWeaponEngravingBuilder] Skipping mode switch - loading shared build, has official data, or grid already populated');
       return;
+    }
+
+    // If we have a weapon with no grid data, and we're not currently loading submissions,
+    // and we have no submissions yet, and we haven't already tried loading for this weapon, trigger a load
+    const weaponKey = `${selectedWeapon.id}-${selectedWeapon.name}`;
+    if (!loadingSubmissions && existingSubmissions.length === 0 && wikiConfig && hasLoadedSubmissionsForWeapon.current !== weaponKey) {
+      console.log('[SoulWeaponEngravingBuilder] No submissions loaded yet for weapon without grid data - triggering load');
+      hasLoadedSubmissionsForWeapon.current = weaponKey;
+      loadExistingSubmissions();
+      return; // Exit early, will re-run when submissions load
     }
 
     // Weapon has no official grid data - check for submissions
@@ -712,7 +734,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         initializeDesignerGrid();
       }
     }
-  }, [existingSubmissions, forceDesignMode, loadingSharedBuild]);
+  }, [existingSubmissions, forceDesignMode, loadingSharedBuild, selectedWeapon, wikiConfig, loadingSubmissions]);
 
   // Update locked inventory indices when grid changes
   useEffect(() => {
@@ -740,7 +762,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       const availableWidth = containerWidth - containerPadding;
 
       // Calculate grid natural size
-      const gridSize = selectedWeapon.gridType === '4x4' ? 4 : 5;
+      // Use submission gridType if available (community submissions), otherwise use weapon gridType
+      const effectiveGridType = currentSubmissionMeta?.gridType || selectedWeapon.gridType || '5x5';
+      const gridSize = effectiveGridType === '4x4' ? 4 : 5;
       const adjustedCellSize = cellSize;
       const gridNaturalWidth = gridSize * adjustedCellSize + (gridSize - 1) * GAP_SIZE + GRID_PADDING * 2;
 
@@ -998,7 +1022,32 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           setHighestUnlockedWeapon(draft.highestUnlockedWeapon);
         }
 
-        console.log('[SoulWeaponEngravingBuilder] Draft loaded and deserialized');
+        // Restore designer mode states
+        if (draft.isGridDesigner !== undefined) {
+          setIsGridDesigner(draft.isGridDesigner);
+        }
+        if (draft.forceDesignMode !== undefined) {
+          setForceDesignMode(draft.forceDesignMode);
+        }
+        if (draft.designerGrid) {
+          setDesignerGrid(draft.designerGrid);
+        }
+        if (draft.gridType) {
+          console.log('[SoulWeaponEngravingBuilder] Draft loading - Setting gridType from draft:', draft.gridType);
+          setGridType(draft.gridType);
+        }
+        if (draft.completionAtk !== undefined) {
+          setCompletionAtk(draft.completionAtk);
+        }
+        if (draft.completionHp !== undefined) {
+          setCompletionHp(draft.completionHp);
+        }
+
+        console.log('[SoulWeaponEngravingBuilder] Draft loaded and deserialized - Designer state:', {
+          isGridDesigner: draft.isGridDesigner,
+          gridType: draft.gridType,
+          designerGridSize: draft.designerGrid ? `${draft.designerGrid.length}x${draft.designerGrid[0]?.length || 0}` : 'none'
+        });
       }
 
     } catch (error) {
@@ -1159,23 +1208,36 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       const weaponNames = new Set();
 
       // Each issue represents a weapon with submissions
-      // Extract weapon name from the weapon:X label
+      // Extract weapon ID from the weapon-id:X label and map to weapon name
+      // Only track weapons that DON'T have official grid data
       for (const issue of issues) {
-        // Find the weapon: label
+        // Find the weapon-id: label
         const weaponLabel = issue.labels.find(label => {
           const labelName = typeof label === 'string' ? label : label.name;
-          return labelName && labelName.startsWith('weapon:');
+          return labelName && labelName.startsWith('weapon-id:');
         });
 
         if (weaponLabel) {
           const labelName = typeof weaponLabel === 'string' ? weaponLabel : weaponLabel.name;
-          const weaponName = labelName.replace('weapon:', '');
-          weaponNames.add(weaponName);
+          const weaponId = parseInt(labelName.replace('weapon-id:', ''), 10);
+
+          // Find the weapon by ID to get its name
+          const weapon = allWeapons.find(w => w.id === weaponId);
+          if (weapon) {
+            // Only include if weapon doesn't have official grid data
+            const hasOfficialData = weapons.find(gw => gw.name === weapon.name);
+            if (!hasOfficialData) {
+              weaponNames.add(weapon.name);
+              console.log(`📋 Found community submission for weapon ID ${weaponId}: ${weapon.name} (no official data)`);
+            } else {
+              console.log(`📋 Skipping weapon ID ${weaponId}: ${weapon.name} (has official data)`);
+            }
+          }
         }
       }
 
       setWeaponsWithSubmissions(weaponNames);
-      console.log(`📋 Found community submissions for ${weaponNames.size} weapons`);
+      console.log(`📋 Found community submissions for ${weaponNames.size} weapons without official data:`, Array.from(weaponNames));
     } catch (error) {
       console.error('Failed to load weapons with submissions:', error);
     }
@@ -1183,7 +1245,17 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
   // Load existing submissions from GitHub issues (reads from comments)
   const loadExistingSubmissions = async (forceRefresh = false) => {
-    if (!selectedWeapon || !wikiConfig) return;
+    console.log('[SoulWeaponEngravingBuilder] loadExistingSubmissions called', {
+      forceRefresh,
+      hasSelectedWeapon: !!selectedWeapon,
+      selectedWeaponId: selectedWeapon?.id,
+      hasWikiConfig: !!wikiConfig
+    });
+
+    if (!selectedWeapon || !wikiConfig) {
+      console.warn('[SoulWeaponEngravingBuilder] Early return - missing selectedWeapon or wikiConfig');
+      return [];
+    }
 
     const owner = wikiConfig.wiki.repository.owner;
     const repo = wikiConfig.wiki.repository.repo;
@@ -1193,13 +1265,18 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     cleanExpiredCache();
 
     // Check cache first (10 minute TTL)
+    // BUT: If cache has 0 submissions, always re-check (maybe a new submission was added)
     if (!forceRefresh) {
       const cache = getSubmissionCache();
       const cached = cache[weaponName];
       if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
-        console.log(`[SoulWeaponEngravingBuilder] Using cached submissions for ${weaponName} (expires in ${Math.round((CACHE_TTL - (Date.now() - cached.timestamp)) / 1000 / 60)} minutes)`);
-        setExistingSubmissions(cached.submissions);
-        return;
+        if (cached.submissions.length > 0) {
+          console.log(`[SoulWeaponEngravingBuilder] Using cached submissions for ${weaponName} (expires in ${Math.round((CACHE_TTL - (Date.now() - cached.timestamp)) / 1000 / 60)} minutes)`);
+          setExistingSubmissions(cached.submissions);
+          return cached.submissions;
+        } else {
+          console.log(`[SoulWeaponEngravingBuilder] Cache has 0 submissions for ${weaponName} - bypassing cache to check for new submissions`);
+        }
       }
     }
 
@@ -1211,7 +1288,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       const octokit = getOctokit();
 
       // Search for OPEN issues only - closed issues are considered deleted
-      const weaponLabel = `weapon:${weaponName}`;
+      const weaponLabel = `weapon-id:${selectedWeapon.id}`;
+      const searchQuery = `repo:${owner}/${repo} label:engraving-grid-submissions label:"${weaponLabel}" is:open`;
+
+      console.log(`[SoulWeaponEngravingBuilder] Searching for grid submissions with query:`, searchQuery);
 
       let issues = [];
 
@@ -1219,7 +1299,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         // Search using authenticated Octokit with retry on rate limit
         const { data } = await retryGitHubAPI(
           async () => await octokit.rest.search.issuesAndPullRequests({
-            q: `repo:${owner}/${repo} label:engraving-grid-submissions label:"${weaponLabel}" is:open`,
+            q: searchQuery,
             per_page: 10,
           }),
           (attempt, delay) => {
@@ -1227,7 +1307,51 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           }
         );
 
+        console.log(`[SoulWeaponEngravingBuilder] Raw search response:`, {
+          total_count: data.total_count,
+          incomplete_results: data.incomplete_results,
+          items: data.items || []
+        });
+
         issues = data.items || [];
+
+        if (issues.length === 0) {
+          console.warn(`[SoulWeaponEngravingBuilder] Search returned 0 results. Checking if GitHub search index is stale...`);
+
+          // Try listing all grid issues to see if it exists but isn't indexed
+          try {
+            const { data: allIssues } = await octokit.rest.issues.listForRepo({
+              owner,
+              repo,
+              labels: 'engraving-grid-submissions',
+              state: 'open',
+              per_page: 100,
+            });
+
+            console.log(`[SoulWeaponEngravingBuilder] Found ${allIssues.length} total grid issues via list API:`,
+              allIssues.map(i => ({
+                number: i.number,
+                title: i.title,
+                labels: i.labels.map(l => l.name),
+                hasWeaponId: i.labels.some(l => l.name === weaponLabel)
+              }))
+            );
+
+            // Check if our issue exists but wasn't found by search
+            const foundViaList = allIssues.find(i =>
+              i.labels.some(l => l.name === weaponLabel)
+            );
+
+            if (foundViaList) {
+              console.warn(`[SoulWeaponEngravingBuilder] Issue found via list API but NOT via search API. GitHub search index is stale.`);
+              issues = [foundViaList];
+            }
+          } catch (listErr) {
+            console.error('[SoulWeaponEngravingBuilder] Fallback list failed:', listErr);
+          }
+        } else {
+          console.log(`[SoulWeaponEngravingBuilder] Search found ${issues.length} issue(s):`, issues.map(i => ({ number: i.number, title: i.title, labels: i.labels.map(l => l.name) })));
+        }
       } catch (searchError) {
         console.error('[SoulWeaponEngravingBuilder] Search failed after retries:', searchError);
         const errorMsg = searchError.status === 403
@@ -1236,7 +1360,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         setSubmissionLoadError(errorMsg);
         setExistingSubmissions([]);
         setLoadingSubmissions(false);
-        return;
+        return [];
       }
 
       const weaponSubmissions = [];
@@ -1270,7 +1394,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           setSubmissionLoadError(errorMsg);
           setExistingSubmissions([]);
           setLoadingSubmissions(false);
-          return;
+          return [];
         }
 
         if (comments.length > 0) {
@@ -1278,17 +1402,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           // Parse each comment for JSON submission data
           for (const comment of comments) {
             try {
-              // Look for JSON block in comment body
-              const jsonMatch = comment.body.match(/```json\n([\s\S]*?)\n```/);
-              if (jsonMatch) {
-                const submission = JSON.parse(jsonMatch[1]);
-                weaponSubmissions.push({
-                  ...submission,
-                  issueNumber: issue.number,
-                  commentId: comment.id,
-                  // Submission already has submittedBy and submittedAt from JSON
-                });
-              }
+              // Try to parse comment body as JSON directly (GitHubStorage stores plain JSON)
+              const submission = JSON.parse(comment.body);
+              weaponSubmissions.push({
+                ...submission,
+                issueNumber: issue.number,
+                commentId: comment.id,
+                // Submission already has submittedBy and submittedAt from JSON
+              });
             } catch (err) {
               console.warn('Failed to parse submission from comment', comment.id, err);
             }
@@ -1305,10 +1426,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
       // Note: Don't load submissions here - the useEffect hook will handle it
       // based on forceDesignMode state
+
+      return weaponSubmissions;
     } catch (error) {
       console.error('Failed to load existing submissions:', error);
       setSubmissionLoadError(`Failed to load submissions: ${error.message}`);
       setExistingSubmissions([]);
+      return [];
     } finally {
       setLoadingSubmissions(false);
     }
@@ -1317,6 +1441,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   // Load a submission into the designer grid
   const loadSubmissionIntoDesigner = (submission) => {
     if (!submission) return;
+
+    console.log('[SoulWeaponEngravingBuilder] loadSubmissionIntoDesigner - Loading submission:', {
+      gridType: submission.gridType,
+      activeSlots: submission.totalActiveSlots,
+      completionEffect: submission.completionEffect
+    });
 
     setGridType(submission.gridType);
     // Convert float values to strings with % for display in input fields
@@ -1346,17 +1476,21 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     console.log('[SoulWeaponEngravingBuilder] Loading submission into normal grid:', {
       gridType: submission.gridType,
       totalActiveSlots: submission.totalActiveSlots,
-      activeSlots: submission.activeSlots
+      activeSlots: submission.activeSlots,
+      completionEffect: submission.completionEffect,
+      fullSubmission: submission
     });
 
     // Store submission metadata separately (don't update selectedWeapon to prevent loop)
-    setCurrentSubmissionMeta({
+    const submissionMeta = {
       gridType: submission.gridType,
       activeSlots: submission.activeSlots,
       completionEffect: submission.completionEffect,
       submittedBy: submission.submittedBy || 'Anonymous',
       submittedAt: submission.submittedAt
-    });
+    };
+    console.log('[SoulWeaponEngravingBuilder] Setting currentSubmissionMeta:', submissionMeta);
+    setCurrentSubmissionMeta(submissionMeta);
 
     // Initialize normal grid from submission
     const gridSize = submission.gridType === '4x4' ? 4 : 5;
@@ -1376,6 +1510,17 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     console.log('[SoulWeaponEngravingBuilder] Grid initialized with size:', gridSize, 'x', gridSize);
     console.log('[SoulWeaponEngravingBuilder] Active cells marked:', submission.activeSlots.length);
+
+    // Log the grid state to verify active cells are in correct positions
+    const activePositions = [];
+    grid.forEach((row, rIdx) => {
+      row.forEach((cell, cIdx) => {
+        if (cell.active) {
+          activePositions.push(`(${rIdx},${cIdx})`);
+        }
+      });
+    });
+    console.log('[SoulWeaponEngravingBuilder] Active cell positions in grid:', activePositions.join(', '));
 
     setGridState(grid);
     setPlacingPiece(null);
@@ -1403,8 +1548,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     }
 
     // Validate inputs
-    if (!completionAtk || !completionHp) {
-      alert('Please enter both ATK and HP completion effects.');
+    const atkValidation = validateCompletionEffect(completionAtk, 'ATK completion effect');
+    const hpValidation = validateCompletionEffect(completionHp, 'HP completion effect');
+
+    if (!atkValidation.valid) {
+      alert(`Invalid ATK value: ${atkValidation.error}`);
+      return;
+    }
+
+    if (!hpValidation.valid) {
+      alert(`Invalid HP value: ${hpValidation.error}`);
       return;
     }
 
@@ -1425,25 +1578,29 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     setSubmitting(true);
     try {
-      // Parse completion effect values (remove % if present, convert to float)
-      const parsePercentage = (value) => {
-        if (typeof value === 'number') return value;
-        const str = String(value).trim().replace('%', '');
-        return parseFloat(str);
-      };
+      // Log state values at submission time
+      console.log('[SoulWeaponEngravingBuilder] submitGridLayout - State values at submission:', {
+        gridType: gridType,
+        completionAtk: completionAtk,
+        completionHp: completionHp,
+        activeSlots: activeSlots.length,
+        designerGridSize: `${designerGrid.length}x${designerGrid[0]?.length || 0}`
+      });
 
-      // Create submission data
+      // Create submission data using validated values
       const submission = {
-        weaponId: selectedWeapon.id,
+        weaponId: String(selectedWeapon.id), // Ensure ID is a string
         weaponName: selectedWeapon.name,
         gridType: gridType,
         completionEffect: {
-          atk: parsePercentage(completionAtk),
-          hp: parsePercentage(completionHp)
+          atk: atkValidation.sanitized, // Use validated numeric value
+          hp: hpValidation.sanitized    // Use validated numeric value
         },
         activeSlots: activeSlots,
         totalActiveSlots: activeSlots.length
       };
+
+      console.log('[SoulWeaponEngravingBuilder] submitGridLayout - Final submission object:', submission);
 
       // Call save-data function with type 'grid-submission'
       // Authenticated users will have their username attached, otherwise anonymous
@@ -1476,9 +1633,29 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         alert('Grid layout submitted successfully!');
       }
 
+      console.log('[SoulWeaponEngravingBuilder] Grid submission successful, reloading submissions...');
+
       // Invalidate cache and reload submissions
       invalidateSubmissionCache(selectedWeapon.name);
-      await loadExistingSubmissions(true); // Force refresh
+
+      // Reload all weapons with submissions to update dropdown
+      await loadAllWeaponsWithSubmissions();
+
+      console.log('[SoulWeaponEngravingBuilder] About to call loadExistingSubmissions(true)');
+      const updatedSubmissions = await loadExistingSubmissions(true); // Force refresh and get fresh data
+      console.log('[SoulWeaponEngravingBuilder] loadExistingSubmissions returned:', updatedSubmissions.length, 'submissions');
+
+      // Exit designer mode and load the submitted grid
+      setIsGridDesigner(false);
+      setForceDesignMode(false);
+
+      // Load the first submission (newly submitted one) into normal grid
+      if (updatedSubmissions.length > 0) {
+        console.log('[SoulWeaponEngravingBuilder] Loading first submission into normal grid');
+        loadSubmissionIntoNormalGrid(updatedSubmissions[0]);
+      } else {
+        console.warn('[SoulWeaponEngravingBuilder] No submissions found after reload!');
+      }
     } catch (error) {
       console.error('Failed to submit grid layout:', error);
       alert(`Failed to submit grid layout: ${error.message}`);
@@ -1888,7 +2065,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     console.log('📱 Cell calculation:', { gridX, gridY, cellTotalSize, row, col });
 
     // Check if within bounds
-    const gridSize = selectedWeapon?.gridType === '4x4' ? 4 : 5;
+    // Use submission gridType if available (community submissions), otherwise use weapon gridType
+    const effectiveGridType = currentSubmissionMeta?.gridType || selectedWeapon?.gridType || '5x5';
+    const gridSize = effectiveGridType === '4x4' ? 4 : 5;
     if (row < 0 || col < 0 || row >= gridSize || col >= gridSize) {
       console.log('📱 Out of bounds:', { row, col, gridSize });
       return null;
@@ -3618,7 +3797,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   }
 
   const completionBonus = getCompletionBonus();
-  const gridSize = selectedWeapon?.gridType === '4x4' ? 4 : 5;
+  // Use submission gridType if available (community submissions), otherwise use weapon gridType
+  const effectiveGridType = currentSubmissionMeta?.gridType || selectedWeapon?.gridType || '5x5';
+  const gridSize = effectiveGridType === '4x4' ? 4 : 5;
   const adjustedCellSize = getAdjustedCellSize(gridSize);
   const currentScale = autoScale ? calculatedScale : gridScale; // Use auto or manual scale
 
@@ -3637,18 +3818,20 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       {/* Build Name */}
       {allowSavingBuilds && !isModal && (
         <div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Build Name
-          </label>
-          <input
-            type="text"
+          <ValidatedInput
+            label="Build Name"
             value={buildName}
             onChange={(e) => {
               setBuildName(e.target.value);
               setHasUnsavedChanges(true);
             }}
+            validator={validateBuildName}
             placeholder="Enter build name..."
-            className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            maxLength={STRING_LIMITS.BUILD_NAME_MAX}
+            required={isAuthenticated}
+            showCounter={true}
+            validateOnBlur={false}
+            className="w-full"
           />
         </div>
       )}
@@ -3977,6 +4160,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             <div className="flex gap-2">
               <button
                 onClick={() => {
+                  console.log('[SoulWeaponEngravingBuilder] Grid type button clicked: 4x4');
                   setGridType('4x4');
                   initializeDesignerGrid('4x4'); // Pass new grid type directly
                 }}
@@ -3990,6 +4174,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               </button>
               <button
                 onClick={() => {
+                  console.log('[SoulWeaponEngravingBuilder] Grid type button clicked: 5x5');
                   setGridType('5x5');
                   initializeDesignerGrid('5x5'); // Pass new grid type directly
                 }}
@@ -4039,27 +4224,31 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           {/* Completion Effects */}
           <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                ATK Completion Effect (%)
-              </label>
-              <input
-                type="text"
+              <ValidatedInput
+                label="ATK Completion Effect (%)"
                 value={completionAtk}
                 onChange={(e) => setCompletionAtk(e.target.value)}
+                validator={(value) => validateCompletionEffect(value, 'ATK completion effect')}
                 placeholder="e.g., 2% or 2.5%"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                maxLength={10}
+                required={true}
+                showCounter={false}
+                validateOnBlur={false}
+                className="w-full"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                HP Completion Effect (%)
-              </label>
-              <input
-                type="text"
+              <ValidatedInput
+                label="HP Completion Effect (%)"
                 value={completionHp}
                 onChange={(e) => setCompletionHp(e.target.value)}
+                validator={(value) => validateCompletionEffect(value, 'HP completion effect')}
                 placeholder="e.g., 5.6% or 10%"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                maxLength={10}
+                required={true}
+                showCounter={false}
+                validateOnBlur={false}
+                className="w-full"
               />
             </div>
           </div>

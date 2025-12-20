@@ -2,6 +2,14 @@
  * Shared Data Operations
  * Handles load, save, and delete operations for all data types
  * Used by both Netlify and Cloudflare implementations
+ *
+ * @deprecated This file is no longer used. All functions now use the storage abstraction layer.
+ * See: wiki-framework/src/services/storage/
+ * - StorageFactory creates storage adapters based on configuration
+ * - GitHubStorage wraps this functionality with improved architecture
+ * - CloudflareKVStorage provides alternative KV-based storage
+ *
+ * This file is kept for reference only and may be removed in future versions.
  */
 
 import { Octokit } from '@octokit/rest';
@@ -120,7 +128,7 @@ export async function saveData({ botToken, owner, repo, type, username, userId, 
 }
 
 /**
- * Save user-centric data (skill-build, battle-loadout, my-spirit, spirit-build)
+ * Save user-centric data (skill-builds, battle-loadouts, my-spirits, spirit-builds)
  * @private
  */
 async function saveUserCentricData({ octokit, owner, repo, config, username, userId, item }) {
@@ -383,3 +391,4 @@ export async function deleteData({ botToken, owner, repo, type, username, userId
     return createErrorResponse(500, error.message || 'Internal server error');
   }
 }
+

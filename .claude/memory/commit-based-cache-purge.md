@@ -51,8 +51,9 @@ git push
 The purge behavior respects the `preserveDraftsOnUpdate` config:
 
 - **preserveDraftsOnUpdate: true** (default)
-  - Purges all `cache:*` keys EXCEPT those containing `_draft`
+  - Purges all `cache:*` keys EXCEPT those containing `:draft:`
   - User draft work is preserved (skill builds, loadouts, etc.)
+  - Draft format: `cache:userId:draft:name`
 
 - **preserveDraftsOnUpdate: false**
   - Purges ALL `cache:*` keys including drafts
@@ -64,10 +65,22 @@ The purge behavior respects the `preserveDraftsOnUpdate` config:
 {
   "features": {
     "purgeClientCacheOnUpdate": false,  // Normal purge on version change
-    "preserveDraftsOnUpdate": true      // Keep drafts during purge
+    "preserveDraftsOnUpdate": true,     // Keep drafts during purge
+    "forceRelogOnUpdate": false         // Force users to re-login on version change
   }
 }
 ```
+
+### forceRelogOnUpdate
+
+When set to `true`, users will be automatically logged out when the version changes. This forces them to re-authenticate with GitHub, which can be useful for:
+
+- Ensuring users have fresh authentication tokens
+- Forcing OAuth scope updates
+- Clearing authentication state after security updates
+- Testing authentication flows in production
+
+**Note:** This clears the `config:wiki_auth` storage key, which triggers the authentication flow on next page load.
 
 ## Priority Order
 

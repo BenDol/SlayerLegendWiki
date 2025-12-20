@@ -4,15 +4,26 @@
  *
  * POST /api/delete-data
  * Body: {
- *   type: 'skill-build' | 'battle-loadout' | 'my-spirit' | 'spirit-build',
+ *   type: 'skill-builds' | 'battle-loadouts' | 'my-spirits' | 'spirit-builds',
  *   username: string,
  *   userId: number,
- *   itemId: string (for skill-build/battle-loadout/spirit-build),
- *   spiritId: string (for my-spirit)
+ *   itemId: string (for skill-builds/battle-loadouts/spirit-builds),
+ *   spiritId: string (for my-spirits)
  * }
  */
 
-import { Octokit } from '@octokit/rest';
+import StorageFactory from '../../../wiki-framework/src/services/storage/StorageFactory.js';
+import {
+  DATA_TYPE_CONFIGS,
+  createErrorResponse,
+  createSuccessResponse,
+} from './_lib/utils.js';
+import {
+  validateUsername,
+  validateUserId,
+  validateItemId,
+} from './_lib/validation.js';
+import wikiConfig from '../../../wiki-config.json' with { type: 'json' };
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -33,10 +44,12 @@ export async function onRequest(context) {
     const { type, username, userId, itemId, spiritId } = await request.json();
 
     // Validate required fields
-    const deleteId = type === 'my-spirit' ? spiritId : itemId;
+    const deleteId = type === 'my-spirits' ? spiritId : itemId;
     if (!type || !username || !userId || !deleteId) {
       return new Response(
-        JSON.stringify({ error: `Missing required fields: type, username, userId, ${type === 'my-spirit' ? 'spiritId' : 'itemId'}` }),
+        JSON.stringify({
+          error: `Missing required fields: type, username, userId, ${type === 'my-spirits' ? 'spiritId' : 'itemId'}`
+        }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -45,7 +58,7 @@ export async function onRequest(context) {
     }
 
     // Validate type
-    const validTypes = ['skill-build', 'battle-loadout', 'my-spirit', 'spirit-build'];
+    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds'];
     if (!validTypes.includes(type)) {
       return new Response(
         JSON.stringify({ error: `Invalid type. Must be one of: ${validTypes.join(', ')}` }),
@@ -55,6 +68,46 @@ export async function onRequest(context) {
         }
       );
     }
+
+    // Validate username
+    const usernameResult = validateUsername(username);
+    if (!usernameResult.valid) {
+      return new Response(
+        JSON.stringify({ error: usernameResult.error }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Validate userId
+    const userIdResult = validateUserId(userId);
+    if (!userIdResult.valid) {
+      return new Response(
+        JSON.stringify({ error: userIdResult.error }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Validate deleteId (itemId or spiritId)
+    const idFieldName = type === 'my-spirits' ? 'Spirit ID' : 'Item ID';
+    const deleteIdResult = validateItemId(deleteId, idFieldName);
+    if (!deleteIdResult.valid) {
+      return new Response(
+        JSON.stringify({ error: deleteIdResult.error }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Get configuration
+    const config = DATA_TYPE_CONFIGS[type];
 
     // Get bot token from environment
     const botToken = env.WIKI_BOT_TOKEN;
@@ -69,11 +122,7 @@ export async function onRequest(context) {
       );
     }
 
-    // Initialize Octokit with bot token
-    const octokit = new Octokit({ auth: botToken });
-
     // Get repo info from environment
-    // Try both VITE_ prefixed (for local dev) and non-prefixed (for Cloudflare)
     const owner = env.WIKI_REPO_OWNER || env.VITE_WIKI_REPO_OWNER;
     const repo = env.WIKI_REPO_NAME || env.VITE_WIKI_REPO_NAME;
 
@@ -88,126 +137,31 @@ export async function onRequest(context) {
       );
     }
 
-    // Set type-specific constants
-    const configs = {
-      'skill-build': {
-        label: 'skill-builds',
-        titlePrefix: '[Skill Builds]',
-        itemsName: 'builds',
-      },
-      'battle-loadout': {
-        label: 'battle-loadouts',
-        titlePrefix: '[Battle Loadouts]',
-        itemsName: 'loadouts',
-      },
-      'my-spirit': {
-        label: 'my-spirits',
-        titlePrefix: '[My Spirits]',
-        itemsName: 'spirits',
-      },
-      'spirit-build': {
-        label: 'spirit-builds',
-        titlePrefix: '[Spirit Builds]',
-        itemsName: 'builds',
-      },
+    // Create storage adapter
+    const storageConfig = wikiConfig.storage || {
+      backend: 'github',
+      version: 'v1',
+      github: { owner, repo },
     };
-    const config = configs[type];
 
-    // Get existing items
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: config.label,
-      state: 'open',
-      per_page: 100,
-    });
-
-    // Find user's issue
-    const existingIssue = issues.find(issue =>
-      issue.labels.some(label =>
-        (typeof label === 'string' && label === `user-id:${userId}`) ||
-        (typeof label === 'object' && label.name === `user-id:${userId}`)
-      )
+    const storage = StorageFactory.create(
+      storageConfig,
+      {
+        WIKI_BOT_TOKEN: botToken,
+        SLAYER_WIKI_DATA: env.SLAYER_WIKI_DATA, // KV namespace binding
+      }
     );
 
-    if (!existingIssue) {
-      return new Response(
-        JSON.stringify({ error: 'No items found for this user' }),
-        {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    // Delete the item
+    const remainingItems = await storage.delete(type, username, userId, deleteId);
 
-    // Security: Verify issue was created by bot account
-    const botUsername = env.WIKI_BOT_USERNAME;
-    if (existingIssue.user.login !== botUsername) {
-      console.warn(`[delete-data] Security: Issue #${existingIssue.number} created by ${existingIssue.user.login}, expected ${botUsername}`);
-      return new Response(
-        JSON.stringify({ error: 'Invalid data source' }),
-        {
-          status: 403,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Parse existing items
-    let items = [];
-    try {
-      items = JSON.parse(existingIssue.body || '[]');
-      if (!Array.isArray(items)) items = [];
-    } catch (e) {
-      items = [];
-    }
-
-    // Find and remove the item
-    const itemIndex = items.findIndex(item => item.id === deleteId);
-
-    if (itemIndex === -1) {
-      return new Response(
-        JSON.stringify({ error: 'Item not found' }),
-        {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Remove the item
-    items.splice(itemIndex, 1);
-
-    // Update or close the issue
-    if (items.length === 0) {
-      // Close the issue if no items left
-      await octokit.rest.issues.update({
-        owner,
-        repo,
-        issue_number: existingIssue.number,
-        state: 'closed',
-      });
-
-      console.log(`[delete-data] Closed empty ${config.itemsName} issue for ${username}`);
-    } else {
-      // Update the issue with remaining items
-      const issueBody = JSON.stringify(items, null, 2);
-
-      await octokit.rest.issues.update({
-        owner,
-        repo,
-        issue_number: existingIssue.number,
-        body: issueBody,
-      });
-
-      console.log(`[delete-data] Updated ${config.itemsName} for ${username}`);
-    }
+    console.log(`[delete-data] Deleted item ${deleteId} for ${username}, ${remainingItems.length} items remaining`);
 
     // Return response with dynamic key name
     const response = {
       success: true,
     };
-    response[config.itemsName] = items;
+    response[config.itemsName] = remainingItems;
 
     return new Response(
       JSON.stringify(response),
@@ -216,6 +170,7 @@ export async function onRequest(context) {
         headers: { 'Content-Type': 'application/json' }
       }
     );
+
   } catch (error) {
     console.error('[delete-data] Error:', error);
     return new Response(

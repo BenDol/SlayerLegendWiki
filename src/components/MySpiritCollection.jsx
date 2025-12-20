@@ -6,6 +6,8 @@ import SpiritSelector from './SpiritSelector';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { getCache, setCache, clearCache } from '../utils/buildCache';
 import { getSaveDataEndpoint, getLoadDataEndpoint, getDeleteDataEndpoint } from '../utils/apiEndpoints.js';
+import { useSpiritsData } from '../hooks/useSpiritsData';
+import { serializeSpirit, deserializeSpirit } from '../utils/spiritSerialization';
 
 /**
  * MySpiritCollection Component
@@ -19,6 +21,7 @@ import { getSaveDataEndpoint, getLoadDataEndpoint, getDeleteDataEndpoint } from 
  */
 const MySpiritCollection = () => {
   const { isAuthenticated, user } = useAuthStore();
+  const { spiritsData } = useSpiritsData(); // Load spirits database
   const [spirits, setSpirits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSpiritSelector, setShowSpiritSelector] = useState(false);
@@ -29,33 +32,41 @@ const MySpiritCollection = () => {
 
   // Load saved spirits
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && spiritsData.length > 0) {
       loadSpirits();
-    } else {
+    } else if (!isAuthenticated) {
       setLoading(false);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, spiritsData]);
 
   const loadSpirits = async () => {
     try {
       setLoading(true);
 
       // Try cache first
-      const cached = getCache('my-spirits', user.id);
+      const cached = getCache('my_spirits', user.id);
       if (cached) {
-        setSpirits(cached);
+        // Deserialize cached spirits, preserving record IDs
+        const deserializedSpirits = cached
+          .map(s => deserializeSpirit(s, spiritsData, s.id))
+          .filter(s => s !== null && s.spirit !== null);
+        setSpirits(deserializedSpirits);
         setLoading(false);
         return;
       }
 
       // Fetch from API
-      const response = await fetch(`${getLoadDataEndpoint()}?type=my-spirit&userId=${user.id}`);
+      const response = await fetch(`${getLoadDataEndpoint()}?type=my-spirits&userId=${user.id}`);
       const data = await response.json();
 
       if (data.success) {
         const loadedSpirits = data.spirits || [];
-        setSpirits(loadedSpirits);
-        setCache('my-spirits', user.id, loadedSpirits);
+        // Deserialize loaded spirits, preserving record IDs
+        const deserializedSpirits = loadedSpirits
+          .map(s => deserializeSpirit(s, spiritsData, s.id))
+          .filter(s => s !== null && s.spirit !== null);
+        setSpirits(deserializedSpirits);
+        setCache('my_spirits', user.id, loadedSpirits); // Cache serialized version
       }
     } catch (error) {
       console.error('Failed to load spirits:', error);
@@ -84,19 +95,14 @@ const MySpiritCollection = () => {
       setSaving(true);
       setSaveError(null);
 
-      const spiritData = {
-        spirit: editingSpirit.spirit,
-        level: editingSpirit.level,
-        awakeningLevel: editingSpirit.awakeningLevel,
-        evolutionLevel: editingSpirit.evolutionLevel,
-        skillEnhancementLevel: editingSpirit.skillEnhancementLevel
-      };
+      // Serialize spirit to only store ID (reduces storage and is resilient to data changes)
+      const spiritData = serializeSpirit(editingSpirit);
 
       const response = await fetch(getSaveDataEndpoint(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'my-spirit',
+          type: 'my-spirits',
           username: user.login,
           userId: user.id,
           data: spiritData,
@@ -111,15 +117,15 @@ const MySpiritCollection = () => {
 
       const data = await response.json();
 
-      // Update cache
+      // Update cache with serialized version
       if (data.spirits) {
-        setCache('my-spirits', user.id, data.spirits);
+        setCache('my_spirits', user.id, data.spirits);
       }
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
 
-      // Reload spirits
+      // Reload spirits (will deserialize the saved data)
       await loadSpirits();
       setEditingSpirit(null);
     } catch (error) {
@@ -138,7 +144,7 @@ const MySpiritCollection = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'my-spirit',
+          type: 'my-spirits',
           username: user.login,
           userId: user.id,
           spiritId: spiritId
@@ -150,7 +156,7 @@ const MySpiritCollection = () => {
       }
 
       // Clear cache and reload
-      clearCache('my-spirits', user.id);
+      clearCache('my_spirits', user.id);
       await loadSpirits();
     } catch (error) {
       console.error('Failed to delete spirit:', error);
@@ -353,3 +359,4 @@ const MySpiritCollection = () => {
 };
 
 export default MySpiritCollection;
+
