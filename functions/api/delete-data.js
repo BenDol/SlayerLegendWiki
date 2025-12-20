@@ -177,10 +177,11 @@ export async function onRequest(context) {
     };
     response[config.itemsName] = remainingItems;
 
+    const result = createSuccessResponse(response);
     return new Response(
-      JSON.stringify(createSuccessResponse(response).body),
+      result.body,  // Already a JSON string from createSuccessResponse
       {
-        status: 200,
+        status: result.statusCode,
         headers: { 'Content-Type': 'application/json' }
       }
     );

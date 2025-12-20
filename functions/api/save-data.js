@@ -235,7 +235,7 @@ export async function onRequest(context) {
     if (type === 'grid-submission') {
       const result = await handleGridSubmission(storage, config, data, username, replace);
       return new Response(
-        JSON.stringify(result.body),
+        result.body,  // Already a JSON string from createSuccessResponse
         {
           status: result.statusCode,
           headers: { 'Content-Type': 'application/json' }
@@ -246,7 +246,7 @@ export async function onRequest(context) {
     // Handle user-centric data
     const result = await handleUserCentricSave(storage, config, type, username, userId, data, spiritId);
     return new Response(
-      JSON.stringify(result.body),
+      result.body,  // Already a JSON string from createSuccessResponse
       {
         status: result.statusCode,
         headers: { 'Content-Type': 'application/json' }
