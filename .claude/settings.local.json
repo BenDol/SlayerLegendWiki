@@ -35,7 +35,8 @@
       "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\wiki-framework\\\\logs\\\\debug.log\" -Tail 200)",
       "Bash(Select-String -Pattern \"SoulWeaponEngravingBuilder|gridType|Grid type|submitGridLayout|loadSubmissionIntoDesigner\" -Context 2,2)",
       "Bash(git checkout:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(ls:*)"
     ]
   }
 }

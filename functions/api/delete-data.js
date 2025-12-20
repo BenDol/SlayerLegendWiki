@@ -24,14 +24,26 @@ import {
   validateItemId,
 } from '../../netlify/functions/shared/validation.js';
 
-// Load wiki config at build time
-let wikiConfig;
-try {
-  // @ts-ignore
-  wikiConfig = await import('../../../wiki-config.json', { with: { type: 'json' } }).then(m => m.default);
-} catch (e) {
-  console.warn('[delete-data] Could not load wiki-config.json, using defaults');
-  wikiConfig = {};
+/**
+ * Get storage configuration from environment
+ * Uses a default GitHub backend configuration
+ */
+function getStorageConfig(env, owner, repo) {
+  // Check if KV namespace is bound (indicates KV backend should be used)
+  if (env.SLAYER_WIKI_DATA) {
+    return {
+      backend: 'cloudflare-kv',
+      version: 'v1',
+      cloudflareKV: { namespace: env.SLAYER_WIKI_DATA }
+    };
+  }
+
+  // Default to GitHub backend
+  return {
+    backend: 'github',
+    version: 'v1',
+    github: { owner, repo }
+  };
 }
 
 export async function onRequest(context) {
@@ -147,11 +159,7 @@ export async function onRequest(context) {
     }
 
     // Create storage adapter
-    const storageConfig = wikiConfig.storage || {
-      backend: 'github',
-      version: 'v1',
-      github: { owner, repo },
-    };
+    const storageConfig = getStorageConfig(env, owner, repo);
 
     const storage = StorageFactory.create(
       storageConfig,

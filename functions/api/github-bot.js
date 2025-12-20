@@ -18,14 +18,26 @@ import { generateVerificationEmail, generateVerificationEmailText } from './emai
 import { sendEmail } from './_lib/sendgrid.js';
 import * as jwt from './_lib/jwt.js';
 
-// Load wiki config at build time
-let wikiConfig;
-try {
-  // @ts-ignore
-  wikiConfig = await import('../../../wiki-config.json', { with: { type: 'json' } }).then(m => m.default);
-} catch (e) {
-  console.warn('[github-bot] Could not load wiki-config.json, using defaults');
-  wikiConfig = {};
+/**
+ * Get storage configuration from environment
+ * Uses a default GitHub backend configuration
+ */
+function getStorageConfig(env, owner, repo) {
+  // Check if KV namespace is bound (indicates KV backend should be used)
+  if (env.SLAYER_WIKI_DATA) {
+    return {
+      backend: 'cloudflare-kv',
+      version: 'v1',
+      cloudflareKV: { namespace: env.SLAYER_WIKI_DATA }
+    };
+  }
+
+  // Default to GitHub backend
+  return {
+    backend: 'github',
+    version: 'v1',
+    github: { owner, repo }
+  };
 }
 
 /**
@@ -133,12 +145,8 @@ function maskEmail(email) {
 /**
  * Create storage instance helper
  */
-function createStorage(botToken, owner, repo) {
-  const storageConfig = wikiConfig.storage || {
-    backend: 'github',
-    version: 'v1',
-    github: { owner, repo },
-  };
+function createStorage(env, botToken, owner, repo) {
+  const storageConfig = getStorageConfig(env, owner, repo);
 
   return StorageFactory.create(
     storageConfig,
@@ -150,8 +158,8 @@ function createStorage(botToken, owner, repo) {
  * Simple storage helpers for verification codes
  * Uses StorageFactory with configured backend
  */
-async function storeVerificationCode(botToken, owner, repo, emailHash, code, expiresAt) {
-  const storage = createStorage(botToken, owner, repo);
+async function storeVerificationCode(env, botToken, owner, repo, emailHash, code, expiresAt) {
+  const storage = createStorage(env, botToken, owner, repo);
 
   const item = {
     id: `verify-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -164,16 +172,16 @@ async function storeVerificationCode(botToken, owner, repo, emailHash, code, exp
   return item;
 }
 
-async function getVerificationCode(botToken, owner, repo, emailHash) {
-  const storage = createStorage(botToken, owner, repo);
+async function getVerificationCode(env, botToken, owner, repo, emailHash) {
+  const storage = createStorage(env, botToken, owner, repo);
   const items = await storage.load('email-verification', emailHash);
 
   // Return the first (and should be only) verification code
   return items[0] || null;
 }
 
-async function deleteVerificationCode(botToken, owner, repo, emailHash, itemId) {
-  const storage = createStorage(botToken, owner, repo);
+async function deleteVerificationCode(env, botToken, owner, repo, emailHash, itemId) {
+  const storage = createStorage(env, botToken, owner, repo);
   return storage.delete('email-verification', emailHash, emailHash, itemId);
 }
 
@@ -920,7 +928,7 @@ async function handleSendVerificationEmail(octokit, env, { owner, repo, email })
     }
 
     // Store verification code
-    await storeVerificationCode(botToken, owner, repo, emailHash, encryptedCode, expiresAt);
+    await storeVerificationCode(env, botToken, owner, repo, emailHash, encryptedCode, expiresAt);
 
     console.log(`[github-bot] Stored verification code for emailHash: ${emailHash.substring(0, 8)}...`);
 
@@ -981,7 +989,7 @@ async function handleVerifyEmail(octokit, env, { owner, repo, email, code }) {
     }
 
     // Get verification code from storage
-    const storedData = await getVerificationCode(botToken, owner, repo, emailHash);
+    const storedData = await getVerificationCode(env, botToken, owner, repo, emailHash);
 
     if (!storedData) {
       return {
@@ -1015,7 +1023,7 @@ async function handleVerifyEmail(octokit, env, { owner, repo, email, code }) {
     }
 
     // Delete verification code after successful verification
-    await deleteVerificationCode(botToken, owner, repo, emailHash, storedData.id);
+    await deleteVerificationCode(env, botToken, owner, repo, emailHash, storedData.id);
 
     // Generate verification token
     const token = await createVerificationToken(email, secret);
