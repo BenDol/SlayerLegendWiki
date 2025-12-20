@@ -13,7 +13,7 @@
  * }
  */
 
-import StorageFactory from '../../wiki-framework/src/services/storage/StorageFactory.js';
+import StorageFactory from 'github-wiki-framework/src/services/storage/StorageFactory.js';
 import {
   DATA_TYPE_CONFIGS,
   VALID_DATA_TYPES,

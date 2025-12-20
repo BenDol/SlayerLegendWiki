@@ -13,11 +13,20 @@
 
 import { Octokit } from '@octokit/rest';
 import * as LeoProfanity from 'leo-profanity';
+import StorageFactory from 'github-wiki-framework/src/services/storage/StorageFactory.js';
 import { generateVerificationEmail, generateVerificationEmailText } from './emailTemplates/verificationEmail.js';
 import { sendEmail } from './_lib/sendgrid.js';
 import * as jwt from './_lib/jwt.js';
-import StorageFactory from './_lib/StorageFactory.js';
-import { getWikiConfig } from './_lib/config.js';
+
+// Load wiki config at build time
+let wikiConfig;
+try {
+  // @ts-ignore
+  wikiConfig = await import('../../../wiki-config.json', { with: { type: 'json' } }).then(m => m.default);
+} catch (e) {
+  console.warn('[github-bot] Could not load wiki-config.json, using defaults');
+  wikiConfig = {};
+}
 
 /**
  * Encrypt data using AES-GCM
@@ -119,6 +128,53 @@ function maskEmail(email) {
   const mask = '*'.repeat(baseMaskLength + randomExtra);
 
   return `${firstChar}${mask}${lastChar}@${domain}`;
+}
+
+/**
+ * Create storage instance helper
+ */
+function createStorage(botToken, owner, repo) {
+  const storageConfig = wikiConfig.storage || {
+    backend: 'github',
+    version: 'v1',
+    github: { owner, repo },
+  };
+
+  return StorageFactory.create(
+    storageConfig,
+    { WIKI_BOT_TOKEN: botToken }
+  );
+}
+
+/**
+ * Simple storage helpers for verification codes
+ * Uses StorageFactory with configured backend
+ */
+async function storeVerificationCode(botToken, owner, repo, emailHash, code, expiresAt) {
+  const storage = createStorage(botToken, owner, repo);
+
+  const item = {
+    id: `verify-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    code,
+    expiresAt,
+    createdAt: new Date().toISOString()
+  };
+
+  await storage.save('email-verification', emailHash, emailHash, item);
+  return item;
+}
+
+async function getVerificationCode(botToken, owner, repo, emailHash) {
+  const storage = createStorage(botToken, owner, repo);
+  const items = await storage.load('email-verification', emailHash);
+
+  // Return the first (and should be only) verification code
+  return items[0] || null;
+}
+
+async function deleteVerificationCode(botToken, owner, repo, emailHash, itemId) {
+  const storage = createStorage(botToken, owner, repo);
+  return storage.delete('email-verification', emailHash, emailHash, itemId);
 }
 
 /**
@@ -857,29 +913,14 @@ async function handleSendVerificationEmail(octokit, env, { owner, repo, email })
     }
     const encryptedCode = await encryptData(code, secret);
 
-    // Create storage adapter
+    // Get bot token
     const botToken = env.WIKI_BOT_TOKEN;
     if (!botToken) {
       throw new Error('WIKI_BOT_TOKEN not configured');
     }
 
-    const wikiConfig = getWikiConfig(env);
-    const storageConfig = wikiConfig.storage || {
-      backend: 'github',
-      version: 'v1',
-      github: { owner, repo },
-    };
-
-    const storage = StorageFactory.create(
-      storageConfig,
-      {
-        WIKI_BOT_TOKEN: botToken,
-        SLAYER_WIKI_DATA: env.SLAYER_WIKI_DATA, // KV namespace (if available)
-      }
-    );
-
-    // Store verification code using storage abstraction
-    await storage.storeVerificationCode(emailHash, encryptedCode, expiresAt);
+    // Store verification code
+    await storeVerificationCode(botToken, owner, repo, emailHash, encryptedCode, expiresAt);
 
     console.log(`[github-bot] Stored verification code for emailHash: ${emailHash.substring(0, 8)}...`);
 
@@ -933,34 +974,14 @@ async function handleVerifyEmail(octokit, env, { owner, repo, email, code }) {
     // Hash email
     const emailHash = await hashIP(email);
 
-    // Get storage configuration
-    const wikiConfig = getWikiConfig(env);
-    const storageConfig = wikiConfig.storage || {
-      backend: 'github',
-      version: 'v1',
-      github: {
-        owner: wikiConfig.repo?.owner || owner,
-        repo: wikiConfig.repo?.name || repo,
-      },
-    };
-
     // Get bot token
     const botToken = env.WIKI_BOT_TOKEN;
     if (!botToken) {
       throw new Error('WIKI_BOT_TOKEN not configured');
     }
 
-    // Create storage adapter
-    const storage = StorageFactory.create(
-      storageConfig,
-      {
-        WIKI_BOT_TOKEN: botToken,
-        SLAYER_WIKI_DATA: env.SLAYER_WIKI_DATA, // KV namespace
-      }
-    );
-
     // Get verification code from storage
-    const storedData = await storage.getVerificationCode(emailHash);
+    const storedData = await getVerificationCode(botToken, owner, repo, emailHash);
 
     if (!storedData) {
       return {
@@ -994,7 +1015,7 @@ async function handleVerifyEmail(octokit, env, { owner, repo, email, code }) {
     }
 
     // Delete verification code after successful verification
-    await storage.deleteVerificationCode(emailHash);
+    await deleteVerificationCode(botToken, owner, repo, emailHash, storedData.id);
 
     // Generate verification token
     const token = await createVerificationToken(email, secret);

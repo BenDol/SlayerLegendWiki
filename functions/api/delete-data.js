@@ -1,5 +1,5 @@
 /**
- * Cloudflare Function: Delete Data (Universal)
+ * Cloudflare Pages Function: Delete Data (Universal)
  * Handles deleting skill builds, battle loadouts, and spirit collection
  *
  * POST /api/delete-data
@@ -12,18 +12,27 @@
  * }
  */
 
-import StorageFactory from './_lib/StorageFactory.js';
+import StorageFactory from 'github-wiki-framework/src/services/storage/StorageFactory.js';
 import {
   DATA_TYPE_CONFIGS,
   createErrorResponse,
   createSuccessResponse,
-} from './_lib/utils.js';
+} from '../../netlify/functions/shared/utils.js';
 import {
   validateUsername,
   validateUserId,
   validateItemId,
-} from './_lib/validation.js';
-import { getWikiConfig } from './_lib/config.js';
+} from '../../netlify/functions/shared/validation.js';
+
+// Load wiki config at build time
+let wikiConfig;
+try {
+  // @ts-ignore
+  wikiConfig = await import('../../../wiki-config.json', { with: { type: 'json' } }).then(m => m.default);
+} catch (e) {
+  console.warn('[delete-data] Could not load wiki-config.json, using defaults');
+  wikiConfig = {};
+}
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -138,7 +147,6 @@ export async function onRequest(context) {
     }
 
     // Create storage adapter
-    const wikiConfig = getWikiConfig(env);
     const storageConfig = wikiConfig.storage || {
       backend: 'github',
       version: 'v1',
@@ -147,10 +155,7 @@ export async function onRequest(context) {
 
     const storage = StorageFactory.create(
       storageConfig,
-      {
-        WIKI_BOT_TOKEN: botToken,
-        SLAYER_WIKI_DATA: env.SLAYER_WIKI_DATA, // KV namespace binding
-      }
+      { WIKI_BOT_TOKEN: botToken }
     );
 
     // Delete the item
@@ -165,7 +170,7 @@ export async function onRequest(context) {
     response[config.itemsName] = remainingItems;
 
     return new Response(
-      JSON.stringify(response),
+      JSON.stringify(createSuccessResponse(response).body),
       {
         status: 200,
         headers: { 'Content-Type': 'application/json' }

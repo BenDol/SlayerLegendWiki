@@ -51,6 +51,7 @@ export default createWikiConfigSync({
         '**/public/images/**',
         '**/external/**',
         '**/node_modules/**',
+        '!**/node_modules/github-wiki-framework/**', // BUT watch the framework package
         '**/dist/**',
         '**/.git/**',
       ],
@@ -64,8 +65,8 @@ export default createWikiConfigSync({
   // Optimize dependency pre-bundling
   optimizeDeps: {
     exclude: [
-      // Exclude framework from pre-bundling to avoid conflicts
-      'wiki-framework',
+      // Exclude framework from pre-bundling to enable HMR
+      'github-wiki-framework',
     ],
     include: [
       // Pre-bundle common dependencies
@@ -84,11 +85,11 @@ export default createWikiConfigSync({
       output: {
         // Manual chunking for better caching
         manualChunks(id) {
+          if (id.includes('node_modules/github-wiki-framework')) {
+            return 'framework';
+          }
           if (id.includes('node_modules')) {
             return 'vendor';
-          }
-          if (id.includes('wiki-framework')) {
-            return 'framework';
           }
         },
       },

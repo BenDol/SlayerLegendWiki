@@ -1,5 +1,5 @@
 {
   "branch": "main",
-  "source": "netlify-env",
-  "detectedAt": "2025-12-20T10:24:43.968Z"
+  "source": "build-time",
+  "detectedAt": "2025-12-20T12:23:40.068Z"
 }

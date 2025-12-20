@@ -1,5 +1,5 @@
 /**
- * Cloudflare Function: Save Data (Universal)
+ * Cloudflare Pages Function: Save Data (Universal)
  * Handles saving skill builds, battle loadouts, spirit collection, and grid submissions
  *
  * POST /api/save-data
@@ -8,26 +8,37 @@
  *   username: string,
  *   userId: number,
  *   data: object,
- *   spiritId?: string (For my-spiritss updates),
+ *   spiritId?: string (For my-spirits updates),
  *   replace?: boolean (for grid-submission replace mode)
  * }
  */
 
-import StorageFactory from './_lib/StorageFactory.js';
+import StorageFactory from 'github-wiki-framework/src/services/storage/StorageFactory.js';
 import {
   DATA_TYPE_CONFIGS,
   VALID_DATA_TYPES,
   createErrorResponse,
   createSuccessResponse,
-} from './_lib/utils.js';
+} from '../../netlify/functions/shared/utils.js';
 import {
   validateUsername,
   validateUserId,
   validateBuildData,
   validateGridSubmission,
   validateRequestBodySize,
-} from './_lib/validation.js';
-import { getWikiConfig } from './_lib/config.js';
+} from '../../netlify/functions/shared/validation.js';
+
+// Load wiki config at build time
+// This works in Cloudflare because it's resolved during bundling
+let wikiConfig;
+try {
+  // Dynamic import during request handling won't work, so we do a static import
+  // @ts-ignore
+  wikiConfig = await import('../../../wiki-config.json', { with: { type: 'json' } }).then(m => m.default);
+} catch (e) {
+  console.warn('[save-data] Could not load wiki-config.json, using defaults');
+  wikiConfig = {};
+}
 
 /**
  * Main handler
@@ -35,7 +46,7 @@ import { getWikiConfig } from './_lib/config.js';
 export async function onRequest(context) {
   const { request, env } = context;
 
-  // Only allow POST
+  // Only accept POST requests
   if (request.method !== 'POST') {
     return new Response(
       JSON.stringify({ error: 'Method not allowed' }),
@@ -203,7 +214,6 @@ export async function onRequest(context) {
     }
 
     // Create storage adapter
-    const wikiConfig = getWikiConfig(env);
     const storageConfig = wikiConfig.storage || {
       backend: 'github',
       version: 'v1',
@@ -212,19 +222,30 @@ export async function onRequest(context) {
 
     const storage = StorageFactory.create(
       storageConfig,
-      {
-        WIKI_BOT_TOKEN: botToken,
-        SLAYER_WIKI_DATA: env.SLAYER_WIKI_DATA, // KV namespace binding
-      }
+      { WIKI_BOT_TOKEN: botToken }
     );
 
     // Handle grid submissions (weapon-centric)
     if (type === 'grid-submission') {
-      return await handleGridSubmission(storage, config, data, username, replace);
+      const result = await handleGridSubmission(storage, config, data, username, replace);
+      return new Response(
+        JSON.stringify(result.body),
+        {
+          status: result.statusCode,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Handle user-centric data
-    return await handleUserCentricSave(storage, config, type, username, userId, data, spiritId);
+    const result = await handleUserCentricSave(storage, config, type, username, userId, data, spiritId);
+    return new Response(
+      JSON.stringify(result.body),
+      {
+        status: result.statusCode,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
 
   } catch (error) {
     console.error('[save-data] Error:', error);
@@ -270,16 +291,10 @@ async function handleGridSubmission(storage, config, data, username, replace) {
           updatedSubmission
         );
 
-        return new Response(
-          JSON.stringify({
-            success: true,
-            submission: updatedSubmission,
-          }),
-          {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-          }
-        );
+        return createSuccessResponse({
+          success: true,
+          submission: updatedSubmission,
+        });
       }
     }
 
@@ -298,26 +313,14 @@ async function handleGridSubmission(storage, config, data, username, replace) {
       newSubmission
     );
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        submission: newSubmission,
-      }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return createSuccessResponse({
+      success: true,
+      submission: newSubmission,
+    });
 
   } catch (error) {
     console.error('[save-data] Grid submission error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Failed to save grid submission' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return createErrorResponse(500, error.message || 'Failed to save grid submission');
   }
 }
 
@@ -332,7 +335,7 @@ async function handleUserCentricSave(storage, config, type, username, userId, da
     // Find existing item
     let itemIndex = -1;
     if (type === 'my-spirits' && spiritId) {
-      // For my-spiritss updates, find by spiritId
+      // For my-spirits updates, find by spiritId
       itemIndex = items.findIndex(item => item.id === spiritId);
     } else if (type !== 'my-spirits' && data.name) {
       // For other types, find by name
@@ -352,12 +355,9 @@ async function handleUserCentricSave(storage, config, type, username, userId, da
     } else {
       // Add new item
       if (config.maxItems && items.length >= config.maxItems) {
-        return new Response(
-          JSON.stringify({ error: `Maximum ${config.maxItems} ${config.itemsName} allowed. Please delete an old item first.` }),
-          {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' }
-          }
+        return createErrorResponse(
+          400,
+          `Maximum ${config.maxItems} ${config.itemsName} allowed. Please delete an old item first.`
         );
       }
 
@@ -382,22 +382,10 @@ async function handleUserCentricSave(storage, config, type, username, userId, da
     response[config.itemsName.replace(/s$/, '')] = itemToSave; // Singular form
     response[config.itemsName] = updatedItems; // Plural form
 
-    return new Response(
-      JSON.stringify(response),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return createSuccessResponse(response);
 
   } catch (error) {
     console.error('[save-data] User-centric save error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Failed to save data' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return createErrorResponse(500, error.message || 'Failed to save data');
   }
 }
