@@ -125,8 +125,10 @@ export default createWikiConfigSync({
           }
 
           // CodeMirror (code editor - very large)
+          // Keep CodeMirror together with its dependencies to avoid initialization issues
           if (id.includes('node_modules/@codemirror') ||
-              id.includes('node_modules/@uiw/react-codemirror')) {
+              id.includes('node_modules/@uiw/react-codemirror') ||
+              id.includes('node_modules/@lezer')) {
             return 'codemirror';
           }
 
