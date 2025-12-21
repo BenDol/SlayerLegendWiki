@@ -1,14 +1,17 @@
 ---
+id: latent-power
 title: Latent Power
-description: Character system guide
+description: Guide to the Latent Power system, unlocking hidden character potential and accessing advanced stat bonuses
 tags:
   - character
+  - latent-power
+  - progression
+  - stats
 category: Characters
-date: 2025-12-13T00:00:00.000Z
-order: 0
+date: 2025-12-21
 ---
-# latent-power
-Comprehensive guide coming soon
 
+# Latent Power
 
-TESTETSTST !
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

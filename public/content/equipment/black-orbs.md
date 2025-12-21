@@ -1,12 +1,17 @@
 ---
 id: black-orbs
-title: ''
-description: ''
-tags: []
-category: ''
-date: ''
+title: Black Orbs
+description: Guide to Black Orbs, a rare and powerful crafting material used for advanced equipment upgrades and special enhancements
+tags:
+  - equipment
+  - materials
+  - black-orbs
+  - crafting
+category: Equipment
+date: 2025-12-21
 ---
-# black-orbs
-Equipment guide
 
-DASDaSD
+# Black Orbs
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

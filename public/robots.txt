@@ -1,0 +1,64 @@
+# robots.txt for Slayer Legend Wiki
+
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow admin/private areas (if any)
+Disallow: /api/
+Disallow: /.netlify/
+Disallow: /.github/
+
+# Disallow build artifacts
+Disallow: /dist/
+Disallow: /node_modules/
+
+# Allow crawling of CSS, JS, and images for better indexing
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+
+# Sitemap location
+Sitemap: https://slayerlegend.wiki/sitemap.xml
+
+# Crawl delay (optional - prevents aggressive crawling)
+# Crawl-delay: 1
+
+# Specific bot instructions
+# Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 0
+
+# Discord bot (for link previews)
+User-agent: Discordbot
+Allow: /
+
+# Twitter bot (for card previews)
+User-agent: Twitterbot
+Allow: /
+
+# Facebook bot (for link previews)
+User-agent: facebookexternalhit
+Allow: /
+
+# LinkedIn bot
+User-agent: LinkedInBot
+Allow: /
+
+# Block common bad bots (optional)
+# User-agent: AhrefsBot
+# Disallow: /
+
+# User-agent: SemrushBot
+# Disallow: /

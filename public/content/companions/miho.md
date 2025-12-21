@@ -1,8 +1,16 @@
 ---
-title: miho
-tags: [companions]
+id: miho
+title: Miho
+description: Guide to Miho, a defensive tank companion. Learn her tanking abilities, survivability builds, and enhancement strategies
+tags:
+  - companions
+  - miho
+  - tank
 category: Companions
-date: 2025-12-13
+date: 2025-12-21
 ---
-# miho
-Companion guide
+
+# Miho
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

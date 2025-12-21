@@ -1,4 +1,5 @@
 ---
+id: guidelines
 title: Editing Guidelines
 description: Style and formatting guidelines for wiki contributors
 tags: [meta, guidelines, style]
@@ -86,6 +87,231 @@ Use tables for structured data:
 ```markdown
 [Official Discord](https://discord.gg/example)
 ```
+
+## Data Injection System
+
+The wiki supports powerful data injection using the `{{...}}` syntax to automatically display game data like spirits, skills, and equipment.
+
+### Why Use Data Injection?
+
+**Benefits:**
+- ✅ Automatic updates when game data changes
+- ✅ Consistent formatting across all pages
+- ✅ Rich, interactive displays
+- ✅ No need to manually maintain stats
+- ✅ Autocomplete suggestions in the editor
+
+### Basic Syntax
+
+All data injection uses double curly braces:
+```markdown
+{{type:identifier:display-mode}}
+```
+
+### Spirit Data
+
+**Spirit by ID:**
+```markdown
+{{data:spirits:1:inline:false}}
+```
+Displays: Spirit #1 (Todd) inline without showing the ID
+
+**Spirit by ID with card:**
+```markdown
+{{data:spirits:4}}
+```
+Displays: Spirit #4 (Loar) as a full card (default mode)
+
+**Parameters:**
+- `spirits` - Data source
+- ID number (1-13 for spirits)
+- `inline` or `card` - Display mode (default: `card`)
+- `true` or `false` - Show ID number (default: `true`)
+
+**Examples:**
+
+Use **inline** for mentions in paragraphs:
+```markdown
+Use {{data:spirits:6:inline:false}} (Todd) for gold farming.
+```
+Result: Shows Todd's name/icon inline without ID
+
+Use **card** for detailed information:
+```markdown
+{{data:spirits:8}}
+```
+Result: Shows full Loar card with stats and abilities
+
+### Skill Data
+
+**Skill by name:**
+```markdown
+{{skill:Fire Slash}}
+```
+Displays: Full skill card with detailed information
+
+**Skill with display mode:**
+```markdown
+{{skill:Ice Spear:compact}}
+```
+Displays: Compact skill information
+
+**Display modes:**
+- `detailed` (default) - Full card with all information
+- `compact` - Smaller, condensed display
+- `inline` - Just the name/icon for text flow
+
+### Equipment Data
+
+**Equipment by name:**
+```markdown
+{{equipment:Legendary Sword}}
+```
+Displays: Full equipment card
+
+**Equipment with mode:**
+```markdown
+{{equipment:Dragon Armor:compact}}
+```
+Displays: Compact equipment information
+
+### Generic Data Injection
+
+For any data source in the database:
+
+**Syntax:**
+```markdown
+{{data:source:id:template:showId}}
+```
+
+**Parameters:**
+1. `source` - Data type (spirits, skills, equipment, etc.)
+2. `id` - Item ID or name
+3. `template` - Display template (`card`, `inline`, `table`)
+4. `showId` - Show ID number (`true` or `false`)
+
+**Available data sources:**
+- `spirits` - Spirit characters
+- `skills` - All skills
+- `equipment` - Equipment items
+- `spirit-upgrades` - Spirit level costs
+- `companions` - Companion data
+
+### Common Use Cases
+
+**In paragraphs (inline):**
+```markdown
+The best spirit for gold farming is {{data:spirits:6:inline:false}},
+which provides a significant gold drop bonus.
+```
+
+**As references (card):**
+```markdown
+## Recommended Spirits
+
+For boss farming:
+{{data:spirits:4}}
+
+For experience farming:
+{{data:spirits:10}}
+```
+
+**Lists with inline:**
+```markdown
+**Key Spirits:**
+- Gold: {{data:spirits:6:inline:false}} (Todd)
+- Experience: {{data:spirits:10:inline:false}} (Luga)
+- Boss: {{data:spirits:4:inline:false}} (Loar)
+```
+
+### Legacy HTML Comment Syntax
+
+The system also supports HTML comment syntax (for compatibility):
+
+```markdown
+<!-- data:spirits:1:inline:false -->
+<!-- skill:Fire Slash:detailed -->
+<!-- equipment:Dragon Sword -->
+```
+
+**However, the `{{...}}` syntax is preferred** as it's more visible in the editor.
+
+### Editor Autocomplete
+
+The page editor provides autocomplete for data injection:
+
+**To use autocomplete:**
+1. Type `{{` in the editor
+2. Choose the data type (spirits, skills, equipment)
+3. Search for the item by name or ID
+4. Select display mode
+5. Press Enter to insert
+
+This ensures correct syntax and valid references.
+
+### Spirit IDs Quick Reference
+
+Common spirit IDs for quick reference:
+- 1: Ulse (Attack boost)
+- 2: Rawy (Critical rate)
+- 3: Herh (Cooldown reduction)
+- 4: Loar (Boss damage)
+- 5: Mum (Normal monster damage)
+- 6: Todd (Gold boost)
+- 7: Dang (Physical defense)
+- 8: Uzu (Drop rate)
+- 9: Bo (Max HP)
+- 10: Luga (Experience boost)
+- 11: Kart (First strike damage)
+- 12: Noah (Burst skill damage)
+- 13: Song (Skill damage)
+
+### Best Practices
+
+**Do:**
+- ✅ Use `inline:false` in sentences to avoid showing IDs
+- ✅ Use `card` mode for detailed references
+- ✅ Use descriptive text around data injections
+- ✅ Test that data injection displays correctly
+- ✅ Use autocomplete to avoid typos
+
+**Don't:**
+- ❌ Use card mode in middle of sentences
+- ❌ Show IDs when mentioning spirits casually
+- ❌ Hardcode stats that could be data-injected
+- ❌ Use invalid IDs or names
+- ❌ Mix multiple display modes inconsistently
+
+### Examples in Context
+
+**Good usage:**
+```markdown
+## Gold Farming Strategy
+
+Use {{data:spirits:6:inline:false}} (Todd) to maximize gold drops
+while farming. His bonus applies to all monster kills.
+
+For detailed information:
+{{data:spirits:6}}
+```
+
+**Avoid:**
+```markdown
+Use {{data:spirits:6}} for gold. (Shows full card inline - breaks text flow)
+```
+
+### Troubleshooting
+
+**Data injection not showing?**
+- Check ID/name is correct
+- Verify data source exists
+- Try using autocomplete to ensure valid reference
+- Check for typos in syntax
+
+**Display looks wrong?**
+- Verify display mode (`inline`, `card`, `detailed`, `compact`)
+- Check if using `inline` for in-text mentions
+- Ensure proper spacing around injection
 
 ## Validation
 

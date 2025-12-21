@@ -1,8 +1,16 @@
 ---
-title: index
-tags: [equipment]
+id: index
+title: Equipment
+description: Comprehensive guide to weapons, armor, accessories, and equipment enhancement systems in Slayer Legend
+tags:
+  - equipment
+  - gear
+  - progression
 category: Equipment
-date: 2025-12-13  
+date: 2025-12-21
 ---
-# index
-Equipment guide
+
+# Equipment
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

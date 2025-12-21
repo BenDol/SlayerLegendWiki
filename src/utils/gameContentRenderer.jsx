@@ -3,6 +3,7 @@ import EquipmentCard from '../components/EquipmentCard';
 import DataInjector from '../components/DataInjector';
 import SpiritSprite from '../components/SpiritSprite';
 import SpiritCard from '../components/SpiritCard';
+import ContributionBanner from '../components/ContributionBanner';
 
 /**
  * Process game-specific syntax in markdown content
@@ -19,6 +20,7 @@ import SpiritCard from '../components/SpiritCard';
  * - {{data:spirits:1}} or <!-- data:spirits:1 --> (defaults to card template)
  * - {{data:spirits:1:inline}} or <!-- data:spirits:1:inline -->
  * - {{spirit-sprite:1:0}} or <!-- spirit-sprite:1:0 -->
+ * - {{contribution-banner:ai-generated}} or <!-- contribution-banner:ai-generated -->
  *
  * @param {string} content - Markdown content
  * @returns {string} - Processed content with internal markers
@@ -116,6 +118,18 @@ export const processGameSyntax = (content) => {
       return `{{SPIRIT_SPRITE:${params}}}`;
     }
   );
+
+  // Process {{contribution-banner:...}} format
+  processed = processed.replace(/\{\{\s*contribution-banner:\s*([^}]+?)\s*\}\}/gi, (match, type) => {
+    const typeStr = type || 'ai-generated';
+    return `{{CONTRIBUTION_BANNER:${typeStr}}}`;
+  });
+
+  // Process <!-- contribution-banner:... --> format (legacy)
+  processed = processed.replace(/<!--\s*contribution-banner:\s*([^-]+?)\s*-->/gi, (match, type) => {
+    const typeStr = type || 'ai-generated';
+    return `{{CONTRIBUTION_BANNER:${typeStr}}}`;
+  });
 
   return processed;
 };
@@ -259,6 +273,17 @@ export const CustomParagraph = ({ node, children, ...props }) => {
           fps={fps}
           animationType={animationType}
         />
+      </div>
+    );
+  }
+
+  // Check for standalone contribution banner marker
+  const bannerMatch = content.match(/^\{\{CONTRIBUTION_BANNER:([^}]+)\}\}$/);
+  if (bannerMatch) {
+    const type = bannerMatch[1].trim();
+    return (
+      <div>
+        <ContributionBanner type={type} />
       </div>
     );
   }

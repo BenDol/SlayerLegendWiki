@@ -1,0 +1,50 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <g transform="translate(60, 60)">
+    <circle cx="30" cy="30" r="30" fill="white" opacity="0.9"/>
+    <text x="75" y="42" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white">
+      Slayer Legend Wiki
+    </text>
+  </g>
+
+  <g transform="translate(60, 250)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" filter="url(#shadow)">
+      My Spirits
+    </text>
+
+    <text x="0" y="60" font-family="Arial, sans-serif" font-size="32" fill="white" opacity="0.9">
+      Track and manage your spirit collection
+    </text>
+
+    <g transform="translate(0, 120)">
+      <g>
+        <rect x="0" y="0" width="180" height="50" rx="25" fill="white" opacity="0.2"/>
+        <text x="20" y="34" font-family="Arial, sans-serif" font-size="24" fill="white">✅ Collected</text>
+      </g>
+      <g transform="translate(200, 0)">
+        <rect x="0" y="0" width="180" height="50" rx="25" fill="white" opacity="0.2"/>
+        <text x="20" y="34" font-family="Arial, sans-serif" font-size="24" fill="white">⭐ Favorites</text>
+      </g>
+      <g transform="translate(400, 0)">
+        <rect x="0" y="0" width="160" height="50" rx="25" fill="white" opacity="0.2"/>
+        <text x="20" y="34" font-family="Arial, sans-serif" font-size="24" fill="white">📈 Progress</text>
+      </g>
+    </g>
+  </g>
+
+  <g transform="translate(900, 200)" opacity="0.3">
+    <circle cx="0" cy="0" r="180" fill="white"/>
+    <text x="-80" y="40" font-size="140">👻</text>
+  </g>
+</svg>

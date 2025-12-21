@@ -1934,6 +1934,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     // Update locked inventory indices
     updateLockedInventoryIndices(deserialized.inventory, deserialized.gridState);
+
+    // Trigger donation prompt on successful load
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Loading up the classics! 🗃️",
+        "This engraving was fire! 🔥",
+        "Back to a proven winner! 🏆",
+        "Ah yes, that perfect fit! 🧩",
+      ]
+    });
   };
 
   /**
@@ -3352,6 +3362,17 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       console.log('💾 Using cached solutions for', selectedWeapon.name);
       setAutoSolveSolutions(solutionCache[cacheKey]);
       setShowSolutionPicker(true);
+
+      // Trigger donation prompt on successful solve
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Let the AI do the work! 🤖",
+          "Work smarter, not harder! 🧠",
+          "Puzzle solved instantly! ⚡",
+          "That's using your brain... or mine! 🎯",
+        ]
+      });
+
       return;
     }
 
@@ -3466,6 +3487,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
           setAutoSolveSolutions(solutions);
           setShowSolutionPicker(true);
+
+          // Trigger donation prompt on successful solve
+          window.triggerDonationPrompt?.({
+            messages: [
+              "Let the AI do the work! 🤖",
+              "Work smarter, not harder! 🧠",
+              "Puzzle solved instantly! ⚡",
+              "That's using your brain... or mine! 🎯",
+            ]
+          });
         }
       } catch (error) {
         console.error('❌ Auto-solve error:', error);
@@ -3534,6 +3565,17 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       console.log('🔍 Using cached best weapon results');
       setBestWeaponResults(cachedResults);
       setShowBestWeaponModal(true);
+
+      // Trigger donation prompt on successful find
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Finding the meta! Nice! 📊",
+          "Optimizing like a pro! 🏆",
+          "Min-maxing at its finest! 🎯",
+          "That's some big brain energy! 🧠",
+        ]
+      });
+
       return;
     }
 
@@ -3697,6 +3739,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           setBestWeaponCache(results);
           setBestWeaponResults(results);
           setShowBestWeaponModal(true);
+
+          // Trigger donation prompt on successful find
+          window.triggerDonationPrompt?.({
+            messages: [
+              "Finding the meta! Nice! 📊",
+              "Optimizing like a pro! 🏆",
+              "Min-maxing at its finest! 🎯",
+              "That's some big brain energy! 🧠",
+            ]
+          });
         }
       } catch (error) {
         console.error('❌ Find best weapon error:', error);
@@ -3859,6 +3911,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
       console.log('[SoulWeaponEngravingBuilder] ✓ Share URL copied to clipboard');
 
+      // Trigger donation prompt on successful share
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Sharing your 200 IQ grid! 🧩",
+          "That engraving is art! 🎨",
+          "Flex that perfect fit! 💪",
+          "Your optimization game is strong! 🎯",
+        ]
+      });
+
     } catch (error) {
       console.error('Failed to share build:', error);
       setShareError(`Failed to share: ${error.message}`);
@@ -3919,6 +3981,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
+    // Trigger donation prompt on successful export
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Backing up that masterpiece! 💾",
+        "Engraving data secured! 🛡️",
+        "Puzzle archived for posterity! 📦",
+        "Smart move saving that! 💡",
+      ]
+    });
   };
 
   const handleImportBuild = (e) => {
@@ -4048,6 +4120,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         }
 
         setHasUnsavedChanges(true);
+
+        // Trigger donation prompt on successful import
+        window.triggerDonationPrompt?.({
+          messages: [
+            "Importing pro layouts! 📥",
+            "Fresh puzzle incoming! 🧩",
+            "Time to test this build! ⚡",
+            "Let's see this engraving! 👀",
+          ]
+        });
       } catch (error) {
         alert('Failed to import build: Invalid file format');
         console.error('Import error:', error);

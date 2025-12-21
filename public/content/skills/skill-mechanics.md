@@ -1,8 +1,17 @@
 ---
-title: skill-mechanics
-tags: [skills]
+id: skill-mechanics
+title: Skill Mechanics
+description: Complete guide to how skills work in Slayer Legend, including damage calculation, cooldowns, skill types, combos, and advanced skill mechanics
+tags:
+  - skills
+  - mechanics
+  - combat
+  - damage
 category: Skills
-date: 2025-12-13
+date: 2025-12-21
 ---
-# skill-mechanics
-Skills guide
+
+# Skill Mechanics
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

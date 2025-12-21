@@ -48,6 +48,16 @@ const EnhancementCalculator = () => {
       totalGold: totalGold.toLocaleString(),
       avgPerLevel: Math.floor(totalGold / (target - current)).toLocaleString(),
     });
+
+    // Trigger donation prompt on successful calculation
+    window.triggerDonationPrompt?.({
+      messages: [
+        "That's a lot of gold! 💰",
+        "Time to start grinding! ⚡",
+        "Enhancement costs calculated! 📈",
+        "Budget your resources like a pro! 🎯",
+      ]
+    });
   };
 
   return (

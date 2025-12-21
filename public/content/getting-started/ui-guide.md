@@ -5,9 +5,8 @@ description: ''
 tags: []
 category: ''
 date: ''
-order: 0
 ---
 # UI Guide
-Main screen, menus, navigation explained.
 
-asdasdasdads
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

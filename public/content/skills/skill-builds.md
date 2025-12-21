@@ -1,8 +1,17 @@
 ---
-title: skill-builds
-tags: [skills]
+id: skill-builds
+title: Skill Builds
+description: Comprehensive guide to skill build templates, optimal skill combinations, elemental synergies, and strategies for different playstyles and content types
+tags:
+  - skills
+  - builds
+  - strategy
+  - optimization
 category: Skills
-date: 2025-12-13
+date: 2025-12-21
 ---
-# skill-builds
-Skills guide
+
+# Skill Builds
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

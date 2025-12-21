@@ -37,6 +37,16 @@ const SpiritSpriteDemoPage = () => {
       await navigator.clipboard.writeText(currentSyntax);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+
+      // Trigger donation prompt on successful copy
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Stealing our sprites? Nice! 😏",
+          "Spreading the spirit love! 👻",
+          "Copy that! Literally! 📋",
+          "Go make something cool with it! ✨",
+        ]
+      });
     } catch (err) {
       console.error('Failed to copy:', err);
     }

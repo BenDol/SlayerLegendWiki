@@ -45,6 +45,16 @@ const FusionCalculator = () => {
       targetGrade: target.name,
       breakdown: breakdown.reverse(),
     });
+
+    // Trigger donation prompt on successful calculation
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Fusion math figured out! ⚗️",
+        "Planning that grind! 💪",
+        "Optimization 101! 📚",
+        "Now you know what you need! 🎯",
+      ]
+    });
   };
 
   return (

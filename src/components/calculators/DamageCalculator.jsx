@@ -35,6 +35,16 @@ const DamageCalculator = () => {
       maxDamage: maxDamage.toFixed(0),
       critMultiplier: avgCritMultiplier.toFixed(2),
     });
+
+    // Trigger donation prompt on successful calculation
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Those are some big numbers! 💥",
+        "Damage optimized! 🎯",
+        "Time to hit like a truck! 🚛",
+        "Crit city, baby! ⚡",
+      ]
+    });
   };
 
   const reset = () => {

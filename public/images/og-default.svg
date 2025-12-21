@@ -1,0 +1,46 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Main logo/branding area (centered) -->
+  <g transform="translate(600, 200)">
+    <!-- Large central icon -->
+    <circle cx="0" cy="0" r="100" fill="white" opacity="0.2"/>
+    <text x="-60" y="40" font-size="120" filter="url(#shadow)">⚔️</text>
+  </g>
+
+  <!-- Title -->
+  <g transform="translate(600, 370)">
+    <text x="0" y="0" text-anchor="middle" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="white" filter="url(#shadow)">
+      Slayer Legend
+    </text>
+    <text x="0" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" fill="white" opacity="0.9">
+      Complete Wiki & Guide
+    </text>
+  </g>
+
+  <!-- Bottom features -->
+  <g transform="translate(600, 520)">
+    <g transform="translate(-280, 0)">
+      <rect x="0" y="0" width="160" height="50" rx="25" fill="white" opacity="0.2"/>
+      <text x="80" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="white">🛠️ Tools</text>
+    </g>
+    <g transform="translate(-100, 0)">
+      <rect x="0" y="0" width="160" height="50" rx="25" fill="white" opacity="0.2"/>
+      <text x="80" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="white">📚 Guides</text>
+    </g>
+    <g transform="translate(80, 0)">
+      <rect x="0" y="0" width="160" height="50" rx="25" fill="white" opacity="0.2"/>
+      <text x="80" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="white">💾 Builds</text>
+    </g>
+  </g>
+</svg>

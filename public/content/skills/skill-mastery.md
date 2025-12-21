@@ -1,15 +1,16 @@
 ---
 id: skill-mastery
-title: skill-mastery
-description: asda sda dsfsdfs df
+title: Skill Mastery
+description: Guide to skill mastery system, leveling skills, and unlocking advanced skill features
 tags:
   - skills
+  - mastery
+  - progression
 category: Skills
-date: 2025-12-13T00:00:00.000Z
-order: 0
+date: 2025-12-21
 ---
-# skill-mastery
-Skills guide
 
+# Skill Mastery
 
-LOL STYDSF
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

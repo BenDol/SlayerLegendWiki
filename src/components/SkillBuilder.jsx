@@ -387,6 +387,16 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       setTimeout(() => setCopied(false), 2000);
 
       console.log('[SkillBuilder] ✓ Share URL copied to clipboard');
+
+      // Trigger donation prompt on successful share
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Sharing your OP build? Nice! ⚔️",
+          "That's a build worth flexing! 💪",
+          "Your friends are gonna love this one! 🎮",
+          "Spreading the meta like a pro! 🔥",
+        ]
+      });
     } catch (error) {
       console.error('[SkillBuilder] Failed to generate share URL:', error);
       setShareError(error.message || 'Failed to generate share URL');
@@ -403,6 +413,16 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
           console.log('[SkillBuilder] ✓ Fallback URL copied to clipboard');
+
+          // Trigger donation prompt on successful share (fallback)
+          window.triggerDonationPrompt?.({
+            messages: [
+              "Sharing your OP build? Nice! ⚔️",
+              "That's a build worth flexing! 💪",
+              "Your friends are gonna love this one! 🎮",
+              "Spreading the meta like a pro! 🔥",
+            ]
+          });
         }
       } catch (fallbackError) {
         console.error('[SkillBuilder] Fallback also failed:', fallbackError);
@@ -432,6 +452,16 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     link.click();
 
     URL.revokeObjectURL(url);
+
+    // Trigger donation prompt on successful export
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Smart move backing that up! 💾",
+        "Data safety first, nice! 🛡️",
+        "A true strategist saves their work! 📝",
+        "Exporting the goods, I see! 📦",
+      ]
+    });
   };
 
   // Import build from JSON
@@ -468,6 +498,16 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         const deserializedBuild = deserializeBuild(buildData, skills);
         setBuild({ slots: deserializedBuild.slots });
         setHasUnsavedChanges(true); // Mark as having changes to block navigation
+
+        // Trigger donation prompt on successful import
+        window.triggerDonationPrompt?.({
+          messages: [
+            "Loading up the good stuff? 📥",
+            "Fresh builds incoming! 🚀",
+            "Time to try something new! ✨",
+            "Importing excellence, I see! 🎯",
+          ]
+        });
       } catch (error) {
         console.error('Failed to import build:', error);
         alert('Failed to import build. Invalid file format.');
@@ -513,6 +553,16 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     setBuild({ slots: deserializedBuild.slots });
     setHasUnsavedChanges(true); // Mark as having changes to block navigation
     setCurrentLoadedBuildId(savedBuild.id); // Track which build is currently loaded
+
+    // Trigger donation prompt on successful load
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Back to the classics! 📚",
+        "Revisiting perfection? 😎",
+        "That was a good one! 👌",
+        "Loading up your masterpiece! 🎨",
+      ]
+    });
   };
 
   // Save build to backend

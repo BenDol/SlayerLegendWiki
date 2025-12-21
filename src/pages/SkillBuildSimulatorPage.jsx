@@ -1,5 +1,6 @@
 import React from 'react';
 import SkillBuilder from '../components/SkillBuilder';
+import MetaTags from '../components/MetaTags';
 
 /**
  * Skill Builder Page
@@ -8,7 +9,18 @@ import SkillBuilder from '../components/SkillBuilder';
  * Accessible at /#/skill-builder
  */
 const SkillBuilderPage = () => {
-  return <SkillBuilder />;
+  return (
+    <>
+      <MetaTags
+        title="Skill Builder"
+        description="Create and optimize skill builds for Slayer Legend. Plan your skill combinations, test different elements, and share builds with the community."
+        image="/images/tools/skill-builder.png"
+        url="/skill-builder"
+        keywords={['skill builder', 'skills', 'builds', 'planner', 'simulator', 'skill combinations']}
+      />
+      <SkillBuilder />
+    </>
+  );
 };
 
 export default SkillBuilderPage;

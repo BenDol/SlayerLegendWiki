@@ -1,8 +1,17 @@
 ---
-title: water-skills
-tags: [skills]
+id: water-skills
+title: Water Skills
+description: Comprehensive guide to water element skills, crowd control effects, and defensive strategies
+tags:
+  - skills
+  - water
+  - elements
+  - crowd-control
 category: Skills
-date: 2025-12-13
+date: 2025-12-21
 ---
-# water-skills
-Skills guide
+
+# Water Skills
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

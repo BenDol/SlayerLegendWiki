@@ -495,6 +495,16 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       setTimeout(() => setCopied(false), 2000);
 
       console.log('[SpiritBuilder] ✓ Share URL copied to clipboard');
+
+      // Trigger donation prompt on successful share
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Sharing your spirit squad? Love it! 👻",
+          "That's a ghostly good team! 🔮",
+          "Your spirit game is on point! ✨",
+          "Spreading the spirit love! 💜",
+        ]
+      });
     } catch (error) {
       console.error('[SpiritBuilder] Failed to generate share URL:', error);
       setShareError(error.message || 'Failed to generate share URL');
@@ -511,6 +521,16 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
           console.log('[SpiritBuilder] ✓ Fallback URL copied to clipboard');
+
+          // Trigger donation prompt on successful share (fallback)
+          window.triggerDonationPrompt?.({
+            messages: [
+              "Sharing your spirit squad? Love it! 👻",
+              "That's a ghostly good team! 🔮",
+              "Your spirit game is on point! ✨",
+              "Spreading the spirit love! 💜",
+            ]
+          });
         }
       } catch (fallbackError) {
         console.error('[SpiritBuilder] Fallback also failed:', fallbackError);
@@ -539,6 +559,16 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     link.click();
 
     URL.revokeObjectURL(url);
+
+    // Trigger donation prompt on successful export
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Backing up those spirits! Smart! 💾",
+        "Spirit data secured! 🛡️",
+        "Exporting spectral goodness! 👻",
+        "Your spirits are safe now! 💫",
+      ]
+    });
   };
 
   // Import build from JSON
@@ -570,6 +600,16 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
         const deserializedBuild = deserializeBuild(buildData, spirits);
         setBuild({ slots: deserializedBuild.slots });
         setHasUnsavedChanges(true);
+
+        // Trigger donation prompt on successful import
+        window.triggerDonationPrompt?.({
+          messages: [
+            "New spirits joining the squad! 👻",
+            "Importing ghostly power! 🔮",
+            "These spirits look promising! ✨",
+            "Fresh spiritual energy incoming! 💫",
+          ]
+        });
       } catch (error) {
         console.error('Failed to import build:', error);
         alert('Failed to import build. Invalid file format.');
@@ -617,6 +657,16 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     setBuild({ slots: deserializedBuild.slots });
     setHasUnsavedChanges(true);
     setCurrentLoadedBuildId(savedBuild.id);
+
+    // Trigger donation prompt on successful load
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Summoning old friends! 👻",
+        "This squad was legendary! 🔮",
+        "Ah yes, the classic lineup! ✨",
+        "Bringing back the dream team! 💫",
+      ]
+    });
   };
 
   // Save build to backend

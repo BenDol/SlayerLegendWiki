@@ -1,15 +1,16 @@
 ---
-title: fire-skills
+id: fire-skills
+title: Fire Skills
+description: Comprehensive guide to fire element skills, their effects, and optimal usage strategies
 tags:
   - skills
+  - fire
+  - elements
 category: Skills
-date: 2025-12-13T00:00:00.000Z
-description: 231231 1321231 3131 23
-order: 0
-id: fire-skills
+date: 2025-12-21
 ---
-# fire-skills
-Skills guide
 
+# Fire Skills
 
-asdasd ada a
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

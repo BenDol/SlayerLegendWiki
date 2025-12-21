@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Ghost, BookOpen, Folder } from 'lucide-react';
+import MetaTags from '../components/MetaTags';
 
 /**
  * My Collections Page
@@ -35,8 +36,16 @@ const MyCollectionsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
+    <>
+      <MetaTags
+        title="My Collections"
+        description="Manage and track your personal game collections. View your spirits, skills, equipment, and unlocked content across different collection types."
+        image="/images/tools/my-collections.png"
+        url="/my-collections"
+        keywords={['collections', 'my collection', 'tracker', 'progress', 'inventory']}
+      />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
@@ -113,6 +122,7 @@ const MyCollectionsPage = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

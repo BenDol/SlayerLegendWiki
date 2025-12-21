@@ -1,8 +1,16 @@
 ---
-title: luna
-tags: [companions]
+id: luna
+title: Luna
+description: Guide to Luna, an offensive combat companion. Learn her abilities, damage builds, and enhancement strategies
+tags:
+  - companions
+  - luna
+  - offense
 category: Companions
-date: 2025-12-13
+date: 2025-12-21
 ---
-# luna
-Companion guide
+
+# Luna
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

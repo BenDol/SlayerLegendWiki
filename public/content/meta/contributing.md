@@ -1,4 +1,5 @@
 ---
+id: contributing
 title: Contributing
 description: Learn how to contribute to the Slayer Legend Wiki
 tags: [meta, contributing]

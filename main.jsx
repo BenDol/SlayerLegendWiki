@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import App from './wiki-framework/src/App.jsx';
+import AppWrapper from './src/components/AppWrapper.jsx';
 import ErrorBoundary from './wiki-framework/src/components/common/ErrorBoundary.jsx';
 import './wiki-framework/src/styles/index.css';
 import { Ghost, Sparkles, Sword } from 'lucide-react';
@@ -405,6 +407,7 @@ const SpiritBuilderPage = React.lazy(() => import('./src/pages/SpiritBuilderPage
 const MySpiritCollectionPage = React.lazy(() => import('./src/pages/MySpiritCollectionPage.jsx'));
 const MyCollectionsPage = React.lazy(() => import('./src/pages/MyCollectionsPage.jsx'));
 const SoulWeaponEngravingBuilderPage = React.lazy(() => import('./src/pages/SoulWeaponEngravingBuilderPage.jsx'));
+const DonatePage = React.lazy(() => import('./src/pages/DonatePage.jsx'));
 
 registerCustomRoutes([
   {
@@ -441,13 +444,22 @@ registerCustomRoutes([
     path: 'spirits/viewer',
     component: <SpiritSpriteDemoPage />,
     suspense: true
+  },
+  {
+    path: 'donate',
+    component: <DonatePage />,
+    suspense: true
   }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
+    <HelmetProvider>
+      <ErrorBoundary>
+        <AppWrapper>
+          <App />
+        </AppWrapper>
+      </ErrorBoundary>
+    </HelmetProvider>
   </React.StrictMode>,
 );

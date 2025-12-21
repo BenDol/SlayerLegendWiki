@@ -473,6 +473,16 @@ const BattleLoadouts = () => {
     setLoadoutName(deserializedLoadout.name || 'My Loadout');
     setHasUnsavedChanges(false); // Loaded from saved, no unsaved changes
     setCurrentLoadedLoadoutId(loadout.id); // Track which loadout is currently loaded
+
+    // Trigger donation prompt on successful load
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Ready for battle! Let's go! ⚔️",
+        "Loading your war machine! 🛡️",
+        "This loadout slaps! 💥",
+        "Locked and loaded! 🎯",
+      ]
+    });
   };
 
   // Save loadout
@@ -523,6 +533,16 @@ const BattleLoadouts = () => {
 
       // Clear localStorage draft after successful save
       clearDraft();
+
+      // Trigger donation prompt on successful save
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Battle loadout saved! Nice! ⚔️",
+          "Ready to crush it! 💪",
+          "Your arsenal looks amazing! 🎯",
+          "That's a winning combo! 🏆",
+        ]
+      });
 
       // Hide success message after 2 seconds
       setTimeout(() => setSaveSuccess(false), 2000);
@@ -584,6 +604,16 @@ const BattleLoadouts = () => {
 
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+
+      // Trigger donation prompt on successful share
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Sharing your war strategy! 🎯",
+          "Your loadout is worth showing off! ⚔️",
+          "Spread the battle tactics! 🛡️",
+          "That's a flex-worthy setup! 💪",
+        ]
+      });
     } catch (error) {
       console.error('[BattleLoadouts] Failed to generate share URL:', error);
       setShareError(error.message || 'Failed to generate share URL');
@@ -602,6 +632,16 @@ const BattleLoadouts = () => {
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
           console.log('[BattleLoadouts] ⚠️ Used fallback encoding method');
+
+          // Trigger donation prompt on successful share (fallback)
+          window.triggerDonationPrompt?.({
+            messages: [
+              "Sharing your war strategy! 🎯",
+              "Your loadout is worth showing off! ⚔️",
+              "Spread the battle tactics! 🛡️",
+              "That's a flex-worthy setup! 💪",
+            ]
+          });
         } else {
           alert('Failed to generate share URL');
         }
@@ -631,6 +671,16 @@ const BattleLoadouts = () => {
     link.click();
 
     URL.revokeObjectURL(url);
+
+    // Trigger donation prompt on successful export
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Backing up your battle plan! 💾",
+        "Strategic data secured! 🛡️",
+        "Exporting tactical excellence! 📦",
+        "Your loadout is archived! 📝",
+      ]
+    });
   };
 
   // Import loadout from JSON
@@ -665,6 +715,16 @@ const BattleLoadouts = () => {
         setCurrentLoadout(deserializedLoadout);
         setLoadoutName(deserializedLoadout.name || '');
         setHasUnsavedChanges(false); // Imported from file, no unsaved changes yet
+
+        // Trigger donation prompt on successful import
+        window.triggerDonationPrompt?.({
+          messages: [
+            "New battle strategy loaded! 📥",
+            "Fresh tactics incoming! 🎯",
+            "Time to dominate! ⚔️",
+            "This loadout looks deadly! 💥",
+          ]
+        });
       } catch (error) {
         console.error('Failed to import loadout:', error);
         alert('Failed to import loadout. Invalid file format.');

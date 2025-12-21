@@ -1,8 +1,17 @@
 ---
-title: companion-builds
-tags: [companions]
+id: companion-builds
+title: Companion Builds
+description: Comprehensive guide to companion build strategies, optimal companion selection, stat priorities, and team compositions for different content types
+tags:
+  - companions
+  - builds
+  - strategy
+  - optimization
 category: Companions
-date: 2025-12-13
+date: 2025-12-21
 ---
-# companion-builds
-Companion guide
+
+# Companion Builds
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

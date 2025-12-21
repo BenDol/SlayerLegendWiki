@@ -7,6 +7,10 @@
     "favicon": "/icon/favicon.ico",
     "manifest": "/site.webmanifest",
     "themeColor": "#3b82f6",
+    "socialPreview": {
+      "defaultImage": "/images/og-default.svg",
+      "twitterCard": "summary_large_image"
+    },
     "repository": {
       "owner": "BenDol",
       "repo": "SlayerLegendWiki",
@@ -361,6 +365,28 @@
       "showContactInfo": false,
       "allowAdminBypass": true,
       "customHtml": null
+    },
+    "donation": {
+      "enabled": true,
+      "prompt": {
+        "minTimeOnSite": 60,
+        "minPagesViewed": 3,
+        "daysUntilNextPrompt": 7
+      },
+      "methods": {
+        "stripe": {
+          "enabled": false,
+          "url": ""
+        },
+        "paypal": {
+          "enabled": false,
+          "url": ""
+        },
+        "kofi": {
+          "enabled": true,
+          "url": "https://ko-fi.com/yourkofi"
+        }
+      }
     }
   },
   "theme": {

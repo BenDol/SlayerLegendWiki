@@ -125,6 +125,16 @@ const MySpiritCollection = () => {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
 
+      // Trigger donation prompt on successful save
+      window.triggerDonationPrompt?.({
+        messages: [
+          "Another spirit for the collection! 👻",
+          "Your spirit roster is growing! ✨",
+          "That's a keeper! 🔮",
+          "Collector vibes! Love it! 💜",
+        ]
+      });
+
       // Reload spirits (will deserialize the saved data)
       await loadSpirits();
       setEditingSpirit(null);

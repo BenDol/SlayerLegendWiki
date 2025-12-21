@@ -1,11 +1,17 @@
 ---
 id: training-log
 title: Training Log
-description: Character system guide
+description: Guide to the Training Log system, tracking character progress, achievements, and unlocking rewards
 tags:
   - character
+  - training-log
+  - progression
+  - achievements
 category: Characters
-date: 2025-12-13T00:00:00.000Z
+date: 2025-12-21
 ---
-# training-log
-Comprehensive guide coming soon
+
+# Training Log
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

@@ -1,12 +1,16 @@
 ---
 id: promotions
-title: ''
-description: ''
-tags: []
-category: ''
-date: ''
-order: 0
+title: Character Promotions
+description: Guide to promoting characters to increase their rank and unlock new abilities
+tags:
+  - character
+  - promotion
+  - progression
+category: Characters
+date: 2025-12-21
 ---
-# promotions
-Comprehensive guide coming soon 
-asdasdasdasd
+
+# Character Promotions
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

@@ -1,15 +1,17 @@
 ---
 id: core-mechanics
-title: ''
-description: ''
-tags: []
-category: ''
-date: ''
+title: Core Mechanics
+description: Understanding the fundamental game mechanics of Slayer Legend including stats, elements, combat systems, and progression
+tags:
+  - beginner
+  - mechanics
+  - combat
+  - stats
+category: Getting Started
+date: 2025-12-21
 ---
-# Core Mechanics  
-Stats: ATK, HP, Crit. Elements: Fire/Water/Earth/Wind with 2x/0.7x multipliers.
 
-dfgnjkdfkgjhbdfkghjdfg
+# Core Mechanics
 
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
 
-dfgnjdfgjhkdfg

@@ -1,8 +1,17 @@
 ---
-title: earth-skills
-tags: [skills]
+id: earth-skills
+title: Earth Skills
+description: Comprehensive guide to earth element skills, sustained damage, and defensive strategies
+tags:
+  - skills
+  - earth
+  - elements
+  - defense
 category: Skills
-date: 2025-12-13
+date: 2025-12-21
 ---
-# earth-skills
-Skills guide
+
+# Earth Skills
+
+{{contribution-banner:ai-generated}} <!-- DELETE ME when you update this page -->
+

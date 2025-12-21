@@ -51,6 +51,16 @@ const StatCalculator = () => {
         gain: (finalHP - hp).toLocaleString(),
       },
     });
+
+    // Trigger donation prompt on successful calculation
+    window.triggerDonationPrompt?.({
+      messages: [
+        "Crunching those numbers! 🧮",
+        "Math is fun... right? 📊",
+        "Stats looking good! 💪",
+        "Calculating like a scientist! 🔬",
+      ]
+    });
   };
 
   return (

@@ -329,7 +329,8 @@ const SpiritSprite = ({
   displayLevel = null,
   displayAwakeningLevel = null,
   displaySkillEnhancement = null,
-  showControls = false
+  showControls = false,
+  bare = false
 }) => {
   const [currentFrame, setCurrentFrame] = useState(0);
   const [isPlaying, setIsPlaying] = useState(animated);
@@ -681,7 +682,7 @@ const SpiritSprite = ({
       <div className="relative group">
         {/* Sprite Image */}
         <div
-          className="relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700"
+          className={`relative overflow-hidden ${bare ? '' : 'rounded-lg bg-gray-100 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700'}`}
           style={{ width: spriteSize, height: spriteSize }}
         >
           {/* Show loading spinner while detecting frames */}

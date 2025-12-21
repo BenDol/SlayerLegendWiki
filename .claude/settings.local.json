@@ -67,7 +67,15 @@
       "Bash(npm run build:cloudflare:*)",
       "Bash(Select-String -Pattern \"Error|FAIL|✓|✅\")",
       "Bash(Select-Object -First 30)",
-      "Bash(xargs basename:*)"
+      "Bash(xargs basename:*)",
+      "Bash(Get-ChildItem -Path \"public/content\" -Directory)",
+      "Bash(Get-ChildItem -Path $_FullName -File)",
+      "Bash(Select-Object -First 5 -ExpandProperty Name)",
+      "Bash(Write-Host \"\" })",
+      "Bash(node scripts/generate-sitemap.js:*)",
+      "Bash(npm run build:sitemap:*)",
+      "Bash(for file in characters/latent-power.md equipment/relics.md equipment/soul-weapons.md equipment/fusion.md characters/enhancement.md characters/stats.md characters/training-log.md skills/skill-mechanics.md)",
+      "Bash(do sed -i 's/{{contribution-banner:ai-generated}}/{{contribution-banner:ai-generated}} <!-- DELETE_ME when you update this page -->/' \"$file\")"
     ]
   }
 }
