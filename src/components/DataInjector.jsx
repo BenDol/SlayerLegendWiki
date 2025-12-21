@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import dataRegistry from '../utils/dataRegistry';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('DataInjector');
 
 /**
  * DataInjector - Component that renders injected data from databases
@@ -38,7 +41,7 @@ const DataInjector = ({ source, id, fieldOrTemplate = 'card', showId = true }) =
 
         if (!item) {
           const errorMsg = `Item "${id}" not found in "${source}" database`;
-          console.error(`[DataInjector] ${errorMsg}`);
+          logger.error('${errorMsg}');
           setError(errorMsg);
           setLoading(false);
           return;
@@ -47,15 +50,15 @@ const DataInjector = ({ source, id, fieldOrTemplate = 'card', showId = true }) =
         setData(item);
         setLoading(false);
       } catch (err) {
-        console.error(`[DataInjector] Error loading data (attempt ${retryCount + 1}):`, err);
-        console.error(`[DataInjector] Error details - source: "${source}", id: "${id}"`, err);
+        logger.error('Error loading data (attempt ${retryCount + 1}):', { error: err });
+        logger.error('Error details - source: "${source}", id: "${id}"', { error: err });
 
         if (!isMounted) return;
 
         // Retry on fetch failures
         if (retryCount < maxRetries && err.message.includes('fetch')) {
           retryCount++;
-          console.log(`[DataInjector] Retrying in ${retryCount * 500}ms...`);
+          logger.debug('Retrying in ${retryCount * 500}ms...');
           setTimeout(() => {
             if (isMounted) loadData();
           }, retryCount * 500); // Exponential backoff: 500ms, 1000ms, 1500ms

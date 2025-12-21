@@ -8,6 +8,9 @@ import { getCache, setCache, clearCache } from '../utils/buildCache';
 import { getSaveDataEndpoint, getLoadDataEndpoint, getDeleteDataEndpoint } from '../utils/apiEndpoints.js';
 import { useSpiritsData } from '../hooks/useSpiritsData';
 import { serializeSpirit, deserializeSpirit } from '../utils/spiritSerialization';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('MySpiritCollection');
 
 /**
  * MySpiritCollection Component
@@ -69,7 +72,7 @@ const MySpiritCollection = () => {
         setCache('my_spirits', user.id, loadedSpirits); // Cache serialized version
       }
     } catch (error) {
-      console.error('Failed to load spirits:', error);
+      logger.error('Failed to load spirits:', { error: error });
     } finally {
       setLoading(false);
     }
@@ -139,7 +142,7 @@ const MySpiritCollection = () => {
       await loadSpirits();
       setEditingSpirit(null);
     } catch (error) {
-      console.error('Failed to save spirit:', error);
+      logger.error('Failed to save spirit:', { error: error });
       setSaveError(error.message || 'Failed to save spirit');
     } finally {
       setSaving(false);
@@ -169,7 +172,7 @@ const MySpiritCollection = () => {
       clearCache('my_spirits', user.id);
       await loadSpirits();
     } catch (error) {
-      console.error('Failed to delete spirit:', error);
+      logger.error('Failed to delete spirit:', { error: error });
       alert('Failed to delete spirit');
     }
   };

@@ -15,6 +15,14 @@ import SavedBuildsPanel from './SavedBuildsPanel';
 import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
 import { validateBuildName, validateCompletionEffect, STRING_LIMITS } from '../utils/validation';
 import { setCache } from '../utils/buildCache';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SoulWeapon');
+const cacheLogger = logger.child('Cache');
+const bestWeaponCacheLogger = logger.child('BestWeaponCache');
+const gridLogger = logger.child('Grid');
+const touchLogger = logger.child('Touch');
+const autoSolveLogger = logger.child('AutoSolve');
 
 /**
  * SoulWeaponEngravingBuilder Component
@@ -228,7 +236,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       if (!cached) return {};
       return JSON.parse(cached);
     } catch (error) {
-      console.error('[Cache] Failed to read submission cache:', error);
+      cacheLogger.error('Failed to read submission cache', { error });
       return {};
     }
   };
@@ -241,9 +249,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         timestamp: Date.now()
       };
       localStorage.setItem(SUBMISSION_CACHE_KEY, JSON.stringify(cache));
-      console.log(`[Cache] Cached ${submissions.length} submission(s) for ${weaponName}`);
+      cacheLogger.debug(`Cached ${submissions.length} submission(s) for ${weaponName}`);
     } catch (error) {
-      console.error('[Cache] Failed to write submission cache:', error);
+      cacheLogger.error('Failed to write submission cache', { error });
     }
   };
 
@@ -252,9 +260,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       const cache = getSubmissionCache();
       delete cache[weaponName];
       localStorage.setItem(SUBMISSION_CACHE_KEY, JSON.stringify(cache));
-      console.log(`[Cache] Invalidated cache for ${weaponName}`);
+      cacheLogger.debug(`Invalidated cache for ${weaponName}`);
     } catch (error) {
-      console.error('[Cache] Failed to invalidate cache:', error);
+      cacheLogger.error('Failed to invalidate cache', { error });
     }
   };
 
@@ -273,10 +281,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
       if (cleaned) {
         localStorage.setItem(SUBMISSION_CACHE_KEY, JSON.stringify(cache));
-        console.log('[Cache] Cleaned expired cache entries');
+        cacheLogger.debug('Cleaned expired cache entries');
       }
     } catch (error) {
-      console.error('[Cache] Failed to clean expired cache:', error);
+      cacheLogger.error('Failed to clean expired cache', { error });
     }
   };
 
@@ -291,7 +299,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
       // Check if cache is expired
       if (now - timestamp > BEST_WEAPON_CACHE_TTL) {
-        console.log('[Best Weapon Cache] Cache expired');
+        bestWeaponCacheLogger.debug('Cache expired');
         localStorage.removeItem(BEST_WEAPON_CACHE_KEY);
         return null;
       }
@@ -305,22 +313,22 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
       // Check if inventory has changed
       if (inventorySignature !== currentInventorySignature) {
-        console.log('[Best Weapon Cache] Inventory changed, cache invalid');
+        bestWeaponCacheLogger.debug('Inventory changed, cache invalid');
         localStorage.removeItem(BEST_WEAPON_CACHE_KEY);
         return null;
       }
 
       // Check if highest unlocked weapon has changed
       if (cachedHighestWeapon !== highestUnlockedWeapon) {
-        console.log('[Best Weapon Cache] Highest unlocked weapon changed, cache invalid');
+        bestWeaponCacheLogger.debug('Highest unlocked weapon changed, cache invalid');
         localStorage.removeItem(BEST_WEAPON_CACHE_KEY);
         return null;
       }
 
-      console.log('[Best Weapon Cache] Valid cache found');
+      bestWeaponCacheLogger.debug('Valid cache found');
       return results;
     } catch (error) {
-      console.error('[Best Weapon Cache] Failed to read cache:', error);
+      bestWeaponCacheLogger.error('Failed to read cache', { error });
       return null;
     }
   };
@@ -341,9 +349,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       };
 
       localStorage.setItem(BEST_WEAPON_CACHE_KEY, JSON.stringify(cacheData));
-      console.log('[Best Weapon Cache] Cached results for current inventory');
+      bestWeaponCacheLogger.debug('Cached results for current inventory');
     } catch (error) {
-      console.error('[Best Weapon Cache] Failed to write cache:', error);
+      bestWeaponCacheLogger.error('Failed to write cache', { error });
     }
   };
 
@@ -416,10 +424,10 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         try {
           setLoading(true);
           setLoadingSharedBuild(true); // Prevent grid initialization
-          console.log('[SoulWeaponEngravingBuilder] Loading shared build:', shareChecksum);
+          logger.info('Loading shared build', { shareChecksum });
 
           if (!wikiConfig) {
-            console.error('[SoulWeaponEngravingBuilder] Wiki config not loaded');
+            logger.error('Wiki config not loaded');
             return;
           }
 
@@ -432,7 +440,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             // Load the build data
             setBuildName(buildData.data.name || '');
 
-            console.log('[SoulWeaponEngravingBuilder] Build data received:', {
+            logger.debug('Build data received', {
               hasWeaponId: !!buildData.data.weaponId,
               weaponId: buildData.data.weaponId,
               hasGridState: !!buildData.data.gridState,
@@ -447,7 +455,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             // Support both old format (gridState) and new optimized format (pieces)
             if (buildData.data.pieces) {
               // New optimized format: pieces array with anchor coordinates
-              console.log('[SoulWeaponEngravingBuilder] Loading pieces from shared build (optimized format)');
+              logger.debug('Loading pieces from shared build (optimized format)');
 
               // First, get the weapon to know the grid structure
               const gridWeapon = weapons.find(w => w.id === buildData.data.weaponId);
@@ -502,7 +510,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               }
             } else if (buildData.data.gridState) {
               // Legacy format: full gridState array (backward compatibility)
-              console.log('[SoulWeaponEngravingBuilder] Loading grid state from shared build (legacy format)');
+              logger.debug('Loading grid state from shared build (legacy format)');
 
               const deserializedGridState = buildData.data.gridState.map(row =>
                 row.map(cell => ({
@@ -518,7 +526,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             }
 
             if (buildData.data.inventory) {
-              console.log('[SoulWeaponEngravingBuilder] Loading inventory from shared build');
+              logger.debug('Loading inventory from shared build');
 
               // Handle both array of items and array with slot indices
               let deserializedInventory = Array(8).fill(null);
@@ -561,7 +569,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                   attack: baseWeapon.attack,
                   requirements: baseWeapon.requirements
                 };
-                console.log('[SoulWeaponEngravingBuilder] Loaded weapon from shared build (merged grid + base):', {
+                logger.debug('Loaded weapon from shared build (merged grid + base)', {
                   name: mergedWeapon.name,
                   id: mergedWeapon.id,
                   hasImage: !!mergedWeapon.image
@@ -571,7 +579,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 setSelectedWeapon(mergedWeapon);
               } else if (gridWeapon) {
                 // Has grid data but no base weapon data - use grid weapon (contains all essential data)
-                console.log('[SoulWeaponEngravingBuilder] Loaded weapon from shared build (grid data only):', {
+                logger.debug('Loaded weapon from shared build (grid data only)', {
                   name: gridWeapon.name,
                   id: gridWeapon.id,
                   hasImage: !!gridWeapon.image,
@@ -583,7 +591,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 setSelectedWeapon(gridWeapon);
               } else if (baseWeapon) {
                 // No grid data, use base weapon
-                console.log('[SoulWeaponEngravingBuilder] Loaded weapon from shared build (base data only):', {
+                logger.debug('Loaded weapon from shared build (base data only)', {
                   name: baseWeapon.name,
                   id: baseWeapon.id,
                   hasImage: !!baseWeapon.image
@@ -592,7 +600,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 hasInitializedGridForWeapon.current = `${baseWeapon.id}-${baseWeapon.name}`;
                 setSelectedWeapon(baseWeapon);
               } else {
-                console.error('[SoulWeaponEngravingBuilder] Could not find weapon with ID:', buildData.data.weaponId, {
+                logger.error('Could not find weapon with ID', {
+                  weaponId: buildData.data.weaponId,
                   hasBaseWeapon: !!baseWeapon,
                   hasGridWeapon: !!gridWeapon,
                   allWeaponsCount: allWeapons.length,
@@ -600,7 +609,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 });
               }
             } else {
-              console.warn('[SoulWeaponEngravingBuilder] No weaponId in shared build data');
+              logger.warn('No weaponId in shared build data');
             }
 
             // Force normal mode (not designer mode) when loading shared builds
@@ -608,13 +617,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             setForceDesignMode(false);
 
             setHasUnsavedChanges(true);
-            console.log('[SoulWeaponEngravingBuilder] ✓ Shared build loaded successfully');
+            logger.info('Shared build loaded successfully');
           } else {
-            console.error('[SoulWeaponEngravingBuilder] Invalid build type:', buildData.type);
+            logger.error('Invalid build type', { type: buildData.type });
             alert('Invalid build type. This URL is for a different builder.');
           }
         } catch (error) {
-          console.error('[SoulWeaponEngravingBuilder] Failed to load shared build:', error);
+          logger.error('Failed to load shared build', { error });
           alert(`Failed to load shared build: ${error.message}`);
         } finally {
           setLoading(false);
@@ -667,7 +676,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         row.some(cell => cell.piece !== null && cell.piece !== undefined)
       );
 
-      console.log('[SoulWeaponEngravingBuilder] Weapon change effect triggered:', {
+      logger.trace('Weapon change effect triggered', {
         weapon: selectedWeapon.name,
         weaponKey,
         lastInitialized: hasInitializedGridForWeapon.current,
@@ -680,15 +689,15 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       if (hasInitializedGridForWeapon.current !== weaponKey) {
         // If there are placed pieces, unsocket them all first
         if (hasPlacedPieces) {
-          console.log('[SoulWeaponEngravingBuilder] Weapon changed - unsocketing all pieces');
+          logger.debug('Weapon changed - unsocketing all pieces');
           unsocketAllPieces();
         }
 
-        console.log('[SoulWeaponEngravingBuilder] Initializing grid for weapon change');
+        logger.debug('Initializing grid for weapon change');
         hasInitializedGridForWeapon.current = weaponKey;
         initializeGrid();
       } else {
-        console.log('[SoulWeaponEngravingBuilder] Skipping grid initialization - already initialized for this weapon');
+        logger.trace('Skipping grid initialization - already initialized for this weapon');
       }
     }
   }, [selectedWeapon, loadingSharedBuild]);
@@ -700,7 +709,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       row.some(cell => cell.piece !== null && cell.piece !== undefined)
     );
 
-    console.log('[SoulWeaponEngravingBuilder] Mode switching effect triggered:', {
+    logger.trace('Mode switching effect triggered', {
       hasWeapon: !!selectedWeapon,
       hasGridData: weaponHasGridData(),
       hasSubmissionMeta: !!currentSubmissionMeta,
@@ -713,7 +722,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     // Skip if loading shared build, no weapon, weapon has official grid data, or grid already populated
     if (loadingSharedBuild || !selectedWeapon || weaponHasGridData() || hasPlacedPieces) {
-      console.log('[SoulWeaponEngravingBuilder] Skipping mode switch - loading shared build, has official data, or grid already populated');
+      logger.trace('Skipping mode switch - loading shared build, has official data, or grid already populated');
       return;
     }
 
@@ -721,7 +730,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // and we have no submissions yet, and we haven't already tried loading for this weapon, trigger a load
     const weaponKey = `${selectedWeapon.id}-${selectedWeapon.name}`;
     if (!loadingSubmissions && existingSubmissions.length === 0 && wikiConfig && hasLoadedSubmissionsForWeapon.current !== weaponKey) {
-      console.log('[SoulWeaponEngravingBuilder] No submissions loaded yet for weapon without grid data - triggering load');
+      logger.debug('No submissions loaded yet for weapon without grid data - triggering load');
       hasLoadedSubmissionsForWeapon.current = weaponKey;
       loadExistingSubmissions();
       return; // Exit early, will re-run when submissions load
@@ -730,20 +739,20 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // Weapon has no official grid data - check for submissions
     if (existingSubmissions.length > 0 && !forceDesignMode) {
       // Submissions exist and not forcing design mode - show normal grid mode with submission
-      console.log('[SoulWeaponEngravingBuilder] Switching to normal mode with submission');
+      logger.debug('Switching to normal mode with submission');
       setIsGridDesigner(false);
       loadSubmissionIntoNormalGrid(existingSubmissions[0]);
     } else {
       // No submissions or forcing design mode - show designer mode
-      console.log('[SoulWeaponEngravingBuilder] Switching to designer mode');
+      logger.debug('Switching to designer mode');
       setIsGridDesigner(true);
       if (existingSubmissions.length > 0) {
         // Load submission into designer for editing
-        console.log('[SoulWeaponEngravingBuilder] Loading submission into designer');
+        logger.debug('Loading submission into designer');
         loadSubmissionIntoDesigner(existingSubmissions[0]);
       } else {
         // No submissions - start with empty grid
-        console.log('[SoulWeaponEngravingBuilder] Initializing empty designer grid');
+        logger.debug('Initializing empty designer grid');
         initializeDesignerGrid();
       }
     }
@@ -787,7 +796,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Clamp to min/max
       const clampedScale = Math.max(GRID_SCALE_MIN, Math.min(GRID_SCALE_MAX, newScale));
 
-      console.log('Auto-scale calculation:', {
+      gridLogger.trace('Auto-scale calculation', {
         containerWidth,
         availableWidth,
         gridNaturalWidth,
@@ -813,14 +822,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     const inventoryContainer = inventoryContainerRef.current;
     const grid = gridRef.current;
 
-    console.log('📱 Setting up NATIVE touch event listeners', {
+    touchLogger.trace('Setting up NATIVE touch event listeners', {
       hasInventory: !!inventoryContainer,
       hasGrid: !!grid,
       hasEngravings: engravings.length > 0
     });
 
     if (!inventoryContainer || !grid || engravings.length === 0) {
-      console.log('📱 Refs not ready yet, skipping listener setup');
+      touchLogger.trace('Refs not ready yet, skipping listener setup');
       return;
     }
 
@@ -832,7 +841,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       const index = parseInt(slot.getAttribute('data-inventory-index'));
       const piece = inventory[index];
 
-      console.log('📱 NATIVE touchstart on inventory slot', index, 'piece:', piece?.shape?.name);
+      touchLogger.trace('NATIVE touchstart on inventory slot', index, 'piece:', piece?.shape?.name);
 
       if (piece && !lockedInventoryIndices.includes(index)) {
         handleTouchStart(e, piece, index);
@@ -842,7 +851,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // Handle touchmove - prevent scrolling
     const handleTouchMovePrevent = (e) => {
       if (touchDragging) {
-        console.log('📱 NATIVE touchmove - preventing default');
+        touchLogger.trace('NATIVE touchmove - preventing default');
         e.preventDefault();
         handleTouchMove(e);
       }
@@ -851,12 +860,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // Handle touchend
     const handleTouchEndNative = (e) => {
       if (touchDragging) {
-        console.log('📱 NATIVE touchend');
+        touchLogger.trace('NATIVE touchend');
         handleTouchEnd(e);
       }
     };
 
-    console.log('📱 Attaching NATIVE touch listeners');
+    touchLogger.trace('Attaching NATIVE touch listeners');
 
     // Use { passive: false } to allow preventDefault
     inventoryContainer.addEventListener('touchstart', handleInventoryTouchStart, { passive: false });
@@ -867,7 +876,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     grid.addEventListener('touchend', handleTouchEndNative, { passive: false });
 
     return () => {
-      console.log('📱 Cleaning up NATIVE touch event listeners');
+      touchLogger.trace('Cleaning up NATIVE touch event listeners');
       inventoryContainer.removeEventListener('touchstart', handleInventoryTouchStart);
       inventoryContainer.removeEventListener('touchmove', handleTouchMovePrevent);
       inventoryContainer.removeEventListener('touchend', handleTouchEndNative);
@@ -897,8 +906,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
   // Debug: Track gridState changes to investigate socketing issue
   useEffect(() => {
-    console.log('=== GridState Changed ===');
-    console.log('Grid dimensions:', gridState.length, 'x', gridState[0]?.length);
+    gridLogger.trace('GridState Changed');
+    gridLogger.trace('Grid dimensions', { rows: gridState.length, cols: gridState[0]?.length });
 
     // Find all placed pieces
     const placedPieces = [];
@@ -916,11 +925,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       });
     });
 
-    console.log('Placed pieces found:', placedPieces.length);
+    gridLogger.trace('Placed pieces found', { count: placedPieces.length });
     placedPieces.forEach((piece, idx) => {
-      console.log(`  Piece ${idx + 1}:`, piece);
+      gridLogger.trace(`Piece ${idx + 1}`, { piece });
     });
-    console.log('=========================');
+    
   }, [gridState]);
 
   // Cleanup document touch listeners on unmount
@@ -961,7 +970,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       if (weaponsData.weapons && weaponsData.weapons.length > 0) {
         const minWeaponId = weaponsData.weapons[0].id;
 
-        console.log('[SoulWeaponEngravingBuilder] Filtering weapons:', {
+        logger.trace('Filtering weapons', {
           totalWeapons: allWeaponsData.length,
           minWeaponId: minWeaponId,
           firstGridWeapon: weaponsData.weapons[0].name
@@ -970,7 +979,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         // Only include weapons with id >= first grid weapon id
         filteredAllWeapons = allWeaponsData.filter(w => w.id >= minWeaponId);
 
-        console.log('[SoulWeaponEngravingBuilder] Filtered weapons:', {
+        logger.trace('Filtered weapons', {
           filtered: filteredAllWeapons.length,
           showing: `${weaponsData.weapons[0].name} (ID ${minWeaponId}) and onwards`
         });
@@ -1006,7 +1015,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Try to load draft
       const draft = loadDraft();
       if (draft && !initialBuild) {
-        console.log('[SoulWeaponEngravingBuilder] Loading draft from localStorage');
+        logger.debug('Loading draft from localStorage');
 
         setBuildName(draft.buildName || '');
 
@@ -1057,7 +1066,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           setDesignerGrid(draft.designerGrid);
         }
         if (draft.gridType) {
-          console.log('[SoulWeaponEngravingBuilder] Draft loading - Setting gridType from draft:', draft.gridType);
+          logger.debug('Draft loading - Setting gridType from draft', { gridType: draft.gridType });
           setGridType(draft.gridType);
         }
         if (draft.completionAtk !== undefined) {
@@ -1067,7 +1076,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           setCompletionHp(draft.completionHp);
         }
 
-        console.log('[SoulWeaponEngravingBuilder] Draft loaded and deserialized - Designer state:', {
+        logger.debug('Draft loaded and deserialized - Designer state', {
           isGridDesigner: draft.isGridDesigner,
           gridType: draft.gridType,
           designerGridSize: draft.designerGrid ? `${draft.designerGrid.length}x${draft.designerGrid[0]?.length || 0}` : 'none'
@@ -1075,7 +1084,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       }
 
     } catch (error) {
-      console.error('Failed to load soul weapon engraving data:', error);
+      logger.error('Failed to load soul weapon engraving data', { error });
     } finally {
       setLoading(false);
     }
@@ -1155,7 +1164,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
       return null; // No data found
     } catch (error) {
-      console.error(`[getWeaponGridData] Failed to fetch community data for ${weapon.name}:`, error);
+      logger.error(`Failed to fetch community data for ${weapon.name}`, { error });
       return null;
     }
   };
@@ -1251,24 +1260,24 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             const hasOfficialData = weapons.find(gw => gw.name === weapon.name);
             if (!hasOfficialData) {
               weaponNames.add(weapon.name);
-              console.log(`📋 Found community submission for weapon ID ${weaponId}: ${weapon.name} (no official data)`);
+              gridLogger.trace(`📋 Found community submission for weapon ID ${weaponId}: ${weapon.name} (no official data)`);
             } else {
-              console.log(`📋 Skipping weapon ID ${weaponId}: ${weapon.name} (has official data)`);
+              gridLogger.trace(`📋 Skipping weapon ID ${weaponId}: ${weapon.name} (has official data)`);
             }
           }
         }
       }
 
       setWeaponsWithSubmissions(weaponNames);
-      console.log(`📋 Found community submissions for ${weaponNames.size} weapons without official data:`, Array.from(weaponNames));
+      logger.debug(`Found community submissions for ${weaponNames.size} weapons without official data`, { weapons: Array.from(weaponNames) });
     } catch (error) {
-      console.error('Failed to load weapons with submissions:', error);
+      logger.error('Failed to load weapons with submissions', { error });
     }
   };
 
   // Load existing submissions from GitHub issues (reads from comments)
   const loadExistingSubmissions = async (forceRefresh = false) => {
-    console.log('[SoulWeaponEngravingBuilder] loadExistingSubmissions called', {
+    logger.debug('loadExistingSubmissions called', {
       forceRefresh,
       hasSelectedWeapon: !!selectedWeapon,
       selectedWeaponId: selectedWeapon?.id,
@@ -1276,7 +1285,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     });
 
     if (!selectedWeapon || !wikiConfig) {
-      console.warn('[SoulWeaponEngravingBuilder] Early return - missing selectedWeapon or wikiConfig');
+      logger.warn('Early return - missing selectedWeapon or wikiConfig');
       return [];
     }
 
@@ -1294,11 +1303,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       const cached = cache[weaponName];
       if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
         if (cached.submissions.length > 0) {
-          console.log(`[SoulWeaponEngravingBuilder] Using cached submissions for ${weaponName} (expires in ${Math.round((CACHE_TTL - (Date.now() - cached.timestamp)) / 1000 / 60)} minutes)`);
+          gridLogger.trace(`[SoulWeaponEngravingBuilder] Using cached submissions for ${weaponName} (expires in ${Math.round((CACHE_TTL - (Date.now() - cached.timestamp)) / 1000 / 60)} minutes)`);
           setExistingSubmissions(cached.submissions);
           return cached.submissions;
         } else {
-          console.log(`[SoulWeaponEngravingBuilder] Cache has 0 submissions for ${weaponName} - bypassing cache to check for new submissions`);
+          gridLogger.trace(`[SoulWeaponEngravingBuilder] Cache has 0 submissions for ${weaponName} - bypassing cache to check for new submissions`);
         }
       }
     }
@@ -1314,7 +1323,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       const weaponLabel = createWeaponIdLabel(selectedWeapon.id);
       const searchQuery = `repo:${owner}/${repo} label:engraving-grid-submissions label:"${weaponLabel}" is:open`;
 
-      console.log(`[SoulWeaponEngravingBuilder] Searching for grid submissions with query:`, searchQuery);
+      gridLogger.trace(`[SoulWeaponEngravingBuilder] Searching for grid submissions with query:`, searchQuery);
 
       let issues = [];
 
@@ -1326,11 +1335,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             per_page: 10,
           }),
           (attempt, delay) => {
-            console.log(`[SoulWeaponEngravingBuilder] Search retry ${attempt}/3 - waiting ${Math.round(delay / 1000)}s due to rate limit`);
+            gridLogger.trace(`[SoulWeaponEngravingBuilder] Search retry ${attempt}/3 - waiting ${Math.round(delay / 1000)}s due to rate limit`);
           }
         );
 
-        console.log(`[SoulWeaponEngravingBuilder] Raw search response:`, {
+        gridLogger.trace(`[SoulWeaponEngravingBuilder] Raw search response:`, {
           total_count: data.total_count,
           incomplete_results: data.incomplete_results,
           items: data.items || []
@@ -1339,7 +1348,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         issues = data.items || [];
 
         if (issues.length === 0) {
-          console.warn(`[SoulWeaponEngravingBuilder] Search returned 0 results. Checking if GitHub search index is stale...`);
+          logger.warn(`Search returned 0 results. Checking if GitHub search index is stale`);
 
           // Try listing all grid issues to see if it exists but isn't indexed
           try {
@@ -1351,7 +1360,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               per_page: 100,
             });
 
-            console.log(`[SoulWeaponEngravingBuilder] Found ${allIssues.length} total grid issues via list API:`,
+            logger.debug(`Found ${allIssues.length} total grid issues via list API`,
               allIssues.map(i => ({
                 number: i.number,
                 title: i.title,
@@ -1366,17 +1375,17 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             );
 
             if (foundViaList) {
-              console.warn(`[SoulWeaponEngravingBuilder] Issue found via list API but NOT via search API. GitHub search index is stale.`);
+              logger.warn(`Issue found via list API but NOT via search API. GitHub search index is stale`);
               issues = [foundViaList];
             }
           } catch (listErr) {
-            console.error('[SoulWeaponEngravingBuilder] Fallback list failed:', listErr);
+            logger.error('Fallback list failed:', listErr);
           }
         } else {
-          console.log(`[SoulWeaponEngravingBuilder] Search found ${issues.length} issue(s):`, issues.map(i => ({ number: i.number, title: i.title, labels: i.labels.map(l => l.name) })));
+          logger.debug(`Search found ${issues.length} issue(s)`, { issues: issues.map(i => ({ number: i.number, title: i.title, labels: i.labels.map(l => l.name) })) });
         }
       } catch (searchError) {
-        console.error('[SoulWeaponEngravingBuilder] Search failed after retries:', searchError);
+        logger.error('Search failed after retries:', searchError);
         const errorMsg = searchError.status === 403
           ? 'GitHub API rate limit exceeded. Please try again later or sign in for higher rate limits.'
           : `Failed to search for submissions: ${searchError.message}`;
@@ -1404,13 +1413,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               per_page: 100,
             }),
             (attempt, delay) => {
-              console.log(`[SoulWeaponEngravingBuilder] Comments retry ${attempt}/3 - waiting ${Math.round(delay / 1000)}s due to rate limit`);
+              gridLogger.trace(`[SoulWeaponEngravingBuilder] Comments retry ${attempt}/3 - waiting ${Math.round(delay / 1000)}s due to rate limit`);
             }
           );
 
           comments = data;
         } catch (commentsError) {
-          console.error('[SoulWeaponEngravingBuilder] Comments fetch failed after retries:', commentsError);
+          logger.error('Comments fetch failed after retries:', commentsError);
           const errorMsg = commentsError.status === 403
             ? 'GitHub API rate limit exceeded. Please try again later or sign in for higher rate limits.'
             : `Failed to load submission data: ${commentsError.message}`;
@@ -1434,7 +1443,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 // Submission already has submittedBy and submittedAt from JSON
               });
             } catch (err) {
-              console.warn('Failed to parse submission from comment', comment.id, err);
+              logger.warn('Failed to parse submission from comment', { commentId: comment.id, error: err });
             }
           }
         }
@@ -1445,14 +1454,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Cache the submissions in localStorage
       setSubmissionCache(weaponName, weaponSubmissions);
 
-      console.log(`[SoulWeaponEngravingBuilder] Loaded ${weaponSubmissions.length} submission(s) for ${weaponName}`);
+      gridLogger.trace(`[SoulWeaponEngravingBuilder] Loaded ${weaponSubmissions.length} submission(s) for ${weaponName}`);
 
       // Note: Don't load submissions here - the useEffect hook will handle it
       // based on forceDesignMode state
 
       return weaponSubmissions;
     } catch (error) {
-      console.error('Failed to load existing submissions:', error);
+      logger.error('Failed to load existing submissions', { error });
       setSubmissionLoadError(`Failed to load submissions: ${error.message}`);
       setExistingSubmissions([]);
       return [];
@@ -1465,7 +1474,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const loadSubmissionIntoDesigner = (submission) => {
     if (!submission) return;
 
-    console.log('[SoulWeaponEngravingBuilder] loadSubmissionIntoDesigner - Loading submission:', {
+    logger.debug('loadSubmissionIntoDesigner - Loading submission', {
       gridType: submission.gridType,
       activeSlots: submission.totalActiveSlots,
       completionEffect: submission.completionEffect
@@ -1496,7 +1505,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const loadSubmissionIntoNormalGrid = (submission) => {
     if (!submission) return;
 
-    console.log('[SoulWeaponEngravingBuilder] Loading submission into normal grid:', {
+    logger.debug('Loading submission into normal grid', {
       gridType: submission.gridType,
       totalActiveSlots: submission.totalActiveSlots,
       activeSlots: submission.activeSlots,
@@ -1512,7 +1521,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       submittedBy: submission.submittedBy || 'Anonymous',
       submittedAt: submission.submittedAt
     };
-    console.log('[SoulWeaponEngravingBuilder] Setting currentSubmissionMeta:', submissionMeta);
+    logger.debug('Setting currentSubmissionMeta', { submissionMeta });
     setCurrentSubmissionMeta(submissionMeta);
 
     // Initialize normal grid from submission
@@ -1531,8 +1540,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       }
     });
 
-    console.log('[SoulWeaponEngravingBuilder] Grid initialized with size:', gridSize, 'x', gridSize);
-    console.log('[SoulWeaponEngravingBuilder] Active cells marked:', submission.activeSlots.length);
+    logger.debug('Grid initialized', { size: `${gridSize}x${gridSize}` });
+    logger.debug('Active cells marked', { count: submission.activeSlots.length });
 
     // Log the grid state to verify active cells are in correct positions
     const activePositions = [];
@@ -1543,7 +1552,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         }
       });
     });
-    console.log('[SoulWeaponEngravingBuilder] Active cell positions in grid:', activePositions.join(', '));
+    logger.debug('Active cell positions in grid', { positions: activePositions.join(', ') });
 
     setGridState(grid);
     setPlacingPiece(null);
@@ -1602,7 +1611,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     setSubmitting(true);
     try {
       // Log state values at submission time
-      console.log('[SoulWeaponEngravingBuilder] submitGridLayout - State values at submission:', {
+      logger.debug('submitGridLayout - State values at submission', {
         gridType: gridType,
         completionAtk: completionAtk,
         completionHp: completionHp,
@@ -1623,7 +1632,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         totalActiveSlots: activeSlots.length
       };
 
-      console.log('[SoulWeaponEngravingBuilder] submitGridLayout - Final submission object:', submission);
+      logger.debug('submitGridLayout - Final submission object', { submission });
 
       // Call save-data function with type 'grid-submission'
       // Authenticated users will have their username attached, otherwise anonymous
@@ -1656,7 +1665,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         alert('Grid layout submitted successfully!');
       }
 
-      console.log('[SoulWeaponEngravingBuilder] Grid submission successful!');
+      logger.info('Grid submission successful');
 
       // Exit designer mode immediately
       setIsGridDesigner(false);
@@ -1671,7 +1680,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         submittedBy: isAuthenticated ? user.login : 'Anonymous',
         submittedAt: new Date().toISOString()
       };
-      console.log('[SoulWeaponEngravingBuilder] Loading submitted grid immediately:', immediateSubmissionData);
+      logger.debug('Loading submitted grid immediately', { immediateSubmissionData });
       loadSubmissionIntoNormalGrid(immediateSubmissionData);
 
       // Invalidate cache for background refresh
@@ -1680,27 +1689,27 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Wait 1.5 seconds, then refresh from GitHub to get the actual stored version
       setTimeout(async () => {
         try {
-          console.log('[SoulWeaponEngravingBuilder] Refreshing submission data from GitHub...');
+          logger.debug('Refreshing submission data from GitHub');
 
           // Reload all weapons with submissions to update dropdown
           await loadAllWeaponsWithSubmissions();
 
           // Force refresh submissions from GitHub
           const updatedSubmissions = await loadExistingSubmissions(true);
-          console.log('[SoulWeaponEngravingBuilder] Refreshed submissions from GitHub:', updatedSubmissions.length);
+          logger.debug('Refreshed submissions from GitHub', { count: updatedSubmissions.length });
 
           // If we got fresh data, reload it into the grid
           if (updatedSubmissions.length > 0) {
-            console.log('[SoulWeaponEngravingBuilder] Reloading first submission with fresh data from GitHub');
+            logger.debug('Reloading first submission with fresh data from GitHub');
             loadSubmissionIntoNormalGrid(updatedSubmissions[0]);
           }
         } catch (error) {
-          console.error('[SoulWeaponEngravingBuilder] Failed to refresh from GitHub:', error);
+          logger.error('Failed to refresh from GitHub', { error });
           // Not fatal - user already has the submitted grid loaded
         }
       }, 1500);
     } catch (error) {
-      console.error('Failed to submit grid layout:', error);
+      logger.error('Failed to submit grid layout', { error });
       alert(`Failed to submit grid layout: ${error.message}`);
     } finally {
       setSubmitting(false);
@@ -1723,14 +1732,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           // Square piece is 2x2, so divide image width by 2 to get cell size
           const naturalCellSize = Math.floor(img.naturalWidth / squareShape.pattern[0].length);
           setCellSize(naturalCellSize);
-          console.log(`Calculated natural cell size: ${naturalCellSize}px from image ${img.naturalWidth}x${img.naturalHeight}`);
+          gridLogger.debug(`Calculated natural cell size: ${naturalCellSize}px from image ${img.naturalWidth}x${img.naturalHeight}`);
           resolve();
         };
         img.onerror = reject;
         img.src = imageUrl;
       });
     } catch (error) {
-      console.error('Failed to calculate natural cell size, using default 45px:', error);
+      gridLogger.error('Failed to calculate natural cell size, using default 45px', { error });
       setCellSize(45);
     }
   };
@@ -1789,7 +1798,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       }
     });
 
-    console.log('Locked inventory indices:', locked, 'Inventory:', inventory.map((p, i) => p ? `${i}: ${p.shapeId}` : `${i}: empty`));
+    gridLogger.trace('Locked inventory indices', { locked, inventory: inventory.map((p, i) => p ? `${i}: ${p.shapeId}` : `${i}: empty`) });
     setLockedInventoryIndices(locked);
   };
 
@@ -2007,7 +2016,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Hide success message after 2 seconds
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (err) {
-      console.error('[SoulWeaponEngravingBuilder] Failed to save build:', err);
+      logger.error('Failed to save build', { error: err });
       setSaveError(err.message || 'Failed to save build');
     } finally {
       setSaving(false);
@@ -2015,7 +2024,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleWeaponChange = (weaponId) => {
-    console.log('[Weapon Change] Switching weapon to ID:', weaponId);
+    logger.debug('Switching weapon', { weaponId });
 
     // First, find the weapon in allWeapons (basic weapon data with image)
     const baseWeapon = allWeapons.find(w => w.id === parseInt(weaponId));
@@ -2026,11 +2035,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     if (gridWeapon) {
       // Weapon has grid data - normal mode
-      console.log('[Weapon Change] Weapon has grid data, using normal mode');
+      logger.debug('Weapon has grid data, using normal mode');
 
       // Unsocket all pieces from current weapon (try to return to inventory)
       unsocketAllPieces();
-      console.log('[Weapon Change] Unsocketed all pieces from previous weapon');
+      logger.debug('Unsocketed all pieces from previous weapon');
 
       // Merge grid data with base weapon data (to get image field)
       setSelectedWeapon({
@@ -2042,8 +2051,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       setForceDesignMode(false); // Ensure we exit design mode
     } else {
       // No grid data - Grid Designer Mode
-      console.log('[Weapon Change] Weapon has NO grid data, will enter Grid Designer Mode');
-      console.log('[Weapon Change] Force clearing grid and inventory for fresh start');
+      logger.debug('Weapon has NO grid data, will enter Grid Designer Mode');
+      logger.debug('Force clearing grid and inventory for fresh start');
 
       // Force clear everything for Grid Designer Mode
       // Clear inventory completely (don't try to save pieces)
@@ -2138,7 +2147,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleRemoveFromInventory = (slotIndex) => {
-    console.log('❌❌❌ handleRemoveFromInventory called for slot:', slotIndex);
+    gridLogger.trace('handleRemoveFromInventory called', { slotIndex });
     console.trace('Stack trace for remove call');
 
     const newInventory = [...inventory];
@@ -2212,7 +2221,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleDragEnd = () => {
-    console.log('🔥 Drag ended - cleaning up (piece stays in inventory)');
+    gridLogger.trace('Drag ended - cleaning up (piece stays in inventory)');
 
     // IMPORTANT: When drag ends without being dropped on grid, the piece stays in inventory
     // We only clear visual drag state, we do NOT remove the piece from inventory
@@ -2230,7 +2239,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const handleDragOver = (e, row, col) => {
     e.preventDefault();
     if (!draggingPiece) {
-      console.log('❌ DragOver but no draggingPiece');
+      gridLogger.trace('DragOver but no draggingPiece');
       return;
     }
 
@@ -2238,7 +2247,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // This makes the piece appear exactly where the user is dragging it
     const anchorRow = row - dragPatternOffset.row;
     const anchorCol = col - dragPatternOffset.col;
-    console.log(`📍 DragOver [${row}][${col}] -> anchor [${anchorRow}][${anchorCol}]`);
+    gridLogger.trace(`DragOver [${row}][${col}] -> anchor [${anchorRow}][${anchorCol}]`);
 
     // Calculate which cells this piece would occupy from the anchor point
     const pattern = getRotatedPattern(draggingPiece.shape.pattern, currentDragRotation);
@@ -2327,7 +2336,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     const gridRect = gridRef.current.getBoundingClientRect();
     const currentScale = autoScale ? calculatedScale : gridScale;
 
-    console.log('📱 getTouchGridCell:', {
+    touchLogger.trace('getTouchGridCell:', {
       touchX: touch.clientX,
       touchY: touch.clientY,
       gridLeft: gridRect.left,
@@ -2341,7 +2350,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     const relativeX = (touch.clientX - gridRect.left) / currentScale;
     const relativeY = (touch.clientY - gridRect.top) / currentScale;
 
-    console.log('📱 Relative position:', { relativeX, relativeY, GRID_PADDING });
+    touchLogger.trace('Relative position:', { relativeX, relativeY, GRID_PADDING });
 
     // Account for grid padding
     const gridX = relativeX - GRID_PADDING;
@@ -2352,44 +2361,44 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     const col = Math.floor(gridX / cellTotalSize);
     const row = Math.floor(gridY / cellTotalSize);
 
-    console.log('📱 Cell calculation:', { gridX, gridY, cellTotalSize, row, col });
+    touchLogger.trace('Cell calculation:', { gridX, gridY, cellTotalSize, row, col });
 
     // Check if within bounds
     // Use submission gridType if available (community submissions), otherwise use weapon gridType
     const effectiveGridType = currentSubmissionMeta?.gridType || selectedWeapon?.gridType || '5x5';
     const gridSize = effectiveGridType === '4x4' ? 4 : 5;
     if (row < 0 || col < 0 || row >= gridSize || col >= gridSize) {
-      console.log('📱 Out of bounds:', { row, col, gridSize });
+      touchLogger.trace('Out of bounds:', { row, col, gridSize });
       return null;
     }
 
-    console.log('📱 Valid cell:', { row, col });
+    touchLogger.trace('Valid cell:', { row, col });
     return { row, col };
   };
 
   const handleTouchStart = (e, piece, index) => {
-    console.log('📱📱📱 handleTouchStart CALLED', { piece: piece?.shape?.name, index, event: e.type });
+    touchLogger.trace('📱📱 handleTouchStart CALLED', { piece: piece?.shape?.name, index, event: e.type });
 
     // Don't interfere with level editor clicks (check target only, no preventDefault yet)
     if (e.target.closest('[data-level-editor]')) {
-      console.log('📱 Touch on level editor, ignoring');
+      touchLogger.trace('Touch on level editor, ignoring');
       return;
     }
 
     // Prevent dragging locked pieces
     if (lockedInventoryIndices.includes(index)) {
-      console.log('📱 Piece is locked, ignoring');
+      touchLogger.trace('Piece is locked, ignoring');
       return;
     }
 
     // CRITICAL: Prevent default to stop scrolling
-    console.log('📱 Calling preventDefault and stopPropagation');
+    touchLogger.trace('Calling preventDefault and stopPropagation');
     e.preventDefault();
     e.stopPropagation();
 
     const touch = e.touches[0];
-    console.log('📱 Touch Start:', touch.clientX, touch.clientY);
-    console.log('📱 Setting state: touchDragging=true, draggingPiece=', piece.shape.name);
+    touchLogger.trace('Touch Start:', touch.clientX, touch.clientY);
+    touchLogger.trace('Setting state: touchDragging=true, draggingPiece=', piece.shape.name);
 
     setTouchStartPos({ x: touch.clientX, y: touch.clientY });
     setTouchCurrentPos({ x: touch.clientX, y: touch.clientY });
@@ -2415,13 +2424,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       }
     }
 
-    console.log('📱 Pattern offset set to:', { row: firstFilledRow, col: firstFilledCol });
+    touchLogger.trace('Pattern offset set to:', { row: firstFilledRow, col: firstFilledCol });
     setDragPatternOffset({ row: firstFilledRow, col: firstFilledCol });
   };
 
   const handleTouchMove = (e) => {
     if (!touchDraggingRef.current || !draggingPieceRef.current) {
-      console.log('❌ Touch move ignored:', { touchDragging: touchDraggingRef.current, draggingPiece: !!draggingPieceRef.current });
+      gridLogger.trace('❌ Touch move ignored:', { touchDragging: touchDraggingRef.current, draggingPiece: !!draggingPieceRef.current });
       return;
     }
 
@@ -2429,19 +2438,19 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     e.stopPropagation();
 
     const touch = e.touches[0];
-    console.log('📱 Touch Move:', touch.clientX, touch.clientY);
+    touchLogger.trace('Touch Move:', touch.clientX, touch.clientY);
 
     // Always update current position for floating preview
     setTouchCurrentPos({ x: touch.clientX, y: touch.clientY });
 
     const cell = getTouchGridCell(touch);
-    console.log('📱 Touch Grid Cell:', cell);
+    touchLogger.trace('Touch Grid Cell:', cell);
 
     if (cell) {
       // Use same logic as handleDragOver
       const anchorRow = cell.row - dragPatternOffset.row;
       const anchorCol = cell.col - dragPatternOffset.col;
-      console.log('📱 Anchor position:', anchorRow, anchorCol);
+      touchLogger.trace('Anchor position:', anchorRow, anchorCol);
 
       const pattern = getRotatedPattern(draggingPieceRef.current.shape.pattern, currentDragRotation);
       const previewCells = [];
@@ -2480,7 +2489,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         }
       }
 
-      console.log('📱 Setting preview:', { anchorRow, anchorCol, previewCells: previewCells.length });
+      touchLogger.trace('Setting preview:', { anchorRow, anchorCol, previewCells: previewCells.length });
       setPreviewPosition({ row: anchorRow, col: anchorCol });
       setDragPreviewCells(previewCells);
     } else {
@@ -2497,16 +2506,16 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     e.stopPropagation();
 
     const touch = e.changedTouches[0];
-    console.log('📱 Touch End:', touch.clientX, touch.clientY);
+    touchLogger.trace('Touch End:', touch.clientX, touch.clientY);
     const cell = getTouchGridCell(touch);
-    console.log('📱 Touch End Cell:', cell);
+    touchLogger.trace('Touch End Cell:', cell);
 
     if (cell) {
       // Use same logic as handleDrop
       const anchorRow = cell.row - dragPatternOffset.row;
       const anchorCol = cell.col - dragPatternOffset.col;
 
-      console.log('📱 Dropping at:', anchorRow, anchorCol);
+      touchLogger.trace('Dropping at:', anchorRow, anchorCol);
       setPlacingInventoryIndex(draggingIndex);
 
       // Calculate initial button position based on CURRENT rotation (will stay fixed during further rotations)
@@ -2519,7 +2528,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       setPlacingPosition({ row: anchorRow, col: anchorCol });
       setPlacingRotation(currentDragRotation);
     } else {
-      console.log('📱 Not over grid, canceling drop - piece stays in inventory');
+      touchLogger.trace('Not over grid, canceling drop - piece stays in inventory');
       // IMPORTANT: When dropped outside grid, the piece stays in inventory
       // We only clear visual drag state, we do NOT remove the piece from inventory
     }
@@ -2549,13 +2558,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleTouchStartPlacedPiece = (e, piece, clickedPatternRow, clickedPatternCol) => {
-    console.log('📱 Touch start on placed piece:', piece, 'clicked cell:', clickedPatternRow, clickedPatternCol);
+    touchLogger.trace('Touch start on placed piece:', piece, 'clicked cell:', clickedPatternRow, clickedPatternCol);
 
     // CRITICAL: Prevent default to stop scrolling
     e.preventDefault();
 
     const touch = e.touches[0];
-    console.log('📱 Touch Start Placed:', touch.clientX, touch.clientY);
+    touchLogger.trace('Touch Start Placed:', touch.clientX, touch.clientY);
 
     setTouchStartPos({ x: touch.clientX, y: touch.clientY });
     setTouchCurrentPos({ x: touch.clientX, y: touch.clientY });
@@ -2581,7 +2590,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     // Add document-level touch listeners IMMEDIATELY (not via useEffect)
     // This ensures the first touchmove is captured
-    console.log('📱 Adding document touch listeners immediately');
+    touchLogger.trace('Adding document touch listeners immediately');
 
     const handleDocumentTouchMove = (e) => {
       if (touchDraggingRef.current && draggingPieceRef.current) {
@@ -2600,12 +2609,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     // Store cleanup function
     touchCleanupRef.current = () => {
-      console.log('📱 Cleaning up document touch listeners');
+      touchLogger.trace('Cleaning up document touch listeners');
       document.removeEventListener('touchmove', handleDocumentTouchMove);
       document.removeEventListener('touchend', handleDocumentTouchEnd);
     };
 
-    console.log('📱 Touch dragging placed piece, draggingFromGrid:', { anchorRow: piece.anchorRow, anchorCol: piece.anchorCol });
+    touchLogger.trace('Touch dragging placed piece, draggingFromGrid:', { anchorRow: piece.anchorRow, anchorCol: piece.anchorCol });
   };
 
   // Placement confirmation handlers
@@ -2624,13 +2633,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     const newGrid = JSON.parse(JSON.stringify(gridState));
     const inventoryIndex = placingInventoryIndex !== null ? placingInventoryIndex : undefined;
 
-    console.log('Placing piece:', placingPiece);
-    console.log('Pattern:', pattern);
-    console.log('Position:', placingPosition);
+    gridLogger.trace('Placing piece:', placingPiece);
+    gridLogger.trace('Pattern:', pattern);
+    gridLogger.trace('Position:', placingPosition);
 
     // If we're moving a piece from the grid, remove it from its old position first
     if (draggingFromGrid) {
-      console.log('Removing piece from old position:', draggingFromGrid);
+      gridLogger.trace('Removing piece from old position:', draggingFromGrid);
       for (let r = 0; r < newGrid.length; r++) {
         for (let c = 0; c < newGrid[r].length; c++) {
           if (newGrid[r][c].piece &&
@@ -2655,14 +2664,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               anchorCol: placingPosition.col,
               inventoryIndex: inventoryIndex // Track source inventory slot
             };
-            console.log(`Setting piece at [${gridRow}][${gridCol}]:`, pieceData);
+            gridLogger.trace(`Setting piece at [${gridRow}][${gridCol}]:`, pieceData);
             newGrid[gridRow][gridCol].piece = pieceData;
           }
         }
       });
     });
 
-    console.log('New grid state after placement:', newGrid);
+    gridLogger.trace('New grid state after placement:', newGrid);
     setGridState(newGrid);
 
     // DON'T remove piece from inventory - keep it there but locked
@@ -2694,12 +2703,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleCancelPlacement = () => {
-    console.log('❌ Canceling placement - removing piece from grid');
+    gridLogger.trace('❌ Canceling placement - removing piece from grid');
 
     // ALWAYS remove piece from grid when canceling
     // If we were dragging from grid, remove it from the grid
     if (draggingFromGrid) {
-      console.log('❌ Removing piece from grid at:', draggingFromGrid);
+      gridLogger.trace('❌ Removing piece from grid at:', draggingFromGrid);
       const newGrid = JSON.parse(JSON.stringify(gridState));
       for (let r = 0; r < newGrid.length; r++) {
         for (let c = 0; c < newGrid[r].length; c++) {
@@ -2718,7 +2727,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Piece came from inventory, unlock it
       const newLockedIndices = lockedInventoryIndices.filter(idx => idx !== placingInventoryIndex);
       setLockedInventoryIndices(newLockedIndices);
-      console.log('❌ Piece returned to inventory slot', placingInventoryIndex);
+      gridLogger.trace('❌ Piece returned to inventory slot', placingInventoryIndex);
     } else if (placingPiece && placingInventoryIndex === null) {
       // Piece was unsocketed from grid, find empty inventory slot
       const emptySlot = inventory.findIndex(slot => slot === null);
@@ -2731,7 +2740,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           level: placingPiece.level
         };
         setInventory(newInventory);
-        console.log('❌ Piece returned to inventory slot', emptySlot);
+        gridLogger.trace('❌ Piece returned to inventory slot', emptySlot);
       }
     }
 
@@ -2748,11 +2757,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleClickPlacedPiece = (e, piece) => {
-    console.log('👆 Clicked placed piece, entering placing mode:', piece);
+    gridLogger.trace('👆 Clicked placed piece, entering placing mode:', piece);
 
     // Validate piece data
     if (!piece || !piece.shape || !piece.shape.pattern) {
-      console.error('❌ Invalid piece data:', piece);
+      gridLogger.error('Invalid piece data', { piece });
       return;
     }
 
@@ -2807,7 +2816,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleDragPlacedPiece = (e, piece, clickedPatternRow, clickedPatternCol) => {
-    console.log('🔥 Starting drag of placed piece:', piece, 'clicked cell:', clickedPatternRow, clickedPatternCol);
+    gridLogger.trace('🔥 Starting drag of placed piece:', piece, 'clicked cell:', clickedPatternRow, clickedPatternCol);
 
     // DON'T remove the piece from grid yet - keep it visible during drag
     // We'll remove it when dropping in a new location or on drag end
@@ -2822,7 +2831,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       rarity: piece.rarity,
       level: piece.level
     };
-    console.log('🔥 Setting dragging piece:', dragPieceData);
+    gridLogger.trace('🔥 Setting dragging piece:', dragPieceData);
 
     // Set effectAllowed before changing state
     e.dataTransfer.effectAllowed = 'move';
@@ -2836,7 +2845,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       setCurrentDragRotation(piece.rotation || 0); // Preserve rotation
       // Mark that we're dragging from grid so we can remove it on drop
       setDraggingFromGrid({ anchorRow: piece.anchorRow, anchorCol: piece.anchorCol });
-      console.log('🔥 Dragging state set after delay - rotation:', piece.rotation || 0, 'from grid:', piece.anchorRow, piece.anchorCol);
+      gridLogger.trace('🔥 Dragging state set after delay - rotation:', piece.rotation || 0, 'from grid:', piece.anchorRow, piece.anchorCol);
     }, 0);
   };
 
@@ -3010,11 +3019,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleClearGrid = () => {
-    console.log('[Clear Grid] Button clicked');
-    console.log('[Clear Grid] Grid state has pieces:', gridState.some(row => row.some(cell => cell.piece)));
+    gridLogger.debug('Clear grid button clicked');
+    gridLogger.debug('Grid state has pieces', { hasPieces: gridState.some(row => row.some(cell => cell.piece)) });
 
     if (confirm('Clear all placed pieces? They will be returned to inventory if space available.')) {
-      console.log('[Clear Grid] User confirmed, clearing grid...');
+      gridLogger.debug('User confirmed, clearing grid');
 
       // Return pieces to inventory where possible
       const piecesToReturn = [];
@@ -3032,7 +3041,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         });
       });
 
-      console.log('[Clear Grid] Pieces to return:', piecesToReturn.length);
+      gridLogger.debug('Pieces to return', { count: piecesToReturn.length });
 
       const newInventory = [...inventory];
       piecesToReturn.forEach(piece => {
@@ -3047,13 +3056,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         }
       });
 
-      console.log('[Clear Grid] Updated inventory, initializing grid...');
+      gridLogger.debug('Updated inventory, initializing grid');
       setInventory(newInventory);
       initializeGrid();
       setHasUnsavedChanges(true);
-      console.log('[Clear Grid] Grid cleared successfully');
+      gridLogger.info('Grid cleared successfully');
     } else {
-      console.log('[Clear Grid] User cancelled');
+      gridLogger.debug('User cancelled clear grid');
     }
   };
 
@@ -3075,7 +3084,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       });
     });
 
-    console.log('[SoulWeaponEngravingBuilder] Unsocketing pieces:', piecesToReturn.length);
+    gridLogger.debug('Unsocketing pieces', { count: piecesToReturn.length });
 
     const newInventory = [...inventory];
     piecesToReturn.forEach(piece => {
@@ -3088,7 +3097,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           level: piece.level
         };
       } else {
-        console.warn('[SoulWeaponEngravingBuilder] No inventory space for piece:', piece.shapeId);
+        gridLogger.warn('No inventory space for piece', { shapeId: piece.shapeId });
       }
     });
 
@@ -3100,7 +3109,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         piece: null
       }))
     );
-    console.log('[SoulWeaponEngravingBuilder] Grid state cleared after unsocketing');
+    gridLogger.debug('Grid state cleared after unsocketing');
 
     setGridState(clearedGrid);
     setInventory(newInventory);
@@ -3319,7 +3328,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       }
     }
 
-    console.log(`🔍 Deduplicated: ${solutions.length} → ${unique.length} unique solutions`);
+    gridLogger.trace(`🔍 Deduplicated: ${solutions.length} → ${unique.length} unique solutions`);
     return unique;
   };
 
@@ -3359,7 +3368,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // Check cache first
     const cacheKey = getCacheKey(selectedWeapon.id, validPieces);
     if (solutionCache[cacheKey]) {
-      console.log('💾 Using cached solutions for', selectedWeapon.name);
+      gridLogger.trace('💾 Using cached solutions for', selectedWeapon.name);
       setAutoSolveSolutions(solutionCache[cacheKey]);
       setShowSolutionPicker(true);
 
@@ -3376,8 +3385,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       return;
     }
 
-    console.log('🧩 Starting auto-solve with', validPieces.length, 'pieces');
-    console.log('📝 Pieces:', validPieces.map(p => `[${p.inventoryIndex}] ${p.shape.name}`).join(', '));
+    autoSolveLogger.debug('Starting auto-solve with', validPieces.length, 'pieces');
+    autoSolveLogger.debug('Pieces', { pieces: validPieces.map(p => `[${p.inventoryIndex}] ${p.shape.name}`).join(', ') });
     setIsSolving(true);
     setAutoSolveSolutions([]);
 
@@ -3396,7 +3405,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       try {
         // Calculate minimum pieces needed based on grid size
         const totalActiveSlots = emptyGrid.flat().filter(cell => cell.active).length;
-        console.log(`📊 Grid has ${totalActiveSlots} active slots to cover`);
+        gridLogger.trace(`📊 Grid has ${totalActiveSlots} active slots to cover`);
 
         // Calculate average cells per piece
         const avgCellsPerPiece = validPieces.reduce((sum, p) => {
@@ -3409,7 +3418,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         const minPieces = Math.max(1, Math.floor(totalActiveSlots / avgCellsPerPiece));
         const maxPiecesToTry = Math.min(validPieces.length, 8);
 
-        console.log(`⚡ Optimization: Starting from ${minPieces} pieces (skipping impossible sizes)`);
+        gridLogger.trace(`⚡ Optimization: Starting from ${minPieces} pieces (skipping impossible sizes)`);
 
         // Track which shape type combinations we've already found
         const foundShapeTypeSignatures = new Set();
@@ -3430,11 +3439,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         };
 
         for (let numPieces = minPieces; numPieces <= maxPiecesToTry; numPieces++) {
-          console.log(`\n🔍 Trying combinations of ${numPieces} piece(s)...`);
+          gridLogger.trace(`\n🔍 Trying combinations of ${numPieces} piece(s)...`);
 
           // Generate ALL unique combinations of this size
           const combinations = getCombinations(validPieces, numPieces);
-          console.log(`   Generated ${combinations.length} piece combinations`);
+          gridLogger.trace(`   Generated ${combinations.length} piece combinations`);
 
           let foundInThisSize = 0;
           let skippedDuplicates = 0;
@@ -3462,17 +3471,17 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               foundInThisSize++;
 
               const pieceIndices = combination.map(p => p.inventoryIndex).join(',');
-              console.log(`   ✅ Solution ${solutions.length}: [${pieceIndices}] = ${shapeTypeSignature}`);
+              gridLogger.trace(`   ✅ Solution ${solutions.length}: [${pieceIndices}] = ${shapeTypeSignature}`);
             }
           }
 
-          console.log(`   Found ${foundInThisSize} unique shape combinations (skipped ${skippedDuplicates} duplicates)`);
+          gridLogger.trace(`   Found ${foundInThisSize} unique shape combinations (skipped ${skippedDuplicates} duplicates)`);
 
           // Continue to next size to find all possible shape type combinations
         }
 
-        console.log(`\n✅ Total: ${solutions.length} unique solution(s) found`);
-        console.log('💡 Each solution uses a different combination of pieces');
+        gridLogger.trace(`\n✅ Total: ${solutions.length} unique solution(s) found`);
+        gridLogger.trace('💡 Each solution uses a different combination of pieces');
 
         if (solutions.length === 0) {
           alert('No complete solutions found. Try different pieces or fewer pieces that can cover the grid.');
@@ -3483,7 +3492,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             ...prev,
             [cacheKey]: solutions
           }));
-          console.log('💾 Cached solutions for future use');
+          gridLogger.trace('💾 Cached solutions for future use');
 
           setAutoSolveSolutions(solutions);
           setShowSolutionPicker(true);
@@ -3499,7 +3508,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           });
         }
       } catch (error) {
-        console.error('❌ Auto-solve error:', error);
+        autoSolveLogger.error('Auto-solve error', { error });
         alert('An error occurred while solving. Please try again.');
       } finally {
         setIsSolving(false);
@@ -3508,7 +3517,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleApplySolution = (solution) => {
-    console.log('✅ Applying solution:', solution);
+    autoSolveLogger.info('Applying solution', solution);
 
     // Start with empty grid
     const newGrid = JSON.parse(JSON.stringify(gridState));
@@ -3562,7 +3571,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // Check for valid cache first
     const cachedResults = getBestWeaponCache();
     if (cachedResults) {
-      console.log('🔍 Using cached best weapon results');
+      autoSolveLogger.debug('Using cached best weapon results');
       setBestWeaponResults(cachedResults);
       setShowBestWeaponModal(true);
 
@@ -3617,7 +3626,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       return;
     }
 
-    console.log('🔍 Finding best weapon for', validPieces.length, 'pieces');
+    autoSolveLogger.debug('Finding best weapon for', validPieces.length, 'pieces');
     setIsFindingBestWeapon(true);
     setBestWeaponResults([]);
 
@@ -3628,23 +3637,23 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         const startTime = Date.now();
         const newCacheEntries = {}; // Batch cache updates
 
-        console.log(`🔓 Testing ${unlockedWeapons.length} unlocked weapons (up to ${highestWeaponName})`);
+        gridLogger.trace(`🔓 Testing ${unlockedWeapons.length} unlocked weapons (up to ${highestWeaponName})`);
 
         // Test each unlocked weapon
         for (let weaponIndex = 0; weaponIndex < unlockedWeapons.length; weaponIndex++) {
           const weapon = unlockedWeapons[weaponIndex];
-          console.log(`\n🗡️ Testing weapon ${weaponIndex + 1}/${unlockedWeapons.length}: ${weapon.name}`);
+          gridLogger.trace(`\n🗡️ Testing weapon ${weaponIndex + 1}/${unlockedWeapons.length}: ${weapon.name}`);
 
           // Get grid data for this weapon (official or community)
           const weaponGridData = await getWeaponGridData(weapon);
 
           if (!weaponGridData || !weaponGridData.hasData) {
-            console.log(`   ⚠️ No grid data available (skipping)`);
+            gridLogger.trace(`   ⚠️ No grid data available (skipping)`);
             continue; // Skip weapons without grid data
           }
 
           if (weaponGridData.source === 'community') {
-            console.log(`   📝 Using community submission from ${weaponGridData.submittedBy || 'Anonymous'}`);
+            gridLogger.trace(`   📝 Using community submission from ${weaponGridData.submittedBy || 'Anonymous'}`);
           }
 
           // Create empty grid for this weapon using the grid data
@@ -3686,7 +3695,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             const tierBonus = weapon.id * 10; // 10 points per weapon level (weapon 42 gets +420)
             score += tierBonus;
 
-            console.log(`   ✅ Found ${solutions.length} solutions (${samePieceSolutions.length} same-piece) - Base: ${solutions.length + samePieceBonus}, Tier: +${tierBonus} = Score: ${score.toFixed(1)}`);
+            gridLogger.trace(`   ✅ Found ${solutions.length} solutions (${samePieceSolutions.length} same-piece) - Base: ${solutions.length + samePieceBonus}, Tier: +${tierBonus} = Score: ${score.toFixed(1)}`);
 
             // Enrich weapon object with grid data if it doesn't have it
             const enrichedWeapon = {
@@ -3706,12 +3715,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               submittedBy: weaponGridData.submittedBy // For community submissions
             });
           } else {
-            console.log(`   ❌ No solutions found`);
+            gridLogger.trace(`   ❌ No solutions found`);
           }
 
           // Timeout check (max 30 seconds)
           if (Date.now() - startTime > 30000) {
-            console.log('⏱️ Timeout reached, stopping search');
+            gridLogger.trace('⏱️ Timeout reached, stopping search');
             break;
           }
         }
@@ -3720,8 +3729,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         results.sort((a, b) => b.score - a.score);
 
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        console.log(`\n🏆 Best weapon search complete in ${elapsed}s`);
-        console.log(`📊 Found ${results.length} weapons with solutions (tested ${unlockedWeapons.length} unlocked weapons)`);
+        gridLogger.trace(`\n🏆 Best weapon search complete in ${elapsed}s`);
+        gridLogger.trace(`📊 Found ${results.length} weapons with solutions (tested ${unlockedWeapons.length} unlocked weapons)`);
 
         // Update cache with all new entries found during search
         if (Object.keys(newCacheEntries).length > 0) {
@@ -3729,7 +3738,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             ...prev,
             ...newCacheEntries
           }));
-          console.log(`💾 Cached ${Object.keys(newCacheEntries).length} new weapon solutions`);
+          gridLogger.trace(`💾 Cached ${Object.keys(newCacheEntries).length} new weapon solutions`);
         }
 
         if (results.length === 0) {
@@ -3751,7 +3760,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           });
         }
       } catch (error) {
-        console.error('❌ Find best weapon error:', error);
+        autoSolveLogger.error('Find best weapon error', { error });
         alert('An error occurred while searching. Please try again.');
       } finally {
         setIsFindingBestWeapon(false);
@@ -3764,11 +3773,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     // Check cache first (both existing cache and new cache entries from current search)
     const cacheKey = getCacheKey(weaponId, validPieces);
     if (solutionCache[cacheKey]) {
-      console.log(`   💾 Using cached solutions (existing)`);
+      gridLogger.trace(`   💾 Using cached solutions (existing)`);
       return solutionCache[cacheKey];
     }
     if (newCacheEntries && newCacheEntries[cacheKey]) {
-      console.log(`   💾 Using cached solutions (current search)`);
+      gridLogger.trace(`   💾 Using cached solutions (current search)`);
       return newCacheEntries[cacheKey];
     }
 
@@ -3830,7 +3839,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   };
 
   const handleSelectBestWeapon = (weaponResult) => {
-    console.log('✅ Selecting weapon:', weaponResult.weapon.name);
+    autoSolveLogger.info('Selecting weapon', weaponResult.weapon.name);
     setSelectedWeapon(weaponResult.weapon);
     setShowBestWeaponModal(false);
     // Grid will be re-initialized by useEffect
@@ -3884,7 +3893,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         inventory: inventoryItems
       };
 
-      console.log('[SoulWeaponEngravingBuilder] Sharing build:', {
+      logger.debug('Sharing build', {
         name: buildData.name,
         weaponId: buildData.weaponId,
         placedPieces: gridState.flatMap(row => row.filter(cell => cell.piece !== null)).length,
@@ -3899,7 +3908,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       // Save build and get checksum (returns string, not object)
       const checksum = await saveSharedBuild(owner, repo, 'soul-weapon-engraving', buildData);
 
-      console.log('[SoulWeaponEngravingBuilder] Generated checksum:', checksum);
+      logger.debug('Generated checksum', { checksum });
 
       // Generate share URL
       const baseURL = window.location.origin + window.location.pathname;
@@ -3909,7 +3918,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
 
-      console.log('[SoulWeaponEngravingBuilder] ✓ Share URL copied to clipboard');
+      logger.info('Share URL copied to clipboard');
 
       // Trigger donation prompt on successful share
       window.triggerDonationPrompt?.({
@@ -3922,7 +3931,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       });
 
     } catch (error) {
-      console.error('Failed to share build:', error);
+      logger.error('Failed to share build', { error });
       setShareError(`Failed to share: ${error.message}`);
     } finally {
       setSharing(false);
@@ -4132,7 +4141,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         });
       } catch (error) {
         alert('Failed to import build: Invalid file format');
-        console.error('Import error:', error);
+        logger.error('Import error', { error });
       }
     };
     reader.readAsText(file);
@@ -4622,7 +4631,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             <div className="flex gap-2">
               <button
                 onClick={() => {
-                  console.log('[SoulWeaponEngravingBuilder] Grid type button clicked: 4x4');
+                  gridLogger.debug('Grid type button clicked: 4x4');
                   setGridType('4x4');
                   initializeDesignerGrid('4x4'); // Pass new grid type directly
                 }}
@@ -4636,7 +4645,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               </button>
               <button
                 onClick={() => {
-                  console.log('[SoulWeaponEngravingBuilder] Grid type button clicked: 5x5');
+                  gridLogger.debug('Grid type button clicked: 5x5');
                   setGridType('5x5');
                   initializeDesignerGrid('5x5'); // Pass new grid type directly
                 }}
@@ -4807,7 +4816,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 </p>
                 <button
                   onClick={() => {
-                    console.log('[SoulWeaponEngravingBuilder] Enter Design Mode clicked, setting forceDesignMode to true');
+                    gridLogger.debug('Enter Design Mode clicked, setting forceDesignMode to true');
                     setForceDesignMode(true);
                   }}
                   className="inline-flex items-center gap-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600 text-white rounded-md text-sm font-medium transition-colors"
@@ -4904,7 +4913,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               onTouchEnd={handleTouchEnd}
               onPointerMove={(e) => {
                 if (e.pointerType === 'touch' && touchDragging) {
-                  console.log('📱 onPointerMove (touch) on grid');
+                  touchLogger.trace('onPointerMove (touch) on grid');
                   const fakeTouch = { clientX: e.clientX, clientY: e.clientY };
                   const fakeTouchEvent = {
                     ...e,
@@ -4918,7 +4927,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               }}
               onPointerUp={(e) => {
                 if (e.pointerType === 'touch' && touchDragging) {
-                  console.log('📱 onPointerUp (touch) on grid');
+                  touchLogger.trace('onPointerUp (touch) on grid');
                   const fakeTouch = { clientX: e.clientX, clientY: e.clientY };
                   const fakeTouchEvent = {
                     ...e,
@@ -4965,15 +4974,15 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                     <div
                       key={`${rowIndex}-${colIndex}`}
                       onDragOver={(e) => {
-                        console.log(`✋ DragOver fired on cell [${rowIndex}][${colIndex}]`);
+                        gridLogger.trace(`DragOver fired on cell [${rowIndex}][${colIndex}]`);
                         handleDragOver(e, rowIndex, colIndex);
                       }}
                       onDragEnter={(e) => {
-                        console.log(`👋 DragEnter on cell [${rowIndex}][${colIndex}]`);
+                        gridLogger.trace(`DragEnter on cell [${rowIndex}][${colIndex}]`);
                         e.preventDefault();
                       }}
                       onDrop={(e) => {
-                        console.log(`💧 Drop on cell [${rowIndex}][${colIndex}]`);
+                        gridLogger.trace(`Drop on cell [${rowIndex}][${colIndex}]`);
                         handleDrop(e, rowIndex, colIndex);
                       }}
                       className={`
@@ -5021,14 +5030,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
               {/* Dragging Preview Overlay - Shows piece following cursor during drag */}
               {draggingPiece && previewPosition && !placingPiece && (() => {
-                console.log('🎨 Rendering dragging preview overlay at:', previewPosition, 'piece:', draggingPiece.shapeId);
+                
                 const pattern = getRotatedPattern(draggingPiece.shape.pattern, currentDragRotation);
                 const filledCells = getFilledCells(pattern, previewPosition.row, previewPosition.col);
-                console.log('🎨 Filled cells for drag preview:', filledCells);
+                
                 const rarityColor = getRarityColor(draggingPiece.rarity);
                 const rarityImageName = getRarityImageName(draggingPiece.rarity);
                 const isValid = canPlacePiece(previewPosition.row, previewPosition.col, pattern);
-                console.log('🎨 Is valid placement:', isValid);
+                
 
                 return (
                   <>
@@ -5096,7 +5105,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                     {/* Draw gems at each filled cell */}
                     {filledCells.map((filledCell) => {
                       const imgSrc = `/images/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`;
-                      console.log(`🎨 Rendering drag preview gem at [${filledCell.row}][${filledCell.col}] src: ${imgSrc}`);
+                      
                       return (
                         <div
                           key={`drag-gem-${filledCell.row}-${filledCell.col}`}
@@ -5119,9 +5128,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             src={imgSrc}
                             alt="gem"
                             className="w-full h-full object-contain opacity-70"
-                            onLoad={() => console.log(`🎨 Drag preview gem loaded: ${imgSrc}`)}
+                            onLoad={() => {}}
                             onError={(e) => {
-                              console.error(`🎨 Drag preview gem FAILED to load: ${imgSrc}`);
+                              gridLogger.error(`Drag preview gem failed to load`, { imgSrc });
                               e.target.style.display = 'none';
                             }}
                           />
@@ -5210,7 +5219,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                         data-draggable-piece="true"
                         draggable={true}
                         onDragStart={(e) => {
-                          console.log('🔄 Starting reposition from placing mode');
+                          gridLogger.trace('Starting reposition from placing mode');
                           // Start dragging from placing mode - just set up drag state
                           setDragPatternOffset({ row: filledCell.patternRow, col: filledCell.patternCol });
                           const dragPieceData = {
@@ -5230,7 +5239,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             // Clear placing state
                             setPlacingPiece(null);
                             setPlacingPosition(null);
-                            console.log('🔄 Switched from placing to dragging mode');
+                            gridLogger.trace('Switched from placing to dragging mode');
                           }, 0);
                         }}
                         onDragEnd={handleDragEnd}
@@ -5268,8 +5277,8 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               {/* Placed Pieces Overlay - Render as individual gems + lines */}
               {/* Always render, but skip the specific piece being dragged (handled inside the loop) */}
               {(() => {
-                console.log('==== RENDERING PLACED PIECES ====');
-                console.log('Scanning grid for placed pieces...');
+                
+                
 
                 // Track which pieces we've already rendered to avoid duplicates
                 const renderedPieces = new Set();
@@ -5289,14 +5298,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                       if (draggingFromGrid &&
                           cell.piece.anchorRow === draggingFromGrid.anchorRow &&
                           cell.piece.anchorCol === draggingFromGrid.anchorCol) {
-                        console.log(`⏭️ Skipping piece being dragged at [${cell.piece.anchorRow}][${cell.piece.anchorCol}]`);
+                        
                         return null;
                       }
 
                       // Mark as rendered
                       renderedPieces.add(pieceKey);
 
-                      console.log(`✓ Rendering piece at anchor [${cell.piece.anchorRow}][${cell.piece.anchorCol}] from cell [${rowIndex}][${colIndex}]`);
+                      
 
                       return (
                         <EngravingPiece
@@ -5397,13 +5406,13 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                   const clickedOnPiece = target.closest('[data-draggable-piece="true"]');
 
                   if (!clickedOnButtons && !clickedOnPiece) {
-                    console.log('👆 Clicked outside piece - auto-socketing or removing');
+                    gridLogger.trace('👆 Clicked outside piece - auto-socketing or removing');
                     const isValid = isCurrentPlacementValid();
                     if (isValid) {
-                      console.log('✓ Valid placement - auto-confirming');
+                      gridLogger.trace('✓ Valid placement - auto-confirming');
                       handleConfirmPlacement();
                     } else {
-                      console.log('❌ Invalid placement - auto-canceling');
+                      gridLogger.trace('❌ Invalid placement - auto-canceling');
                       handleCancelPlacement();
                     }
                   }
@@ -5532,14 +5541,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                     const isButton = target.closest('[data-remove-button]');
                     const isLevelEditor = target.closest('[data-level-editor]');
 
-                    console.log('📱 onTouchStart event fired on inventory slot', index, {
+                    touchLogger.trace('onTouchStart event fired on inventory slot', index, {
                       target: target.tagName,
                       isButton: !!isButton,
                       isLevelEditor: !!isLevelEditor
                     });
 
                     if (isButton || isLevelEditor) {
-                      console.log('📱 Touch on button/level editor, ignoring and stopping propagation');
+                      touchLogger.trace('Touch on button/level editor, ignoring and stopping propagation');
                       e.stopPropagation();
                       return;
                     }
@@ -5554,12 +5563,12 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                       const isLevelEditor = target.closest('[data-level-editor]');
 
                       if (isButton || isLevelEditor) {
-                        console.log('📱 onPointerDown: Touch on button/level editor, ignoring');
+                        touchLogger.trace('onPointerDown: Touch on button/level editor, ignoring');
                         e.stopPropagation();
                         return;
                       }
 
-                      console.log('📱 onPointerDown (touch) event fired on inventory slot', index);
+                      touchLogger.trace('onPointerDown (touch) event fired on inventory slot', index);
                       // Convert pointer event to touch-like event
                       const fakeTouch = {
                         clientX: e.clientX,
@@ -5622,7 +5631,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             // Store initial position to detect if this is a drag or tap
                             e.currentTarget.dataset.startX = e.clientX;
                             e.currentTarget.dataset.startY = e.clientY;
-                            console.log('📱 Pointer down on remove button - stopping all events');
+                            touchLogger.trace('Pointer down on remove button - stopping all events');
                           }}
                           onTouchStart={(e) => {
                             e.stopPropagation();
@@ -5631,7 +5640,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             const touch = e.touches[0];
                             e.currentTarget.dataset.startX = touch.clientX;
                             e.currentTarget.dataset.startY = touch.clientY;
-                            console.log('📱 Touch start on remove button - stopping all events');
+                            touchLogger.trace('Touch start on remove button - stopping all events');
                           }}
                           onPointerUp={(e) => {
                             e.stopPropagation();
@@ -5645,11 +5654,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             const DRAG_THRESHOLD = 10; // pixels
 
                             if (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD) {
-                              console.log('📱 Remove button: Drag detected, ignoring', { deltaX, deltaY });
+                              touchLogger.trace('Remove button: Drag detected, ignoring', { deltaX, deltaY });
                               return;
                             }
 
-                            console.log('📱 Remove button pressed, removing piece');
+                            touchLogger.trace('Remove button pressed, removing piece');
                             handleRemoveFromInventory(index);
                           }}
                           onTouchEnd={(e) => {
@@ -5665,11 +5674,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             const DRAG_THRESHOLD = 10; // pixels
 
                             if (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD) {
-                              console.log('📱 Remove button: Drag detected, ignoring', { deltaX, deltaY });
+                              touchLogger.trace('Remove button: Drag detected, ignoring', { deltaX, deltaY });
                               return;
                             }
 
-                            console.log('📱 Touch end on remove button, removing piece');
+                            touchLogger.trace('Touch end on remove button, removing piece');
                             handleRemoveFromInventory(index);
                           }}
                           onClick={(e) => {

@@ -1,5 +1,8 @@
 import { getOctokit } from '../../wiki-framework/src/services/github/api.js';
 import { createUserIdLabel } from '../../wiki-framework/src/utils/githubLabelUtils.js';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('BattleLoadouts');
 
 /**
  * Battle Loadouts Storage System - Slayer Legend Wiki
@@ -68,7 +71,7 @@ export async function getUserLoadouts(owner, repo, username, userId = null) {
       );
 
       if (loadoutsIssue) {
-        console.log(`[BattleLoadouts] Found loadouts for user ${username} by ID: ${userId}`);
+        logger.debug(`Found loadouts for user ${username} by ID: ${userId}`);
       }
     }
 
@@ -79,26 +82,26 @@ export async function getUserLoadouts(owner, repo, username, userId = null) {
       );
 
       if (loadoutsIssue) {
-        console.log(`[BattleLoadouts] Found legacy loadouts for ${username} by title`);
+        logger.debug(`Found legacy loadouts for ${username} by title`);
       }
     }
 
     if (!loadoutsIssue) {
-      console.log(`[BattleLoadouts] No loadouts found for user: ${username}`);
+      logger.debug(`No loadouts found for user: ${username}`);
       return [];
     }
 
     // Parse JSON from issue body
     try {
       const loadouts = JSON.parse(loadoutsIssue.body || '[]');
-      console.log(`[BattleLoadouts] Loaded ${loadouts.length} loadouts for ${username}`);
+      logger.debug(`Loaded ${loadouts.length} loadouts for ${username}`);
       return Array.isArray(loadouts) ? loadouts : [];
     } catch (parseError) {
-      console.error(`[BattleLoadouts] Failed to parse loadouts data for ${username}:`, parseError);
+      logger.error(`Failed to parse loadouts data for ${username}`, { error: parseError });
       return [];
     }
   } catch (error) {
-    console.error(`[BattleLoadouts] Failed to get loadouts for ${username}:`, error);
+    logger.error(`Failed to get loadouts for ${username}`, { error });
     return [];
   }
 }
@@ -160,7 +163,7 @@ export async function saveUserLoadouts(owner, repo, username, userId, loadouts) 
 
     if (existingIssue) {
       // Update existing loadouts
-      console.log(`[BattleLoadouts] Updating loadouts for ${username} (issue #${existingIssue.number})`);
+      logger.debug(`Updating loadouts for ${username}`, { issueNumber: existingIssue.number });
 
       const { data: updatedIssue } = await octokit.rest.issues.update({
         owner,
@@ -178,7 +181,7 @@ export async function saveUserLoadouts(owner, repo, username, userId, loadouts) 
         );
 
         if (!hasUserIdLabel) {
-          console.log(`[BattleLoadouts] Adding user-id label to legacy loadouts for ${username}`);
+          logger.debug(`Adding user-id label to legacy loadouts for ${username}`);
           await octokit.rest.issues.addLabels({
             owner,
             repo,
@@ -191,7 +194,7 @@ export async function saveUserLoadouts(owner, repo, username, userId, loadouts) 
       return updatedIssue;
     } else {
       // Create new loadouts issue
-      console.log(`[BattleLoadouts] Creating new loadouts issue for ${username}${userIdLabel ? ` (ID: ${userId})` : ''}`);
+      logger.debug(`Creating new loadouts issue for ${username}${userIdLabel ? ` (ID: ${userId})` : ''}`);
 
       const labels = [LOADOUTS_LABEL];
       if (userIdLabel) {
@@ -214,15 +217,15 @@ export async function saveUserLoadouts(owner, repo, username, userId, loadouts) 
           issue_number: newIssue.number,
           lock_reason: 'off-topic',
         });
-        console.log(`[BattleLoadouts] Locked loadouts issue for ${username} to collaborators only`);
+        logger.debug(`Locked loadouts issue for ${username} to collaborators only`);
       } catch (lockError) {
-        console.warn(`[BattleLoadouts] Failed to lock issue for ${username}:`, lockError.message);
+        logger.warn(`Failed to lock issue for ${username}`, { error: lockError.message });
       }
 
       return newIssue;
     }
   } catch (error) {
-    console.error(`[BattleLoadouts] Failed to save loadouts for ${username}:`, error);
+    logger.error(`Failed to save loadouts for ${username}`, { error });
     throw error;
   }
 }
@@ -255,7 +258,7 @@ export async function addUserLoadout(owner, repo, username, userId, loadout) {
 
   loadouts.push(loadout);
   await saveUserLoadouts(owner, repo, username, userId, loadouts);
-  console.log(`[BattleLoadouts] Added loadout "${loadout.name}" for ${username}`);
+  logger.info(`Added loadout "${loadout.name}" for ${username}`);
 
   return loadouts;
 }
@@ -287,7 +290,7 @@ export async function updateUserLoadout(owner, repo, username, userId, loadoutId
   };
 
   await saveUserLoadouts(owner, repo, username, userId, loadouts);
-  console.log(`[BattleLoadouts] Updated loadout "${updatedLoadout.name}" for ${username}`);
+  logger.info(`Updated loadout "${updatedLoadout.name}" for ${username}`);
 
   return loadouts;
 }
@@ -311,7 +314,7 @@ export async function deleteUserLoadout(owner, repo, username, userId, loadoutId
   }
 
   await saveUserLoadouts(owner, repo, username, userId, filteredLoadouts);
-  console.log(`[BattleLoadouts] Deleted loadout ${loadoutId} for ${username}`);
+  logger.info(`Deleted loadout ${loadoutId} for ${username}`);
 
   return filteredLoadouts;
 }

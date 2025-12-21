@@ -75,7 +75,18 @@
       "Bash(node scripts/generate-sitemap.js:*)",
       "Bash(npm run build:sitemap:*)",
       "Bash(for file in characters/latent-power.md equipment/relics.md equipment/soul-weapons.md equipment/fusion.md characters/enhancement.md characters/stats.md characters/training-log.md skills/skill-mechanics.md)",
-      "Bash(do sed -i 's/{{contribution-banner:ai-generated}}/{{contribution-banner:ai-generated}} <!-- DELETE_ME when you update this page -->/' \"$file\")"
+      "Bash(do sed -i 's/{{contribution-banner:ai-generated}}/{{contribution-banner:ai-generated}} <!-- DELETE_ME when you update this page -->/' \"$file\")",
+      "Bash(dir \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\wiki-framework\\\\src\\\\services\\\\storage\")",
+      "Bash(python3:*)",
+      "Bash(node migrate-logs.js:*)",
+      "Bash(node migrate-logs-final.cjs)",
+      "Bash(node migrate-spirit-builder.cjs:*)",
+      "Bash(node migrate-skill-builder.cjs:*)",
+      "Bash(node migrate-battle-loadouts.cjs:*)",
+      "Bash(node migrate-services.cjs:*)",
+      "Bash(Get-Content \"C:\\\\Users\\\\dolb9\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Projects-slayerlegend-wiki\\\\tasks\\\\b31197e.output\")",
+      "Bash(node:*)",
+      "Bash(npx vitest:*)"
     ]
   }
 }

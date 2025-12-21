@@ -3,6 +3,9 @@
  * Handles loading and executing reCAPTCHA for anonymous edit submissions
  */
 
+import { createLogger } from './logger';
+
+const logger = createLogger('Recaptcha');
 let recaptchaLoaded = false;
 let recaptchaLoadPromise = null;
 
@@ -42,7 +45,7 @@ export const loadRecaptcha = (siteKey) => {
         if (window.grecaptcha && window.grecaptcha.execute) {
           clearInterval(checkReady);
           recaptchaLoaded = true;
-          console.log('[reCAPTCHA] Loaded successfully');
+          logger.debug('Loaded successfully');
           resolve();
         }
       }, 100);
@@ -88,10 +91,10 @@ export const executeRecaptcha = async (siteKey, action = 'anonymous_edit') => {
       throw new Error('reCAPTCHA did not return a token');
     }
 
-    console.log('[reCAPTCHA] Token generated successfully');
+    logger.debug('Token generated successfully');
     return token;
   } catch (error) {
-    console.error('[reCAPTCHA] Execution failed:', error);
+    logger.error('Execution failed:', { error: error });
     throw new Error('CAPTCHA verification failed. Please try again.');
   }
 };
@@ -140,7 +143,7 @@ export const showRecaptchaV2Challenge = (siteKey, containerId) => {
         }
       });
 
-      console.log('[reCAPTCHA] v2 challenge rendered');
+      logger.debug('v2 challenge rendered');
     } catch (error) {
       reject(error);
     }

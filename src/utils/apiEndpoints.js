@@ -9,6 +9,10 @@
  * - Development: Uses Vite proxy (/api/github/* for OAuth, direct URLs for data operations)
  */
 
+import { createLogger } from './logger';
+
+const logger = createLogger('ApiEndpoints');
+
 /**
  * Detect the current platform
  * @returns {'netlify' | 'cloudflare' | 'dev'} - Current platform
@@ -191,7 +195,7 @@ export function getEndpoint(name) {
 
 // Log platform detection in development
 if (import.meta.env.DEV) {
-  console.log('[API Endpoints] Platform detected:', detectPlatform());
-  console.log('[API Endpoints] Functions base URL:', getFunctionsBaseUrl());
-  console.log('[API Endpoints] OAuth base URL:', getOAuthBaseUrl());
+  logger.debug('Platform detected', { platform: detectPlatform() });
+  logger.debug('Functions base URL', { url: getFunctionsBaseUrl() });
+  logger.debug('OAuth base URL', { url: getOAuthBaseUrl() });
 }

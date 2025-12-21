@@ -8,6 +8,9 @@ import { getUserLoadouts } from '../services/battleLoadouts';
 import { getCache, setCache, mergeCacheWithGitHub } from '../utils/buildCache';
 import { getDeleteDataEndpoint } from '../utils/apiEndpoints.js';
 import { getSkillGradeColor, getEquipmentRarityColor } from '../config/rarityColors';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SavedLoadoutsPanel');
 
 /**
  * SavedLoadoutsPanel Component
@@ -52,7 +55,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
       // Ensure we have an array
       setSkills(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('[SavedLoadoutsPanel] Failed to load skills:', err);
+      logger.error('Failed to load skills:', { error: err });
       setSkills([]);
     }
   };
@@ -65,7 +68,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
       const spiritsArray = data.spirits || [];
       setSpirits(Array.isArray(spiritsArray) ? spiritsArray : []);
     } catch (err) {
-      console.error('[SavedLoadoutsPanel] Failed to load spirits:', err);
+      logger.error('Failed to load spirits:', { error: err });
       setSpirits([]);
     }
   };
@@ -102,7 +105,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
       // Update cache with merged results
       setCache('battle_loadouts', user.id, mergedLoadouts);
     } catch (err) {
-      console.error('[SavedLoadouts] Failed to load loadouts:', err);
+      logger.error('Failed to load loadouts:', { error: err });
       setError('Failed to load saved loadouts');
     } finally {
       setLoading(false);
@@ -147,7 +150,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
       // Update cache after deletion
       setCache('battle_loadouts', user.id, sortedLoadouts);
     } catch (err) {
-      console.error('[SavedLoadouts] Failed to delete loadout:', err);
+      logger.error('Failed to delete loadout:', { error: err });
       setError(err.message || 'Failed to delete loadout');
     }
   };

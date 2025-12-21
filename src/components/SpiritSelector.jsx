@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { X, Search } from 'lucide-react';
 import SpiritSprite from './SpiritSprite';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SpiritSelector');
 
 /**
  * SpiritSelector Component
@@ -39,7 +42,7 @@ const SpiritSelector = ({ isOpen, onClose, onSelectSpirit, currentBuild = null }
       const data = await response.json();
       setSpirits(data.spirits);
     } catch (error) {
-      console.error('Failed to load spirits:', error);
+      logger.error('Failed to load spirits:', error);
     } finally {
       setLoading(false);
     }

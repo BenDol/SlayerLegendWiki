@@ -18,6 +18,9 @@ import {
   cacheVerificationToken,
   clearCachedVerificationToken,
 } from '../services/anonymousEditService';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('AnonymousEditForm');
 
 export default function AnonymousEditForm({
   owner,
@@ -57,7 +60,7 @@ export default function AnonymousEditForm({
   useEffect(() => {
     if (recaptchaSiteKey) {
       loadRecaptcha(recaptchaSiteKey).catch((error) => {
-        console.error('[AnonymousEdit] Failed to load reCAPTCHA:', error);
+        logger.error('Failed to load reCAPTCHA:', { error: error });
       });
     }
   }, [recaptchaSiteKey]);
@@ -217,7 +220,7 @@ export default function AnonymousEditForm({
         setGeneralError(result.error || 'Failed to submit edit. Please try again.');
       }
     } catch (error) {
-      console.error('[AnonymousEdit] Submit failed:', error);
+      logger.error('Submit failed:', { error: error });
       setGeneralError(error.message || 'Failed to submit edit. Please try again.');
     } finally {
       setIsSubmitting(false);

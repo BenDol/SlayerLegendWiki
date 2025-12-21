@@ -6,6 +6,9 @@ import { getCache, setCache, clearCache } from '../utils/buildCache';
 import { getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { useSpiritsData } from '../hooks/useSpiritsData';
 import { deserializeSpirit } from '../utils/spiritSerialization';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SavedSpiritsGallery');
 
 /**
  * SavedSpiritsGallery Component
@@ -78,10 +81,10 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
         setSpirits(deserializedSpirits);
         setCache('my_spirits', user.id, loadedSpirits); // Cache serialized version
       } else {
-        console.warn('API returned unsuccessful response:', data);
+        logger.warn('API returned unsuccessful response:', { error: data });
       }
     } catch (error) {
-      console.error('Failed to load spirits:', error);
+      logger.error('Failed to load spirits:', { error: error });
       setError(error.message);
     } finally {
       setLoading(false);
@@ -176,10 +179,10 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
                   type: 'saved-spirit',
                   spirit: spirit
                 }));
-                console.log('[SavedSpiritsGallery] Drag started:', spirit.spirit.name);
+                logger.debug('Drag started', { spirit: spirit.spirit.name });
               }}
               onDragEnd={(e) => {
-                console.log('[SavedSpiritsGallery] Drag ended');
+                logger.debug('Drag ended');
               }}
               className={`relative bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200 dark:border-gray-800 shadow-sm transition-all ${
                 isInUse

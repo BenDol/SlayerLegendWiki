@@ -1,3 +1,6 @@
+const { createLogger } = require('../../../src/utils/logger');
+const logger = createLogger('DeleteData');
+
 /**
  * Delete Data Handler (Platform-Agnostic)
  * Handles deleting skill builds, battle loadouts, engraving builds, and spirit collection
@@ -97,7 +100,7 @@ export async function handleDeleteData(adapter, configAdapter) {
     // Delete the item
     const remainingItems = await storage.delete(type, username, userId, deleteId);
 
-    console.log(`[delete-data] Deleted item ${deleteId} for ${username}, ${remainingItems.length} items remaining`);
+    logger.debug(`Deleted item ${deleteId} for ${username}, ${remainingItems.length} items remaining`);
 
     // Return response with dynamic key name
     const response = {

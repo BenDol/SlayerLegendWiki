@@ -41,6 +41,7 @@ describe('battleLoadouts', () => {
     // Spy on console methods
     consoleSpy = {
       log: vi.spyOn(console, 'log').mockImplementation(() => {}),
+      info: vi.spyOn(console, 'info').mockImplementation(() => {}),
       error: vi.spyOn(console, 'error').mockImplementation(() => {}),
       warn: vi.spyOn(console, 'warn').mockImplementation(() => {})
     };
@@ -49,6 +50,7 @@ describe('battleLoadouts', () => {
   afterEach(() => {
     vi.clearAllMocks();
     consoleSpy.log.mockRestore();
+    consoleSpy.info.mockRestore();
     consoleSpy.error.mockRestore();
     consoleSpy.warn.mockRestore();
   });
@@ -147,7 +149,7 @@ describe('battleLoadouts', () => {
       expect(loadouts).toEqual([]);
       expect(consoleSpy.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to parse loadouts data'),
-        expect.any(Error)
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
 
@@ -161,7 +163,7 @@ describe('battleLoadouts', () => {
       expect(loadouts).toEqual([]);
       expect(consoleSpy.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to get loadouts'),
-        expect.any(Error)
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
 
@@ -328,7 +330,7 @@ describe('battleLoadouts', () => {
       expect(result.number).toBe(123);
       expect(consoleSpy.warn).toHaveBeenCalledWith(
         expect.stringContaining('Failed to lock issue'),
-        expect.any(String)
+        expect.objectContaining({ error: expect.any(String) })
       );
     });
 
@@ -362,7 +364,7 @@ describe('battleLoadouts', () => {
 
       expect(consoleSpy.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to save loadouts'),
-        expect.any(Error)
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
   });
@@ -423,7 +425,7 @@ describe('battleLoadouts', () => {
       const loadout = { name: 'My Loadout', skillBuild: {} };
       await addUserLoadout('owner', 'repo', 'testuser', 12345, loadout);
 
-      expect(consoleSpy.log).toHaveBeenCalledWith(
+      expect(consoleSpy.info).toHaveBeenCalledWith(
         expect.stringContaining('Added loadout "My Loadout" for testuser')
       );
     });
@@ -514,7 +516,7 @@ describe('battleLoadouts', () => {
 
       await updateUserLoadout('owner', 'repo', 'testuser', 12345, 'loadout-1', { name: 'New' });
 
-      expect(consoleSpy.log).toHaveBeenCalledWith(
+      expect(consoleSpy.info).toHaveBeenCalledWith(
         expect.stringContaining('Updated loadout "New" for testuser')
       );
     });
@@ -581,7 +583,7 @@ describe('battleLoadouts', () => {
 
       await deleteUserLoadout('owner', 'repo', 'testuser', 12345, 'loadout-1');
 
-      expect(consoleSpy.log).toHaveBeenCalledWith(
+      expect(consoleSpy.info).toHaveBeenCalledWith(
         expect.stringContaining('Deleted loadout loadout-1 for testuser')
       );
     });

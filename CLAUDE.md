@@ -98,6 +98,86 @@ See **[Development Guide](.claude/development.md)** for workflows.
 
 ## Coding Standards
 
+### Logging Standards
+
+**CRITICAL: Use centralized logger instead of console for all logging.**
+
+The project uses a centralized logging utility (`src/utils/logger.js`) that provides environment-aware filtering and structured prefixes.
+
+#### Basic Usage
+
+```javascript
+import { createLogger } from '../utils/logger';
+const logger = createLogger('ComponentName');
+
+// Critical user actions
+logger.info('User saved build', { buildName, userId });
+
+// Development debugging
+logger.debug('Cache hit', { key, value });
+
+// Verbose lifecycle
+logger.trace('Effect running', { deps });
+
+// Errors and warnings
+logger.error('Failed to load data', { error });
+logger.warn('Using fallback value', { key });
+```
+
+#### Log Levels
+
+| Level | Production | Development | Use Cases |
+|-------|-----------|-------------|-----------|
+| **ERROR** | ✅ Visible | ✅ Visible | API failures, exceptions, data corruption |
+| **WARN** | ✅ Visible | ✅ Visible | Fallbacks, deprecations, missing optional data |
+| **INFO** | ⚠️ Critical Only | ✅ All | User actions + lifecycle events |
+| **DEBUG** | ❌ Hidden | ✅ Visible | Cache ops, validations, internal state |
+| **TRACE** | ❌ Hidden | ✅ Visible | Lifecycle, polling, verbose tracking |
+
+#### Critical Actions (INFO Logged in Production)
+
+These keywords in INFO messages trigger production logging:
+- **Authentication**: `login`, `logout`, `authenticate`
+- **Data operations**: `save`, `delete`, `create`, `update`
+- **Sharing**: `share`, `export`, `import`, `copy`
+- **Monetization**: `donate`, `payment`
+
+#### Child Loggers
+
+Use child loggers for nested contexts:
+
+```javascript
+const logger = createLogger('SoulWeapon');
+const cacheLogger = logger.child('Cache');
+const bestWeaponLogger = logger.child('BestWeapon');
+
+cacheLogger.debug('Cached 5 submissions'); // Outputs: [SoulWeapon:Cache] Cached 5 submissions
+```
+
+#### Best Practices
+
+1. **Never use `console.log/warn/error` directly** - Always use logger
+2. **Choose appropriate log levels** - Don't use INFO for internal debugging
+3. **Include context data** - Pass objects as second parameter
+4. **Use consistent prefixes** - Typically component or module name
+5. **Keep messages concise** - Logs should be scannable
+6. **Production = clean** - Only errors, warnings, and critical actions visible
+
+#### Migration Pattern
+
+**Before:**
+```javascript
+console.log('[Component] Doing something:', value);
+console.error('[Component] Failed:', error);
+```
+
+**After:**
+```javascript
+const logger = createLogger('Component');
+logger.debug('Doing something', { value });
+logger.error('Failed', { error });
+```
+
 ### Use Constants for Configuration Values
 
 **CRITICAL: Extract repetitive magic numbers and strings into named constants.**

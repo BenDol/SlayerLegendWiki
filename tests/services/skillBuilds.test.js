@@ -41,6 +41,7 @@ describe('skillBuilds', () => {
     // Spy on console methods
     consoleSpy = {
       log: vi.spyOn(console, 'log').mockImplementation(() => {}),
+      info: vi.spyOn(console, 'info').mockImplementation(() => {}),
       error: vi.spyOn(console, 'error').mockImplementation(() => {}),
       warn: vi.spyOn(console, 'warn').mockImplementation(() => {})
     };
@@ -49,6 +50,7 @@ describe('skillBuilds', () => {
   afterEach(() => {
     vi.clearAllMocks();
     consoleSpy.log.mockRestore();
+    consoleSpy.info.mockRestore();
     consoleSpy.error.mockRestore();
     consoleSpy.warn.mockRestore();
   });
@@ -147,7 +149,7 @@ describe('skillBuilds', () => {
       expect(builds).toEqual([]);
       expect(consoleSpy.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to parse builds data'),
-        expect.any(Error)
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
 
@@ -161,7 +163,7 @@ describe('skillBuilds', () => {
       expect(builds).toEqual([]);
       expect(consoleSpy.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to get builds'),
-        expect.any(Error)
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
 
@@ -328,7 +330,7 @@ describe('skillBuilds', () => {
       expect(result.number).toBe(123);
       expect(consoleSpy.warn).toHaveBeenCalledWith(
         expect.stringContaining('Failed to lock issue'),
-        expect.any(String)
+        expect.objectContaining({ error: expect.any(String) })
       );
     });
 
@@ -362,7 +364,7 @@ describe('skillBuilds', () => {
 
       expect(consoleSpy.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to save builds'),
-        expect.any(Error)
+        expect.objectContaining({ error: expect.any(Error) })
       );
     });
   });
@@ -423,7 +425,7 @@ describe('skillBuilds', () => {
       const build = { name: 'My Build', slots: [] };
       await addUserBuild('owner', 'repo', 'testuser', 12345, build);
 
-      expect(consoleSpy.log).toHaveBeenCalledWith(
+      expect(consoleSpy.info).toHaveBeenCalledWith(
         expect.stringContaining('Added build "My Build" for testuser')
       );
     });
@@ -514,7 +516,7 @@ describe('skillBuilds', () => {
 
       await updateUserBuild('owner', 'repo', 'testuser', 12345, 'build-1', { name: 'New' });
 
-      expect(consoleSpy.log).toHaveBeenCalledWith(
+      expect(consoleSpy.info).toHaveBeenCalledWith(
         expect.stringContaining('Updated build "New" for testuser')
       );
     });
@@ -581,7 +583,7 @@ describe('skillBuilds', () => {
 
       await deleteUserBuild('owner', 'repo', 'testuser', 12345, 'build-1');
 
-      expect(consoleSpy.log).toHaveBeenCalledWith(
+      expect(consoleSpy.info).toHaveBeenCalledWith(
         expect.stringContaining('Deleted build build-1 for testuser')
       );
     });

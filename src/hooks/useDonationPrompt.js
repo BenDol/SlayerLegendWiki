@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { persistName, cacheName, configName } from '../../wiki-framework/src/utils/storageManager';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('DonationPrompt');
 
 // Storage keys following conventions
 const STORAGE_KEYS = {
@@ -62,7 +65,7 @@ export const useDonationPrompt = (options = {}) => {
   const shownThisSession = useCallback(() => {
     const key = STORAGE_KEYS.sessionShown;
     const value = sessionStorage.getItem(key);
-    console.log(`[DonationPrompt] shownThisSession check: key="${key}", value="${value}", result=${value === 'true'}`);
+    logger.debug('Session storage check', { key, value, result: value === 'true' });
     return value === 'true';
   }, []);
 
@@ -115,7 +118,7 @@ export const useDonationPrompt = (options = {}) => {
 
     // If forced, bypass ALL checks and show immediately
     if (force) {
-      console.log('[DonationPrompt] Force triggered (bypassing all checks)! 🎉');
+      logger.info('Force triggered donation prompt (bypassing all checks)');
       setShouldShow(messages || true); // Pass messages or true
       return true;
     }
@@ -124,7 +127,8 @@ export const useDonationPrompt = (options = {}) => {
     setInteractionCount(prev => prev + 1);
 
     // Log detailed eligibility check
-    console.log(`[DonationPrompt] Eligibility check (isScroll: ${isScrollTrigger}):`, {
+    logger.debug('Eligibility check', {
+      isScrollTrigger,
       enabled: config.enabled,
       donated: hasDonated(),
       cooldown: isInCooldown(),
@@ -142,7 +146,7 @@ export const useDonationPrompt = (options = {}) => {
       if (hasRecentDismissal()) reasons.push('recently dismissed');
       if (interactionCount < config.minInteractionsBeforeEligible) reasons.push(`need ${config.minInteractionsBeforeEligible} interactions (have ${interactionCount})`);
 
-      console.log(`[DonationPrompt] ❌ Cannot trigger: ` + reasons.join(', '));
+      logger.debug('Cannot trigger', { reasons: reasons.join(', ') });
       return false;
     }
 
@@ -151,7 +155,11 @@ export const useDonationPrompt = (options = {}) => {
     const roll = Math.random();
     const passed = roll < chance;
 
-    console.log(`[DonationPrompt] Random roll: ${(roll * 100).toFixed(1)}% (need ${(chance * 100)}%) - ${passed ? '✅ PASSED' : '❌ FAILED'}`);
+    logger.debug('Random roll', {
+      roll: (roll * 100).toFixed(1) + '%',
+      needed: (chance * 100) + '%',
+      passed
+    });
 
     if (!passed) {
       return false;
@@ -162,7 +170,7 @@ export const useDonationPrompt = (options = {}) => {
     sessionStorage.setItem(STORAGE_KEYS.sessionShown, 'true');
     localStorage.setItem(STORAGE_KEYS.lastShown, Date.now().toString());
 
-    console.log('[DonationPrompt] 🎉 Triggered successfully!');
+    logger.info('Donation prompt triggered successfully');
     return true;
   }, [canTrigger, rollChance, config, interactionCount, hasDonated, isInCooldown, shownThisSession, hasRecentDismissal]);
 
@@ -170,13 +178,13 @@ export const useDonationPrompt = (options = {}) => {
   const handleClose = useCallback(() => {
     setShouldShow(false);
     localStorage.setItem(STORAGE_KEYS.dismissed, Date.now().toString());
-    console.log('[DonationPrompt] Dismissed by user');
+    logger.info('User dismissed donation prompt');
   }, []);
 
   // Handle user clicking donate
   const handleDonate = useCallback(() => {
     setShouldShow(false);
-    console.log('[DonationPrompt] User clicked donate!');
+    logger.info('User clicked donate button');
   }, []);
 
   // Track interaction count in session
@@ -209,7 +217,7 @@ export const useDonationPrompt = (options = {}) => {
 export const markUserAsDonated = () => {
   localStorage.setItem(STORAGE_KEYS.donated, 'true');
   localStorage.setItem(STORAGE_KEYS.donationDate, Date.now().toString());
-  console.log('[DonationPrompt] User marked as donated! 💖');
+  logger.info('User marked as donated');
 };
 
 /**
@@ -221,7 +229,7 @@ export const resetDonationPromptStatus = () => {
     sessionStorage.removeItem(key);
   });
   sessionStorage.removeItem('donationInteractionCount');
-  console.log('[DonationPrompt] Status reset for testing');
+  logger.debug('Donation prompt status reset for testing');
 };
 
 /**
@@ -233,7 +241,7 @@ export const getDebugTrigger = () => {
     resetDonationPromptStatus();
     // Trigger will happen on next useful action, or you can dispatch custom event
     window.dispatchEvent(new CustomEvent('donation-debug-trigger', { detail: { force: true } }));
-    console.log('[DonationPrompt] Debug trigger dispatched - perform a useful action or use force option');
+    logger.debug('Debug trigger dispatched - perform a useful action or use force option');
   };
 };
 

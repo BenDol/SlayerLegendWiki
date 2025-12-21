@@ -6,6 +6,9 @@ import { getCache, setCache, clearCache } from '../utils/buildCache';
 import { getLoadDataEndpoint, getDeleteDataEndpoint } from '../utils/apiEndpoints.js';
 import { useSpiritsData } from '../hooks/useSpiritsData';
 import { deserializeBuild } from '../utils/spiritSerialization';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SavedSpiritBuildsPanel');
 
 /**
  * SavedSpiritBuildsPanel Component
@@ -125,7 +128,7 @@ const SavedSpiritBuildsPanel = ({
       // Cache the serialized builds
       setCache('spirit_builds', user.id, sortedBuilds);
     } catch (err) {
-      console.error('[SavedSpiritBuildsPanel] Failed to load builds:', err);
+      logger.error('Failed to load builds:', { error: err });
       setError(err.message || 'Failed to load builds');
     } finally {
       setLoading(false);
@@ -172,7 +175,7 @@ const SavedSpiritBuildsPanel = ({
         setInternalSavedBuilds(updatedBuilds);
       }
     } catch (err) {
-      console.error('[SavedSpiritBuildsPanel] Failed to delete build:', err);
+      logger.error('Failed to delete build:', { error: err });
       alert('Failed to delete build: ' + err.message);
     } finally {
       setDeletingId(null);

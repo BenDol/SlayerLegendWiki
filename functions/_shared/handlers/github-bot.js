@@ -1,3 +1,6 @@
+const { createLogger } = require('../../../src/utils/logger');
+const logger = createLogger('GithubBot');
+
 /**
  * GitHub Bot Handler (Platform-Agnostic)
  * Handles all bot-authenticated GitHub operations
@@ -70,7 +73,7 @@ async function checkProfanity(adapter, text) {
   // Try OpenAI Moderation API first (if configured)
   if (openaiApiKey) {
     try {
-      console.log('[Profanity] Checking with OpenAI Moderation API for text:', text);
+      logger.debug('Checking with OpenAI Moderation API for text:', text);
       const response = await fetch(
         'https://api.openai.com/v1/moderations',
         {
@@ -93,7 +96,7 @@ async function checkProfanity(adapter, text) {
         // Categories: hate, harassment, self-harm, sexual, violence
         const containsProfanity = result.flagged;
 
-        console.log('[Profanity] OpenAI Moderation result:', {
+        logger.debug('OpenAI Moderation result', {
           flagged: result.flagged,
           categories: result.categories,
           category_scores: result.category_scores
@@ -113,13 +116,13 @@ async function checkProfanity(adapter, text) {
       console.warn('[Profanity] OpenAI API error:', error.message, 'falling back to leo-profanity');
     }
   } else {
-    console.log('[Profanity] OPENAI_API_KEY not configured, using leo-profanity fallback');
+    logger.debug('OPENAI_API_KEY not configured, using leo-profanity fallback');
   }
 
   // Fallback to leo-profanity package
-  console.log('[Profanity] Using leo-profanity package for text:', text);
+  logger.debug('Using leo-profanity package for text:', text);
   const containsProfanity = LeoProfanity.check(text);
-  console.log('[Profanity] leo-profanity result:', containsProfanity);
+  logger.debug('leo-profanity result:', containsProfanity);
   return { containsProfanity, method: 'leo-profanity' };
 }
 
@@ -304,7 +307,7 @@ async function handleCreateComment(adapter, octokit, { owner, repo, issueNumber,
     body,
   });
 
-  console.log(`[github-bot] Created comment ${comment.id} on issue #${issueNumber}`);
+  logger.debug(`Created comment ${comment.id} on issue #${issueNumber}`);
 
   return adapter.createJsonResponse(200, {
     comment: {
@@ -338,7 +341,7 @@ async function handleUpdateIssue(adapter, octokit, { owner, repo, issueNumber, b
     body,
   });
 
-  console.log(`[github-bot] Updated issue #${issueNumber}`);
+  logger.debug(`Updated issue #${issueNumber}`);
 
   return adapter.createJsonResponse(200, {
     issue: {
@@ -375,7 +378,7 @@ async function handleListIssues(adapter, octokit, { owner, repo, labels, state =
   const botUsername = adapter.getEnv('WIKI_BOT_USERNAME');
   const botIssues = issues.filter(issue => issue.user.login === botUsername);
 
-  console.log(`[github-bot] Listed ${botIssues.length}/${issues.length} bot-created issues with labels: ${labels}`);
+  logger.debug(`Listed ${botIssues.length}/${issues.length} bot-created issues with labels: ${labels}`);
 
   return adapter.createJsonResponse(200, { issues: botIssues });
 }
@@ -395,7 +398,7 @@ async function handleGetComment(adapter, octokit, { owner, repo, commentId }) {
     comment_id: commentId,
   });
 
-  console.log(`[github-bot] Fetched comment ${commentId}`);
+  logger.debug(`Fetched comment ${commentId}`);
 
   return adapter.createJsonResponse(200, { comment });
 }
@@ -439,7 +442,7 @@ async function handleCreateCommentIssue(adapter, octokit, { owner, repo, title, 
     labels: Array.isArray(labels) ? labels : [labels],
   });
 
-  console.log(`[github-bot] Created comment issue #${issue.number}${requestedBy ? ` (requested by ${requestedBy})` : ''}`);
+  logger.debug(`Created comment issue #${issue.number}${requestedBy ? ` (requested by ${requestedBy})` : ''}`);
 
   return adapter.createJsonResponse(200, {
     issue: {
@@ -523,7 +526,7 @@ async function handleCreateAdminIssue(octokit, { owner, repo, title, body, label
     }
   }
 
-  console.log(`[github-bot] Created admin issue #${issue.number} by ${username}`);
+  logger.debug(`Created admin issue #${issue.number} by ${username}`);
 
   return {
     statusCode: 200,
@@ -593,7 +596,7 @@ async function handleUpdateAdminIssue(octokit, { owner, repo, issueNumber, body,
     body,
   });
 
-  console.log(`[github-bot] Updated admin issue #${issueNumber} by ${username}`);
+  logger.debug(`Updated admin issue #${issueNumber} by ${username}`);
 
   return {
     statusCode: 200,
@@ -690,7 +693,7 @@ async function handleSaveUserSnapshot(octokit, { owner, repo, username, snapshot
       }
 
       issue = updatedIssue;
-      console.log(`[github-bot] Updated user snapshot #${existingIssueNumber} for ${username}`);
+      logger.debug(`Updated user snapshot #${existingIssueNumber} for ${username}`);
     } else {
       // Create new snapshot
       const labels = ['user-snapshot', 'automated'];
@@ -719,7 +722,7 @@ async function handleSaveUserSnapshot(octokit, { owner, repo, username, snapshot
       }
 
       issue = newIssue;
-      console.log(`[github-bot] Created user snapshot #${newIssue.number} for ${username}`);
+      logger.debug(`Created user snapshot #${newIssue.number} for ${username}`);
     }
 
     return {
@@ -882,7 +885,7 @@ async function handleSendVerificationEmail(adapter, configAdapter, cryptoAdapter
     // Store verification code using storage abstraction
     await storage.storeVerificationCode(emailHash, encryptedCode, expiresAt);
 
-    console.log(`[github-bot] Stored verification code for emailHash: ${emailHash.substring(0, 8)}...`);
+    logger.debug(`Stored verification code for emailHash: ${emailHash.substring(0, 8)}...`);
 
     // Send email with SendGrid
     // Add [TEST] prefix in development mode
@@ -902,7 +905,7 @@ async function handleSendVerificationEmail(adapter, configAdapter, cryptoAdapter
       throw new Error(emailResult.error || 'Failed to send email');
     }
 
-    console.log(`[github-bot] Verification email sent to ${email}`);
+    logger.debug(`Verification email sent to ${email}`);
 
     return adapter.createJsonResponse(200, {
       message: 'Verification code sent',
@@ -918,10 +921,10 @@ async function handleSendVerificationEmail(adapter, configAdapter, cryptoAdapter
  * Required: email, code
  */
 async function handleVerifyEmail(adapter, configAdapter, cryptoAdapter, octokit, { owner, repo, email, code }) {
-  console.log('[github-bot] handleVerifyEmail called:', { owner, repo, email: email ? '***' : undefined, code: code ? '***' : undefined });
+  logger.debug('handleVerifyEmail called:', { owner, repo, email: email ? '***' : undefined, code: code ? '***' : undefined });
 
   if (!email || !code) {
-    console.log('[github-bot] Missing email or code');
+    logger.debug('Missing email or code');
     return adapter.createJsonResponse(400, { error: "Missing required fields: email, code" });
   }
 
@@ -954,14 +957,14 @@ async function handleVerifyEmail(adapter, configAdapter, cryptoAdapter, octokit,
     const storedData = await storage.getVerificationCode(emailHash);
 
     if (!storedData) {
-      console.log('[github-bot] No matching verification code found or expired');
+      logger.debug('No matching verification code found or expired');
       return adapter.createJsonResponse(
         404, {
         error: 'Verification code not found or expired'
       });
     }
 
-    console.log('[github-bot] Found verification code for email hash');
+    logger.debug('Found verification code for email hash');
 
     // Decrypt and verify code
     const secret = adapter.getEnv("EMAIL_VERIFICATION_SECRET");
@@ -981,7 +984,7 @@ async function handleVerifyEmail(adapter, configAdapter, cryptoAdapter, octokit,
     }
 
     if (decryptedCode !== code) {
-      console.log('[github-bot] Invalid verification code');
+      logger.debug('Invalid verification code');
       return adapter.createJsonResponse(
         403, {
         error: 'Invalid verification code'
@@ -989,13 +992,13 @@ async function handleVerifyEmail(adapter, configAdapter, cryptoAdapter, octokit,
     }
 
     // Delete the verification code after successful verification
-    console.log('[github-bot] Verification successful, deleting code');
+    logger.debug('Verification successful, deleting code');
     await storage.deleteVerificationCode(emailHash);
 
     // Generate verification token
     const token = await createVerificationToken(adapter, email);
 
-    console.log(`[github-bot] Email verified: ${email}`);
+    logger.debug(`Email verified: ${email}`);
 
     return adapter.createJsonResponse(
       200, {
@@ -1116,7 +1119,7 @@ async function handleCreateAnonymousPR(adapter, configAdapter, cryptoAdapter, oc
     return adapter.createJsonResponse(400, { error: 'Missing required fields' });
   }
 
-  console.log('[github-bot] Starting anonymous PR creation for:', { email, displayName, section, pageId });
+  logger.debug('Starting anonymous PR creation for:', { email, displayName, section, pageId });
 
   try {
     // Validate all inputs BEFORE any processing
@@ -1197,51 +1200,51 @@ async function handleCreateAnonymousPR(adapter, configAdapter, cryptoAdapter, oc
     }
 
     // 4. Check display name for profanity
-    console.log('[github-bot] Checking display name for profanity:', displayName);
+    logger.debug('Checking display name for profanity:', displayName);
     const profanityCheck = await checkProfanity(adapter, displayName);
-    console.log('[github-bot] Profanity check result:', profanityCheck);
+    logger.debug('Profanity check result:', profanityCheck);
 
     if (profanityCheck.containsProfanity) {
-      console.log(`[github-bot] Display name rejected due to profanity (method: ${profanityCheck.method}):`, displayName);
+      logger.debug(`Display name rejected due to profanity (method: ${profanityCheck.method}):`, displayName);
       return adapter.createJsonResponse(400, {
         error: 'Display name contains inappropriate language. Please choose a respectful name.'
       });
     }
 
-    console.log('[github-bot] Display name passed profanity check');
+    logger.debug('Display name passed profanity check');
 
     // 5b. Check reason for profanity (if provided)
     if (reason && reason.length > 0) {
-      console.log('[github-bot] Checking reason for profanity:', reason);
+      logger.debug('Checking reason for profanity:', reason);
       const reasonProfanityCheck = await checkProfanity(adapter, reason);
-      console.log('[github-bot] Reason profanity check result:', reasonProfanityCheck);
+      logger.debug('Reason profanity check result:', reasonProfanityCheck);
 
       if (reasonProfanityCheck.containsProfanity) {
-        console.log(`[github-bot] Reason rejected due to profanity (method: ${reasonProfanityCheck.method}):`, reason);
+        logger.debug(`Reason rejected due to profanity (method: ${reasonProfanityCheck.method}):`, reason);
         return adapter.createJsonResponse(400, {
           error: 'Edit reason contains inappropriate language. Please provide a respectful explanation.'
         });
       }
 
-      console.log('[github-bot] Reason passed profanity check');
+      logger.debug('Reason passed profanity check');
     }
 
     // 5c. Check page content for profanity
-    console.log('[github-bot] Checking page content for profanity (length:', content.length, ')');
+    logger.debug('Checking page content for profanity (length:', content.length, ')');
     // Only check first 5000 chars to avoid overwhelming the API
     const contentSample = content.substring(0, 5000);
     const contentProfanityCheck = await checkProfanity(adapter, contentSample);
-    console.log('[github-bot] Content profanity check result:', contentProfanityCheck);
+    logger.debug('Content profanity check result:', contentProfanityCheck);
 
     if (contentProfanityCheck.containsProfanity) {
-      console.log(`[github-bot] Content rejected due to profanity (method: ${contentProfanityCheck.method})`);
+      logger.debug(`Content rejected due to profanity (method: ${contentProfanityCheck.method})`);
       return adapter.createJsonResponse(400, {
           error: 'Page content contains inappropriate language. Please remove offensive content and try again.'
         });
       
     }
 
-    console.log('[github-bot] Content passed profanity check');
+    logger.debug('Content passed profanity check');
 
     // 6. Create branch
     const timestamp = Date.now();
@@ -1291,10 +1294,10 @@ Co-Authored-By: Wiki Bot <bot@slayerlegend.wiki>`;
         ref: 'main',
       });
       fileSha = existingFile.sha;
-      console.log('[github-bot] File exists on main, using sha:', fileSha);
+      logger.debug('File exists on main, using sha:', fileSha);
     } catch (error) {
       // File doesn't exist, that's fine (new page)
-      console.log('[github-bot] File does not exist on main (new page)');
+      logger.debug('File does not exist on main (new page)');
       fileSha = undefined;
     }
 
@@ -1349,7 +1352,7 @@ ${reason ? `**Reason:** ${reason}` : ''}
     // 10. Record submission for rate limiting
     await recordSubmission(adapter);
 
-    console.log(`[github-bot] Anonymous PR created: #${pr.number} by ${displayName} (${email})`);
+    logger.debug(`Anonymous PR created: #${pr.number} by ${displayName} (${email})`);
 
     return adapter.createJsonResponse(200, {
 

@@ -3,6 +3,10 @@
  * Matches skill names to images with fallbacks
  */
 
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('ImageService');
+
 // Cache for image database
 let imageIndexCache = null;
 let imageSearchCache = null;
@@ -20,7 +24,7 @@ async function loadImageIndex() {
     imageIndexCache = await response.json();
     return imageIndexCache;
   } catch (err) {
-    console.error('Failed to load image index:', err);
+    logger.error('Failed to load image index', { error: err });
     return null;
   }
 }
@@ -38,7 +42,7 @@ async function loadImageSearchIndex() {
     imageSearchCache = await response.json();
     return imageSearchCache;
   } catch (err) {
-    console.error('Failed to load image search index:', err);
+    logger.error('Failed to load image search index', { error: err });
     return null;
   }
 }

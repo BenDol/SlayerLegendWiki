@@ -15,6 +15,9 @@ import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage'
 import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
 import { serializeBuild, deserializeBuild } from '../utils/spiritSerialization';
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('BattleLoadouts');
 
 /**
  * BattleLoadouts Component
@@ -84,7 +87,7 @@ const BattleLoadouts = () => {
       const loadSharedBuild = async () => {
         try {
           setLoading(true);
-          console.log('[BattleLoadouts] Loading shared build:', shareChecksum);
+          logger.info('Loading shared build', { shareChecksum });
 
           // Get repo info from config
           const configResponse = await fetch('/wiki-config.json');
@@ -104,12 +107,12 @@ const BattleLoadouts = () => {
             setCurrentLoadout(deserializedLoadout);
             setLoadoutName(deserializedLoadout.name || '');
             setHasUnsavedChanges(false);
-            console.log('[BattleLoadouts] ✓ Shared build loaded successfully');
+            logger.info('Shared build loaded successfully');
           } else {
             throw new Error(`Invalid build type: ${buildData.type}`);
           }
         } catch (error) {
-          console.error('[BattleLoadouts] Failed to load shared build:', error);
+          logger.error('Failed to load shared build', { error });
           alert(`Failed to load shared build: ${error.message}`);
         } finally {
           setLoading(false);
@@ -134,7 +137,7 @@ const BattleLoadouts = () => {
           setHasUnsavedChanges(false); // Loaded from URL, no unsaved changes yet
         }
       } catch (error) {
-        console.error('[BattleLoadouts] Failed to load loadout from URL:', error);
+        logger.error('Failed to load loadout from URL', { error });
       }
     }
     // Load from localStorage if no URL params
@@ -161,7 +164,7 @@ const BattleLoadouts = () => {
       const data = await response.json();
       setSkills(data);
     } catch (error) {
-      console.error('Failed to load skills:', error);
+      logger.error('Failed to load skills', { error });
     } finally {
       setLoading(false);
     }
@@ -173,7 +176,7 @@ const BattleLoadouts = () => {
       const data = await response.json();
       setSpirits(data.spirits);
     } catch (error) {
-      console.error('Failed to load spirits:', error);
+      logger.error('Failed to load spirits', { error });
     }
   };
 
@@ -550,7 +553,7 @@ const BattleLoadouts = () => {
       // Trigger refresh of saved loadouts panel
       setRefreshTrigger(prev => prev + 1);
     } catch (err) {
-      console.error('[BattleLoadouts] Failed to save loadout:', err);
+      logger.error('Failed to save loadout', { error: err });
       const errorMessage = err.message || 'Failed to save loadout';
       setSaveError(errorMessage);
 
@@ -579,7 +582,7 @@ const BattleLoadouts = () => {
       setSharing(true);
       setShareError(null);
 
-      console.log('[BattleLoadouts] Generating share URL...');
+      logger.debug('Generating share URL');
 
       // Get repo info from config
       const configResponse = await fetch('/wiki-config.json');
@@ -597,7 +600,7 @@ const BattleLoadouts = () => {
       const baseURL = window.location.origin + window.location.pathname;
       const shareURL = generateShareUrl(baseURL, 'battle-loadouts', checksum);
 
-      console.log('[BattleLoadouts] ✓ Share URL generated:', shareURL);
+      logger.info('Share URL generated', { shareURL });
 
       // Copy to clipboard
       await navigator.clipboard.writeText(shareURL);
@@ -615,7 +618,7 @@ const BattleLoadouts = () => {
         ]
       });
     } catch (error) {
-      console.error('[BattleLoadouts] Failed to generate share URL:', error);
+      logger.error('Failed to generate share URL', { error });
       setShareError(error.message || 'Failed to generate share URL');
 
       // Fallback to old method if share service fails
@@ -631,7 +634,7 @@ const BattleLoadouts = () => {
 
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
-          console.log('[BattleLoadouts] ⚠️ Used fallback encoding method');
+          logger.warn('Used fallback encoding method');
 
           // Trigger donation prompt on successful share (fallback)
           window.triggerDonationPrompt?.({
@@ -646,7 +649,7 @@ const BattleLoadouts = () => {
           alert('Failed to generate share URL');
         }
       } catch (fallbackError) {
-        console.error('[BattleLoadouts] Fallback also failed:', fallbackError);
+        logger.error('Fallback also failed', { error: fallbackError });
         alert('Failed to generate share URL');
       }
     } finally {
@@ -726,7 +729,7 @@ const BattleLoadouts = () => {
           ]
         });
       } catch (error) {
-        console.error('Failed to import loadout:', error);
+        logger.error('Failed to import loadout', { error });
         alert('Failed to import loadout. Invalid file format.');
       }
     };

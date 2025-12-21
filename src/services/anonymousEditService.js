@@ -6,6 +6,9 @@
 
 import { getGithubBotEndpoint } from '../utils/apiEndpoints';
 import { cacheName } from '../../wiki-framework/src/utils/storageManager';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('AnonymousEditService');
 
 /**
  * Send verification code to email
@@ -40,7 +43,7 @@ export const sendVerificationCode = async (owner, repo, email) => {
       issueNumber: data.issueNumber,
     };
   } catch (error) {
-    console.error('[AnonymousEdit] Failed to send verification code:', error);
+    logger.error('Failed to send verification code', { error });
     return {
       success: false,
       error: error.message || 'Failed to send verification code',
@@ -83,7 +86,7 @@ export const verifyCode = async (owner, repo, email, code) => {
       token: data.token,
     };
   } catch (error) {
-    console.error('[AnonymousEdit] Verification failed:', error);
+    logger.error('Verification failed', { error });
     return {
       success: false,
       error: error.message || 'Verification failed',
@@ -132,7 +135,7 @@ export const checkRateLimit = async (owner, repo) => {
       remaining: data.remaining,
     };
   } catch (error) {
-    console.error('[AnonymousEdit] Rate limit check failed:', error);
+    logger.error('Rate limit check failed', { error });
     return {
       allowed: true, // Default to allowing if check fails
       error: error.message,
@@ -212,7 +215,7 @@ export const submitAnonymousEdit = async ({
       pr: data.pr,
     };
   } catch (error) {
-    console.error('[AnonymousEdit] Failed to submit edit:', error);
+    logger.error('Failed to submit edit', { error });
     return {
       success: false,
       error: error.message || 'Failed to submit edit',
@@ -243,7 +246,7 @@ export const getCachedVerificationToken = (email) => {
 
     return token;
   } catch (error) {
-    console.error('[AnonymousEdit] Failed to get cached token:', error);
+    logger.error('Failed to get cached token', { error });
     return null;
   }
 };
@@ -264,7 +267,7 @@ export const cacheVerificationToken = (email, token) => {
       })
     );
   } catch (error) {
-    console.error('[AnonymousEdit] Failed to cache token:', error);
+    logger.error('Failed to cache token', { error });
   }
 };
 
@@ -277,6 +280,6 @@ export const clearCachedVerificationToken = (email) => {
     const key = cacheName('anon_edit_token', email);
     localStorage.removeItem(key);
   } catch (error) {
-    console.error('[AnonymousEdit] Failed to clear token:', error);
+    logger.error('Failed to clear token', { error });
   }
 };

@@ -10,6 +10,10 @@
  * - deserialize: After loading from API/cache
  */
 
+import { createLogger } from './logger';
+
+const logger = createLogger('SpiritSerialization');
+
 /**
  * Serialize a spirit configuration for storage
  * Converts full spirit object to just ID
@@ -153,7 +157,7 @@ export const loadSpiritsDatabase = async () => {
     const data = await response.json();
     return data.spirits || [];
   } catch (error) {
-    console.error('[spiritSerialization] Failed to load spirits database:', error);
+    logger.error('[spiritSerialization] Failed to load spirits database:', error);
     return [];
   }
 };

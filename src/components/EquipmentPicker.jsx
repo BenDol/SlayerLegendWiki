@@ -2,13 +2,16 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 import { getEquipmentRarityColor } from '../config/rarityColors';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('EquipmentPicker');
 
 // Import imageService from parent project
 let imageService = null;
 try {
   imageService = require('../services/imageService');
 } catch (err) {
-  console.warn('Image service not found in parent project');
+  logger.debug('Image service not found in parent project');
 }
 
 /**

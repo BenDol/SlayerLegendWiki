@@ -3,6 +3,9 @@
  * Handles GitHub API caching delays by storing recent saves locally
  */
 
+import { createLogger } from './logger';
+
+const logger = createLogger('BuildCache');
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 /**
@@ -63,7 +66,7 @@ export const getCache = (type, userId) => {
 
     return data.items;
   } catch (error) {
-    console.error('[buildCache] Failed to get cache:', error);
+    logger.error('Failed to get cache:', { error: error });
     return null;
   }
 };
@@ -81,7 +84,7 @@ export const setCache = (type, userId, items) => {
 
     localStorage.setItem(key, JSON.stringify(data));
   } catch (error) {
-    console.error('[buildCache] Failed to set cache:', error);
+    logger.error('Failed to set cache:', { error: error });
   }
 };
 
@@ -93,7 +96,7 @@ export const clearCache = (type, userId) => {
     const key = getCacheKey(type, userId);
     localStorage.removeItem(key);
   } catch (error) {
-    console.error('[buildCache] Failed to clear cache:', error);
+    logger.error('Failed to clear cache:', { error: error });
   }
 };
 
@@ -112,7 +115,7 @@ export const clearAllCaches = () => {
       }
     });
   } catch (error) {
-    console.error('[buildCache] Failed to clear all caches:', error);
+    logger.error('Failed to clear all caches:', { error: error });
   }
 };
 

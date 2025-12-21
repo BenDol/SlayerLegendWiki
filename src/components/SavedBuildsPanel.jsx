@@ -7,6 +7,9 @@ import LoginModal from '../../wiki-framework/src/components/auth/LoginModal';
 import { getCache, setCache, mergeCacheWithGitHub } from '../utils/buildCache';
 import { getSaveDataEndpoint, getDeleteDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { getSkillGradeColor } from '../config/rarityColors';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SavedBuildsPanel');
 
 /**
  * SavedBuildsPanel Component
@@ -73,7 +76,7 @@ const SavedBuildsPanel = ({
       const data = await response.json();
       setWeapons(data || []);
     } catch (err) {
-      console.error('[SavedBuildsPanel] Failed to load weapons:', err);
+      logger.error('Failed to load weapons:', { error: err });
     }
   };
 
@@ -83,7 +86,7 @@ const SavedBuildsPanel = ({
       const data = await response.json();
       setSkills(data || []);
     } catch (err) {
-      console.error('[SavedBuildsPanel] Failed to load skills:', err);
+      logger.error('Failed to load skills:', { error: err });
     }
   };
 
@@ -122,7 +125,7 @@ const SavedBuildsPanel = ({
       // Update cache with merged results
       setCache(cacheKey, user.id, mergedBuilds);
     } catch (err) {
-      console.error('[SavedBuilds] Failed to load builds:', err);
+      logger.error('Failed to load builds:', { error: err });
       setError('Failed to load saved builds');
     } finally {
       setLoading(false);
@@ -182,7 +185,7 @@ const SavedBuildsPanel = ({
       // Hide success message after 2 seconds
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (err) {
-      console.error('[SavedBuilds] Failed to save build:', err);
+      logger.error('Failed to save build:', { error: err });
       setError(err.message || 'Failed to save build');
     } finally {
       setSaving(false);
@@ -230,7 +233,7 @@ const SavedBuildsPanel = ({
       // Update cache after deletion
       setCache(cacheKey, user.id, sortedBuilds);
     } catch (err) {
-      console.error('[SavedBuilds] Failed to delete build:', err);
+      logger.error('Failed to delete build:', { error: err });
       setError(err.message || 'Failed to delete build');
     }
   };

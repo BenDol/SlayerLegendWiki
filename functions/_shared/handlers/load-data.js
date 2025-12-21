@@ -1,3 +1,6 @@
+const { createLogger } = require('../../../src/utils/logger');
+const logger = createLogger('LoadData');
+
 /**
  * Load Data Handler (Platform-Agnostic)
  * Handles loading skill builds, battle loadouts, engraving builds, and spirit collection
@@ -69,7 +72,7 @@ export async function handleLoadData(adapter, configAdapter) {
     // Load items
     const items = await storage.load(type, userId);
 
-    console.log(`[load-data] Loaded ${items.length} ${config.itemsName} for user ${userId}`);
+    logger.debug(`Loaded ${items.length} ${config.itemsName} for user ${userId}`);
 
     // Return response with dynamic key names
     const response = {

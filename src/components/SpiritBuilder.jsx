@@ -13,6 +13,9 @@ import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage'
 import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
 import { serializeBuild, deserializeBuild } from '../utils/spiritSerialization';
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SpiritBuilder');
 
 /**
  * SpiritBuilder Component
@@ -85,7 +88,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       const loadFromSharedUrl = async () => {
         try {
           setLoading(true);
-          console.log('[SpiritBuilder] Loading shared build:', shareChecksum);
+          logger.info('Loading shared build', { shareChecksum });
 
           const configResponse = await fetch('/wiki-config.json');
           const config = await configResponse.json();
@@ -99,13 +102,13 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
             setBuildName(buildData.data.name || '');
             setBuild({ slots: deserializedBuild.slots });
             setHasUnsavedChanges(true);
-            console.log('[SpiritBuilder] ✓ Shared build loaded successfully');
+            logger.info('Shared build loaded successfully');
           } else {
-            console.error('[SpiritBuilder] Invalid build type:', buildData.type);
+            logger.error('Invalid build type', { type: buildData.type });
             alert('Invalid build type. This URL is for a different builder.');
           }
         } catch (error) {
-          console.error('[SpiritBuilder] Failed to load shared build:', error);
+          logger.error('Failed to load shared build', { error });
           alert(`Failed to load shared build: ${error.message}`);
         } finally {
           setLoading(false);
@@ -126,7 +129,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           setHasUnsavedChanges(true); // Mark as having changes to block navigation
         }
       } catch (error) {
-        console.error('Failed to load build from URL:', error);
+        logger.error('Failed to load build from URL', { error });
       }
     }
     // Load from localStorage if no URL params
@@ -162,7 +165,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       const data = await response.json();
       setSpirits(data.spirits);
     } catch (error) {
-      console.error('Failed to load spirits:', error);
+      logger.error('Failed to load spirits', { error });
     } finally {
       setLoading(false);
     }
@@ -184,13 +187,13 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
    */
   const buildsMatch = (savedBuild) => {
     if (!savedBuild) {
-      console.log('[SpiritBuilder] buildsMatch: savedBuild is null/undefined');
+      logger.debug('buildsMatch: savedBuild is null/undefined');
       return false;
     }
 
     // Check name
     if (savedBuild.name !== buildName) {
-      console.log('[SpiritBuilder] buildsMatch: name mismatch', { savedName: savedBuild.name, currentName: buildName });
+      logger.debug('buildsMatch: name mismatch', { savedName: savedBuild.name, currentName: buildName });
       return false;
     }
 
@@ -198,7 +201,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     const currentSerialized = serializeBuildWithName(build);
     const savedSerialized = serializeBuildWithName(savedBuild);
 
-    console.log('[SpiritBuilder] buildsMatch: comparing builds', {
+    logger.debug('buildsMatch: comparing builds', {
       savedBuildId: savedBuild.id,
       currentSlots: currentSerialized.slots,
       savedSlots: savedSerialized.slots
@@ -206,7 +209,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
     // Compare serialized slots
     if (currentSerialized.slots.length !== savedSerialized.slots.length) {
-      console.log('[SpiritBuilder] buildsMatch: slot length mismatch');
+      logger.debug('buildsMatch: slot length mismatch');
       return false;
     }
 
@@ -215,28 +218,28 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       const savedSlot = savedSerialized.slots[i];
 
       if (currentSlot.spiritId !== savedSlot.spiritId) {
-        console.log(`[SpiritBuilder] buildsMatch: slot ${i} spiritId mismatch`, { current: currentSlot.spiritId, saved: savedSlot.spiritId });
+        logger.debug(`buildsMatch: slot ${i} spiritId mismatch`, { current: currentSlot.spiritId, saved: savedSlot.spiritId });
         return false;
       }
       if (currentSlot.level !== savedSlot.level) {
-        console.log(`[SpiritBuilder] buildsMatch: slot ${i} level mismatch`, { current: currentSlot.level, saved: savedSlot.level });
+        logger.debug(`buildsMatch: slot ${i} level mismatch`, { current: currentSlot.level, saved: savedSlot.level });
         return false;
       }
       if (currentSlot.awakeningLevel !== savedSlot.awakeningLevel) {
-        console.log(`[SpiritBuilder] buildsMatch: slot ${i} awakeningLevel mismatch`, { current: currentSlot.awakeningLevel, saved: savedSlot.awakeningLevel });
+        logger.debug(`buildsMatch: slot ${i} awakeningLevel mismatch`, { current: currentSlot.awakeningLevel, saved: savedSlot.awakeningLevel });
         return false;
       }
       if (currentSlot.evolutionLevel !== savedSlot.evolutionLevel) {
-        console.log(`[SpiritBuilder] buildsMatch: slot ${i} evolutionLevel mismatch`, { current: currentSlot.evolutionLevel, saved: savedSlot.evolutionLevel });
+        logger.debug(`buildsMatch: slot ${i} evolutionLevel mismatch`, { current: currentSlot.evolutionLevel, saved: savedSlot.evolutionLevel });
         return false;
       }
       if (currentSlot.skillEnhancementLevel !== savedSlot.skillEnhancementLevel) {
-        console.log(`[SpiritBuilder] buildsMatch: slot ${i} skillEnhancementLevel mismatch`, { current: currentSlot.skillEnhancementLevel, saved: savedSlot.skillEnhancementLevel });
+        logger.debug(`buildsMatch: slot ${i} skillEnhancementLevel mismatch`, { current: currentSlot.skillEnhancementLevel, saved: savedSlot.skillEnhancementLevel });
         return false;
       }
     }
 
-    console.log('[SpiritBuilder] buildsMatch: MATCH FOUND for build', savedBuild.id);
+    logger.debug('buildsMatch: MATCH FOUND for build', { buildId: savedBuild.id });
     return true;
   };
 
@@ -244,7 +247,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
    * Check if current build matches any saved build and update highlighting
    */
   useEffect(() => {
-    console.log('[SpiritBuilder] useEffect: checking for build match', {
+    logger.debug('useEffect: checking for build match', {
       buildName,
       hasUnsavedChanges,
       savedBuildsCount: savedBuilds?.length || 0,
@@ -254,7 +257,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     const hasContent = buildName.trim() !== '' || build.slots.some(slot => slot.spirit !== null);
 
     if (!isAuthenticated || !savedBuilds || savedBuilds.length === 0) {
-      console.log('[SpiritBuilder] useEffect: early return - no saved builds or not authenticated');
+      logger.debug('useEffect: early return - no saved builds or not authenticated');
       if (currentLoadedBuildId !== null) {
         setCurrentLoadedBuildId(null);
       }
@@ -267,14 +270,14 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     }
 
     // Find matching build
-    console.log('[SpiritBuilder] useEffect: searching for matching build among', savedBuilds.length, 'builds');
+    logger.debug('useEffect: searching for matching build', { count: savedBuilds.length });
     const matchingBuild = savedBuilds.find(savedBuild => buildsMatch(savedBuild));
 
     if (matchingBuild) {
-      console.log('[SpiritBuilder] useEffect: MATCH FOUND - setting currentLoadedBuildId to', matchingBuild.id);
+      logger.debug('useEffect: MATCH FOUND', { buildId: matchingBuild.id });
       setCurrentLoadedBuildId(matchingBuild.id);
     } else {
-      console.log('[SpiritBuilder] useEffect: NO MATCH - setting currentLoadedBuildId to null');
+      logger.debug('useEffect: NO MATCH - setting currentLoadedBuildId to null');
       setCurrentLoadedBuildId(null);
       if (hasContent && !hasUnsavedChanges) {
         setHasUnsavedChanges(true);
@@ -411,7 +414,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       try {
         const { type, spirit } = JSON.parse(dragData);
         if (type === 'saved-spirit') {
-          console.log('[SpiritBuilder] Dropped saved spirit:', spirit.spirit.name);
+          logger.debug('Dropped saved spirit', { name: spirit.spirit.name });
 
           // Check if spirit is already equipped in another slot
           const isAlreadyEquipped = build.slots.some((slot, index) =>
@@ -438,7 +441,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           return;
         }
       } catch (error) {
-        console.error('[SpiritBuilder] Failed to parse drag data:', error);
+        logger.error('Failed to parse drag data', { error });
       }
     }
 
@@ -466,7 +469,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       setSharing(true);
       setShareError(null);
 
-      console.log('[SpiritBuilder] Generating share URL...');
+      logger.debug('Generating share URL');
 
       const configResponse = await fetch('/wiki-config.json');
       const config = await configResponse.json();
@@ -483,7 +486,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       // Save build and get checksum
       const checksum = await saveSharedBuild(owner, repo, 'spirit-builds', buildData);
 
-      console.log('[SpiritBuilder] Generated checksum:', checksum);
+      logger.debug('Generated checksum', { checksum });
 
       // Generate share URL
       const baseURL = window.location.origin + window.location.pathname;
@@ -494,7 +497,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
 
-      console.log('[SpiritBuilder] ✓ Share URL copied to clipboard');
+      logger.info('Share URL copied to clipboard');
 
       // Trigger donation prompt on successful share
       window.triggerDonationPrompt?.({
@@ -506,12 +509,12 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
         ]
       });
     } catch (error) {
-      console.error('[SpiritBuilder] Failed to generate share URL:', error);
+      logger.error('Failed to generate share URL', { error });
       setShareError(error.message || 'Failed to generate share URL');
 
       // Fallback to old method if share service fails
       try {
-        console.log('[SpiritBuilder] Falling back to old encoding method...');
+        logger.warn('Falling back to old encoding method');
         const serializedBuild = serializeBuild(build);
         const encoded = encodeBuild(serializedBuild);
         if (encoded) {
@@ -520,7 +523,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           await navigator.clipboard.writeText(shareURL);
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
-          console.log('[SpiritBuilder] ✓ Fallback URL copied to clipboard');
+          logger.info('Fallback URL copied to clipboard');
 
           // Trigger donation prompt on successful share (fallback)
           window.triggerDonationPrompt?.({
@@ -533,7 +536,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           });
         }
       } catch (fallbackError) {
-        console.error('[SpiritBuilder] Fallback also failed:', fallbackError);
+        logger.error('Fallback also failed', { error: fallbackError });
         alert('Failed to generate share URL');
       }
     } finally {
@@ -611,7 +614,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           ]
         });
       } catch (error) {
-        console.error('Failed to import build:', error);
+        logger.error('Failed to import build', { error });
         alert('Failed to import build. Invalid file format.');
       }
     };
@@ -705,8 +708,8 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
       const data = await response.json();
       const sortedBuilds = data.builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-      console.log('[SpiritBuilder] After save - sortedBuilds:', sortedBuilds);
-      console.log('[SpiritBuilder] Current buildName:', buildName);
+      logger.debug('After save - sortedBuilds', { builds: sortedBuilds });
+      logger.debug('Current buildName', { buildName });
 
       setSavedBuilds(sortedBuilds);
       setSaveSuccess(true);
@@ -714,12 +717,12 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
       // Find the saved build ID (it's the one with the matching name)
       const savedBuild = sortedBuilds.find(b => b.name === buildName);
-      console.log('[SpiritBuilder] Found saved build:', savedBuild);
+      logger.debug('Found saved build', { savedBuild });
       if (savedBuild) {
-        console.log('[SpiritBuilder] Setting currentLoadedBuildId to:', savedBuild.id);
+        logger.debug('Setting currentLoadedBuildId', { buildId: savedBuild.id });
         setCurrentLoadedBuildId(savedBuild.id);
       } else {
-        console.warn('[SpiritBuilder] Could not find saved build with name:', buildName);
+        logger.warn('Could not find saved build with name', { buildName });
       }
 
       // Cache the updated builds
@@ -730,7 +733,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (err) {
-      console.error('[SpiritBuilder] Failed to save build:', err);
+      logger.error('Failed to save build', { error: err });
       setSaveError(err.message || 'Failed to save build');
     } finally {
       setSaving(false);

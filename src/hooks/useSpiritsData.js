@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { loadSpiritsDatabase } from '../utils/spiritSerialization';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('useSpiritsData');
 
 /**
  * Custom hook to load and cache spirits database
@@ -18,7 +21,7 @@ export const useSpiritsData = () => {
         setSpiritsData(data);
         setError(null);
       } catch (err) {
-        console.error('[useSpiritsData] Failed to load spirits data:', err);
+        logger.error('[useSpiritsData] Failed to load spirits data:', err);
         setError(err.message || 'Failed to load spirits data');
       } finally {
         setLoading(false);

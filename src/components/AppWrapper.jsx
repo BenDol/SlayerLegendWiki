@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import DonationSystem from './DonationSystem';
 import useScrollDepthTrigger from '../hooks/useScrollDepthTrigger';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('AppWrapper');
 
 /**
  * AppWrapper Component
@@ -27,7 +30,7 @@ const AppWrapper = ({ children }) => {
         unsubscribe = useAuthStore.subscribe((state) => {
           // Check if auth state changed from false to true (user just logged in)
           if (state.isAuthenticated && !previousAuthState) {
-            console.log('[AppWrapper] User logged in successfully - triggering donation prompt');
+            logger.info('User logged in successfully - triggering donation prompt');
 
             // Small delay so prompt doesn't interfere with login UI closing
             setTimeout(() => {
@@ -46,7 +49,7 @@ const AppWrapper = ({ children }) => {
           previousAuthState = state.isAuthenticated;
         });
       } catch (error) {
-        console.warn('[AppWrapper] Could not subscribe to auth changes:', error);
+        logger.warn('Could not subscribe to auth changes', { error });
       }
     };
 
@@ -61,12 +64,12 @@ const AppWrapper = ({ children }) => {
 
   // Track current page path - only set for markdown content pages
   useEffect(() => {
-    console.log('[AppWrapper] Page tracking effect initialized');
+    logger.trace('Page tracking effect initialized');
     let updatePagePathRef = null;
 
     const updatePagePath = () => {
       const hash = window.location.hash;
-      console.log('[AppWrapper] updatePagePath called, current hash:', hash);
+      logger.trace('updatePagePath called', { hash });
 
       // Only track content pages (format: #/section/page-name or #/getting-started, etc.)
       // Exclude special pages like #/skill-builder, #/donate, #/search
@@ -84,14 +87,14 @@ const AppWrapper = ({ children }) => {
         const isSpecialPage = specialPages.some(sp => path.startsWith(sp));
 
         if (!isSpecialPage && path) {
-          console.log('[AppWrapper] ✓ Tracking content page:', path);
+          logger.debug('Tracking content page', { path });
           setCurrentPagePath(path);
         } else {
-          console.log('[AppWrapper] ✗ Not tracking special page:', path);
+          logger.trace('Not tracking special page', { path });
           setCurrentPagePath(null);
         }
       } else {
-        console.log('[AppWrapper] ✗ No hash or invalid hash, not tracking');
+        logger.trace('No hash or invalid hash, not tracking');
         setCurrentPagePath(null);
       }
     };
@@ -100,7 +103,7 @@ const AppWrapper = ({ children }) => {
 
     // Update on hash change
     window.addEventListener('hashchange', updatePagePath);
-    console.log('[AppWrapper] hashchange listener attached');
+    logger.trace('hashchange listener attached');
 
     // Initial update - call immediately
     updatePagePath();
@@ -109,7 +112,7 @@ const AppWrapper = ({ children }) => {
     let lastHash = window.location.hash;
     const pollInterval = setInterval(() => {
       if (window.location.hash !== lastHash) {
-        console.log('[AppWrapper] Hash changed detected by polling');
+        logger.trace('Hash changed detected by polling');
         lastHash = window.location.hash;
         updatePagePathRef();
       }
@@ -117,7 +120,7 @@ const AppWrapper = ({ children }) => {
 
     // Cleanup
     return () => {
-      console.log('[AppWrapper] Cleaning up hashchange listener and poll interval');
+      logger.trace('Cleaning up hashchange listener and poll interval');
       window.removeEventListener('hashchange', updatePagePath);
       clearInterval(pollInterval);
     };
@@ -125,7 +128,7 @@ const AppWrapper = ({ children }) => {
 
   // Memoize the scroll trigger callback to prevent effect from re-running on every render
   const handleScrollTrigger = useCallback(() => {
-    console.log('[AppWrapper] Scroll depth reached - attempting to trigger donation prompt');
+    logger.info('Scroll depth reached - attempting to trigger donation prompt');
     const result = window.triggerDonationPrompt?.({
       messages: [
         "Learning something useful? 📖",
@@ -133,9 +136,9 @@ const AppWrapper = ({ children }) => {
         "Deep dive into the wiki! 🤿",
         "Knowledge is power! 💡",
       ],
-      isScrollTrigger: true // Use higher success rate for scroll triggers (80% vs 30%)
+      isScrollTrigger: true
     });
-    console.log('[AppWrapper] Donation prompt trigger result:', result);
+    logger.debug('Donation prompt trigger result', { result });
   }, []);
 
   // Trigger donation prompt when user scrolls 65% down a content page

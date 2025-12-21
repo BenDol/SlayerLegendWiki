@@ -2,6 +2,9 @@ import { useState } from 'react';
 import SpiritSprite from '../components/SpiritSprite';
 import spiritData from '../../public/data/spirit-characters.json';
 import Button from '../../wiki-framework/src/components/common/Button';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SpiritSpriteDemoPage');
 
 /**
  * Demo page for SpiritSprite component
@@ -48,7 +51,7 @@ const SpiritSpriteDemoPage = () => {
         ]
       });
     } catch (err) {
-      console.error('Failed to copy:', err);
+      logger.debug('Failed to copy:', err);
     }
   };
 

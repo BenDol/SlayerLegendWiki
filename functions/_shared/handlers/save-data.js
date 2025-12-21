@@ -1,3 +1,6 @@
+const { createLogger } = require('../../../src/utils/logger');
+const logger = createLogger('SaveData');
+
 /**
  * Save Data Handler (Platform-Agnostic)
  * Handles saving skill builds, battle loadouts, engraving builds, spirit collection, and grid submissions
@@ -263,7 +266,7 @@ async function handleUserCentricSave(adapter, storage, config, type, username, u
     // Save the item
     const updatedItems = await storage.save(type, username, userId, itemToSave);
 
-    console.log(`[save-data] Saved ${config.itemsName} for ${username}`);
+    logger.debug(`Saved ${config.itemsName} for ${username}`);
 
     // Return response with dynamic key names
     const response = {

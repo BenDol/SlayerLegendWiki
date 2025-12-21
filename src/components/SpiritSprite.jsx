@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import spiritData from '../../public/data/spirit-characters.json';
 import { cacheName } from '../../wiki-framework/src/utils/storageManager';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SpiritSprite');
 
 // LocalStorage keys for cache persistence
 const ANIMATION_CACHE_KEY = cacheName('spirit_sprite_animation');
@@ -47,11 +50,11 @@ const loadAnimationCacheFromStorage = () => {
       }
 
       if (loaded > 0) {
-        console.log(`[SpiritSprite] Loaded ${loaded} animation detection entries from localStorage (${expired} expired)`);
+        logger.debug(`Loaded ${loaded} animation detection entries from localStorage`, { expired });
       }
     }
   } catch (e) {
-    console.warn('[SpiritSprite] Failed to load animation cache from localStorage:', e);
+    logger.warn('Failed to load animation cache from localStorage', { error: e });
   }
 };
 
@@ -70,7 +73,7 @@ const saveAnimationCacheToStorage = () => {
 
     localStorage.setItem(ANIMATION_CACHE_KEY, JSON.stringify(toStore));
   } catch (e) {
-    console.warn('[SpiritSprite] Failed to save animation cache to localStorage:', e);
+    logger.warn('Failed to save animation cache to localStorage', { error: e });
   }
 };
 
@@ -97,11 +100,11 @@ const loadImageCacheMetaFromStorage = () => {
       }
 
       if (loaded > 0) {
-        console.log(`[SpiritSprite] Loaded ${loaded} image cache metadata entries from localStorage (${expired} expired)`);
+        logger.debug(`Loaded ${loaded} image cache metadata entries from localStorage`, { expired });
       }
     }
   } catch (e) {
-    console.warn('[SpiritSprite] Failed to load image cache metadata from localStorage:', e);
+    logger.warn('Failed to load image cache metadata from localStorage', { error: e });
   }
 };
 
@@ -120,7 +123,7 @@ const saveImageCacheMetaToStorage = () => {
 
     localStorage.setItem(IMAGE_CACHE_META_KEY, JSON.stringify(toStore));
   } catch (e) {
-    console.warn('[SpiritSprite] Failed to save image cache metadata to localStorage:', e);
+    logger.warn('Failed to save image cache metadata to localStorage', { error: e });
   }
 };
 
@@ -151,7 +154,7 @@ const cleanupCache = (cache, accessMap, maxSize) => {
     accessMap.delete(key);
   }
 
-  console.log(`[SpiritSprite] Cache cleanup: removed ${toRemove} old entries, ${cache.size} remaining`);
+  logger.debug(`Cache cleanup: removed ${toRemove} old entries`, { remaining: cache.size });
 };
 
 // Utility function to clear all SpiritSprite caches (useful for debugging or memory management)
@@ -168,10 +171,10 @@ export const clearSpiritCaches = () => {
     localStorage.removeItem(ANIMATION_CACHE_KEY);
     localStorage.removeItem(IMAGE_CACHE_META_KEY);
   } catch (e) {
-    console.warn('[SpiritSprite] Failed to clear localStorage caches:', e);
+    logger.warn('Failed to clear localStorage caches', { error: e });
   }
 
-  console.log(`[SpiritSprite] Cleared all caches (memory + localStorage): ${imageCount} images, ${animationCount} animation detections`);
+  logger.debug(`Cleared all caches`, { imageCount, animationCount });
   return { imageCount, animationCount };
 };
 
@@ -225,7 +228,7 @@ export const cleanupExpiredImages = () => {
     saveImageCacheMetaToStorage();
   }
 
-  console.log(`[SpiritSprite] Cleaned up ${removed} expired images`);
+  logger.debug(`Cleaned up ${removed} expired images`);
   return removed;
 };
 
@@ -245,7 +248,7 @@ const getCachedImage = (spiritId, level, frameNumber, framePath) => {
       return Promise.resolve(cached.img);
     } else {
       // Cache expired, remove it and fetch fresh
-      console.log(`[SpiritSprite] Cache expired for ${cacheKey}, re-fetching`);
+      logger.debug(`Cache expired, re-fetching`, { cacheKey });
       imageCache.delete(cacheKey);
       imageCacheAccess.delete(cacheKey);
     }
@@ -563,11 +566,11 @@ const SpiritSprite = ({
         for (let i = 0; i < toRemove; i++) {
           animationDetectionCache.delete(keys[i]);
         }
-        console.log(`[SpiritSprite] Animation cache cleanup: removed ${toRemove} entries`);
+        logger.debug(`Animation cache cleanup: removed ${toRemove} entries`);
       }
 
       animationDetectionCache.set(cacheKey, results);
-      console.log(`[SpiritSprite] Cached animation types for spirit ${spiritId} level ${level}`, results);
+      logger.debug(`Cached animation types for spirit ${spiritId} level ${level}`, { results });
 
       // Persist animation cache to localStorage
       saveAnimationCacheToStorage();

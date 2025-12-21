@@ -11,6 +11,9 @@ import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateSha
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
 import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SkillBuilder');
 
 /**
  * SkillBuilder Component
@@ -78,7 +81,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       const loadFromSharedUrl = async () => {
         try {
           setLoading(true);
-          console.log('[SkillBuilder] Loading shared build:', shareChecksum);
+          logger.info('Loading shared build', { shareChecksum });
 
           const configResponse = await fetch('/wiki-config.json');
           const config = await configResponse.json();
@@ -93,13 +96,13 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
             setMaxSlots(buildData.data.maxSlots || 10);
             setBuild({ slots: deserializedBuild.slots });
             setHasUnsavedChanges(true);
-            console.log('[SkillBuilder] ✓ Shared build loaded successfully');
+            logger.info('Shared build loaded successfully');
           } else {
-            console.error('[SkillBuilder] Invalid build type:', buildData.type);
+            logger.error('Invalid build type', { type: buildData.type });
             alert('Invalid build type. This URL is for a different builder.');
           }
         } catch (error) {
-          console.error('[SkillBuilder] Failed to load shared build:', error);
+          logger.error('Failed to load shared build', { error });
           alert(`Failed to load shared build: ${error.message}`);
         } finally {
           setLoading(false);
@@ -121,7 +124,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           setHasUnsavedChanges(true); // Mark as having changes to block navigation
         }
       } catch (error) {
-        console.error('Failed to load build from URL:', error);
+        logger.error('Failed to load build from URL', { error });
       }
     }
     // Load from localStorage if no URL params
@@ -160,7 +163,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       const data = await response.json();
       setSkills(data);
     } catch (error) {
-      console.error('Failed to load skills:', error);
+      logger.error('Failed to load skills', { error });
     } finally {
       setLoading(false);
     }
@@ -357,7 +360,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       setSharing(true);
       setShareError(null);
 
-      console.log('[SkillBuilder] Generating share URL...');
+      logger.debug('Generating share URL');
 
       const configResponse = await fetch('/wiki-config.json');
       const config = await configResponse.json();
@@ -375,7 +378,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       // Save build and get checksum
       const checksum = await saveSharedBuild(owner, repo, 'skill-builds', buildData);
 
-      console.log('[SkillBuilder] Generated checksum:', checksum);
+      logger.debug('Generated checksum', { checksum });
 
       // Generate share URL
       const baseURL = window.location.origin + window.location.pathname;
@@ -386,7 +389,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
 
-      console.log('[SkillBuilder] ✓ Share URL copied to clipboard');
+      logger.info('Share URL copied to clipboard');
 
       // Trigger donation prompt on successful share
       window.triggerDonationPrompt?.({
@@ -398,12 +401,12 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         ]
       });
     } catch (error) {
-      console.error('[SkillBuilder] Failed to generate share URL:', error);
+      logger.error('Failed to generate share URL', { error });
       setShareError(error.message || 'Failed to generate share URL');
 
       // Fallback to old method if share service fails
       try {
-        console.log('[SkillBuilder] Falling back to old encoding method...');
+        logger.warn('Falling back to old encoding method');
         const serializedBuild = serializeBuild({ ...build, name: buildName, maxSlots });
         const encoded = encodeBuild(serializedBuild);
         if (encoded) {
@@ -412,7 +415,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           await navigator.clipboard.writeText(shareURL);
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
-          console.log('[SkillBuilder] ✓ Fallback URL copied to clipboard');
+          logger.info('Fallback URL copied to clipboard');
 
           // Trigger donation prompt on successful share (fallback)
           window.triggerDonationPrompt?.({
@@ -425,7 +428,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           });
         }
       } catch (fallbackError) {
-        console.error('[SkillBuilder] Fallback also failed:', fallbackError);
+        logger.error('Fallback also failed', { error: fallbackError });
         alert('Failed to generate share URL');
       }
     } finally {
@@ -509,7 +512,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           ]
         });
       } catch (error) {
-        console.error('Failed to import build:', error);
+        logger.error('Failed to import build', { error });
         alert('Failed to import build. Invalid file format.');
       }
     };
@@ -622,7 +625,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       // Hide success message after 2 seconds
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (err) {
-      console.error('[SkillBuilder] Failed to save build:', err);
+      logger.error('Failed to save build', { error: err });
       setSaveError(err.message || 'Failed to save build');
     } finally {
       setSaving(false);

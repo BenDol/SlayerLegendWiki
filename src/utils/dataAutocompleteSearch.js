@@ -1,4 +1,7 @@
 import dataRegistry from './dataRegistry';
+import { createLogger } from './logger';
+
+const logger = createLogger('DataAutocompleteSearch');
 
 /**
  * Fuzzy match score - returns 0-100 based on how well query matches text
@@ -176,7 +179,7 @@ export const searchDataForAutocomplete = async (query, limit = 20) => {
         }
       }
     } catch (err) {
-      console.error(`[DataAutocomplete] Failed to search ${sourceKey}:`, err);
+      logger.error(`[DataAutocomplete] Failed to search ${sourceKey}:`, err);
     }
   }
 

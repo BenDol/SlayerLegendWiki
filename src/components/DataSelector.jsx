@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import dataRegistry from '../utils/dataRegistry';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('DataSelector');
 
 /**
  * Dynamic DataSelector - UI component for selecting data to inject into markdown
@@ -82,7 +85,7 @@ const DataSelector = ({ onSelect, onClose }) => {
         setItems(data);
         setFilteredItems(data);
       } catch (err) {
-        console.error('Failed to load data:', err);
+        logger.error('Failed to load data:', err);
         setItems([]);
         setFilteredItems([]);
       }

@@ -6,6 +6,9 @@
  */
 
 import { styleRegistry } from '../../wiki-framework/src/utils/styleRegistry.js';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('RarityColors');
 
 // Register skill rarity colors
 styleRegistry.registerCategory('skill-rarity', {
@@ -106,7 +109,7 @@ styleRegistry.registerCategory('equipment-rarity', {
   },
 });
 
-console.log('[RarityColors] Registered skill and equipment rarity colors with styleRegistry');
+logger.info('Registered skill and equipment rarity colors with styleRegistry');
 
 /**
  * Helper functions for backwards compatibility

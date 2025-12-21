@@ -1,3 +1,6 @@
+const { createLogger } = require('../../src/utils/logger');
+const logger = createLogger('WikiGitHubStorage');
+
 /**
  * Wiki-Specific GitHub Storage Wrapper
  *
@@ -81,7 +84,7 @@ class WikiGitHubStorage extends GitHubStorage {
           labels: [typeLabel, userLabel, versionLabel],
         });
 
-        console.log(`[WikiGitHubStorage] Updated issue for ${username}: ${issueTitle}`);
+        logger.debug(`Updated issue for ${username}: ${issueTitle}`);
       } else {
         // Create new issue with wiki-specific title
         const config = DATA_TYPE_CONFIGS[type];
@@ -96,7 +99,7 @@ class WikiGitHubStorage extends GitHubStorage {
           labels: [typeLabel, userLabel, versionLabel],
         });
 
-        console.log(`[WikiGitHubStorage] Created issue for ${username}: ${issueTitle}`);
+        logger.debug(`Created issue for ${username}: ${issueTitle}`);
       }
 
       return items;

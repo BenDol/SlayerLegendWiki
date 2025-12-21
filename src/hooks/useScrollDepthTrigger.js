@@ -1,4 +1,7 @@
 import { useEffect, useRef } from 'react';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('ScrollDepth');
 
 /**
  * Hook to trigger donation prompt when user scrolls to a certain depth
@@ -16,20 +19,23 @@ const useScrollDepthTrigger = (threshold = 65, onTrigger, pageIdentifier = null)
   useEffect(() => {
     // Skip if no page identifier provided (means we don't want scroll tracking on this page)
     if (pageIdentifier === null) {
-      console.log('[ScrollDepth] Skipping - no page identifier (not a content page)');
+      logger.trace('Skipping - no page identifier (not a content page)');
       return;
     }
 
-    console.log(`[ScrollDepth] Effect running for page: "${pageIdentifier}" (previous: "${previousPageRef.current}")`);
+    logger.trace('Effect running for page', { pageIdentifier, previous: previousPageRef.current });
 
     // Reset trigger state when page identifier changes
     if (previousPageRef.current !== pageIdentifier) {
-      console.log(`[ScrollDepth] ✨ Page changed from "${previousPageRef.current}" to "${pageIdentifier}" - RESETTING trigger state`);
+      logger.debug('Page changed - resetting trigger state', {
+        from: previousPageRef.current,
+        to: pageIdentifier
+      });
       hasTriggeredRef.current = false;
       lastMilestoneRef.current = null;
       previousPageRef.current = pageIdentifier;
     } else {
-      console.log(`[ScrollDepth] Same page - reattaching listener (trigger state: ${hasTriggeredRef.current})`);
+      logger.trace('Same page - reattaching listener', { triggered: hasTriggeredRef.current });
     }
 
     const handleScroll = () => {
@@ -53,12 +59,19 @@ const useScrollDepthTrigger = (threshold = 65, onTrigger, pageIdentifier = null)
       const milestone = Math.floor(scrollPercentage / 10) * 10;
       if (!lastMilestoneRef.current || lastMilestoneRef.current !== milestone) {
         lastMilestoneRef.current = milestone;
-        console.log(`[ScrollDepth] [${pageIdentifier}] Scroll: ${scrollPercentage.toFixed(1)}% (threshold: ${threshold}%, triggered: ${hasTriggeredRef.current})`);
+        logger.trace(`Scroll: ${scrollPercentage.toFixed(1)}%`, {
+          page: pageIdentifier,
+          threshold,
+          triggered: hasTriggeredRef.current
+        });
       }
 
       // Trigger when reaching the threshold
       if (scrollPercentage >= threshold) {
-        console.log(`[ScrollDepth] ✅ [${pageIdentifier}] Reached ${threshold}% scroll depth - TRIGGERING DONATION PROMPT`);
+        logger.info('Donation prompt triggered by scroll depth', {
+          page: pageIdentifier,
+          scrollDepth: threshold
+        });
         hasTriggeredRef.current = true;
         onTrigger?.();
       }
@@ -66,12 +79,12 @@ const useScrollDepthTrigger = (threshold = 65, onTrigger, pageIdentifier = null)
 
     // Add scroll listener
     window.addEventListener('scroll', handleScroll, { passive: true });
-    console.log(`[ScrollDepth] ✓ Scroll listener attached for page: "${pageIdentifier}"`);
+    logger.trace('Scroll listener attached', { page: pageIdentifier });
 
     // Cleanup
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      console.log(`[ScrollDepth] ✗ Scroll listener removed for page: "${pageIdentifier}"`);
+      logger.trace('Scroll listener removed', { page: pageIdentifier });
     };
   }, [threshold, onTrigger, pageIdentifier]);
 };

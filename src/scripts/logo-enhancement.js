@@ -28,7 +28,7 @@
    */
   function log(...args) {
     if (CONFIG.debug) {
-      console.log('[Logo Enhancement]', ...args);
+      logger.debug('Logo enhancement', ...args);
     }
   }
 
@@ -88,12 +88,11 @@
     }
 
     if (attempt >= CONFIG.maxRetries) {
-      console.warn(
-        '[Logo Enhancement] Failed to find logo after',
-        CONFIG.maxRetries,
-        'attempts. Smoke effect may not work.',
-        '\nLogo selector:', CONFIG.logoSelector
-      );
+      logger.warn('Failed to find logo after attempts', {
+        maxRetries: CONFIG.maxRetries,
+        selector: CONFIG.logoSelector,
+        message: 'Smoke effect may not work'
+      });
       return;
     }
 
@@ -161,8 +160,8 @@
       addLogoId,
       checkLogo: () => {
         const logo = document.querySelector(CONFIG.logoSelector);
-        console.log('Logo element:', logo);
-        console.log('Has ID:', logo?.id === CONFIG.logoId);
+        logger.debug('Logo element:', { data: logo });
+        logger.trace('Has ID', { hasId: logo?.id === CONFIG.logoId });
         return logo;
       }
     };

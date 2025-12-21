@@ -1,5 +1,8 @@
 import { getOctokit } from '../../wiki-framework/src/services/github/api.js';
 import { createUserIdLabel } from '../../wiki-framework/src/utils/githubLabelUtils.js';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('SkillBuilds');
 
 /**
  * Skill Builds Storage System - Slayer Legend Wiki
@@ -65,7 +68,7 @@ export async function getUserBuilds(owner, repo, username, userId = null) {
       );
 
       if (buildsIssue) {
-        console.log(`[SkillBuilds] Found builds for user ${username} by ID: ${userId}`);
+        logger.debug(`Found builds for user ${username} by ID: ${userId}`);
       }
     }
 
@@ -76,26 +79,26 @@ export async function getUserBuilds(owner, repo, username, userId = null) {
       );
 
       if (buildsIssue) {
-        console.log(`[SkillBuilds] Found legacy builds for ${username} by title`);
+        logger.debug(`Found legacy builds for ${username} by title`);
       }
     }
 
     if (!buildsIssue) {
-      console.log(`[SkillBuilds] No builds found for user: ${username}`);
+      logger.debug(`No builds found for user: ${username}`);
       return [];
     }
 
     // Parse JSON from issue body
     try {
       const builds = JSON.parse(buildsIssue.body || '[]');
-      console.log(`[SkillBuilds] Loaded ${builds.length} builds for ${username}`);
+      logger.debug(`Loaded ${builds.length} builds for ${username}`);
       return Array.isArray(builds) ? builds : [];
     } catch (parseError) {
-      console.error(`[SkillBuilds] Failed to parse builds data for ${username}:`, parseError);
+      logger.error(`Failed to parse builds data for ${username}`, { error: parseError });
       return [];
     }
   } catch (error) {
-    console.error(`[SkillBuilds] Failed to get builds for ${username}:`, error);
+    logger.error(`Failed to get builds for ${username}`, { error });
     return [];
   }
 }
@@ -157,7 +160,7 @@ export async function saveUserBuilds(owner, repo, username, userId, builds) {
 
     if (existingIssue) {
       // Update existing builds
-      console.log(`[SkillBuilds] Updating builds for ${username} (issue #${existingIssue.number})`);
+      logger.debug(`Updating builds for ${username}`, { issueNumber: existingIssue.number });
 
       const { data: updatedIssue } = await octokit.rest.issues.update({
         owner,
@@ -175,7 +178,7 @@ export async function saveUserBuilds(owner, repo, username, userId, builds) {
         );
 
         if (!hasUserIdLabel) {
-          console.log(`[SkillBuilds] Adding user-id label to legacy builds for ${username}`);
+          logger.debug(`Adding user-id label to legacy builds for ${username}`);
           await octokit.rest.issues.addLabels({
             owner,
             repo,
@@ -188,7 +191,7 @@ export async function saveUserBuilds(owner, repo, username, userId, builds) {
       return updatedIssue;
     } else {
       // Create new builds issue
-      console.log(`[SkillBuilds] Creating new builds issue for ${username}${userIdLabel ? ` (ID: ${userId})` : ''}`);
+      logger.debug(`Creating new builds issue for ${username}${userIdLabel ? ` (ID: ${userId})` : ''}`);
 
       const labels = [BUILDS_LABEL];
       if (userIdLabel) {
@@ -211,15 +214,15 @@ export async function saveUserBuilds(owner, repo, username, userId, builds) {
           issue_number: newIssue.number,
           lock_reason: 'off-topic',
         });
-        console.log(`[SkillBuilds] Locked builds issue for ${username} to collaborators only`);
+        logger.debug(`Locked builds issue for ${username} to collaborators only`);
       } catch (lockError) {
-        console.warn(`[SkillBuilds] Failed to lock issue for ${username}:`, lockError.message);
+        logger.warn(`Failed to lock issue for ${username}`, { error: lockError.message });
       }
 
       return newIssue;
     }
   } catch (error) {
-    console.error(`[SkillBuilds] Failed to save builds for ${username}:`, error);
+    logger.error(`Failed to save builds for ${username}`, { error });
     throw error;
   }
 }
@@ -252,7 +255,7 @@ export async function addUserBuild(owner, repo, username, userId, build) {
 
   builds.push(build);
   await saveUserBuilds(owner, repo, username, userId, builds);
-  console.log(`[SkillBuilds] Added build "${build.name}" for ${username}`);
+  logger.info(`Added build "${build.name}" for ${username}`);
 
   return builds;
 }
@@ -284,7 +287,7 @@ export async function updateUserBuild(owner, repo, username, userId, buildId, up
   };
 
   await saveUserBuilds(owner, repo, username, userId, builds);
-  console.log(`[SkillBuilds] Updated build "${updatedBuild.name}" for ${username}`);
+  logger.info(`Updated build "${updatedBuild.name}" for ${username}`);
 
   return builds;
 }
@@ -308,7 +311,7 @@ export async function deleteUserBuild(owner, repo, username, userId, buildId) {
   }
 
   await saveUserBuilds(owner, repo, username, userId, filteredBuilds);
-  console.log(`[SkillBuilds] Deleted build ${buildId} for ${username}`);
+  logger.info(`Deleted build ${buildId} for ${username}`);
 
   return filteredBuilds;
 }

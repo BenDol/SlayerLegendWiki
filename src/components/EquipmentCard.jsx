@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getRarityBackgroundColor, getEquipmentRarityColor } from '../config/rarityColors';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('EquipmentCard');
 
 /**
  * EquipmentCard Component
@@ -78,7 +81,7 @@ const EquipmentCard = ({ name, id, equipment, mode = 'detailed', type = 'soul-we
           setImageUrl(foundEquipment.image);
         }
       } catch (err) {
-        console.error('Error loading equipment:', err);
+        logger.error('Error loading equipment:', err);
         setError(err.message);
       } finally {
         setLoading(false);
