@@ -63,7 +63,10 @@
       "Bash(find:*)",
       "Bash(for file in EquipmentCard.jsx EquipmentPicker.jsx SavedBuildsPanel.jsx SavedLoadoutsPanel.jsx SkillCard.jsx SkillPicker.jsx SkillSelector.jsx SkillSlot.jsx)",
       "Bash(do sed -i \"s|from ''../../wiki-framework/src/utils/rarityColors''|from ''../config/rarityColors''|g\" \"$file\")",
-      "Bash(tasklist:*)"
+      "Bash(tasklist:*)",
+      "Bash(npm run build:cloudflare:*)",
+      "Bash(Select-String -Pattern \"Error|FAIL|✓|✅\")",
+      "Bash(Select-Object -First 30)"
     ]
   }
 }
