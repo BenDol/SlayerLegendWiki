@@ -97,94 +97,16 @@ export default createWikiConfigSync({
         warn(warning);
       },
       output: {
-        // Manual chunking for better caching and smaller chunks
+        // Simplified chunking - let Vite handle most dependencies automatically
+        // Manual chunking was causing module initialization order issues with React hooks
+        // and CodeMirror's circular dependencies
         manualChunks(id) {
-          // Framework chunk
+          // Keep framework separate for independent updates
           if (id.includes('node_modules/github-wiki-framework')) {
             return 'framework';
           }
-
-          // React core libraries (changes infrequently, cache separately)
-          if (id.includes('node_modules/react') ||
-              id.includes('node_modules/react-dom') ||
-              id.includes('node_modules/scheduler')) {
-            return 'react-vendor';
-          }
-
-          // React Router (changes independently of React)
-          if (id.includes('node_modules/react-router-dom') ||
-              id.includes('node_modules/react-router') ||
-              id.includes('node_modules/@remix-run')) {
-            return 'react-router';
-          }
-
-          // Octokit (large GitHub API library)
-          if (id.includes('node_modules/octokit') ||
-              id.includes('node_modules/@octokit')) {
-            return 'octokit';
-          }
-
-          // CodeMirror (code editor - very large)
-          // Let Vite handle CodeMirror automatically - manual chunking causes initialization issues
-          // with circular dependencies between @codemirror/* packages
-          // NOTE: Commented out to fix "Cannot access 'XX' before initialization" errors
-          // if (id.includes('node_modules/@codemirror') ||
-          //     id.includes('node_modules/@uiw/react-codemirror')) {
-          //   return 'codemirror';
-          // }
-
-          // Search library (fuse.js - large)
-          if (id.includes('node_modules/fuse.js')) {
-            return 'search';
-          }
-
-          // Markdown processing libraries (large, rarely change)
-          if (id.includes('node_modules/react-markdown') ||
-              id.includes('node_modules/remark-') ||
-              id.includes('node_modules/rehype-') ||
-              id.includes('node_modules/unified') ||
-              id.includes('node_modules/micromark') ||
-              id.includes('node_modules/mdast') ||
-              id.includes('node_modules/hast') ||
-              id.includes('node_modules/unist') ||
-              id.includes('node_modules/vfile') ||
-              id.includes('node_modules/estree')) {
-            return 'markdown';
-          }
-
-          // Lucide icons (many icons, large bundle)
-          if (id.includes('node_modules/lucide-react')) {
-            return 'icons';
-          }
-
-          // Date utilities
-          if (id.includes('node_modules/date-fns')) {
-            return 'date-utils';
-          }
-
-          // Node polyfills (only loaded when needed)
-          if (id.includes('node_modules/buffer') ||
-              id.includes('node_modules/process') ||
-              id.includes('node_modules/gray-matter')) {
-            return 'node-polyfills';
-          }
-
-          // State management
-          if (id.includes('node_modules/zustand') ||
-              id.includes('node_modules/immer')) {
-            return 'state';
-          }
-
-          // Other utilities (profanity filter, etc.)
-          if (id.includes('node_modules/leo-profanity') ||
-              id.includes('node_modules/clsx')) {
-            return 'utils';
-          }
-
-          // Other vendor code (should be small now)
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
+          // Let Vite automatically handle all other vendor code splitting
+          // This respects dependency order and prevents initialization errors
         },
       },
     },
