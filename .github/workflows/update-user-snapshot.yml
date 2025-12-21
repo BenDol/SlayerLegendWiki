@@ -57,6 +57,7 @@ jobs:
 
     env:
       WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username (anonymous contributions)
+      VITE_RELEASE_DATE: ${{ vars.VITE_RELEASE_DATE }}  # Release date for filtering PRs (optional)
 
     steps:
       - name: Checkout repository
@@ -83,6 +84,42 @@ jobs:
             const SNAPSHOT_LABEL = 'user-snapshot';
             const SNAPSHOT_TITLE_PREFIX = '[User Snapshot]';
             const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
+
+            // Read release date from environment variable
+            let releaseDate = null; // null = no filtering
+            const releaseDateStr = process.env.VITE_RELEASE_DATE;
+            if (releaseDateStr && releaseDateStr.trim() !== '') {
+              releaseDate = new Date(releaseDateStr);
+              if (isNaN(releaseDate.getTime())) {
+                console.warn('⚠️ Invalid VITE_RELEASE_DATE format:', releaseDateStr);
+                releaseDate = null;
+              } else {
+                console.log(`📅 Release date configured: ${releaseDate.toISOString()}`);
+                console.log(`   Only PRs after this date will be included in snapshots`);
+              }
+            }
+
+            /**
+             * Filter PRs by release date
+             * @param {Array} prs - Array of PRs to filter
+             * @returns {Array} Filtered PRs after release date
+             */
+            function filterByReleaseDate(prs) {
+              if (!releaseDate) return prs;
+
+              const beforeCount = prs.length;
+              const filtered = prs.filter(pr => {
+                const prDate = new Date(pr.created_at);
+                return prDate >= releaseDate;
+              });
+
+              const filteredCount = beforeCount - filtered.length;
+              if (filteredCount > 0) {
+                console.log(`   📅 Filtered out ${filteredCount} PR(s) created before release date`);
+              }
+
+              return filtered;
+            }
 
             // Determine mode
             const mode = context.payload.inputs?.mode || 'single';
@@ -146,6 +183,10 @@ jobs:
               }
 
               console.log(`✅ Found ${allPRs.length} PRs for @${username}`);
+
+              // Filter PRs by release date
+              allPRs = filterByReleaseDate(allPRs);
+              console.log(`✅ After release date filter: ${allPRs.length} PRs`);
 
               // Fetch detailed data for each PR (additions, deletions, changed_files)
               // pulls.list() doesn't include these fields, need pulls.get() for each PR
@@ -378,7 +419,10 @@ jobs:
                   page: page,
                 });
 
-                for (const pr of prs) {
+                // Filter PRs by release date before collecting contributors
+                const filteredPRs = filterByReleaseDate(prs);
+
+                for (const pr of filteredPRs) {
                   if (pr.user && pr.user.login && pr.user.id) {
                     // Skip bot account - no snapshots for service accounts
                     if (pr.user.login === BOT_USERNAME) {
