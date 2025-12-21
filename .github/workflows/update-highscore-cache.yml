@@ -191,7 +191,7 @@ jobs:
                   userId: contributor.id,
                   login: contributor.login,
                   avatarUrl: contributor.avatar_url,
-                  contributions: contributor.contributions,
+                  contributions: 0,  // Will be counted from filtered commits
                   additions: 0,
                   deletions: 0,
                   profileUrl: contributor.html_url,
@@ -271,6 +271,7 @@ jobs:
                     } else if (userId && contributorMap.has(userId)) {
                       // Regular contributor
                       const contributor = contributorMap.get(userId);
+                      contributor.contributions++;  // Count this commit
                       contributor.additions += additions;
                       contributor.deletions += deletions;
                     }
