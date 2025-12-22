@@ -1679,8 +1679,21 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
     let wikiConfig;
     let baseUrl;
 
-    // In development, load from local filesystem
-    if (process.env.NODE_ENV !== 'production' && process.env.CONTEXT !== 'production') {
+    // Detect platform to determine if we have filesystem access
+    // Netlify Functions: Have filesystem access (Node.js)
+    // Cloudflare Workers: No filesystem, must fetch via HTTP
+    const platform = adapter.getPlatform();
+    const hasFilesystemAccess = platform === 'netlify';
+
+    console.log('[CF] Environment check', {
+      platform,
+      hasFilesystemAccess,
+      NODE_ENV: process.env.NODE_ENV,
+      CONTEXT: process.env.CONTEXT
+    });
+
+    // In Netlify (with filesystem), load from local filesystem
+    if (hasFilesystemAccess) {
       try {
         const fs = await import('fs');
         const path = await import('path');
@@ -1754,8 +1767,8 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
     // 3. Load achievement definitions from public/achievements.json
     let definitions;
 
-    // In development, load from local filesystem
-    if (process.env.NODE_ENV !== 'production' && process.env.CONTEXT !== 'production') {
+    // In Netlify (with filesystem), load from local filesystem
+    if (hasFilesystemAccess) {
       try {
         const fs = await import('fs');
         const path = await import('path');
