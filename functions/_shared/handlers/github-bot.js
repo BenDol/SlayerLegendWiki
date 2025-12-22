@@ -1603,13 +1603,27 @@ async function handleLinkAnonymousEdits(adapter, octokit, { owner, repo, manual 
  * Required Header: Authorization: Bearer {token}
  */
 async function handleCheckAchievements(adapter, octokit, { owner, repo }, headers) {
+  logger.info('handleCheckAchievements called', {
+    owner,
+    repo,
+    hasHeaders: !!headers,
+    authHeader: headers?.authorization ? 'present' : 'missing',
+    NODE_ENV: process.env.NODE_ENV,
+    CONTEXT: process.env.CONTEXT
+  });
+
   if (!owner || !repo) {
+    logger.error('Missing owner or repo', { owner, repo });
     return adapter.createJsonResponse(400, { error: 'Missing required fields: owner, repo' });
   }
 
   // Extract and validate Authorization header
   const authHeader = headers?.authorization || headers?.Authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    logger.error('Missing or invalid Authorization header', {
+      hasAuth: !!authHeader,
+      authType: authHeader?.substring(0, 10)
+    });
     return adapter.createJsonResponse(401, { error: 'Missing or invalid Authorization header' });
   }
 
@@ -1967,8 +1981,16 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
       totalAchievements: existingAchievements.length + newlyUnlocked.length,
     });
   } catch (error) {
-    logger.error('Failed to check achievements', { error });
-    return adapter.createJsonResponse(500, { error: error.message });
+    logger.error('Failed to check achievements - caught error', {
+      error: error.message,
+      stack: error.stack,
+      name: error.name,
+      cause: error.cause
+    });
+    return adapter.createJsonResponse(500, {
+      error: error.message || 'Failed to check achievements',
+      details: process.env.NODE_ENV !== 'production' ? error.stack : undefined
+    });
   }
 }
 
