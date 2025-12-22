@@ -1125,7 +1125,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       const weaponLabel = createWeaponLabel(weapon.name);
       const { data } = await retryGitHubAPI(
         async () => await octokit.rest.search.issuesAndPullRequests({
-          q: `repo:${owner}/${repo} label:engraving-grid-submissions label:"${weaponLabel}" is:open`,
+          q: `repo:${owner}/${repo} label:soul-weapon-grids label:"${weaponLabel}" is:open`,
           per_page: 1,
         })
       );
@@ -1235,7 +1235,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
     try {
       // Search for OPEN issues only - closed issues are considered deleted
-      const issues = await searchGitHubIssues(owner, repo, 'label:engraving-grid-submissions is:open');
+      const issues = await searchGitHubIssues(owner, repo, 'label:soul-weapon-grids is:open');
 
       const weaponNames = new Set();
 
@@ -1321,7 +1321,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
       // Search for OPEN issues only - closed issues are considered deleted
       const weaponLabel = createWeaponIdLabel(selectedWeapon.id);
-      const searchQuery = `repo:${owner}/${repo} label:engraving-grid-submissions label:"${weaponLabel}" is:open`;
+      const searchQuery = `repo:${owner}/${repo} label:soul-weapon-grids label:"${weaponLabel}" is:open`;
 
       gridLogger.trace(`[SoulWeaponEngravingBuilder] Searching for grid submissions with query:`, searchQuery);
 
@@ -1355,7 +1355,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             const { data: allIssues } = await octokit.rest.issues.listForRepo({
               owner,
               repo,
-              labels: 'engraving-grid-submissions',
+              labels: 'soul-weapon-grids',
               state: 'open',
               per_page: 100,
             });
@@ -4239,7 +4239,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           allowSavingBuilds={false}
           currentLoadedBuildId={currentLoadedBuildId}
           onBuildsChange={setSavedBuilds}
-          defaultExpanded={true}
+          defaultExpanded={false}
           externalBuilds={savedBuilds}
           buildType="engraving-builds"
           buildData={{
@@ -6179,7 +6179,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
       {/* Best Weapon Finder Modal */}
       {showBestWeaponModal && bestWeaponResults.length > 0 && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-0 md:p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-0 md:p-4 z-[200]">
           <div className="bg-white dark:bg-gray-900 rounded-none md:rounded-lg shadow-2xl w-full h-full md:max-w-6xl md:h-auto md:max-h-[90vh] overflow-hidden border-0 md:border border-gray-300 dark:border-gray-700">
             {/* Header */}
             <div className="bg-blue-600 text-white px-4 md:px-6 py-4 flex items-center justify-between">

@@ -508,7 +508,45 @@ export function validateArrayLength(array, max, fieldName) {
  * @returns {ValidationResult}
  */
 export function validateSpiritSlots(slots) {
-  return validateArrayLength(slots, COLLECTION_LIMITS.MAX_SPIRIT_SLOTS, 'Spirit slots');
+  // Validate array length
+  const lengthResult = validateArrayLength(slots, COLLECTION_LIMITS.MAX_SPIRIT_SLOTS, 'Spirit slots');
+  if (!lengthResult.valid) return lengthResult;
+
+  // Validate each slot structure
+  for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i];
+    if (!slot) continue; // Empty slot is valid
+
+    // Validate type field (must be "collection" or "base")
+    if (slot.type && slot.type !== "collection" && slot.type !== "base") {
+      return {
+        valid: false,
+        error: `Invalid slot type at index ${i}: must be "collection" or "base"`
+      };
+    }
+
+    // If type is "collection", must have mySpiritId
+    if (slot.type === "collection") {
+      if (!slot.mySpiritId || typeof slot.mySpiritId !== 'string') {
+        return {
+          valid: false,
+          error: `Collection spirit slot at index ${i} must have valid mySpiritId`
+        };
+      }
+    }
+
+    // If type is "base" or no type (old format), should have spiritId (or null for empty)
+    if (slot.type === "base" || !slot.type) {
+      if (slot.spiritId !== null && slot.spiritId !== undefined && typeof slot.spiritId !== 'number') {
+        return {
+          valid: false,
+          error: `Base spirit slot at index ${i} must have valid spiritId (number or null)`
+        };
+      }
+    }
+  }
+
+  return { valid: true };
 }
 
 /**
@@ -612,13 +650,47 @@ export function validateBuildData(data, type) {
   // Validate slots if present
   if (data.slots) {
     let slotsResult;
-    if (type === 'skill-builds' || type === 'battle-loadouts') {
+    if (type === 'skill-builds') {
       slotsResult = validateSkillSlots(data.slots);
     } else if (type === 'spirit-builds') {
       slotsResult = validateSpiritSlots(data.slots);
+    } else if (type === 'battle-loadouts') {
+      // Battle loadouts can have embedded skill build (backward compatibility)
+      if (data.skillBuild && data.skillBuild.slots) {
+        slotsResult = validateSkillSlots(data.skillBuild.slots);
+      }
     }
 
     if (slotsResult && !slotsResult.valid) return slotsResult;
+  }
+
+  // Validate battle loadout build references (new format)
+  if (type === 'battle-loadouts') {
+    // Validate skillBuildId if present (new format)
+    if (data.skillBuildId !== undefined && data.skillBuildId !== null) {
+      if (typeof data.skillBuildId !== 'string') {
+        return {
+          valid: false,
+          error: 'skillBuildId must be a string'
+        };
+      }
+    }
+
+    // Validate spiritBuildId if present (new format)
+    if (data.spiritBuildId !== undefined && data.spiritBuildId !== null) {
+      if (typeof data.spiritBuildId !== 'string') {
+        return {
+          valid: false,
+          error: 'spiritBuildId must be a string'
+        };
+      }
+    }
+
+    // Validate embedded spirit build slots if present (backward compatibility)
+    if (data.spiritBuild && data.spiritBuild.slots) {
+      const spiritSlotsResult = validateSpiritSlots(data.spiritBuild.slots);
+      if (!spiritSlotsResult.valid) return spiritSlotsResult;
+    }
   }
 
   // Validate JSON size

@@ -356,10 +356,10 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
                 </button>
 
                 {/* Preview Icons */}
-                <div className="flex-shrink-0 flex gap-2">
+                <div className="flex-shrink-0 flex gap-2 items-center">
                   {/* Spirits Section (Left) */}
                   {getLoadoutSpirits(loadout).length > 0 && (
-                    <div className="flex flex-wrap gap-0.5 max-w-[52px] sm:max-w-none items-center">
+                    <div className="flex flex-wrap gap-0.5 max-w-[52px] sm:max-w-none">
                       {getLoadoutSpirits(loadout).map((spirit, index) => {
                         return (
                           <div

@@ -40,11 +40,19 @@ const SavedSpiritBuildsPanel = ({
   const { isAuthenticated, user } = useAuthStore();
   const { spiritsData } = useSpiritsData(); // Load spirits database
   const [internalSavedBuilds, setInternalSavedBuilds] = useState([]);
+  const [mySpirits, setMySpirits] = useState([]); // Load user's spirit collection
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [deletingId, setDeletingId] = useState(null);
   const [showEnhancementTags, setShowEnhancementTags] = useState(false);
+
+  // Load user's my-spirits collection
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      loadMySpirits();
+    }
+  }, [isAuthenticated, user?.id]);
 
   // Load saved builds
   useEffect(() => {
@@ -66,12 +74,78 @@ const SavedSpiritBuildsPanel = ({
   }, [isAuthenticated, user, externalSavedBuilds, spiritsData]);
 
   // Use external builds if provided (controlled mode), otherwise use internal state
-  // Deserialize whichever builds we're using
+  // Deserialize whichever builds we're using (pass mySpirits for collection resolution)
   const savedBuilds = useMemo(() => {
     const builds = externalSavedBuilds !== null ? externalSavedBuilds : internalSavedBuilds;
     if (spiritsData.length === 0) return builds; // Can't deserialize without spirits data
-    return builds.map(build => deserializeBuild(build, spiritsData));
-  }, [externalSavedBuilds, internalSavedBuilds, spiritsData]);
+
+    logger.debug('Deserializing saved builds', {
+      buildCount: builds.length,
+      mySpiritsCount: mySpirits.length,
+      firstBuildSlots: builds[0]?.slots
+    });
+
+    const deserialized = builds.map(build => {
+      const result = deserializeBuild(build, spiritsData, mySpirits);
+
+      // Normalize to always have 3 slots (for consistent comparison)
+      const emptySlot = {
+        type: 'base',
+        spirit: null,
+        level: 1,
+        awakeningLevel: 0,
+        evolutionLevel: 4,
+        skillEnhancementLevel: 0
+      };
+
+      const normalizedSlots = Array(3).fill(null).map((_, index) => {
+        const slot = result.slots?.[index];
+        if (!slot || slot.spirit === undefined) {
+          return { ...emptySlot };
+        }
+        return slot;
+      });
+
+      logger.debug('Build deserialized and normalized', {
+        buildId: build.id,
+        originalSlotCount: build.slots?.length,
+        normalizedSlotCount: normalizedSlots.length,
+        slots: normalizedSlots.map(s => ({
+          type: s.type,
+          mySpiritId: s.mySpiritId,
+          spiritId: s.spirit?.id,
+          missing: s.missing
+        }))
+      });
+
+      return { ...result, slots: normalizedSlots };
+    });
+
+    return deserialized;
+  }, [externalSavedBuilds, internalSavedBuilds, spiritsData, mySpirits]);
+
+  const loadMySpirits = async () => {
+    if (!user?.id) return;
+
+    try {
+      logger.debug('Loading my-spirits collection', { userId: user.id });
+      const endpoint = `${getLoadDataEndpoint()}?type=my-spirits&userId=${user.id}`;
+      const response = await fetch(endpoint);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // API returns { spirits: [...] }, extract the array
+      const spiritsArray = data.spirits || data || [];
+      setMySpirits(Array.isArray(spiritsArray) ? spiritsArray : []);
+      logger.debug('Loaded my-spirits collection', { count: spiritsArray?.length || 0 });
+    } catch (error) {
+      logger.error('Failed to load my-spirits collection', { error });
+      setMySpirits([]); // Set empty array on error
+    }
+  };
 
   const loadSavedBuilds = async () => {
     if (!user || !isAuthenticated) return;

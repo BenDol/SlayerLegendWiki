@@ -12,7 +12,7 @@ import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
 import { saveBuild, loadBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
-import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
+import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { serializeBuild, deserializeBuild } from '../utils/spiritSerialization';
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 import { createLogger } from '../utils/logger';
@@ -39,6 +39,10 @@ const BattleLoadouts = () => {
   const [currentLoadout, setCurrentLoadout] = useState(createEmptyLoadout(''));
   const [skills, setSkills] = useState([]);
   const [spirits, setSpirits] = useState([]);
+  const [mySpirits, setMySpirits] = useState([]);
+  const [allSkillBuilds, setAllSkillBuilds] = useState([]);
+  const [allSpiritBuilds, setAllSpiritBuilds] = useState([]);
+  const [userBuildsLoaded, setUserBuildsLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showSkillBuilder, setShowSkillBuilder] = useState(false);
   const [showSpiritBuilder, setShowSpiritBuilder] = useState(false);
@@ -74,9 +78,29 @@ const BattleLoadouts = () => {
     loadData();
   }, []);
 
+  // Load user's builds and spirits collection when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      setUserBuildsLoaded(false); // Reset when starting to load
+      loadUserBuildsAndSpirits();
+    } else {
+      // Not authenticated, clear builds and mark as loaded so draft can load
+      setAllSkillBuilds([]);
+      setAllSpiritBuilds([]);
+      setMySpirits([]);
+      setUserBuildsLoaded(true);
+    }
+  }, [isAuthenticated, user?.id]);
+
   // Load loadout from URL
   useEffect(() => {
     if (skills.length === 0 || spirits.length === 0) return; // Wait for skills and spirits to load
+
+    // If authenticated, wait for user builds to load before processing draft
+    if (isAuthenticated && user?.id && !userBuildsLoaded) {
+      logger.debug('Waiting for user builds to load before processing draft');
+      return;
+    }
 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
     const shareChecksum = urlParams.get('share');
@@ -98,11 +122,11 @@ const BattleLoadouts = () => {
           const buildData = await loadBuild(owner, repo, shareChecksum);
 
           if (buildData.type === 'battle-loadouts') {
-            // Deserialize skill build and spirit build
+            // Deserialize skill build and spirit build (pass mySpirits for collection resolution)
             const deserializedLoadout = {
               ...buildData.data,
               skillBuild: buildData.data.skillBuild ? deserializeSkillBuild(buildData.data.skillBuild, skills) : null,
-              spiritBuild: buildData.data.spiritBuild ? deserializeSpiritBuild(buildData.data.spiritBuild, spirits) : null
+              spiritBuild: buildData.data.spiritBuild ? deserializeSpiritBuild(buildData.data.spiritBuild, spirits, mySpirits) : null
             };
             setCurrentLoadout(deserializedLoadout);
             setLoadoutName(deserializedLoadout.name || '');
@@ -126,11 +150,11 @@ const BattleLoadouts = () => {
       try {
         const decodedLoadout = decodeLoadout(encodedLoadout);
         if (decodedLoadout) {
-          // Deserialize skill build and spirit build
+          // Deserialize skill build and spirit build (pass mySpirits for collection resolution)
           const deserializedLoadout = {
             ...decodedLoadout,
             skillBuild: decodedLoadout.skillBuild ? deserializeSkillBuild(decodedLoadout.skillBuild, skills) : null,
-            spiritBuild: decodedLoadout.spiritBuild ? deserializeSpiritBuild(decodedLoadout.spiritBuild, spirits) : null
+            spiritBuild: decodedLoadout.spiritBuild ? deserializeSpiritBuild(decodedLoadout.spiritBuild, spirits, mySpirits) : null
           };
           setCurrentLoadout(deserializedLoadout);
           setLoadoutName(deserializedLoadout.name || '');
@@ -146,17 +170,29 @@ const BattleLoadouts = () => {
       if (draft) {
         setLoadoutName(draft.loadoutName || '');
 
-        // Deserialize loadout to ensure skill and spirit objects are current
-        const deserializedLoadout = {
-          ...draft.currentLoadout,
-          skillBuild: draft.currentLoadout.skillBuild ? deserializeSkillBuild(draft.currentLoadout.skillBuild, skills) : null,
-          spiritBuild: draft.currentLoadout.spiritBuild ? deserializeSpiritBuild(draft.currentLoadout.spiritBuild, spirits) : null
-        };
-        setCurrentLoadout(deserializedLoadout);
+        // Check if draft uses new format (build IDs) or old format (full builds)
+        if (draft.currentLoadout.skillBuildId !== undefined || draft.currentLoadout.spiritBuildId !== undefined) {
+          // New format - resolve build IDs to full builds
+          logger.debug('Loading draft with build IDs', {
+            skillBuildId: draft.currentLoadout.skillBuildId,
+            spiritBuildId: draft.currentLoadout.spiritBuildId
+          });
+          const resolvedLoadout = resolveLoadoutBuilds(draft.currentLoadout);
+          setCurrentLoadout(resolvedLoadout);
+        } else {
+          // Old format - deserialize embedded builds
+          logger.debug('Loading draft with embedded builds');
+          const deserializedLoadout = {
+            ...draft.currentLoadout,
+            skillBuild: draft.currentLoadout.skillBuild ? deserializeSkillBuild(draft.currentLoadout.skillBuild, skills) : null,
+            spiritBuild: draft.currentLoadout.spiritBuild ? deserializeSpiritBuild(draft.currentLoadout.spiritBuild, spirits, mySpirits) : null
+          };
+          setCurrentLoadout(deserializedLoadout);
+        }
         setHasUnsavedChanges(true);
       }
     }
-  }, [skills, spirits, loadDraft]);
+  }, [skills, spirits, mySpirits, allSkillBuilds, allSpiritBuilds, userBuildsLoaded, isAuthenticated, user?.id, loadDraft]);
 
   const loadSkills = async () => {
     try {
@@ -177,6 +213,69 @@ const BattleLoadouts = () => {
       setSpirits(data.spirits);
     } catch (error) {
       logger.error('Failed to load spirits', { error });
+    }
+  };
+
+  /**
+   * Load user's skill builds, spirit builds, and my-spirits collection
+   * Needed for resolving build IDs to full builds
+   */
+  const loadUserBuildsAndSpirits = async () => {
+    if (!user?.id) return;
+
+    try {
+      logger.debug('Loading user builds and spirits', { userId: user.id });
+
+      // Load all three collections in parallel
+      const loadDataEndpoint = getLoadDataEndpoint();
+      const [skillBuildsRes, spiritBuildsRes, mySpiritsRes] = await Promise.all([
+        fetch(`${loadDataEndpoint}?type=skill-builds&userId=${user.id}`),
+        fetch(`${loadDataEndpoint}?type=spirit-builds&userId=${user.id}`),
+        fetch(`${loadDataEndpoint}?type=my-spirits&userId=${user.id}`)
+      ]);
+
+      logger.debug('Fetch responses', {
+        skillBuildsOk: skillBuildsRes.ok,
+        skillBuildsStatus: skillBuildsRes.status,
+        spiritBuildsOk: spiritBuildsRes.ok,
+        spiritBuildsStatus: spiritBuildsRes.status,
+        mySpiritsOk: mySpiritsRes.ok,
+        mySpiritsStatus: mySpiritsRes.status
+      });
+
+      // Parse responses
+      const skillBuildsData = skillBuildsRes.ok ? await skillBuildsRes.json() : { builds: [] };
+      const spiritBuildsData = spiritBuildsRes.ok ? await spiritBuildsRes.json() : { builds: [] };
+      const mySpiritsData = mySpiritsRes.ok ? await mySpiritsRes.json() : { spirits: [] };
+
+      logger.debug('Parsed data', {
+        skillBuildsData,
+        spiritBuildsData,
+        mySpiritsData
+      });
+
+      setAllSkillBuilds(skillBuildsData.builds || []);
+      setAllSpiritBuilds(spiritBuildsData.builds || []);
+      setMySpirits(mySpiritsData.spirits || []);
+
+      logger.debug('Loaded user builds and spirits', {
+        skillBuilds: skillBuildsData.builds?.length || 0,
+        spiritBuilds: spiritBuildsData.builds?.length || 0,
+        mySpirits: mySpiritsData.spirits?.length || 0
+      });
+
+      setUserBuildsLoaded(true);
+    } catch (error) {
+      logger.error('Failed to load user builds and spirits', {
+        error,
+        errorMessage: error?.message,
+        errorStack: error?.stack
+      });
+      // Set empty arrays on error
+      setAllSkillBuilds([]);
+      setAllSpiritBuilds([]);
+      setMySpirits([]);
+      setUserBuildsLoaded(true); // Mark as loaded even on error to avoid infinite waiting
     }
   };
 
@@ -236,50 +335,185 @@ const BattleLoadouts = () => {
   /**
    * Deserialize spirit build (spirit IDs -> full spirit objects)
    * Uses shared deserialization utility
+   * @param {Object} build - Serialized spirit build
+   * @param {Array} spiritsArray - Array of all spirits
+   * @param {Array} mySpiritsArray - Array of user's collection spirits (for collection references)
    */
-  const deserializeSpiritBuild = (build, spiritsArray) => {
+  const deserializeSpiritBuild = (build, spiritsArray, mySpiritsArray = []) => {
     if (!build) return null;
-    return deserializeBuild(build, spiritsArray);
+    return deserializeBuild(build, spiritsArray, mySpiritsArray);
   };
 
   /**
-   * Serialize entire loadout for storage (only store IDs)
+   * Normalize spirit build to always have 3 slots
+   */
+  const normalizeSpiritBuild = (build) => {
+    if (!build) return null;
+
+    const emptySlot = {
+      type: 'base',
+      spirit: null,
+      level: 1,
+      awakeningLevel: 0,
+      evolutionLevel: 4,
+      skillEnhancementLevel: 0
+    };
+
+    const normalizedSlots = Array(3).fill(null).map((_, index) => {
+      const slot = build.slots?.[index];
+      if (!slot || slot.spirit === undefined) {
+        return { ...emptySlot };
+      }
+      return slot;
+    });
+
+    return { ...build, slots: normalizedSlots };
+  };
+
+  /**
+   * Serialize entire loadout for storage (store build IDs, not full builds)
    */
   const serializeLoadout = (loadout) => {
     return {
       name: loadout.name,
-      skillBuild: serializeSkillBuild(loadout.skillBuild),
-      spiritBuild: serializeSpiritBuild(loadout.spiritBuild),
+      skillBuildId: loadout.skillBuild?.id || null,
+      spiritBuildId: loadout.spiritBuild?.id || null,
       spirit: loadout.spirit ? { spiritId: loadout.spirit.id } : null,
-      skillStone: loadout.skillStone, // Assuming this is already simple data
-      promotionAbility: loadout.promotionAbility, // Assuming this is already simple data
-      familiar: loadout.familiar // Assuming this is already simple data
+      skillStone: loadout.skillStone,
+      promotionAbility: loadout.promotionAbility,
+      familiar: loadout.familiar
     };
   };
 
   /**
-   * Check if current loadout matches a saved loadout
+   * Resolve build IDs to full builds (deserialized)
+   * Handles missing builds gracefully
+   */
+  const resolveLoadoutBuilds = (loadout) => {
+    let skillBuild = null;
+    let spiritBuild = null;
+
+    // Resolve skill build
+    if (loadout.skillBuildId) {
+      const found = allSkillBuilds.find(b => b.id === loadout.skillBuildId);
+      if (found) {
+        skillBuild = deserializeSkillBuild(found, skills);
+      } else {
+        // Build not found - mark as missing
+        skillBuild = {
+          missing: true,
+          id: loadout.skillBuildId,
+          name: 'Deleted Build',
+          slots: []
+        };
+        logger.warn('Skill build not found', { skillBuildId: loadout.skillBuildId });
+      }
+    }
+    // Handle old embedded format (migration)
+    else if (loadout.skillBuild) {
+      skillBuild = deserializeSkillBuild(loadout.skillBuild, skills);
+    }
+
+    // Resolve spirit build
+    if (loadout.spiritBuildId) {
+      logger.debug('Resolving spirit build', {
+        spiritBuildId: loadout.spiritBuildId,
+        allSpiritBuildsCount: allSpiritBuilds.length,
+        allSpiritBuildIds: allSpiritBuilds.map(b => b.id)
+      });
+
+      const found = allSpiritBuilds.find(b => b.id === loadout.spiritBuildId);
+      if (found) {
+        logger.debug('Spirit build found', { buildId: found.id, buildName: found.name });
+        spiritBuild = deserializeSpiritBuild(found, spirits, mySpirits);
+        // Normalize to always have 3 slots
+        spiritBuild = normalizeSpiritBuild(spiritBuild);
+      } else {
+        // Build not found - mark as missing
+        spiritBuild = {
+          missing: true,
+          id: loadout.spiritBuildId,
+          name: 'Deleted Build',
+          slots: []
+        };
+        logger.warn('Spirit build not found', {
+          spiritBuildId: loadout.spiritBuildId,
+          availableBuilds: allSpiritBuilds.map(b => ({ id: b.id, name: b.name }))
+        });
+      }
+    }
+    // Handle old embedded format (migration)
+    else if (loadout.spiritBuild) {
+      spiritBuild = deserializeSpiritBuild(loadout.spiritBuild, spirits, mySpirits);
+      // Normalize to always have 3 slots
+      spiritBuild = normalizeSpiritBuild(spiritBuild);
+    }
+
+    return {
+      ...loadout,
+      skillBuild,
+      spiritBuild
+    };
+  };
+
+  /**
+   * Check if current loadout matches a saved loadout (compare by build IDs)
    */
   const loadoutsMatch = (savedLoadout) => {
-    if (!savedLoadout) return false;
-    if (savedLoadout.name !== loadoutName) return false;
+    if (!savedLoadout) {
+      logger.debug('loadoutsMatch: savedLoadout is null/undefined');
+      return false;
+    }
 
-    // Compare skill build (serialize both for consistent comparison)
-    const currentSkillBuild = serializeSkillBuild(currentLoadout.skillBuild);
-    const savedSkillBuild = serializeSkillBuild(savedLoadout.skillBuild);
-    if (JSON.stringify(currentSkillBuild) !== JSON.stringify(savedSkillBuild)) return false;
+    if (savedLoadout.name !== loadoutName) {
+      logger.debug('loadoutsMatch: name mismatch', {
+        savedName: savedLoadout.name,
+        currentName: loadoutName
+      });
+      return false;
+    }
 
-    // Compare spirit build (serialize both for consistent comparison)
-    const currentSpiritBuild = serializeSpiritBuild(currentLoadout.spiritBuild);
-    const savedSpiritBuild = serializeSpiritBuild(savedLoadout.spiritBuild);
-    if (JSON.stringify(currentSpiritBuild) !== JSON.stringify(savedSpiritBuild)) return false;
+    // Compare skill build ID
+    const currentSkillBuildId = currentLoadout.skillBuild?.id || null;
+    const savedSkillBuildId = savedLoadout.skillBuildId || savedLoadout.skillBuild?.id || null;
+    if (currentSkillBuildId !== savedSkillBuildId) {
+      logger.debug('loadoutsMatch: skill build ID mismatch', {
+        currentSkillBuildId,
+        savedSkillBuildId
+      });
+      return false;
+    }
+
+    // Compare spirit build ID
+    const currentSpiritBuildId = currentLoadout.spiritBuild?.id || null;
+    const savedSpiritBuildId = savedLoadout.spiritBuildId || savedLoadout.spiritBuild?.id || null;
+    if (currentSpiritBuildId !== savedSpiritBuildId) {
+      logger.debug('loadoutsMatch: spirit build ID mismatch', {
+        currentSpiritBuildId,
+        savedSpiritBuildId
+      });
+      return false;
+    }
 
     // Compare other properties
-    if (JSON.stringify(currentLoadout.spirit) !== JSON.stringify(savedLoadout.spirit)) return false;
-    if (JSON.stringify(currentLoadout.skillStone) !== JSON.stringify(savedLoadout.skillStone)) return false;
-    if (JSON.stringify(currentLoadout.promotionAbility) !== JSON.stringify(savedLoadout.promotionAbility)) return false;
-    if (JSON.stringify(currentLoadout.familiar) !== JSON.stringify(savedLoadout.familiar)) return false;
+    if (JSON.stringify(currentLoadout.spirit) !== JSON.stringify(savedLoadout.spirit)) {
+      logger.debug('loadoutsMatch: spirit mismatch');
+      return false;
+    }
+    if (JSON.stringify(currentLoadout.skillStone) !== JSON.stringify(savedLoadout.skillStone)) {
+      logger.debug('loadoutsMatch: skillStone mismatch');
+      return false;
+    }
+    if (JSON.stringify(currentLoadout.promotionAbility) !== JSON.stringify(savedLoadout.promotionAbility)) {
+      logger.debug('loadoutsMatch: promotionAbility mismatch');
+      return false;
+    }
+    if (JSON.stringify(currentLoadout.familiar) !== JSON.stringify(savedLoadout.familiar)) {
+      logger.debug('loadoutsMatch: familiar mismatch');
+      return false;
+    }
 
+    logger.debug('loadoutsMatch: MATCH FOUND', { loadoutId: savedLoadout.id });
     return true;
   };
 
@@ -318,9 +552,20 @@ const BattleLoadouts = () => {
     const matchingLoadout = savedLoadouts.find(savedLoadout => loadoutsMatch(savedLoadout));
 
     if (matchingLoadout) {
+      logger.debug('Found matching loadout, clearing unsaved changes', {
+        matchingLoadoutId: matchingLoadout.id,
+        hasUnsavedChanges
+      });
       setCurrentLoadedLoadoutId(matchingLoadout.id);
-      // Don't automatically clear hasUnsavedChanges when matching
+      // Clear unsaved changes when we match a saved loadout
+      if (hasUnsavedChanges) {
+        setHasUnsavedChanges(false);
+      }
     } else {
+      logger.debug('No matching loadout found', {
+        hasContent,
+        hasUnsavedChanges
+      });
       setCurrentLoadedLoadoutId(null);
       // Mark as having changes if there's content and no match
       if (hasContent && !hasUnsavedChanges) {
@@ -414,6 +659,39 @@ const BattleLoadouts = () => {
       }
     }));
     setDraggedSkillSlotIndex(null);
+
+    // Save the skill build if it has an ID (already saved)
+    if (currentLoadout.skillBuild.id && currentLoadout.skillBuild.name && isAuthenticated && user) {
+      logger.info('Saving skill build after drag reorder', { buildId: currentLoadout.skillBuild.id });
+
+      (async () => {
+        try {
+          const serializedBuild = {
+            name: currentLoadout.skillBuild.name,
+            maxSlots: currentLoadout.skillBuild.maxSlots || 10,
+            slots: newSlots.map(slot => ({
+              skillId: slot.skillId !== undefined ? slot.skillId : (slot.skill?.id || null),
+              level: slot.level
+            }))
+          };
+
+          await fetch(getSaveDataEndpoint(), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'skill-builds',
+              username: user.login,
+              userId: user.id,
+              data: serializedBuild,
+            }),
+          });
+
+          logger.info('Saved skill build after drag', { buildId: currentLoadout.skillBuild.id });
+        } catch (error) {
+          logger.error('Failed to save skill build after drag', { error });
+        }
+      })();
+    }
   };
 
   // Drag and drop handlers for spirits
@@ -453,6 +731,33 @@ const BattleLoadouts = () => {
       }
     }));
     setDraggedSpiritSlotIndex(null);
+
+    // Save the spirit build if it has an ID (already saved)
+    if (currentLoadout.spiritBuild.id && currentLoadout.spiritBuild.name && isAuthenticated && user) {
+      logger.info('Saving spirit build after drag reorder', { buildId: currentLoadout.spiritBuild.id });
+
+      (async () => {
+        try {
+          const serializedBuild = serializeBuild({ slots: newSlots });
+          serializedBuild.name = currentLoadout.spiritBuild.name;
+
+          await fetch(getSaveDataEndpoint(), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'spirit-builds',
+              username: user.login,
+              userId: user.id,
+              data: serializedBuild,
+            }),
+          });
+
+          logger.info('Saved spirit build after drag', { buildId: currentLoadout.spiritBuild.id });
+        } catch (error) {
+          logger.error('Failed to save spirit build after drag', { error });
+        }
+      })();
+    }
   };
 
   // Load saved loadout
@@ -465,15 +770,11 @@ const BattleLoadouts = () => {
       if (!confirmed) return;
     }
 
-    // Deserialize the skill build and spirit build if they exist
-    const deserializedLoadout = {
-      ...loadout,
-      skillBuild: loadout.skillBuild ? deserializeSkillBuild(loadout.skillBuild, skills) : null,
-      spiritBuild: loadout.spiritBuild ? deserializeSpiritBuild(loadout.spiritBuild, spirits) : null
-    };
+    // Resolve build IDs to full builds (with mySpirits for spirit build resolution)
+    const resolvedLoadout = resolveLoadoutBuilds(loadout);
 
-    setCurrentLoadout(deserializedLoadout);
-    setLoadoutName(deserializedLoadout.name || 'My Loadout');
+    setCurrentLoadout(resolvedLoadout);
+    setLoadoutName(resolvedLoadout.name || 'My Loadout');
     setHasUnsavedChanges(false); // Loaded from saved, no unsaved changes
     setCurrentLoadedLoadoutId(loadout.id); // Track which loadout is currently loaded
 
@@ -488,6 +789,100 @@ const BattleLoadouts = () => {
     });
   };
 
+  /**
+   * Helper: Save skill build and return its ID
+   */
+  const saveSkillBuildAndGetId = async (skillBuild) => {
+    if (!skillBuild) return null;
+    if (skillBuild.id) return skillBuild.id; // Already has ID
+
+    logger.debug('Saving skill build before loadout save');
+
+    const buildName = skillBuild.name || 'Untitled Skill Build';
+
+    // Serialize skill build (skill objects -> skill IDs only)
+    const serializedBuild = {
+      name: buildName,
+      maxSlots: skillBuild.maxSlots || 10,
+      slots: skillBuild.slots.map(slot => ({
+        skillId: slot.skillId !== undefined ? slot.skillId : (slot.skill?.id || null),
+        level: slot.level
+      }))
+    };
+
+    const response = await fetch(getSaveDataEndpoint(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'skill-builds',
+        username: user.login,
+        userId: user.id,
+        data: serializedBuild,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to save skill build: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    // Response format: { builds: [...] }
+    const savedBuild = data.builds?.find(b => b.name === buildName);
+
+    if (savedBuild?.id) {
+      logger.info('Skill build saved with ID', { id: savedBuild.id });
+      return savedBuild.id;
+    }
+
+    throw new Error('Failed to get skill build ID from save response');
+  };
+
+  /**
+   * Helper: Save spirit build and return its ID
+   */
+  const saveSpiritBuildAndGetId = async (spiritBuild) => {
+    if (!spiritBuild) return null;
+    if (spiritBuild.id) return spiritBuild.id; // Already has ID
+
+    logger.debug('Saving spirit build before loadout save');
+
+    const buildName = spiritBuild.name || 'Untitled Spirit Build';
+
+    // Serialize spirit build using existing utility
+    const serializedBuild = serializeBuild(spiritBuild);
+    serializedBuild.name = buildName;
+
+    const response = await fetch(getSaveDataEndpoint(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'spirit-builds',
+        username: user.login,
+        userId: user.id,
+        data: serializedBuild,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to save spirit build: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    // Response format: { builds: [...] }
+    const savedBuild = data.builds?.find(b => b.name === buildName);
+
+    if (savedBuild?.id) {
+      logger.info('Spirit build saved with ID', { id: savedBuild.id });
+      return savedBuild.id;
+    }
+
+    throw new Error('Failed to get spirit build ID from save response');
+  };
+
   // Save loadout
   const handleSaveLoadout = async () => {
     if (!user || !isAuthenticated) return;
@@ -497,8 +892,40 @@ const BattleLoadouts = () => {
     setSaveSuccess(false);
 
     try {
-      // Serialize loadout to only store IDs (reduces storage and is resilient to data changes)
-      const loadoutData = serializeLoadout(currentLoadout);
+      // Step 1: Save skill build if it doesn't have an ID
+      let skillBuildId = currentLoadout.skillBuild?.id || null;
+      if (currentLoadout.skillBuild && !skillBuildId) {
+        skillBuildId = await saveSkillBuildAndGetId(currentLoadout.skillBuild);
+        // Update the current loadout with the new ID
+        setCurrentLoadout(prev => ({
+          ...prev,
+          skillBuild: { ...prev.skillBuild, id: skillBuildId }
+        }));
+      }
+
+      // Step 2: Save spirit build if it doesn't have an ID
+      let spiritBuildId = currentLoadout.spiritBuild?.id || null;
+      if (currentLoadout.spiritBuild && !spiritBuildId) {
+        spiritBuildId = await saveSpiritBuildAndGetId(currentLoadout.spiritBuild);
+        // Update the current loadout with the new ID
+        setCurrentLoadout(prev => ({
+          ...prev,
+          spiritBuild: { ...prev.spiritBuild, id: spiritBuildId }
+        }));
+      }
+
+      // Step 3: Serialize loadout with build IDs
+      const loadoutData = {
+        name: loadoutName,
+        skillBuildId: skillBuildId,
+        spiritBuildId: spiritBuildId,
+        spirit: currentLoadout.spirit ? { spiritId: currentLoadout.spirit.id } : null,
+        skillStone: currentLoadout.skillStone,
+        promotionAbility: currentLoadout.promotionAbility,
+        familiar: currentLoadout.familiar
+      };
+
+      logger.debug('Saving battle loadout', { loadoutData });
 
       const response = await fetch(getSaveDataEndpoint(), {
         method: 'POST',
@@ -708,11 +1135,11 @@ const BattleLoadouts = () => {
       try {
         const data = JSON.parse(e.target.result);
 
-        // Deserialize skill build and spirit build
+        // Deserialize skill build and spirit build (pass mySpirits for collection resolution)
         const deserializedLoadout = {
           ...data,
           skillBuild: data.skillBuild ? deserializeSkillBuild(data.skillBuild, skills) : null,
-          spiritBuild: data.spiritBuild ? deserializeSpiritBuild(data.spiritBuild, spirits) : null
+          spiritBuild: data.spiritBuild ? deserializeSpiritBuild(data.spiritBuild, spirits, mySpirits) : null
         };
 
         setCurrentLoadout(deserializedLoadout);
@@ -1004,6 +1431,29 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick, onDragStart,
     }
   };
 
+  // Show missing indicator if skill build is marked as missing
+  if (skillBuild?.missing) {
+    return (
+      <div style={{ paddingBottom: '2.5rem' }} className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 border border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Skills to use</span>
+        </div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-800 dark:text-red-300 font-medium mb-2">Skill Build Missing</p>
+          <p className="text-red-600 dark:text-red-400 text-sm mb-3">
+            The skill build for this loadout has been deleted.
+          </p>
+          <button
+            onClick={onEdit}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            Select New Skill Build
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ paddingBottom: '2.5rem' }} className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 border border-gray-200 dark:border-gray-800">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
@@ -1084,6 +1534,32 @@ const SpiritsSection = ({ spiritBuild, onEdit, onClear, onRemoveSpirit, onDragSt
       onClear();
     }
   };
+
+  // Show missing indicator if spirit build is marked as missing
+  if (spiritBuild?.missing) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="text-2xl sm:text-3xl">🔮</span>
+            <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Spirits</span>
+          </div>
+        </div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-800 dark:text-red-300 font-medium mb-2">Spirit Build Missing</p>
+          <p className="text-red-600 dark:text-red-400 text-sm mb-3">
+            The spirit build for this loadout has been deleted.
+          </p>
+          <button
+            onClick={onEdit}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            Select New Spirit Build
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800">

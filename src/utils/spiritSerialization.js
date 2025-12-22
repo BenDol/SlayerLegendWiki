@@ -66,25 +66,103 @@ export const deserializeSpirit = (serializedSpirit, spiritsData, recordId = null
 };
 
 /**
- * Deserialize a spirit slot in a build
- * Handles empty slots (spirit: null) and serialized slots
+ * Serialize a spirit slot (handles both collection and base types)
  *
- * @param {Object} slot - Slot with spiritId or null
- * @param {Array} spiritsData - Full spirits database
- * @returns {Object} Deserialized slot with full spirit object or null
+ * @param {Object} slot - Spirit slot with full data
+ * @returns {Object} Serialized slot
  */
-export const deserializeSlot = (slot, spiritsData) => {
-  if (!slot) return null;
-
-  // Check if already deserialized (has full spirit object with name)
-  if (slot.spirit && typeof slot.spirit === 'object' && slot.spirit.name) {
-    return slot;
+export const serializeSlot = (slot) => {
+  if (!slot || !slot.spirit) {
+    return {
+      type: "base",
+      spiritId: null,
+      level: 1,
+      awakeningLevel: 0,
+      evolutionLevel: 4,
+      skillEnhancementLevel: 0
+    };
   }
 
-  // Deserialize from spiritId - create clean structure
-  if (slot.spiritId !== undefined) {
+  // If slot has mySpiritId, it's a collection spirit (reference)
+  if (slot.mySpiritId) {
+    return {
+      type: "collection",
+      mySpiritId: slot.mySpiritId
+    };
+  }
+
+  // Otherwise, it's a base spirit (snapshot)
+  return {
+    type: "base",
+    spiritId: slot.spirit?.id || null,
+    level: slot.level,
+    awakeningLevel: slot.awakeningLevel,
+    evolutionLevel: slot.evolutionLevel,
+    skillEnhancementLevel: slot.skillEnhancementLevel
+  };
+};
+
+/**
+ * Deserialize a spirit slot in a build
+ * Handles empty slots (spirit: null), serialized slots, and both collection and base types
+ *
+ * @param {Object} slot - Slot with spiritId or mySpiritId
+ * @param {Array} spiritsData - Full spirits database
+ * @param {Array} mySpirits - User's spirit collection (optional)
+ * @returns {Object} Deserialized slot with full spirit object or null
+ */
+export const deserializeSlot = (slot, spiritsData, mySpirits = []) => {
+  if (!slot) return null;
+
+  // COLLECTION SPIRIT (Reference)
+  if (slot.type === "collection" && slot.mySpiritId) {
+    const mySpirit = mySpirits.find(s => s.id === slot.mySpiritId);
+
+    if (!mySpirit) {
+      // Spirit not found in collection (deleted)
+      return {
+        type: "collection",
+        mySpiritId: slot.mySpiritId,
+        spirit: null,
+        missing: true,
+        level: 1,
+        awakeningLevel: 0,
+        evolutionLevel: 4,
+        skillEnhancementLevel: 0
+      };
+    }
+
+    // Resolve the base spirit data
+    const baseSpirit = spiritsData.find(s => s.id === mySpirit.spiritId);
+
+    return {
+      type: "collection",
+      mySpiritId: mySpirit.id,
+      spirit: baseSpirit || null,
+      level: mySpirit.level,
+      awakeningLevel: mySpirit.awakeningLevel,
+      evolutionLevel: mySpirit.evolutionLevel,
+      skillEnhancementLevel: mySpirit.skillEnhancementLevel
+    };
+  }
+
+  // BASE SPIRIT (Snapshot) - already deserialized
+  if (slot.spirit && typeof slot.spirit === 'object' && slot.spirit.name) {
+    return {
+      type: slot.type || "base",
+      spirit: slot.spirit,
+      level: slot.level || 1,
+      awakeningLevel: slot.awakeningLevel || 0,
+      evolutionLevel: slot.evolutionLevel || 4,
+      skillEnhancementLevel: slot.skillEnhancementLevel || 0
+    };
+  }
+
+  // BASE SPIRIT (Snapshot) - needs deserialization (includes migration from old format)
+  if (slot.type === "base" || slot.spiritId !== undefined) {
     const spirit = spiritsData.find(s => s.id === slot.spiritId);
     return {
+      type: "base",
       spirit: spirit || null,
       level: slot.level || 1,
       awakeningLevel: slot.awakeningLevel || 0,
@@ -93,8 +171,9 @@ export const deserializeSlot = (slot, spiritsData) => {
     };
   }
 
-  // Empty slot or already has spirit: null
+  // Empty slot
   return {
+    type: "base",
     spirit: null,
     level: slot.level || 1,
     awakeningLevel: slot.awakeningLevel || 0,
@@ -105,45 +184,35 @@ export const deserializeSlot = (slot, spiritsData) => {
 
 /**
  * Deserialize a spirit build
- * Converts all slots with spiritId to full spirit objects
+ * Converts all slots with spiritId or mySpiritId to full spirit objects
  *
  * @param {Object} build - Build with serialized slots
  * @param {Array} spiritsData - Full spirits database
+ * @param {Array} mySpirits - User's spirit collection (optional)
  * @returns {Object} Deserialized build with full spirit objects
  */
-export const deserializeBuild = (build, spiritsData) => {
+export const deserializeBuild = (build, spiritsData, mySpirits = []) => {
   if (!build) return null;
 
   return {
     ...build,
-    slots: build.slots?.map(slot => deserializeSlot(slot, spiritsData)) || []
+    slots: build.slots?.map(slot => deserializeSlot(slot, spiritsData, mySpirits)) || []
   };
 };
 
 /**
  * Serialize a spirit build
- * Converts all slots with full spirit objects to spiritId only
+ * Converts all slots with full spirit objects to appropriate format (collection or base)
  *
  * @param {Object} build - Build with full spirit objects
- * @returns {Object} Serialized build with only spiritIds
+ * @returns {Object} Serialized build with only necessary data
  */
 export const serializeBuild = (build) => {
   if (!build) return null;
 
   return {
     ...build,
-    slots: build.slots?.map(slot => {
-      if (!slot) return slot;
-
-      // Always create clean structure with only necessary fields
-      return {
-        spiritId: slot.spiritId !== undefined ? slot.spiritId : (slot.spirit?.id || null),
-        level: slot.level,
-        awakeningLevel: slot.awakeningLevel,
-        evolutionLevel: slot.evolutionLevel,
-        skillEnhancementLevel: slot.skillEnhancementLevel
-      };
-    }) || []
+    slots: build.slots?.map(slot => serializeSlot(slot)) || []
   };
 };
 

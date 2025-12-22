@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import DonationSystem from './DonationSystem';
+import DonationSystem from '../../wiki-framework/src/components/donation/DonationSystem';
+import DonationMascot from './DonationMascot';
 import useScrollDepthTrigger from '../hooks/useScrollDepthTrigger';
 import { createLogger } from '../utils/logger';
 
@@ -148,8 +149,8 @@ const AppWrapper = ({ children }) => {
     <>
       {children}
 
-      {/* Donation system - shows animated spirit prompts */}
-      <DonationSystem />
+      {/* Donation system - shows animated spirit prompts with custom mascot */}
+      <DonationSystem MascotComponent={DonationMascot} />
     </>
   );
 };

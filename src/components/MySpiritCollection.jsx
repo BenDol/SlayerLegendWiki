@@ -168,9 +168,22 @@ const MySpiritCollection = () => {
         throw new Error('Failed to delete spirit');
       }
 
-      // Clear cache and reload
-      clearCache('my_spirits', user.id);
-      await loadSpirits();
+      const data = await response.json();
+
+      // Update cache with the remaining spirits from server response
+      if (data.spirits) {
+        setCache('my_spirits', user.id, data.spirits);
+
+        // Deserialize and update local state immediately
+        const deserializedSpirits = data.spirits
+          .map(s => deserializeSpirit(s, spiritsData, s.id))
+          .filter(s => s !== null && s.spirit !== null);
+        setSpirits(deserializedSpirits);
+      } else {
+        // Fallback: clear cache and reload if response doesn't contain spirits
+        clearCache('my_spirits', user.id);
+        await loadSpirits();
+      }
     } catch (error) {
       logger.error('Failed to delete spirit:', { error: error });
       alert('Failed to delete spirit');

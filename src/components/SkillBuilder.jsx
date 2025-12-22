@@ -352,6 +352,37 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
     setBuild({ slots: newSlots });
     setDraggedSlotIndex(null);
+
+    // Save immediately if in modal mode and build has an ID (already saved)
+    if (isModal && initialBuild?.id && buildName && isAuthenticated && user) {
+      logger.info('Saving after drag reorder', { buildId: initialBuild.id });
+
+      (async () => {
+        try {
+          const serializedBuild = serializeBuild({ ...build, slots: newSlots, name: buildName, maxSlots });
+          const buildData = {
+            name: serializedBuild.name,
+            maxSlots: serializedBuild.maxSlots,
+            slots: serializedBuild.slots,
+          };
+
+          await fetch(getSaveDataEndpoint(), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'skill-builds',
+              username: user.login,
+              userId: user.id,
+              data: buildData,
+            }),
+          });
+
+          logger.info('Saved after drag', { buildId: initialBuild.id });
+        } catch (error) {
+          logger.error('Failed to save after drag', { error });
+        }
+      })();
+    }
   };
 
   // Share build

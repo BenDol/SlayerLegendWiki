@@ -49,7 +49,7 @@ const SpiritBuilderModal = ({ isOpen, onClose, initialBuild = null, onSave }) =>
             isModal={true}
             initialBuild={initialBuild}
             onSave={onSave}
-            allowSavingBuilds={false}
+            allowSavingBuilds={true}
           />
         </div>
 

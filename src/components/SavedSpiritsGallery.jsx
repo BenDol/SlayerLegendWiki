@@ -177,7 +177,11 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
                 e.dataTransfer.effectAllowed = 'copy';
                 e.dataTransfer.setData('application/json', JSON.stringify({
                   type: 'saved-spirit',
-                  spirit: spirit
+                  spirit: {
+                    ...spirit,
+                    type: 'collection',
+                    mySpiritId: spirit.id
+                  }
                 }));
                 logger.debug('Drag started', { spirit: spirit.spirit.name });
               }}
@@ -189,7 +193,11 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
                   ? 'opacity-50 cursor-not-allowed'
                   : 'cursor-move hover:shadow-md hover:scale-105'
               }`}
-              onClick={() => !isInUse && onSelectSpirit(spirit)}
+              onClick={() => !isInUse && onSelectSpirit({
+                ...spirit,
+                type: 'collection',
+                mySpiritId: spirit.id
+              })}
             >
               {isInUse && (
                 <div className="absolute top-1 right-1 bg-gray-600 text-white text-xs px-1.5 py-0.5 rounded z-20">

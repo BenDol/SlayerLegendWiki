@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, X, Settings, Move } from 'lucide-react';
+import { Plus, X, Settings, Move, Save } from 'lucide-react';
 import SpiritSprite from './SpiritSprite';
 
 /**
@@ -11,7 +11,9 @@ import SpiritSprite from './SpiritSprite';
  * - Animated spirit sprite
  * - Configuration controls (level, awakening level, evolution, skill enhancement)
  * - Companion slot special indicator
+ * - Collection spirit badge and save-to-collection button
  *
+ * @param {object} slot - Full slot data (includes type, mySpiritId, missing, etc.)
  * @param {object} spirit - Spirit data object
  * @param {number} level - Spirit level (1-300)
  * @param {number} awakeningLevel - Awakening level (0+), every 6 levels = +1 evolution
@@ -21,6 +23,7 @@ import SpiritSprite from './SpiritSprite';
  * @param {number} slotNumber - Slot number (1-3)
  * @param {function} onSelectSpirit - Callback when clicking to select spirit
  * @param {function} onRemoveSpirit - Callback when removing spirit
+ * @param {function} onSaveToCollection - Callback when saving base spirit to collection
  * @param {function} onLevelChange - Callback when level changes
  * @param {function} onAwakeningLevelChange - Callback when awakening level changes
  * @param {function} onEvolutionChange - Callback when evolution level changes
@@ -29,6 +32,7 @@ import SpiritSprite from './SpiritSprite';
  * @param {boolean} configAsPopup - If true, show config in popup modal instead of inline
  */
 const SpiritSlot = ({
+  slot,
   spirit,
   level = 1,
   awakeningLevel = 0,
@@ -39,6 +43,7 @@ const SpiritSlot = ({
   slotIndex,
   onSelectSpirit,
   onRemoveSpirit,
+  onSaveToCollection,
   onLevelChange,
   onAwakeningLevelChange,
   onEvolutionChange,
@@ -53,7 +58,9 @@ const SpiritSlot = ({
   const isEmpty = !spirit;
   const [showConfigPopup, setShowConfigPopup] = useState(false);
 
-  // Refs for awakening input fields to attach wheel event listeners
+  // Refs for input fields to attach wheel event listeners with passive: false
+  const inlineLevelInputRef = useRef(null);
+  const modalLevelInputRef = useRef(null);
   const inlineAwakeningInputRef = useRef(null);
   const modalAwakeningInputRef = useRef(null);
 
@@ -164,11 +171,47 @@ const SpiritSlot = ({
     };
   }, [awakeningLevel, maxAwakeningLevel, isAwakeningEnabled]);
 
+  // Add wheel event listener for inline level input with passive: false
+  useEffect(() => {
+    const input = inlineLevelInputRef.current;
+    if (!input || readOnly) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const delta = e.deltaY > 0 ? -1 : 1;
+      const newLevel = Math.max(1, Math.min(level + delta, 300));
+      handleLevelInput({ target: { value: newLevel } });
+    };
+
+    input.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      input.removeEventListener('wheel', handleWheel);
+    };
+  }, [level, readOnly]);
+
+  // Add wheel event listener for modal level input with passive: false
+  useEffect(() => {
+    const input = modalLevelInputRef.current;
+    if (!input) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const delta = e.deltaY > 0 ? -1 : 1;
+      const newLevel = Math.max(1, Math.min(level + delta, 300));
+      handleLevelInput({ target: { value: newLevel } });
+    };
+
+    input.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      input.removeEventListener('wheel', handleWheel);
+    };
+  }, [level]);
+
   return (
     <div
       className={`flex flex-col items-center gap-2 transition-opacity ${isDragging ? 'opacity-50' : ''}`}
-      draggable={!isEmpty && !readOnly}
-      onDragStart={(e) => !isEmpty && !readOnly && onDragStart?.(e, slotIndex ?? slotNumber)}
       onDragOver={(e) => {
         e.preventDefault();
         onDragOver?.(e, slotIndex ?? slotNumber);
@@ -236,7 +279,25 @@ const SpiritSlot = ({
           ) : (
             <div className="relative group">
               {/* Spirit Sprite */}
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32">
+              <div
+                className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32"
+                draggable={!readOnly && !!onDragStart}
+                onDragStart={(e) => {
+                  if (!readOnly && onDragStart) {
+                    onDragStart(e, slotIndex ?? slotNumber);
+                  }
+                }}
+              >
+                {/* Missing Spirit Indicator */}
+                {slot?.missing && (
+                  <div className="absolute inset-0 bg-red-500/30 rounded-lg border-2 border-red-500 flex items-center justify-center z-20 pointer-events-none">
+                    <div className="text-center text-red-900 dark:text-red-100 font-bold text-xs sm:text-sm">
+                      <div>Spirit</div>
+                      <div>Deleted</div>
+                    </div>
+                  </div>
+                )}
+
                 <SpiritSprite
                   spiritId={spirit.id}
                   level={cappedEvolutionLevel}
@@ -275,9 +336,33 @@ const SpiritSlot = ({
                   title={spirit.element}
                 />
 
+                {/* Collection Badge */}
+                {slot?.type === "collection" && !slot?.missing && (
+                  <div
+                    className="absolute top-0 left-0 bg-blue-600 text-white text-[0.5rem] sm:text-xs px-1.5 py-0.5 rounded-br-lg rounded-tl-lg font-medium shadow-md z-10"
+                    title="From Your Collection"
+                  >
+                    Collection
+                  </div>
+                )}
+
+                {/* Save to Collection Button (bottom-left) */}
+                {slot?.type === "base" && spirit && !readOnly && onSaveToCollection && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSaveToCollection();
+                    }}
+                    className="absolute bottom-0 left-0 bg-green-600 hover:bg-green-700 text-white rounded-tr-lg rounded-bl-lg p-1 sm:p-1.5 shadow-lg opacity-70 hover:opacity-100 transition-opacity z-10"
+                    title="Save to My Spirit Collection"
+                  >
+                    <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </button>
+                )}
+
                 {/* Drag Indicator (show on hover when draggable) */}
                 {onDragStart && (
-                  <div className="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/20 rounded-lg transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div className="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/20 rounded-lg transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
                     <div className="bg-gray-900/50 rounded-lg p-2">
                       <Move className="w-5 h-5 sm:w-6 sm:h-6 text-white/70" />
                     </div>
@@ -326,17 +411,10 @@ const SpiritSlot = ({
                     Level:
                   </label>
                   <input
+                    ref={inlineLevelInputRef}
                     type="number"
                     value={level}
                     onChange={handleLevelInput}
-                    onWheel={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (readOnly) return;
-                      const delta = e.deltaY > 0 ? -1 : 1;
-                      const newLevel = Math.max(1, Math.min(level + delta, 300));
-                      handleLevelInput({ target: { value: newLevel } });
-                    }}
                     disabled={readOnly}
                     min="1"
                     max="300"
@@ -445,16 +523,10 @@ const SpiritSlot = ({
                   Level
                 </label>
                 <input
+                  ref={modalLevelInputRef}
                   type="number"
                   value={level}
                   onChange={handleLevelInput}
-                  onWheel={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const delta = e.deltaY > 0 ? -1 : 1;
-                    const newLevel = Math.max(1, Math.min(level + delta, 300));
-                    handleLevelInput({ target: { value: newLevel } });
-                  }}
                   min="1"
                   max="300"
                   className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
