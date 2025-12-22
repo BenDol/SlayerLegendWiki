@@ -1666,35 +1666,59 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
       }
     } else {
       // In production, determine base URL from environment/headers, then fetch config
+      let envBaseUrl = null;
       try {
         // Try to get the host from the request headers or environment
-        const host = adapter.getEnv('CF_PAGES_URL') || adapter.getEnv('URL') || headers?.host;
+        const cfPagesUrl = adapter.getEnv('CF_PAGES_URL');
+        const urlEnv = adapter.getEnv('URL');
+        const hostHeader = headers?.host;
+
+        logger.info('Determining base URL from environment', {
+          CF_PAGES_URL: cfPagesUrl,
+          URL: urlEnv,
+          host: hostHeader
+        });
+
+        const host = cfPagesUrl || urlEnv || hostHeader;
         if (host) {
-          baseUrl = host.startsWith('http') ? host : `https://${host}`;
+          envBaseUrl = host.startsWith('http') ? host : `https://${host}`;
+          logger.info('Using environment-derived base URL', { envBaseUrl });
         } else {
-          baseUrl = null; // Will be loaded from config
+          logger.info('No environment base URL found, will load from config');
         }
       } catch (e) {
-        baseUrl = null; // Will be loaded from config
+        logger.warn('Error determining base URL from environment', { error: e.message });
       }
 
       // Fetch wiki config to get the configured URL as fallback
       try {
-        const configUrl = baseUrl ? `${baseUrl}/wiki-config.json` : 'https://slayerlegend.wiki/wiki-config.json';
+        const configUrl = envBaseUrl ? `${envBaseUrl}/wiki-config.json` : 'https://slayerlegend.wiki/wiki-config.json';
+        logger.info('Fetching wiki config', { configUrl });
+
         const configResponse = await fetch(configUrl);
         if (configResponse.ok) {
           wikiConfig = await configResponse.json();
           // Use environment baseUrl if available, otherwise use config URL
-          baseUrl = baseUrl || wikiConfig.wiki?.url || 'https://slayerlegend.wiki';
-          logger.debug('Loaded wiki config from deployed site', { baseUrl });
+          baseUrl = envBaseUrl || wikiConfig.wiki?.url || 'https://slayerlegend.wiki';
+          logger.info('Loaded wiki config from deployed site', {
+            baseUrl,
+            configUrl: wikiConfig.wiki?.url,
+            usingEnv: !!envBaseUrl
+          });
         } else {
-          logger.warn('Failed to fetch wiki config, using fallback', { status: configResponse.status });
-          baseUrl = baseUrl || 'https://slayerlegend.wiki';
+          logger.warn('Failed to fetch wiki config, using fallback', {
+            configUrl,
+            status: configResponse.status,
+            statusText: configResponse.statusText
+          });
+          baseUrl = envBaseUrl || 'https://slayerlegend.wiki';
         }
       } catch (e) {
         logger.warn('Could not load wiki config, using fallback', { error: e.message });
-        baseUrl = baseUrl || 'https://slayerlegend.wiki';
+        baseUrl = envBaseUrl || 'https://slayerlegend.wiki';
       }
+
+      logger.info('Final base URL determined', { baseUrl });
     }
 
     // 3. Load achievement definitions from public/achievements.json
@@ -1715,21 +1739,33 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
       }
     } else {
       // In production, fetch from the deployed site
-
       const achievementsUrl = `${baseUrl}/achievements.json`;
-      logger.debug('Fetching achievement definitions from deployed site', { url: achievementsUrl });
+      logger.info('Fetching achievement definitions from deployed site', { url: achievementsUrl, baseUrl });
 
-      const achievementDefsResponse = await fetch(achievementsUrl);
-      if (!achievementDefsResponse.ok) {
-        logger.error('Failed to fetch achievement definitions', {
+      try {
+        const achievementDefsResponse = await fetch(achievementsUrl);
+        if (!achievementDefsResponse.ok) {
+          const errorText = await achievementDefsResponse.text().catch(() => 'Unable to read error body');
+          logger.error('Failed to fetch achievement definitions - HTTP error', {
+            url: achievementsUrl,
+            baseUrl,
+            status: achievementDefsResponse.status,
+            statusText: achievementDefsResponse.statusText,
+            errorBody: errorText,
+          });
+          throw new Error(`Failed to load achievement definitions: ${achievementDefsResponse.status} ${achievementDefsResponse.statusText}`);
+        }
+        definitions = await achievementDefsResponse.json();
+        logger.info('Successfully loaded achievement definitions from deployed site', { count: definitions.achievements?.length });
+      } catch (fetchError) {
+        logger.error('Failed to fetch achievement definitions - network/parse error', {
           url: achievementsUrl,
-          status: achievementDefsResponse.status,
-          statusText: achievementDefsResponse.statusText
+          baseUrl,
+          error: fetchError.message,
+          stack: fetchError.stack,
         });
-        throw new Error('Failed to load achievement definitions');
+        throw new Error(`Failed to load achievement definitions: ${fetchError.message}`);
       }
-      definitions = await achievementDefsResponse.json();
-      logger.debug('Loaded achievement definitions from deployed site');
     }
 
     // 4. Get release date from environment variable (VITE_RELEASE_DATE)
