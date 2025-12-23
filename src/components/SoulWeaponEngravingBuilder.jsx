@@ -220,6 +220,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const [loadingSharedBuild, setLoadingSharedBuild] = useState(false); // True while loading a shared build (prevents grid initialization)
   const hasInitializedGridForWeapon = useRef(null); // Track which weapon we've initialized the grid for
   const hasLoadedSubmissionsForWeapon = useRef(null); // Track which weapon we've loaded submissions for
+  const loadedShareChecksum = useRef(null); // Track which share checksum we've loaded
 
   // Submission cache constants
   const SUBMISSION_CACHE_KEY = cacheName('soul_weapon_submissions');
@@ -419,7 +420,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
     const shareChecksum = urlParams.get('share');
 
+    // Skip if no share checksum OR if we've already loaded this exact checksum
+    if (!shareChecksum || loadedShareChecksum.current === shareChecksum) return;
+
     if (shareChecksum) {
+      loadedShareChecksum.current = shareChecksum; // Mark this checksum as being loaded
       const loadFromSharedUrl = async () => {
         try {
           setLoading(true);
@@ -756,7 +761,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
         initializeDesignerGrid();
       }
     }
-  }, [existingSubmissions, forceDesignMode, loadingSharedBuild, selectedWeapon, wikiConfig, loadingSubmissions]);
+  }, [existingSubmissions, forceDesignMode, loadingSharedBuild, selectedWeapon, wikiConfig, loadingSubmissions, gridState]);
 
   // Update locked inventory indices when grid changes
   useEffect(() => {
@@ -1029,7 +1034,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
 
         // Deserialize gridState: Reconstruct pieces with full shape data
         if (draft.gridState) {
-          const deserializedGridState = draft.gridState.map(row =>
+          let gridState = draft.gridState.map(row =>
             row.map(cell => ({
               active: cell.active,
               piece: cell.piece ? {
@@ -1038,7 +1043,85 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               } : null
             }))
           );
-          setGridState(deserializedGridState);
+
+          // CRITICAL FIX: Recalculate missing anchor coordinates (same logic as deserializeBuild)
+          // Check if we need to recalculate missing anchor coordinates
+          const needsAnchors = gridState.some(row =>
+            row.some(cell => cell.piece && (cell.piece.anchorRow === undefined || cell.piece.anchorCol === undefined))
+          );
+
+          if (needsAnchors) {
+            logger.warn('Draft has missing anchor coordinates - recalculating using flood-fill');
+
+            // Find connected piece instances using flood-fill
+            const visited = gridState.map(row => row.map(() => false));
+            const pieceGroups = [];
+
+            for (let r = 0; r < gridState.length; r++) {
+              for (let c = 0; c < gridState[r].length; c++) {
+                if (!visited[r][c] && gridState[r][c].piece) {
+                  const piece = gridState[r][c].piece;
+                  const cells = [];
+                  const stack = [{ row: r, col: c }];
+
+                  while (stack.length > 0) {
+                    const { row, col } = stack.pop();
+                    if (row < 0 || row >= gridState.length || col < 0 || col >= gridState[0].length) continue;
+                    if (visited[row][col]) continue;
+
+                    const currentCell = gridState[row][col];
+                    if (!currentCell.piece) continue;
+                    if (currentCell.piece.shapeId !== piece.shapeId ||
+                        currentCell.piece.rotation !== piece.rotation ||
+                        currentCell.piece.rarity !== piece.rarity ||
+                        currentCell.piece.level !== piece.level) continue;
+
+                    visited[row][col] = true;
+                    cells.push({ row, col });
+
+                    stack.push({ row: row - 1, col });
+                    stack.push({ row: row + 1, col });
+                    stack.push({ row, col: col - 1 });
+                    stack.push({ row, col: col + 1 });
+                  }
+
+                  const anchor = cells.reduce((min, curr) => {
+                    if (curr.row < min.row || (curr.row === min.row && curr.col < min.col)) {
+                      return curr;
+                    }
+                    return min;
+                  }, cells[0]);
+
+                  pieceGroups.push({ cells, anchor, piece });
+                  logger.debug('Draft - Found piece group', { shapeId: piece.shapeId, anchor: [anchor.row, anchor.col], cells: cells.length });
+                }
+              }
+            }
+
+            // Apply anchors
+            gridState = gridState.map((row, rowIndex) =>
+              row.map((cell, colIndex) => {
+                if (cell.piece) {
+                  const group = pieceGroups.find(g =>
+                    g.cells.some(c => c.row === rowIndex && c.col === colIndex)
+                  );
+                  if (group) {
+                    return {
+                      ...cell,
+                      piece: {
+                        ...cell.piece,
+                        anchorRow: group.anchor.row,
+                        anchorCol: group.anchor.col
+                      }
+                    };
+                  }
+                }
+                return cell;
+              })
+            );
+          }
+
+          setGridState(gridState);
         }
 
         // Deserialize inventory: Reconstruct pieces with full shape data
@@ -1819,7 +1902,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             shapeId: cell.piece.shapeId !== undefined ? cell.piece.shapeId : cell.piece.shape?.id,
             rarity: cell.piece.rarity,
             level: cell.piece.level,
-            rotation: cell.piece.rotation
+            rotation: cell.piece.rotation,
+            anchorRow: cell.piece.anchorRow,
+            anchorCol: cell.piece.anchorCol
           } : null
         }))
       ) : gridState.map(row =>
@@ -1829,7 +1914,9 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
             shapeId: cell.piece.shapeId !== undefined ? cell.piece.shapeId : cell.piece.shape?.id,
             rarity: cell.piece.rarity,
             level: cell.piece.level,
-            rotation: cell.piece.rotation
+            rotation: cell.piece.rotation,
+            anchorRow: cell.piece.anchorRow,
+            anchorCol: cell.piece.anchorCol
           } : null
         }))
       ),
@@ -1853,21 +1940,136 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
    * Deserialize build after loading (restore full shape objects from IDs)
    */
   const deserializeBuild = (serializedBuild) => {
+    const gridState = serializedBuild.gridState.map(row =>
+      row.map(cell => ({
+        active: cell.active,
+        piece: cell.piece ? {
+          shape: engravings.find(e => e.id === cell.piece.shapeId),
+          shapeId: cell.piece.shapeId,
+          rarity: cell.piece.rarity,
+          level: cell.piece.level,
+          rotation: cell.piece.rotation,
+          anchorRow: cell.piece.anchorRow,
+          anchorCol: cell.piece.anchorCol
+        } : null
+      }))
+    );
+
+    // CRITICAL FIX: Recalculate anchor coordinates for old builds that don't have them
+    // This happens when loading builds saved before the anchor coordinate fix
+    // We need to find connected components (separate piece instances) using flood-fill
+
+    // Check if any piece is missing anchor coordinates
+    const needsAnchors = gridState.some(row =>
+      row.some(cell => cell.piece && (cell.piece.anchorRow === undefined || cell.piece.anchorCol === undefined))
+    );
+
+    if (!needsAnchors) {
+      // All pieces have anchors, no fix needed
+      return {
+        weaponId: serializedBuild.weaponId,
+        weaponName: serializedBuild.weaponName,
+        gridState: gridState,
+        inventory: serializedBuild.inventory.map(piece =>
+          piece ? {
+            shape: engravings.find(e => e.id === piece.shapeId),
+            shapeId: piece.shapeId,
+            rarity: piece.rarity,
+            level: piece.level
+          } : null
+        )
+      };
+    }
+
+    logger.warn('Loading old build format without anchor coordinates - recalculating...');
+
+    // Find all connected piece instances using flood-fill
+    const visited = gridState.map(row => row.map(() => false));
+    const pieceGroups = []; // Array of { cells: [{row, col}], anchor: {row, col}, piece: {...} }
+
+    for (let r = 0; r < gridState.length; r++) {
+      for (let c = 0; c < gridState[r].length; c++) {
+        if (!visited[r][c] && gridState[r][c].piece) {
+          // Found an unvisited piece cell - start flood fill
+          const piece = gridState[r][c].piece;
+          const cells = [];
+          const stack = [{ row: r, col: c }];
+
+          while (stack.length > 0) {
+            const { row, col } = stack.pop();
+
+            // Skip if out of bounds or already visited
+            if (row < 0 || row >= gridState.length || col < 0 || col >= gridState[0].length) continue;
+            if (visited[row][col]) continue;
+
+            const currentCell = gridState[row][col];
+
+            // Skip if no piece or different piece
+            if (!currentCell.piece) continue;
+            if (currentCell.piece.shapeId !== piece.shapeId ||
+                currentCell.piece.rotation !== piece.rotation ||
+                currentCell.piece.rarity !== piece.rarity ||
+                currentCell.piece.level !== piece.level) continue;
+
+            // Mark as visited and add to group
+            visited[row][col] = true;
+            cells.push({ row, col });
+
+            // Add adjacent cells to stack (4-directional)
+            stack.push({ row: row - 1, col });
+            stack.push({ row: row + 1, col });
+            stack.push({ row, col: col - 1 });
+            stack.push({ row, col: col + 1 });
+          }
+
+          // Find anchor (top-left cell) for this piece group
+          const anchor = cells.reduce((min, curr) => {
+            if (curr.row < min.row || (curr.row === min.row && curr.col < min.col)) {
+              return curr;
+            }
+            return min;
+          }, cells[0]);
+
+          pieceGroups.push({ cells, anchor, piece });
+
+          logger.debug('Found piece group', {
+            shapeId: piece.shapeId,
+            rotation: piece.rotation,
+            cellCount: cells.length,
+            anchor: [anchor.row, anchor.col]
+          });
+        }
+      }
+    }
+
+    // Apply anchors to all cells
+    const fixedGridState = gridState.map((row, rowIndex) =>
+      row.map((cell, colIndex) => {
+        if (cell.piece) {
+          // Find which group this cell belongs to
+          const group = pieceGroups.find(g =>
+            g.cells.some(c => c.row === rowIndex && c.col === colIndex)
+          );
+
+          if (group) {
+            return {
+              ...cell,
+              piece: {
+                ...cell.piece,
+                anchorRow: group.anchor.row,
+                anchorCol: group.anchor.col
+              }
+            };
+          }
+        }
+        return cell;
+      })
+    );
+
     return {
       weaponId: serializedBuild.weaponId,
       weaponName: serializedBuild.weaponName,
-      gridState: serializedBuild.gridState.map(row =>
-        row.map(cell => ({
-          active: cell.active,
-          piece: cell.piece ? {
-            shape: engravings.find(e => e.id === cell.piece.shapeId),
-            shapeId: cell.piece.shapeId,
-            rarity: cell.piece.rarity,
-            level: cell.piece.level,
-            rotation: cell.piece.rotation
-          } : null
-        }))
-      ),
+      gridState: fixedGridState,
       inventory: serializedBuild.inventory.map(piece =>
         piece ? {
           shape: engravings.find(e => e.id === piece.shapeId),
@@ -1919,9 +2121,41 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       if (!confirmed) return;
     }
 
-    // Find the weapon
-    const weapon = allWeapons.find(w => w.id === savedBuild.weaponId);
-    if (!weapon) {
+    // Find the weapon (merge grid data with base weapon data)
+    const baseWeapon = allWeapons.find(w => w.id === savedBuild.weaponId);
+    const gridWeapon = weapons.find(w => w.id === savedBuild.weaponId);
+
+    let weapon;
+    if (gridWeapon && baseWeapon) {
+      // Merge grid data (gridType, activeSlots) with base weapon data (image, attack)
+      weapon = {
+        ...gridWeapon,
+        image: baseWeapon.image,
+        attack: baseWeapon.attack,
+        requirements: baseWeapon.requirements
+      };
+      logger.debug('Loaded weapon from saved build (merged grid + base)', {
+        name: weapon.name,
+        id: weapon.id,
+        gridType: weapon.gridType,
+        hasImage: !!weapon.image
+      });
+    } else if (gridWeapon) {
+      // Has grid data but no base weapon data - use grid weapon
+      weapon = gridWeapon;
+      logger.debug('Loaded weapon from saved build (grid data only)', {
+        name: weapon.name,
+        id: weapon.id,
+        gridType: weapon.gridType
+      });
+    } else if (baseWeapon) {
+      // No grid data, use base weapon
+      weapon = baseWeapon;
+      logger.warn('Loaded weapon from saved build (base data only - no gridType)', {
+        name: weapon.name,
+        id: weapon.id
+      });
+    } else {
       alert('Weapon not found for this build');
       return;
     }
@@ -4214,6 +4448,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   // Use submission gridType if available (community submissions), otherwise use weapon gridType
   const effectiveGridType = currentSubmissionMeta?.gridType || selectedWeapon?.gridType || '5x5';
   const gridSize = effectiveGridType === '4x4' ? 4 : 5;
+
   const adjustedCellSize = getAdjustedCellSize(gridSize);
   const currentScale = autoScale ? calculatedScale : gridScale; // Use auto or manual scale
 
@@ -6103,7 +6338,6 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                             lineThickness={miniLineThickness}
                             interactive={false}
                             zIndexBase={10}
-                            scale={1}
                           />
                         ));
                       })()}
