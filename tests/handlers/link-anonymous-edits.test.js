@@ -145,7 +145,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
     }));
     mockListComments.mockResolvedValue({ data: [] });
 
-    // Mock GitHub user API
+    // Mock GitHub user API (receives calls from our server with 'token' format)
     global.fetch = vi.fn(async (url, options) => {
       if (url === 'https://api.github.com/user') {
         const authHeader = options?.headers?.Authorization;
@@ -231,7 +231,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -257,7 +257,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token invalid-token',
+          authorization: 'Bearer invalid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -280,7 +280,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -302,7 +302,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token no-email-token',
+          authorization: 'Bearer no-email-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -342,7 +342,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token no-email-token',
+          authorization: 'Bearer no-email-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -365,7 +365,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -387,7 +387,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -422,7 +422,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -448,7 +448,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -472,7 +472,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -500,7 +500,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',
@@ -534,7 +534,7 @@ describe('handleGithubBot - link-anonymous-edits', () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         headers: {
-          authorization: 'token valid-token',
+          authorization: 'Bearer valid-token',
         },
         body: JSON.stringify({
           action: 'link-anonymous-edits',

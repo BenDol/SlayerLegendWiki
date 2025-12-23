@@ -1452,7 +1452,7 @@ ${reason ? `**Reason:** ${reason}` : ''}
  * Authenticates user via OAuth token and validates identity
  * Required: owner, repo
  * Optional: manual (boolean) - If true, enforces cooldown check
- * Required Header: Authorization: token {token}
+ * Required Header: Authorization: Bearer {token}
  */
 async function handleLinkAnonymousEdits(adapter, octokit, { owner, repo, manual = false }, headers) {
   if (!owner || !repo) {
@@ -1461,11 +1461,16 @@ async function handleLinkAnonymousEdits(adapter, octokit, { owner, repo, manual 
 
   // Extract and validate Authorization header
   const authHeader = headers?.authorization || headers?.Authorization;
-  if (!authHeader || !authHeader.startsWith('token ')) {
-    return adapter.createJsonResponse(401, { error: 'Missing or invalid Authorization header' });
+  if (!authHeader) {
+    return adapter.createJsonResponse(401, { error: 'Missing Authorization header' });
   }
 
-  const userToken = authHeader.substring(6); // Remove 'token ' prefix
+  // Validate Bearer token format
+  if (!authHeader.startsWith('Bearer ')) {
+    return adapter.createJsonResponse(401, { error: 'Invalid Authorization header format. Use "Bearer {token}"' });
+  }
+
+  const userToken = authHeader.substring(7); // Remove 'Bearer ' prefix
 
   try {
     // 1. Validate token and fetch authenticated user from GitHub
@@ -1616,7 +1621,7 @@ async function handleLinkAnonymousEdits(adapter, octokit, { owner, repo, manual 
  * Check achievements for authenticated user (SERVER-SIDE)
  * All data retrieval and processing happens on the server
  * Required: owner, repo
- * Required Header: Authorization: token {token}
+ * Required Header: Authorization: Bearer {token}
  */
 async function handleCheckAchievements(adapter, octokit, { owner, repo }, headers) {
   console.log('[CF] handleCheckAchievements called', {
@@ -1645,19 +1650,24 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
 
   // Extract and validate Authorization header
   const authHeader = headers?.authorization || headers?.Authorization;
-  if (!authHeader || !authHeader.startsWith('token ')) {
-    console.error('[CF] Missing or invalid Authorization header', {
-      hasAuth: !!authHeader,
-      authType: authHeader?.substring(0, 10)
-    });
-    logger.error('Missing or invalid Authorization header', {
-      hasAuth: !!authHeader,
-      authType: authHeader?.substring(0, 10)
-    });
-    return adapter.createJsonResponse(401, { error: 'Missing or invalid Authorization header' });
+  if (!authHeader) {
+    console.error('[CF] Missing Authorization header');
+    logger.error('Missing Authorization header');
+    return adapter.createJsonResponse(401, { error: 'Missing Authorization header' });
   }
 
-  const userToken = authHeader.substring(6); // Remove 'token ' prefix
+  // Validate Bearer token format
+  if (!authHeader.startsWith('Bearer ')) {
+    console.error('[CF] Invalid Authorization header format', {
+      authType: authHeader?.substring(0, 10)
+    });
+    logger.error('Invalid Authorization header format', {
+      authType: authHeader?.substring(0, 10)
+    });
+    return adapter.createJsonResponse(401, { error: 'Invalid Authorization header format. Use "Bearer {token}"' });
+  }
+
+  const userToken = authHeader.substring(7); // Remove 'Bearer ' prefix
 
   try {
     // 1. Validate token and fetch authenticated user
@@ -2064,7 +2074,7 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
  * Check Single Achievement (SERVER-SIDE)
  * Targeted achievement check for immediate feedback
  * Required: owner, repo, achievementId
- * Required Header: Authorization: token {token}
+ * Required Header: Authorization: Bearer {token}
  */
 async function handleCheckSingleAchievement(adapter, octokit, { owner, repo, achievementId }, headers) {
   console.log('[CF] handleCheckSingleAchievement called', {
@@ -2082,12 +2092,18 @@ async function handleCheckSingleAchievement(adapter, octokit, { owner, repo, ach
 
   // Extract and validate Authorization header
   const authHeader = headers?.authorization || headers?.Authorization;
-  if (!authHeader || !authHeader.startsWith('token ')) {
-    console.error('[CF] Missing or invalid Authorization header');
-    return adapter.createJsonResponse(401, { error: 'Missing or invalid Authorization header' });
+  if (!authHeader) {
+    console.error('[CF] Missing Authorization header');
+    return adapter.createJsonResponse(401, { error: 'Missing Authorization header' });
   }
 
-  const userToken = authHeader.substring(6); // Remove 'token ' prefix
+  // Validate Bearer token format
+  if (!authHeader.startsWith('Bearer ')) {
+    console.error('[CF] Invalid Authorization header format');
+    return adapter.createJsonResponse(401, { error: 'Invalid Authorization header format. Use "Bearer {token}"' });
+  }
+
+  const userToken = authHeader.substring(7); // Remove 'Bearer ' prefix
 
   try {
     // 1. Validate token and fetch authenticated user

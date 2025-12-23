@@ -103,7 +103,8 @@
       "Bash(Get-Process)",
       "Bash(Where-Object { $_ProcessName -match \"node|npm\" })",
       "Bash(Select-Object ProcessName, Id)",
-      "Bash(Format-Table)"
+      "Bash(Format-Table)",
+      "Bash(Select-String -Pattern \"FAIL|Error:|Expected|Received\" -Context 0,2)"
     ]
   }
 }
