@@ -2494,11 +2494,11 @@ async function handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo }) 
 
       if (issues.length > 0) {
         const issue = issues[0];
-        resolvePromise(adapter.createJsonResponse(200, {
+        resolvePromise({
           issueNumber: issue.number,
           issueUrl: issue.html_url,
           body: issue.body || ''
-        }));
+        });
         return;
       }
 
@@ -2522,14 +2522,14 @@ async function handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo }) 
 
       logger.info('Created content creator index issue', { issueNumber: newIssue.number });
 
-      resolvePromise(adapter.createJsonResponse(201, {
+      resolvePromise({
         issueNumber: newIssue.number,
         issueUrl: newIssue.html_url,
         body: newIssue.body || ''
-      }));
+      });
     } catch (error) {
       logger.error('Failed to get/create creator index', { error: error.message });
-      rejectPromise(adapter.createJsonResponse(500, { error: error.message }));
+      rejectPromise(error);
     } finally {
       // Keep in-flight entry for 5 seconds after completion to prevent race conditions during GitHub's eventual consistency
       setTimeout(() => {
@@ -2555,8 +2555,7 @@ async function handleSubmitContentCreator(adapter, octokit, { owner, repo, creat
 
   try {
     // Get index issue
-    const indexResult = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const indexData = await indexResult.json();
+    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
     const issueNumber = indexData.issueNumber;
     const currentBody = indexData.body;
 
@@ -2634,8 +2633,7 @@ async function handleGetApprovedCreators(adapter, octokit, { owner, repo }) {
 
   try {
     // Get index issue
-    const indexResult = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const indexData = await indexResult.json();
+    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
     const issueNumber = indexData.issueNumber;
     const body = indexData.body;
 
@@ -2681,8 +2679,7 @@ async function handleGetAllCreatorSubmissions(adapter, octokit, { owner, repo })
 
   try {
     // Get index issue
-    const indexResult = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const indexData = await indexResult.json();
+    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
     const issueNumber = indexData.issueNumber;
     const body = indexData.body;
 
@@ -2769,8 +2766,7 @@ async function handleSyncCreatorApprovals(adapter, octokit, { owner, repo, admin
 
   try {
     // Get index issue
-    const indexResult = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const indexData = await indexResult.json();
+    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
     const issueNumber = indexData.issueNumber;
     const body = indexData.body;
 
@@ -2878,8 +2874,7 @@ async function handleApproveCreator(adapter, octokit, { owner, repo, creatorId, 
 
   try {
     // Get index issue
-    const indexResult = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const indexData = await indexResult.json();
+    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
     const issueNumber = indexData.issueNumber;
     const body = indexData.body;
 
@@ -3009,8 +3004,7 @@ async function handleDeleteCreatorSubmission(adapter, octokit, { owner, repo, cr
 
   try {
     // Get index issue
-    const indexResult = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const indexData = await indexResult.json();
+    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
     const issueNumber = indexData.issueNumber;
     const body = indexData.body;
 
