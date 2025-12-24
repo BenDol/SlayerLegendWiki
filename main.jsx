@@ -5,6 +5,7 @@ import App from './wiki-framework/src/App.jsx';
 import AppWrapper from './src/components/AppWrapper.jsx';
 import ErrorBoundary from './wiki-framework/src/components/common/ErrorBoundary.jsx';
 import './wiki-framework/src/styles/index.css';
+import './src/styles/custom.css';
 import { Ghost, Sparkles, Sword, Video } from 'lucide-react';
 
 // Initialize bot token for comment system (prevents users from closing comment issues)

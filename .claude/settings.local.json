@@ -92,9 +92,6 @@
       "Bash(Select-String -Pattern \"linking|Linking|anonymous|AuthStore|AnonymousEditLinking\" -Context 0,2)",
       "Bash(Select-String -Pattern \"error|Error|ERROR\" -Context 2,2)",
       "Bash(Select-Object -First 20)",
-      "Bash(Select-String -Pattern \"FAIL|✓.*link-anonymous\" -Context 2,0)",
-      "Bash(Select-String -Pattern \"link|Link|LINK|error|Error|ERROR\" -Context 2,2)",
-      "Bash(Select-String -Pattern \"PASS|FAIL|✓|✗|Tests:|passed|failed\")",
       "Bash(Select-Object -First 50)",
       "Bash(Select-String -Pattern \"error|Error|ERROR|Could not resolve\" -Context 2,2)",
       "Bash(Select-String -Pattern \"get-approved-creators|Unknown action|ContentCreator|creators\" -Context 3,3)",
@@ -104,7 +101,24 @@
       "Bash(Where-Object { $_ProcessName -match \"node|npm\" })",
       "Bash(Select-Object ProcessName, Id)",
       "Bash(Format-Table)",
-      "Bash(Select-String -Pattern \"FAIL|Error:|Expected|Received\" -Context 0,2)"
+      "Bash(Select-String -Pattern \"FAIL|Error:|Expected|Received\" -Context 0,2)",
+      "Bash(Get-Content \"C:\\\\Users\\\\dolb9\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Projects-slayerlegend-wiki\\\\tasks\\\\b1abff1.output\" -Tail 50)",
+      "WebFetch(domain:codepen.io)",
+      "WebFetch(domain:css-shape.com)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:blog.openreplay.com)",
+      "WebFetch(domain:codersblock.com)",
+      "WebFetch(domain:redstapler.co)",
+      "WebFetch(domain:medium.com)",
+      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\public\\\\data\\\\soul-weapons.json\")",
+      "Bash(Select-String -Pattern '\"\"id\"\": 13' -Context 5,5)",
+      "WebFetch(domain:docs.google.com)",
+      "WebFetch(domain:slayerlegend.fandom.com)",
+      "WebFetch(domain:sites.google.com)",
+      "Bash(for i in {201..290})",
+      "Bash(do [ -f \"public/images/equipment/weapons/sword_$i.png\" ])",
+      "WebFetch(domain:en.namu.wiki)",
+      "Bash(Select-String -Pattern \"6dfde566d074|Build Share|skill.*build|checksum\" -Context 2,2)"
     ]
   }
 }

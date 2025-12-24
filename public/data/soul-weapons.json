@@ -172,7 +172,7 @@
   },
   {
     "id": 20,
-    "name": "Silence",
+    "name": "Silence I",
     "requirements": 81000000,
     "attack": 799000,
     "disassemblyReward": 40500000,
@@ -235,7 +235,7 @@
   },
   {
     "id": 27,
-    "name": "Dream",
+    "name": "Dream I",
     "requirements": 850500000,
     "attack": 1916640,
     "disassemblyReward": 425250000,
@@ -511,5 +511,221 @@
     "disassemblyReward": 25110587250000,
     "stageRequirement": null,
     "image": "/images/equipment/weapons/sword_257.png"
+  },
+  {
+    "id": 58,
+    "name": "Thirst",
+    "requirements": 107616802500000,
+    "attack": 75549993,
+    "disassemblyReward": 53808401250000,
+    "stageRequirement": "Stage 1220",
+    "image": "/images/equipment/weapons/sword_258.png"
+  },
+  {
+    "id": 59,
+    "name": "Sincerity",
+    "requirements": 129140163000000,
+    "attack": 83846756,
+    "disassemblyReward": 64570081500000,
+    "stageRequirement": "Stage 1240",
+    "image": "/images/equipment/weapons/sword_259.png"
+  },
+  {
+    "id": 60,
+    "name": "Resolution",
+    "requirements": 150663523500000,
+    "attack": 93024982,
+    "disassemblyReward": 75331761750000,
+    "stageRequirement": "Stage 1260",
+    "image": "/images/equipment/weapons/sword_260.png"
+  },
+  {
+    "id": 61,
+    "name": "Hometown",
+    "requirements": 322850407500000,
+    "attack": 103176129,
+    "disassemblyReward": 161425203750000,
+    "stageRequirement": "Stage 1280",
+    "image": "/images/equipment/weapons/sword_261.png"
+  },
+  {
+    "id": 62,
+    "name": "Verve",
+    "requirements": 387420489000000,
+    "attack": 114400980,
+    "disassemblyReward": 193710244500000,
+    "stageRequirement": "Stage 1300",
+    "image": "/images/equipment/weapons/sword_262.png"
+  },
+  {
+    "id": 63,
+    "name": "Fantasy",
+    "requirements": 451990570500000,
+    "attack": 126810578,
+    "disassemblyReward": 225995285250000,
+    "stageRequirement": "Stage 1320",
+    "image": "/images/equipment/weapons/sword_263.png"
+  },
+  {
+    "id": 64,
+    "name": "Meeting",
+    "requirements": 968551222500000,
+    "attack": 140527256,
+    "disassemblyReward": 484275611250000,
+    "stageRequirement": "Stage 1340",
+    "image": "/images/equipment/weapons/sword_264.png"
+  },
+  {
+    "id": 65,
+    "name": "Nothingness",
+    "requirements": 1162261467000000,
+    "attack": 155685770,
+    "disassemblyReward": 581130733500000,
+    "stageRequirement": "Stage 1360",
+    "image": "/images/equipment/weapons/sword_265.png"
+  },
+  {
+    "id": 66,
+    "name": "Obsession",
+    "requirements": 1355971711500000,
+    "attack": 172434545,
+    "disassemblyReward": 677985855750000,
+    "stageRequirement": "Stage 1380",
+    "image": "/images/equipment/weapons/sword_266.png"
+  },
+  {
+    "id": 67,
+    "name": "Aftertaste",
+    "requirements": 2905653667500000,
+    "attack": 190937046,
+    "disassemblyReward": 1452826833750000,
+    "stageRequirement": "Stage 1400",
+    "image": "/images/equipment/weapons/sword_267.png"
+  },
+  {
+    "id": 68,
+    "name": "Silence II",
+    "requirements": 3486784401000000,
+    "attack": 211373276,
+    "disassemblyReward": 1743392200500000,
+    "stageRequirement": "Stage 1420",
+    "image": "/images/equipment/weapons/sword_268.png"
+  },
+  {
+    "id": 69,
+    "name": "Sorrow",
+    "requirements": 4067915134500000,
+    "attack": 233941438,
+    "disassemblyReward": 2033957567250000,
+    "stageRequirement": "Stage 1440",
+    "image": "/images/equipment/weapons/sword_269.png"
+  },
+  {
+    "id": 70,
+    "name": "Forever",
+    "requirements": 8716961002500000,
+    "attack": 258859746,
+    "disassemblyReward": 4358480501250000,
+    "stageRequirement": "Stage 1460",
+    "image": "/images/equipment/weapons/sword_270.png"
+  },
+  {
+    "id": 71,
+    "name": "Integrity",
+    "requirements": 10460353203000000,
+    "attack": 286368424,
+    "disassemblyReward": 5230176601500000,
+    "stageRequirement": "Stage 1480",
+    "image": "/images/equipment/weapons/sword_271.png"
+  },
+  {
+    "id": 72,
+    "name": "Experience",
+    "requirements": 12203745403500000,
+    "attack": 316731899,
+    "disassemblyReward": 6101872701750000,
+    "stageRequirement": "Stage 1500",
+    "image": "/images/equipment/weapons/sword_272.png"
+  },
+  {
+    "id": 73,
+    "name": "Independent",
+    "requirements": 26150883007500000,
+    "attack": 350241216,
+    "disassemblyReward": 13075441503750000,
+    "stageRequirement": "Stage 1520",
+    "image": "/images/equipment/weapons/sword_273.png"
+  },
+  {
+    "id": 74,
+    "name": "Inspiration",
+    "requirements": 31381059609000000,
+    "attack": 387216682,
+    "disassemblyReward": 15690529804500000,
+    "stageRequirement": "Stage 1540",
+    "image": "/images/equipment/weapons/sword_274.png"
+  },
+  {
+    "id": 75,
+    "name": "Dream II",
+    "requirements": 36611236210500000,
+    "attack": 428010777,
+    "disassemblyReward": 18305618105250000,
+    "stageRequirement": "Stage 1560",
+    "image": "/images/equipment/weapons/sword_275.png"
+  },
+  {
+    "id": 76,
+    "name": "Tenacity",
+    "requirements": 78452649022500000,
+    "attack": 473011355,
+    "disassemblyReward": 39226324511250000,
+    "stageRequirement": "Stage 1580",
+    "image": "/images/equipment/weapons/sword_276.png"
+  },
+  {
+    "id": 77,
+    "name": "Cold-hearted",
+    "requirements": 94143178827000000,
+    "attack": 522645149,
+    "disassemblyReward": 47071589413500000,
+    "stageRequirement": "Stage 1600",
+    "image": "/images/equipment/weapons/sword_277.png"
+  },
+  {
+    "id": 78,
+    "name": "Flutter",
+    "requirements": 109833708631500000,
+    "attack": 577381635,
+    "disassemblyReward": 54916854315750000,
+    "stageRequirement": "Stage 1620",
+    "image": "/images/equipment/weapons/sword_278.png"
+  },
+  {
+    "id": 79,
+    "name": "Satisfaction",
+    "requirements": 235357947067500000,
+    "attack": 637737262,
+    "disassemblyReward": 117678973533750000,
+    "stageRequirement": "Stage 1640",
+    "image": "/images/equipment/weapons/sword_279.png"
+  },
+  {
+    "id": 80,
+    "name": "Reverberation",
+    "requirements": 282429536481000000,
+    "attack": 704280110,
+    "disassemblyReward": 141214768240500000,
+    "stageRequirement": "Stage 1660",
+    "image": "/images/equipment/weapons/sword_280.png"
+  },
+  {
+    "id": 81,
+    "name": "Evangelize",
+    "requirements": 329501125894500000,
+    "attack": 777635000,
+    "disassemblyReward": 164750562947250000,
+    "stageRequirement": "Stage 1680",
+    "image": "/images/equipment/weapons/sword_900.png"
   }
 ]

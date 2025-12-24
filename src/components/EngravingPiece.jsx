@@ -33,6 +33,10 @@ const EngravingPiece = ({
   zIndexBase = 4,
   scale = 1
 }) => {
+  // Track if drag actually started to distinguish clicks from drags
+  const dragStartedRef = React.useRef(false);
+  const mouseDownTimeRef = React.useRef(0);
+  const mouseDownPosRef = React.useRef({ x: 0, y: 0 });
   // Utility functions
   const getRotatedPattern = (pattern, rotation) => {
     if (rotation === 0) return pattern;
@@ -178,13 +182,34 @@ const EngravingPiece = ({
             key={`gem-${filledCell.row}-${filledCell.col}`}
             data-draggable-piece={interactive ? 'true' : undefined}
             draggable={interactive}
-            onDragStart={(e) => interactive && onDragStart && onDragStart(e, piece, filledCell.patternRow, filledCell.patternCol)}
+            onMouseDown={(e) => {
+              if (interactive) {
+                dragStartedRef.current = false;
+                mouseDownTimeRef.current = Date.now();
+                mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
+              }
+            }}
+            onDragStart={(e) => {
+              if (interactive && onDragStart) {
+                dragStartedRef.current = true;
+                onDragStart(e, piece, filledCell.patternRow, filledCell.patternCol);
+              }
+            }}
             onDragEnd={(e) => interactive && onDragEnd && onDragEnd(e)}
             onTouchStart={(e) => interactive && onTouchStart && onTouchStart(e, piece, filledCell.patternRow, filledCell.patternCol)}
-            onClick={(e) => {
+            onMouseUp={(e) => {
               if (interactive && onClick) {
-                e.stopPropagation();
-                onClick(e, piece);
+                const timeDiff = Date.now() - mouseDownTimeRef.current;
+                const dx = e.clientX - mouseDownPosRef.current.x;
+                const dy = e.clientY - mouseDownPosRef.current.y;
+                const moveDiff = Math.sqrt(dx * dx + dy * dy);
+
+                // If no drag started, mouse was down briefly, and didn't move much, treat as click
+                if (!dragStartedRef.current && timeDiff < 300 && moveDiff < 5) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClick(e, piece);
+                }
               }
             }}
             className={`absolute ${interactive ? 'cursor-grab active:cursor-grabbing hover:opacity-90 transition-opacity' : 'pointer-events-none'}`}
@@ -198,7 +223,7 @@ const EngravingPiece = ({
               alignItems: 'center',
               justifyContent: 'center'
             }}
-            title={interactive ? 'Click to edit, drag to move' : undefined}
+            title={interactive ? 'Quick click to edit, click and hold to drag' : undefined}
           >
             <img
               src={imageSrc}

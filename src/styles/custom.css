@@ -12,7 +12,7 @@
   --smoke-opacity: 0.7;                        /* Base opacity - increased for visibility */
   --smoke-blur: 14px;                          /* Blur amount for soft mist effect */
   --smoke-animation-duration: 15s;             /* Slower animation for calm mist */
-  --smoke-particle-size: 40px;                 /* Size of smoke particles */
+  --smoke-particle-size: 22px;                 /* Size of smoke particles */
 
   /* Enable/disable smoke effect (set to 1 to enable, 0 to disable) */
   --smoke-enabled: 1;
@@ -23,34 +23,32 @@
   --smoke-color-1: rgba(255, 140, 0, 0.6);
   --smoke-color-2: rgba(255, 69, 0, 0.55);
   --smoke-color-3: rgba(255, 215, 0, 0.5);
-  --smoke-opacity: 0.8;
+  --smoke-opacity: 0.7;
 }
 
-/* ===== Logo Smoke Effect (Optional) ===== */
+/* ===== Logo Smoke Effect (Auto-Applied) ===== */
 /*
- * This effect is applied to any img element with id="logo"
- * To enable: Add id="logo" to your logo image in Header.jsx
+ * This effect automatically targets the logo in the header home link
+ * using CSS selectors - no framework modifications needed
  * To disable: Set --smoke-enabled: 0 above
  */
 
-/* Style the logo image itself */
-#logo {
+/* Target the logo image in the header home link */
+header a[href="#/"] > div.relative > img {
   position: relative;
   z-index: 2;
   filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.1));
-  transition: transform 0.3s ease, filter 0.3s ease;
+  transition: transform 0.3s ease; /* REMOVED filter transition - was preventing lightning flashes */
 }
 
-/* Logo smoke wrapper - positioned around just the logo image */
-.logo-smoke-wrapper {
-  position: relative;
-  overflow: visible;
-  display: inline-flex;
+/* Target the wrapper div around the logo image */
+header a[href="#/"] > div.relative {
+  overflow: visible !important; /* Override framework's potential overflow:hidden */
 }
 
-/* Create smoke mist effect that spreads around the logo */
-.logo-smoke-wrapper::before,
-.logo-smoke-wrapper::after {
+/* Create smoke mist effect using the existing wrapper div's pseudo-elements */
+header a[href="#/"] > div.relative::before,
+header a[href="#/"] > div.relative::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -73,14 +71,14 @@
 }
 
 /* First smoke layer - slow expansion and drift */
-.logo-smoke-wrapper::before {
+header a[href="#/"] > div.relative::before {
   animation: smoke-mist-1 var(--smoke-animation-duration) ease-in-out infinite;
   animation-delay: 0s;
   transform: translate(-50%, -50%) scale(0.9);
 }
 
 /* Second smoke layer - offset timing and different pattern */
-.logo-smoke-wrapper::after {
+header a[href="#/"] > div.relative::after {
   animation: smoke-mist-2 calc(var(--smoke-animation-duration) * 1.2) ease-in-out infinite;
   animation-delay: calc(var(--smoke-animation-duration) * -0.4);
   transform: translate(-50%, -50%) scale(1.0);
@@ -135,14 +133,14 @@
 }
 
 /* Hover effect - intensify smoke, add glow, and speed up */
-.logo-smoke-wrapper:hover::before,
-.logo-smoke-wrapper:hover::after {
+header a[href="#/"]:hover > div.relative::before,
+header a[href="#/"]:hover > div.relative::after {
   opacity: calc(var(--smoke-opacity) * 1.8 * var(--smoke-enabled));
   animation-duration: calc(var(--smoke-animation-duration) * 0.5);
   filter: blur(calc(var(--smoke-blur) * 1.2));
 }
 
-.logo-smoke-wrapper:hover #logo {
+header a[href="#/"]:hover > div.relative > img {
   transform: scale(1.05);
   filter:
     drop-shadow(0 0 15px rgba(255, 140, 0, 0.6))
@@ -150,6 +148,7 @@
     drop-shadow(0 0 35px rgba(255, 215, 0, 0.3))
     brightness(1.1);
 }
+
 
 /* ===== Smoke Effect Variants (Comment/Uncomment to change style) ===== */
 

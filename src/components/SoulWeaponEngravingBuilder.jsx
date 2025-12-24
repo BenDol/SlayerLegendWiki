@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Share2, Download, Upload, Settings, Trash2, Check, Loader, RefreshCw, RotateCw, Lock, X, CheckCircle, CheckCircle2, Zap, Edit, Send, Save } from 'lucide-react';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
@@ -9,6 +9,7 @@ import { retryGitHubAPI } from '../../wiki-framework/src/utils/retryWithBackoff'
 import { persistName, getItem, setItem, cacheName, configName } from '../../wiki-framework/src/utils/storageManager';
 import { createWeaponLabel, createWeaponIdLabel } from '../../wiki-framework/src/utils/githubLabelUtils.js';
 import EngravingPiece from './EngravingPiece';
+import SoulWeaponEngravingGrid from './SoulWeaponEngravingGrid';
 import CustomDropdown from './CustomDropdown';
 import ValidatedInput from './ValidatedInput';
 import SavedBuildsPanel from './SavedBuildsPanel';
@@ -37,7 +38,7 @@ const autoSolveLogger = logger.child('AutoSolve');
  * - Share/save builds
  * - Configurable piece inventory slots
  */
-const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSave = null, allowSavingBuilds = true }) => {
+const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave = null, allowSavingBuilds = true }, ref) => {
   const { isAuthenticated, user } = useAuthStore();
   const gridRef = useRef(null);
 
@@ -48,7 +49,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   const LINE_THICKNESS = 8; // Thickness of connecting lines between gems
 
   // Grid scaling
-  const GRID_SCALE_DEFAULT = 1.5; // Default scale (150%) when auto-scale is off
+  const GRID_SCALE_DEFAULT = 1.59; // Default scale (159%) when auto-scale is off - increased by 6% total
   const GRID_SCALE_MIN = 0.5; // Minimum scale (50%)
   const GRID_SCALE_MAX = 2.4; // Maximum scale (240%)
   const GRID_SCALE_STEP = 0.1; // Scale slider step size
@@ -386,14 +387,14 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       gridState: serializedGridState,
       inventory: serializedInventory,
       highestUnlockedWeapon,
-      isGridDesigner,
-      forceDesignMode,
+      // NOTE: Exclude isGridDesigner and forceDesignMode from draft
+      // These are session-only states that should be recomputed on load
       designerGrid,
       gridType,
       completionAtk,
       completionHp
     };
-  }, [buildName, selectedWeapon, gridState, inventory, highestUnlockedWeapon, isGridDesigner, forceDesignMode, designerGrid, gridType, completionAtk, completionHp]);
+  }, [buildName, selectedWeapon, gridState, inventory, highestUnlockedWeapon, designerGrid, gridType, completionAtk, completionHp]);
 
   // Draft storage hook
   const { loadDraft, clearDraft } = useDraftStorage(
@@ -1138,13 +1139,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           setHighestUnlockedWeapon(draft.highestUnlockedWeapon);
         }
 
-        // Restore designer mode states
-        if (draft.isGridDesigner !== undefined) {
-          setIsGridDesigner(draft.isGridDesigner);
-        }
-        if (draft.forceDesignMode !== undefined) {
-          setForceDesignMode(draft.forceDesignMode);
-        }
+        // Restore designer grid and type (but not isGridDesigner/forceDesignMode - those are computed)
         if (draft.designerGrid) {
           setDesignerGrid(draft.designerGrid);
         }
@@ -1159,8 +1154,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
           setCompletionHp(draft.completionHp);
         }
 
-        logger.debug('Draft loaded and deserialized - Designer state', {
-          isGridDesigner: draft.isGridDesigner,
+        logger.debug('Draft loaded and deserialized - Designer grid', {
           gridType: draft.gridType,
           designerGridSize: draft.designerGrid ? `${draft.designerGrid.length}x${draft.designerGrid[0]?.length || 0}` : 'none'
         });
@@ -2257,6 +2251,25 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     }
   };
 
+  // Save build (modal mode only)
+  const handleSaveBuild = () => {
+    if (onSave) {
+      const buildData = {
+        name: buildName,
+        weaponId: selectedWeapon?.id,
+        weaponName: selectedWeapon?.name,
+        gridState: gridState,
+        inventory: inventory
+      };
+      onSave(buildData);
+    }
+  };
+
+  // Expose saveBuild function to parent via ref (for modal footer button)
+  useImperativeHandle(ref, () => ({
+    saveBuild: handleSaveBuild
+  }));
+
   const handleWeaponChange = (weaponId) => {
     logger.debug('Switching weapon', { weaponId });
 
@@ -2999,6 +3012,11 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       return;
     }
 
+    // Calculate button position based on current rotation
+    const currentPattern = getRotatedPattern(piece.shape.pattern, piece.rotation || 0);
+    const buttonLeft = GRID_PADDING + piece.anchorCol * (adjustedCellSize + GAP_SIZE);
+    const buttonTop = GRID_PADDING + (piece.anchorRow + currentPattern.length) * (adjustedCellSize + GAP_SIZE) + GRID_PADDING;
+
     // Put piece into placing mode WITHOUT removing from grid yet
     // This lets user rotate, reposition, or cancel
     setPlacingPiece({
@@ -3010,6 +3028,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
     setPlacingPosition({ row: piece.anchorRow, col: piece.anchorCol });
     setPlacingRotation(piece.rotation || 0);
     setPlacingInventoryIndex(piece.inventoryIndex !== undefined ? piece.inventoryIndex : null);
+    setPlacingButtonPosition({ left: buttonLeft, top: buttonTop });
     // Mark that we're editing a piece already on the grid
     setDraggingFromGrid({ anchorRow: piece.anchorRow, anchorCol: piece.anchorCol });
   };
@@ -4455,17 +4474,19 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Soul Weapon Engraving
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Drag and drop engraving pieces onto the grid to plan your layout
-        </p>
-      </div>
+      {!isModal && (
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Soul Weapon Engraving
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Drag and drop engraving pieces onto the grid to plan your layout
+          </p>
+        </div>
+      )}
 
       {/* Saved Builds Panel */}
-      {!isModal && (
+      {allowSavingBuilds && (
         <SavedBuildsPanel
           currentBuild={{ gridState, inventory }}
           buildName={buildName}
@@ -4488,7 +4509,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       )}
 
       {/* Build Name Panel - Controlled by allowSavingBuilds */}
-      {allowSavingBuilds && !isModal && (
+      {allowSavingBuilds && (
         <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-start gap-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap pt-2">Build Name:</label>
@@ -4508,7 +4529,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                 className="w-full"
               />
             </div>
-            {isAuthenticated && (
+            {isAuthenticated && !isModal && (
               <button
                 onClick={saveBuild}
                 disabled={saving || saveSuccess}
@@ -5136,143 +5157,74 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
               transformOrigin: 'center top',
               marginBottom: `${(currentScale - 1) * GRID_SCALE_MARGIN_MULTIPLIER}px`
             }}>
-            <div
-              ref={gridRef}
-              className={`grid gap-1 p-2 rounded-lg relative ${isGridComplete() ? 'bg-gradient-to-br from-cyan-400/20 to-blue-500/20 ring-1 ring-cyan-400' : 'bg-gray-900 dark:bg-black'}`}
-              style={{
-                gridTemplateColumns: `repeat(${gridSize}, ${adjustedCellSize}px)`,
-                gridTemplateRows: `repeat(${gridSize}, ${adjustedCellSize}px)`,
-                touchAction: touchDragging ? 'none' : 'auto'
-              }}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onPointerMove={(e) => {
-                if (e.pointerType === 'touch' && touchDragging) {
-                  touchLogger.trace('onPointerMove (touch) on grid');
-                  const fakeTouch = { clientX: e.clientX, clientY: e.clientY };
-                  const fakeTouchEvent = {
-                    ...e,
-                    touches: [fakeTouch],
-                    changedTouches: [fakeTouch],
-                    preventDefault: () => e.preventDefault(),
-                    stopPropagation: () => e.stopPropagation()
-                  };
-                  handleTouchMove(fakeTouchEvent);
-                }
-              }}
-              onPointerUp={(e) => {
-                if (e.pointerType === 'touch' && touchDragging) {
-                  touchLogger.trace('onPointerUp (touch) on grid');
-                  const fakeTouch = { clientX: e.clientX, clientY: e.clientY };
-                  const fakeTouchEvent = {
-                    ...e,
-                    touches: [],
-                    changedTouches: [fakeTouch],
-                    preventDefault: () => e.preventDefault(),
-                    stopPropagation: () => e.stopPropagation()
-                  };
-                  handleTouchEnd(fakeTouchEvent);
-                }
-              }}
-            >
-              {/* Background Weapon Image */}
-              {selectedWeapon?.image && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                  style={{
-                    opacity: 0.2,
-                    zIndex: 5
-                  }}
-                >
-                  <img
-                    src={selectedWeapon.image}
-                    alt=""
-                    className="w-full h-full object-contain p-4"
-                    style={{
-                      filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))',
-                      pointerEvents: 'none',
-                      userSelect: 'none'
-                    }}
-                  />
-                </div>
-              )}
-
-              {/* Grid Cells */}
-              {gridState.map((row, rowIndex) => {
-                return row.map((cell, colIndex) => {
-                  // Check if this cell is in the drag preview
-                  const previewCell = dragPreviewCells.find(
-                    pc => pc.row === rowIndex && pc.col === colIndex
-                  );
-
-                  return (
-                    <div
-                      key={`${rowIndex}-${colIndex}`}
-                      onDragOver={(e) => {
-                        gridLogger.trace(`DragOver fired on cell [${rowIndex}][${colIndex}]`);
-                        handleDragOver(e, rowIndex, colIndex);
-                      }}
-                      onDragEnter={(e) => {
-                        gridLogger.trace(`DragEnter on cell [${rowIndex}][${colIndex}]`);
-                        e.preventDefault();
-                      }}
-                      onDrop={(e) => {
-                        gridLogger.trace(`Drop on cell [${rowIndex}][${colIndex}]`);
-                        handleDrop(e, rowIndex, colIndex);
-                      }}
-                      className={`
-                        border-2 transition-all relative
-                        ${cell.active ? 'bg-gray-700 dark:bg-gray-600 border-gray-600 dark:border-gray-500' : 'bg-gray-900 dark:bg-black border-gray-800 dark:border-gray-900 opacity-30'}
-                      `}
-                      style={{
-                        width: `${adjustedCellSize}px`,
-                        height: `${adjustedCellSize}px`,
-                        zIndex: 1,
-                        backgroundColor: previewCell
-                          ? previewCell.valid
-                            ? 'rgba(34, 197, 94, 0.4)' // Green if valid
-                            : 'rgba(239, 68, 68, 0.4)' // Red if invalid
-                          : undefined,
-                        borderColor: previewCell
-                          ? previewCell.valid
-                            ? '#22c55e' // Green border
-                            : '#ef4444' // Red border
-                          : undefined,
-                        boxShadow: previewCell
-                          ? previewCell.valid
-                            ? '0 0 10px rgba(34, 197, 94, 0.6), inset 0 0 10px rgba(34, 197, 94, 0.3)'
-                            : '0 0 10px rgba(239, 68, 68, 0.6), inset 0 0 10px rgba(239, 68, 68, 0.3)'
-                          : undefined
-                      }}
-                    >
-                      {/* Piece indicator dot if occupied (hidden during drag/place operations) */}
-                      {cell.piece && !placingPiece && !draggingPiece && (
-                        <div
-                          className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-blue-500/20 transition-colors"
-                          onClick={() => handleUnsocketPiece(rowIndex, colIndex)}
-                        >
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: getRarityColor(cell.piece.rarity) }}
-                            title="Click to unsocket and reposition"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  );
-                });
-              })}
+            <div className="relative">
+              <SoulWeaponEngravingGrid
+                gridRef={gridRef}
+                gridState={gridState}
+                selectedWeapon={selectedWeapon}
+                cellSize={adjustedCellSize}
+                gapSize={GAP_SIZE}
+                gridPadding={GRID_PADDING}
+                lineThickness={LINE_THICKNESS}
+                interactive={true}
+                isComplete={isGridComplete()}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDragPlacedPiece={handleDragPlacedPiece}
+                onDragEnd={handleDragEnd}
+                onTouchStartPlacedPiece={handleTouchStartPlacedPiece}
+                onClickPlacedPiece={handleClickPlacedPiece}
+                onUnsocketPiece={handleUnsocketPiece}
+                draggingFromGrid={draggingFromGrid}
+                dragPreviewCells={dragPreviewCells}
+                draggingPiece={draggingPiece}
+                placingPiece={placingPiece}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onPointerMove={(e) => {
+                  if (e.pointerType === 'touch' && touchDragging) {
+                    touchLogger.trace('onPointerMove (touch) on grid');
+                    const fakeTouch = { clientX: e.clientX, clientY: e.clientY };
+                    const fakeTouchEvent = {
+                      ...e,
+                      touches: [fakeTouch],
+                      changedTouches: [fakeTouch],
+                      preventDefault: () => e.preventDefault(),
+                      stopPropagation: () => e.stopPropagation()
+                    };
+                    handleTouchMove(fakeTouchEvent);
+                  }
+                }}
+                onPointerUp={(e) => {
+                  if (e.pointerType === 'touch' && touchDragging) {
+                    touchLogger.trace('onPointerUp (touch) on grid');
+                    const fakeTouch = { clientX: e.clientX, clientY: e.clientY };
+                    const fakeTouchEvent = {
+                      ...e,
+                      touches: [],
+                      changedTouches: [fakeTouch],
+                      preventDefault: () => e.preventDefault(),
+                      stopPropagation: () => e.stopPropagation()
+                    };
+                    handleTouchEnd(fakeTouchEvent);
+                  }
+                }}
+                containerStyle={{
+                  touchAction: touchDragging ? 'none' : 'auto'
+                }}
+                className="!bg-gray-300 dark:!bg-gray-800"
+              />
 
               {/* Dragging Preview Overlay - Shows piece following cursor during drag */}
               {draggingPiece && previewPosition && !placingPiece && (() => {
-                
+
                 const pattern = getRotatedPattern(draggingPiece.shape.pattern, currentDragRotation);
                 const filledCells = getFilledCells(pattern, previewPosition.row, previewPosition.col);
-                
+
                 const rarityColor = getRarityColor(draggingPiece.rarity);
                 const rarityImageName = getRarityImageName(draggingPiece.rarity);
                 const isValid = canPlacePiece(previewPosition.row, previewPosition.col, pattern);
-                
+
 
                 return (
                   <>
@@ -5340,7 +5292,7 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                     {/* Draw gems at each filled cell */}
                     {filledCells.map((filledCell) => {
                       const imgSrc = `/images/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`;
-                      
+
                       return (
                         <div
                           key={`drag-gem-${filledCell.row}-${filledCell.col}`}
@@ -5506,61 +5458,6 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
                       </div>
                     ))}
                   </>
-                );
-              })()}
-
-              {/* Placed Pieces Overlay - Render as individual gems + lines */}
-              {/* Always render, but skip the specific piece being dragged (handled inside the loop) */}
-              {(() => {
-                
-                
-
-                // Track which pieces we've already rendered to avoid duplicates
-                const renderedPieces = new Set();
-
-                return gridState.map((row, rowIndex) =>
-                  row.map((cell, colIndex) => {
-                    // If this cell has a piece and we haven't rendered this piece yet
-                    if (cell.piece) {
-                      const pieceKey = `${cell.piece.anchorRow}-${cell.piece.anchorCol}`;
-
-                      // Skip if we already rendered this piece
-                      if (renderedPieces.has(pieceKey)) {
-                        return null;
-                      }
-
-                      // Skip if this is the piece currently being dragged
-                      if (draggingFromGrid &&
-                          cell.piece.anchorRow === draggingFromGrid.anchorRow &&
-                          cell.piece.anchorCol === draggingFromGrid.anchorCol) {
-                        
-                        return null;
-                      }
-
-                      // Mark as rendered
-                      renderedPieces.add(pieceKey);
-
-                      
-
-                      return (
-                        <EngravingPiece
-                          key={`piece-${cell.piece.anchorRow}-${cell.piece.anchorCol}`}
-                          piece={cell.piece}
-                          cellSize={adjustedCellSize}
-                          gapSize={GAP_SIZE}
-                          gridPadding={GRID_PADDING}
-                          lineThickness={LINE_THICKNESS}
-                          interactive={true}
-                          onDragStart={handleDragPlacedPiece}
-                          onDragEnd={handleDragEnd}
-                          onTouchStart={handleTouchStartPlacedPiece}
-                          onClick={handleClickPlacedPiece}
-                          zIndexBase={10}
-                        />
-                      );
-                    }
-                    return null;
-                  })
                 );
               })()}
 
@@ -6556,6 +6453,6 @@ const SoulWeaponEngravingBuilder = ({ isModal = false, initialBuild = null, onSa
       )}
     </div>
   );
-};
+});
 
 export default SoulWeaponEngravingBuilder;

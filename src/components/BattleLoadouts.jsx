@@ -5,6 +5,8 @@ import SkillSlot from './SkillSlot';
 import SkillInformation from './SkillInformation';
 import SpiritBuilderModal from './SpiritBuilderModal';
 import SpiritComponent from './SpiritComponent';
+import SoulWeaponEngravingBuilderModal from './SoulWeaponEngravingBuilderModal';
+import SoulWeaponEngravingGrid from './SoulWeaponEngravingGrid';
 import SavedLoadoutsPanel from './SavedLoadoutsPanel';
 import ValidatedInput from './ValidatedInput';
 import { encodeLoadout, decodeLoadout } from '../../wiki-framework/src/utils/battleLoadoutEncoder';
@@ -40,12 +42,14 @@ const BattleLoadouts = () => {
   const [skills, setSkills] = useState([]);
   const [spirits, setSpirits] = useState([]);
   const [mySpirits, setMySpirits] = useState([]);
+  const [allWeapons, setAllWeapons] = useState([]); // All weapons for soul weapon preview
   const [allSkillBuilds, setAllSkillBuilds] = useState([]);
   const [allSpiritBuilds, setAllSpiritBuilds] = useState([]);
   const [userBuildsLoaded, setUserBuildsLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showSkillBuilder, setShowSkillBuilder] = useState(false);
   const [showSpiritBuilder, setShowSpiritBuilder] = useState(false);
+  const [showSoulWeaponBuilder, setShowSoulWeaponBuilder] = useState(false);
   const [showSkillInfo, setShowSkillInfo] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -70,10 +74,10 @@ const BattleLoadouts = () => {
     { loadoutName, currentLoadout }
   );
 
-  // Load skills and spirits data
+  // Load skills, spirits, and weapons data
   useEffect(() => {
     const loadData = async () => {
-      await Promise.all([loadSkills(), loadSpirits()]);
+      await Promise.all([loadSkills(), loadSpirits(), loadWeapons()]);
     };
     loadData();
   }, []);
@@ -213,6 +217,18 @@ const BattleLoadouts = () => {
       setSpirits(data.spirits);
     } catch (error) {
       logger.error('Failed to load spirits', { error });
+    }
+  };
+
+  const loadWeapons = async () => {
+    try {
+      const response = await fetch('/data/soul-weapons.json');
+      const data = await response.json();
+      // soul-weapons.json is a direct array, not an object with a weapons property
+      setAllWeapons(Array.isArray(data) ? data : []);
+      logger.debug('Loaded weapons', { count: Array.isArray(data) ? data.length : 0 });
+    } catch (error) {
+      logger.error('Failed to load weapons', { error });
     }
   };
 
@@ -378,6 +394,7 @@ const BattleLoadouts = () => {
       name: loadout.name,
       skillBuildId: loadout.skillBuild?.id || null,
       spiritBuildId: loadout.spiritBuild?.id || null,
+      soulWeaponBuild: loadout.soulWeaponBuild || null,
       spirit: loadout.spirit ? { spiritId: loadout.spirit.id } : null,
       skillStone: loadout.skillStone,
       promotionAbility: loadout.promotionAbility,
@@ -452,7 +469,8 @@ const BattleLoadouts = () => {
     return {
       ...loadout,
       skillBuild,
-      spiritBuild
+      spiritBuild,
+      soulWeaponBuild: loadout.soulWeaponBuild || null
     };
   };
 
@@ -500,6 +518,10 @@ const BattleLoadouts = () => {
       logger.debug('loadoutsMatch: spirit mismatch');
       return false;
     }
+    if (JSON.stringify(currentLoadout.soulWeaponBuild) !== JSON.stringify(savedLoadout.soulWeaponBuild)) {
+      logger.debug('loadoutsMatch: soulWeaponBuild mismatch');
+      return false;
+    }
     if (JSON.stringify(currentLoadout.skillStone) !== JSON.stringify(savedLoadout.skillStone)) {
       logger.debug('loadoutsMatch: skillStone mismatch');
       return false;
@@ -530,6 +552,7 @@ const BattleLoadouts = () => {
     const hasContent = loadoutName.trim() !== '' ||
       currentLoadout.skillBuild !== null ||
       currentLoadout.spiritBuild !== null ||
+      currentLoadout.soulWeaponBuild !== null ||
       currentLoadout.spirit !== null ||
       currentLoadout.skillStone !== null ||
       currentLoadout.promotionAbility !== null ||
@@ -596,6 +619,18 @@ const BattleLoadouts = () => {
   const handleClearSpiritBuild = () => {
     if (!confirm('Remove spirit build from this loadout?')) return;
     setCurrentLoadout(prev => ({ ...prev, spiritBuild: null }));
+  };
+
+  // Handle soul weapon build save
+  const handleSoulWeaponBuildSave = (build) => {
+    setCurrentLoadout(prev => ({ ...prev, soulWeaponBuild: build }));
+    setShowSoulWeaponBuilder(false);
+  };
+
+  // Clear soul weapon build
+  const handleClearSoulWeaponBuild = () => {
+    if (!confirm('Remove soul weapon build from this loadout?')) return;
+    setCurrentLoadout(prev => ({ ...prev, soulWeaponBuild: null }));
   };
 
   // Remove individual spirit from slot
@@ -919,6 +954,7 @@ const BattleLoadouts = () => {
         name: loadoutName,
         skillBuildId: skillBuildId,
         spiritBuildId: spiritBuildId,
+        soulWeaponBuild: currentLoadout.soulWeaponBuild || null,
         spirit: currentLoadout.spirit ? { spiritId: currentLoadout.spirit.id } : null,
         skillStone: currentLoadout.skillStone,
         promotionAbility: currentLoadout.promotionAbility,
@@ -1312,7 +1348,15 @@ const BattleLoadouts = () => {
             draggedSlotIndex={draggedSpiritSlotIndex}
           />
 
-          {/* Skill Stones - Row 1, Col 2 */}
+          {/* Soul Weapon Engraving - Row 1, Col 2 */}
+          <SoulWeaponSection
+            soulWeaponBuild={currentLoadout.soulWeaponBuild}
+            onEdit={() => setShowSoulWeaponBuilder(true)}
+            onClear={handleClearSoulWeaponBuild}
+            allWeapons={allWeapons}
+          />
+
+          {/* Skill Stones - Row 2, Col 1 */}
           <PlaceholderSection
             title="Skill Stones"
             description="Skill Stone Builder coming soon"
@@ -1320,14 +1364,14 @@ const BattleLoadouts = () => {
             matchHeight={true}
           />
 
-          {/* Promotion Abilities - Row 2, Col 1 */}
+          {/* Promotion Abilities - Row 2, Col 2 */}
           <PlaceholderSection
             title="Slayer Promotion Abilities"
             description="Promotion Ability Builder coming soon"
             icon="⭐"
           />
 
-          {/* Familiar - Row 2, Col 2 */}
+          {/* Familiar - Row 3, Col 1 */}
           <PlaceholderSection
             title="Familiar"
             description="Familiar Builder coming soon"
@@ -1406,6 +1450,14 @@ const BattleLoadouts = () => {
         onClose={() => setShowSpiritBuilder(false)}
         initialBuild={currentLoadout.spiritBuild}
         onSave={handleSpiritBuildSave}
+      />
+
+      {/* Soul Weapon Engraving Builder Modal */}
+      <SoulWeaponEngravingBuilderModal
+        isOpen={showSoulWeaponBuilder}
+        onClose={() => setShowSoulWeaponBuilder(false)}
+        initialBuild={currentLoadout.soulWeaponBuild}
+        onSave={handleSoulWeaponBuildSave}
       />
 
       {/* Skill Information Modal */}
@@ -1701,6 +1753,147 @@ const SpiritsSection = ({ spiritBuild, onEdit, onClear, onRemoveSpirit, onDragSt
 };
 
 /**
+ * Soul Weapon Engraving Section Component
+ */
+const SoulWeaponSection = ({ soulWeaponBuild, onEdit, onClear, allWeapons }) => {
+  const handleClear = () => {
+    if (window.confirm('Are you sure you want to clear the soul weapon build? This cannot be undone.')) {
+      onClear();
+    }
+  };
+
+  // Find the weapon object for the build
+  const weapon = soulWeaponBuild?.weaponId
+    ? allWeapons.find(w => w.id === soulWeaponBuild.weaponId)
+    : null;
+
+  // Calculate base cell size (smaller for preview)
+  const gridSize = soulWeaponBuild?.gridState?.length || 5;
+  const baseCellSize = 45;
+
+  // Scale factor to fit nicely in the panel
+  const scale = gridSize === 4 ? 1.1 : 0.95;
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800 flex flex-col">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="text-2xl sm:text-3xl">⚔️</span>
+          <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Soul Weapon</span>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={onEdit}
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
+          >
+            <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>{soulWeaponBuild ? 'Edit' : 'Create'}</span>
+          </button>
+          {soulWeaponBuild && (
+            <button
+              onClick={handleClear}
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
+            >
+              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {soulWeaponBuild ? (
+        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-4 lg:gap-6">
+          {weapon ? (
+            <>
+              {/* Weapon Info Card */}
+              <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 p-3 min-w-[200px] max-w-[220px]">
+                {/* Weapon Image */}
+                <div className="flex justify-center mb-2.5">
+                  <div className="relative w-[72px] h-[72px] bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg border-2 border-purple-400/50 dark:border-purple-500/50 p-1 shadow-lg">
+                    <img
+                      src={weapon.image}
+                      alt={weapon.name}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.target.src = '/images/equipment/weapons/sword_201.png';
+                      }}
+                    />
+                    {/* Weapon Name Overlay */}
+                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 bg-gray-900/90 dark:bg-gray-950/90 px-1.5 py-[2px] rounded shadow-lg">
+                      <span className="text-[9px] font-semibold text-white whitespace-nowrap leading-none block">{weapon.name}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Weapon Stats */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between py-1.5 border-b border-gray-200 dark:border-gray-700">
+                    <span className="text-[11px] text-gray-600 dark:text-gray-400">ATK</span>
+                    <span className="text-[11px] font-semibold text-red-600 dark:text-red-400">{weapon.attack.toLocaleString()}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-1.5 border-b border-gray-200 dark:border-gray-700">
+                    <span className="text-[11px] text-gray-600 dark:text-gray-400">Required</span>
+                    <span className="text-[11px] font-semibold text-gray-900 dark:text-white">{weapon.requirements.toLocaleString()} 🔮</span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-1.5 border-b border-gray-200 dark:border-gray-700">
+                    <span className="text-[11px] text-gray-600 dark:text-gray-400">Stage</span>
+                    <span className="text-[11px] font-semibold text-gray-900 dark:text-white truncate ml-2">{weapon.stageRequirement}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-1.5">
+                    <span className="text-[11px] text-gray-600 dark:text-gray-400">Disasm.</span>
+                    <span className="text-[11px] font-semibold text-green-600 dark:text-green-400">{weapon.disassemblyReward.toLocaleString()} 🔮</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid Preview */}
+              <div className="flex flex-col items-center gap-3">
+                <div
+                  className="relative inline-block"
+                  style={{
+                    transform: `scale(${scale})`,
+                    transformOrigin: 'center center'
+                  }}
+                >
+                  <SoulWeaponEngravingGrid
+                    gridState={soulWeaponBuild.gridState}
+                    selectedWeapon={weapon}
+                    cellSize={baseCellSize}
+                    gapSize={4}
+                    gridPadding={8}
+                    lineThickness={8}
+                    interactive={false}
+                    isComplete={false}
+                    className="!bg-gray-400 dark:!bg-gray-900"
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="bg-gray-100 dark:bg-gray-800/50 rounded-lg border border-gray-300 dark:border-gray-700 p-4 w-full">
+              <p className="text-center text-gray-500 dark:text-gray-400 text-sm">Loading weapon data...</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={onEdit}
+          className="w-full flex items-center justify-center py-8 sm:py-10 md:py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-purple-500 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+        >
+          <div className="text-center px-2">
+            <Plus className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">No soul weapon build configured</p>
+            <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click here or "Create" to get started</p>
+          </div>
+        </button>
+      )}
+    </div>
+  );
+};
+
+/**
  * Placeholder Section Component
  */
 const PlaceholderSection = ({ title, description, icon, matchHeight = false }) => {
@@ -1727,6 +1920,7 @@ function createEmptyLoadout(name) {
     name,
     skillBuild: null,
     spiritBuild: null,
+    soulWeaponBuild: null,
     spirit: null,
     skillStone: null,
     promotionAbility: null,

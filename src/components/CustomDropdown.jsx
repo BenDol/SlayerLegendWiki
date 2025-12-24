@@ -26,21 +26,47 @@ const CustomDropdown = ({
   const [loadingImages, setLoadingImages] = useState(new Set());
   const dropdownRef = useRef(null);
   const menuRef = useRef(null);
+  const selectedOptionRef = useRef(null);
+  const loadedImagesRef = useRef(new Set()); // Track successfully loaded images across reopens
 
   // Find the selected option (handle null/undefined values)
   // Use override if provided, otherwise find in options
   const selectedOption = selectedOptionOverride || (value != null ? options.find(opt => opt.value === value) : null);
 
-  // Mark all images as loading when dropdown opens or options change
+  // Mark images as loading when dropdown opens (but skip already loaded ones)
   useEffect(() => {
     if (isOpen) {
-      const imageSrcs = new Set(options.filter(opt => opt.image).map(opt => opt.image));
-      setLoadingImages(imageSrcs);
+      const imagesToLoad = options
+        .filter(opt => opt.image && !loadedImagesRef.current.has(opt.image))
+        .map(opt => opt.image);
+
+      setLoadingImages(new Set(imagesToLoad));
+
+      // Failsafe: Remove loading state after 5 seconds for any images that didn't trigger onLoad/onError
+      const timeout = setTimeout(() => {
+        imagesToLoad.forEach(img => {
+          loadedImagesRef.current.add(img);
+        });
+        setLoadingImages(new Set());
+      }, 5000);
+
+      return () => clearTimeout(timeout);
     }
   }, [isOpen, options]);
 
   // Handle image load complete
   const handleImageLoad = (imageSrc) => {
+    loadedImagesRef.current.add(imageSrc); // Remember this image loaded successfully
+    setLoadingImages(prev => {
+      const next = new Set(prev);
+      next.delete(imageSrc);
+      return next;
+    });
+  };
+
+  // Handle image load error
+  const handleImageError = (imageSrc) => {
+    loadedImagesRef.current.add(imageSrc); // Mark as "loaded" to prevent retry loop
     setLoadingImages(prev => {
       const next = new Set(prev);
       next.delete(imageSrc);
@@ -80,6 +106,19 @@ const CustomDropdown = ({
     }
   }, [isOpen]);
 
+  // Scroll to selected option when dropdown opens
+  useEffect(() => {
+    if (isOpen && selectedOptionRef.current) {
+      // Use setTimeout to ensure the menu is fully rendered
+      setTimeout(() => {
+        selectedOptionRef.current?.scrollIntoView({
+          behavior: 'auto',
+          block: 'center'
+        });
+      }, 0);
+    }
+  }, [isOpen]);
+
   const handleSelect = (optionValue, event) => {
     if (event) {
       event.stopPropagation();
@@ -114,6 +153,7 @@ const CustomDropdown = ({
                 alt=""
                 className="w-full h-full object-contain"
                 onLoad={() => handleImageLoad(selectedOption.image)}
+                onError={() => handleImageError(selectedOption.image)}
               />
             </div>
           )}
@@ -148,43 +188,49 @@ const CustomDropdown = ({
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={(e) => handleSelect(option.value, e)}
-              className={`w-full px-3 py-3 md:py-2.5 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-700 transition-colors touch-manipulation ${
-                value != null && option.value === value
-                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                  : 'text-gray-900 dark:text-white'
-              }`}
-            >
-              {option.image && (
-                <div className="relative w-6 h-6 md:w-6 md:h-6 flex-shrink-0">
-                  {loadingImages.has(option.image) && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded">
-                      <Loader className="w-4 h-4 animate-spin text-gray-400" />
-                    </div>
-                  )}
-                  <img
-                    src={option.image}
-                    alt=""
-                    className="w-full h-full object-contain"
-                    onLoad={() => handleImageLoad(option.image)}
-                    style={{ opacity: loadingImages.has(option.image) ? 0 : 1 }}
-                  />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="font-medium truncate text-sm md:text-base">{option.label}</div>
-                {option.description && (
-                  <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">
-                    {option.description}
+          {options.map((option) => {
+            const isSelected = value != null && option.value === value;
+            return (
+              <button
+                key={option.value}
+                ref={isSelected ? selectedOptionRef : null}
+                type="button"
+                onClick={(e) => handleSelect(option.value, e)}
+                className={`w-full px-3 py-3 md:py-2.5 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-700 transition-colors touch-manipulation ${
+                  isSelected
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                    : 'text-gray-900 dark:text-white'
+                }`}
+              >
+                {option.image && (
+                  <div className="relative w-6 h-6 md:w-6 md:h-6 flex-shrink-0">
+                    {loadingImages.has(option.image) && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded">
+                        <Loader className="w-4 h-4 animate-spin text-gray-400" />
+                      </div>
+                    )}
+                    <img
+                      src={option.image}
+                      alt=""
+                      className="w-full h-full object-contain"
+                      onLoad={() => handleImageLoad(option.image)}
+                      onError={() => handleImageError(option.image)}
+                      style={{ opacity: loadingImages.has(option.image) ? 0 : 1 }}
+                    />
                   </div>
                 )}
-              </div>
-            </button>
-          ))}
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium truncate text-sm md:text-base">{option.label}</div>
+                  {option.description && (
+                    <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">
+                      {option.description}
+                    </div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+
         </div>
       )}
     </div>

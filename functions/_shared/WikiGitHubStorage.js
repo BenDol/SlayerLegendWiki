@@ -16,6 +16,17 @@ import { DATA_TYPE_CONFIGS } from './utils.js';
 
 class WikiGitHubStorage extends GitHubStorage {
   /**
+   * Load grid submissions with wiki-specific configuration
+   * Overrides to pass wiki-specific config for grid submissions
+   */
+  async loadGridSubmissions(entityId) {
+    const gridConfig = {
+      typeLabel: 'soul-weapon-grids'
+    };
+    return super.loadGridSubmissions(entityId, gridConfig);
+  }
+
+  /**
    * Save grid submission with wiki-specific configuration
    * Overrides to pass wiki-specific config for grid submissions
    */
@@ -61,13 +72,20 @@ class WikiGitHubStorage extends GitHubStorage {
 
       const issueBody = JSON.stringify(items, null, 2);
 
-      // Find existing issue
+      // Find existing issue (with or without version label)
       const typeLabel = type;
       const userLabel = this._createUserLabel(userId);
       const versionLabel = `data-version:${this.dataVersion}`;
 
-      const allIssues = await this._findIssuesByLabels([typeLabel]);
-      const existingIssue = this._findIssueByLabel(allIssues, userLabel);
+      // Try modern issues first (with version label) to avoid 100-issue limit
+      let allIssues = await this._findIssuesByLabels([typeLabel, versionLabel]);
+      let existingIssue = this._findIssueByLabel(allIssues, userLabel);
+
+      // Fallback: search without version label for legacy issues
+      if (!existingIssue) {
+        allIssues = await this._findIssuesByLabels([typeLabel]);
+        existingIssue = this._findIssueByLabel(allIssues, userLabel);
+      }
 
       if (existingIssue) {
         // Update existing issue (including title to fix old format)
