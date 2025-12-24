@@ -361,8 +361,8 @@ jobs:
               console.log('🔍 Fetching linked anonymous PRs...');
               let linkedPRCount = 0;
               prPage = 1;  // Reset page counter (already declared above)
-              const prPerPage = 100;
-              let hasMorePRs = true;
+              // prPerPage already declared above, reusing same value (100)
+              hasMorePRs = true;  // Reset flag (already declared above)
 
               while (hasMorePRs) {
                 const { data: prs } = await github.rest.pulls.list({
