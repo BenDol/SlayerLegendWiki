@@ -4,6 +4,7 @@ import SpiritSprite from './SpiritSprite';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { getCache, setCache, clearCache } from '../utils/buildCache';
 import { getLoadDataEndpoint, getDeleteDataEndpoint } from '../utils/apiEndpoints.js';
+import { getUserLoadouts } from '../services/battleLoadouts';
 import { useSpiritsData } from '../hooks/useSpiritsData';
 import { deserializeBuild } from '../utils/spiritSerialization';
 import { createLogger } from '../utils/logger';
@@ -27,6 +28,7 @@ const logger = createLogger('SavedSpiritBuildsPanel');
  * @param {string} currentLoadedBuildId - ID of currently loaded build
  * @param {boolean} defaultExpanded - Whether panel should be expanded by default
  * @param {array} savedBuilds - External saved builds list (optional, for controlled mode)
+ * @param {array} mySpiritsFromParent - User's spirit collection from parent (optional, prevents duplicate loading)
  */
 const SavedSpiritBuildsPanel = ({
   currentBuild,
@@ -35,24 +37,29 @@ const SavedSpiritBuildsPanel = ({
   onBuildsChange = null,
   currentLoadedBuildId = null,
   defaultExpanded = false,
-  savedBuilds: externalSavedBuilds = null
+  savedBuilds: externalSavedBuilds = null,
+  mySpiritsFromParent = null
 }) => {
   const { isAuthenticated, user } = useAuthStore();
   const { spiritsData } = useSpiritsData(); // Load spirits database
   const [internalSavedBuilds, setInternalSavedBuilds] = useState([]);
-  const [mySpirits, setMySpirits] = useState([]); // Load user's spirit collection
+  const [internalMySpirits, setInternalMySpirits] = useState([]); // Load user's spirit collection (fallback)
+
+  // Use parent's mySpirits if provided, otherwise use internal state
+  const mySpirits = mySpiritsFromParent !== null ? mySpiritsFromParent : internalMySpirits;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [deletingId, setDeletingId] = useState(null);
   const [showEnhancementTags, setShowEnhancementTags] = useState(false);
 
-  // Load user's my-spirits collection
+  // Load user's my-spirits collection (only if not provided by parent)
   useEffect(() => {
-    if (isAuthenticated && user?.id) {
+    if (mySpiritsFromParent === null && isAuthenticated && user?.id) {
       loadMySpirits();
     }
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, user?.id, mySpiritsFromParent]);
+  // NOTE: Only loads if parent doesn't provide mySpirits to prevent duplicate loading
 
   // Load saved builds
   useEffect(() => {
@@ -122,7 +129,10 @@ const SavedSpiritBuildsPanel = ({
     });
 
     return deserialized;
-  }, [externalSavedBuilds, internalSavedBuilds, spiritsData, mySpirits]);
+  }, [externalSavedBuilds, internalSavedBuilds, spiritsData]);
+  // NOTE: mySpirits intentionally NOT in dependencies to prevent re-deserialization
+  // when collection spirits are updated, which would trigger unnecessary recalculations
+  // and could interfere with the user's current build edits
 
   const loadMySpirits = async () => {
     if (!user?.id) return;
@@ -139,11 +149,11 @@ const SavedSpiritBuildsPanel = ({
       const data = await response.json();
       // API returns { spirits: [...] }, extract the array
       const spiritsArray = data.spirits || data || [];
-      setMySpirits(Array.isArray(spiritsArray) ? spiritsArray : []);
+      setInternalMySpirits(Array.isArray(spiritsArray) ? spiritsArray : []);
       logger.debug('Loaded my-spirits collection', { count: spiritsArray?.length || 0 });
     } catch (error) {
       logger.error('Failed to load my-spirits collection', { error });
-      setMySpirits([]); // Set empty array on error
+      setInternalMySpirits([]); // Set empty array on error
     }
   };
 
@@ -209,8 +219,34 @@ const SavedSpiritBuildsPanel = ({
     }
   };
 
+  const handleLoadBuild = (build) => {
+    onLoadBuild(build);
+
+    // Update URL with build parameter
+    const currentHash = window.location.hash.split('?')[0];
+    const newHash = `${currentHash}?build=${build.id}`;
+    window.history.replaceState(null, '', newHash);
+  };
+
   const handleDeleteBuild = async (buildId) => {
+    // First confirmation: Standard delete prompt
     if (!confirm('Delete this spirit build? This cannot be undone.')) return;
+
+    // Check if this build is used in any battle loadouts
+    try {
+      const loadouts = await getUserLoadouts(user.id, user.login);
+      const usedInLoadouts = loadouts.filter(loadout => loadout.spiritBuildId === buildId);
+
+      // Second confirmation: Warning if build is used in loadouts
+      if (usedInLoadouts.length > 0) {
+        const loadoutNames = usedInLoadouts.map(l => l.name).join(', ');
+        if (!confirm(`⚠️ Warning: This spirit build is used in ${usedInLoadouts.length} battle loadout(s): ${loadoutNames}\n\nDeleting it will remove it from those loadouts. Continue?`)) {
+          return;
+        }
+      }
+    } catch (err) {
+      logger.error('Failed to check loadout usage, continuing with deletion:', { error: err });
+    }
 
     setDeletingId(buildId);
 
@@ -396,7 +432,7 @@ const SavedSpiritBuildsPanel = ({
                     <div className="flex items-start justify-between gap-3">
                       {/* Build Info */}
                       <button
-                        onClick={() => onLoadBuild(build)}
+                        onClick={() => handleLoadBuild(build)}
                         className="flex-1 text-left hover:opacity-80 transition-opacity"
                       >
                         <div className="flex items-center justify-between gap-3">

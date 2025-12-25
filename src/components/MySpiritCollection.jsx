@@ -34,6 +34,8 @@ const MySpiritCollection = () => {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [spiritBuilds, setSpiritBuilds] = useState([]);
+  const [hoveredSpiritId, setHoveredSpiritId] = useState(null);
 
   // Load saved spirits
   useEffect(() => {
@@ -43,6 +45,34 @@ const MySpiritCollection = () => {
       setLoading(false);
     }
   }, [isAuthenticated, user, spiritsData]);
+
+  // Load spirit builds to track usage
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadSpiritBuilds();
+    }
+  }, [isAuthenticated, user]);
+
+  const loadSpiritBuilds = async () => {
+    try {
+      const response = await fetch(`${getLoadDataEndpoint()}?type=spirit-builds&userId=${user.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSpiritBuilds(data.builds || []);
+      }
+    } catch (error) {
+      logger.error('Failed to load spirit builds for usage tracking:', { error });
+    }
+  };
+
+  // Get builds that use a specific spirit
+  const getBuildsUsingSpirit = (spiritId) => {
+    return spiritBuilds.filter(build => {
+      return build.slots?.some(slot =>
+        slot && slot.type === 'collection' && slot.mySpiritId === spiritId
+      );
+    });
+  };
 
   const loadSpirits = async () => {
     try {
@@ -143,6 +173,9 @@ const MySpiritCollection = () => {
       // Reload spirits (will deserialize the saved data)
       await loadSpirits();
 
+      // Reload spirit builds to update usage badges
+      await loadSpiritBuilds();
+
       // Queue spirit collection achievement checks
       if (user?.id && user?.login) {
         const { config } = useConfigStore.getState();
@@ -181,7 +214,51 @@ const MySpiritCollection = () => {
   };
 
   const handleDeleteSpirit = async (spiritId) => {
-    if (!confirm('Delete this spirit from your collection?')) return;
+    logger.debug('handleDeleteSpirit called', { spiritId });
+
+    // First confirmation: Standard delete prompt
+    if (!confirm('Delete this spirit from your collection?')) {
+      logger.debug('User cancelled deletion at first prompt');
+      return;
+    }
+
+    // Check if this spirit is used in any spirit builds
+    try {
+      logger.debug('Fetching spirit builds to check usage');
+      const buildsResponse = await fetch(`${getLoadDataEndpoint()}?type=spirit-builds&userId=${user.id}`);
+
+      logger.debug('Builds response', { ok: buildsResponse.ok, status: buildsResponse.status });
+
+      if (buildsResponse.ok) {
+        const buildsData = await buildsResponse.json();
+        const builds = buildsData.builds || [];
+
+        logger.debug('Loaded spirit builds', { buildCount: builds.length, builds });
+
+        // Check if this spirit (by mySpiritId) is used in any build
+        const usedInBuilds = builds.filter(build => {
+          return build.slots?.some(slot =>
+            slot && slot.type === 'collection' && slot.mySpiritId === spiritId
+          );
+        });
+
+        logger.debug('Checked build usage', { usedInBuildsCount: usedInBuilds.length, usedInBuilds });
+
+        // Second confirmation: Warning if spirit is used in builds
+        if (usedInBuilds.length > 0) {
+          const buildNames = usedInBuilds.map(b => b.name).join(', ');
+          logger.info('Spirit is used in builds, showing warning', { buildNames });
+          if (!confirm(`⚠️ Warning: This spirit is used in ${usedInBuilds.length} spirit build(s): ${buildNames}\n\nDeleting it will remove it from those builds. Continue?`)) {
+            logger.debug('User cancelled deletion at warning prompt');
+            return;
+          }
+        }
+      } else {
+        logger.warn('Failed to load builds, continuing with deletion', { status: buildsResponse.status });
+      }
+    } catch (err) {
+      logger.error('Failed to check build usage, continuing with deletion:', { error: err });
+    }
 
     try {
       const response = await fetch(getDeleteDataEndpoint(), {
@@ -215,6 +292,9 @@ const MySpiritCollection = () => {
         clearCache('my_spirits', user.id);
         await loadSpirits();
       }
+
+      // Reload spirit builds to update usage badges
+      await loadSpiritBuilds();
     } catch (error) {
       logger.error('Failed to delete spirit:', { error: error });
       alert('Failed to delete spirit');
@@ -290,41 +370,85 @@ const MySpiritCollection = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {spirits.map((spirit) => (
-              <div
-                key={spirit.id}
-                className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center"
-              >
-                <SpiritComponent
-                  spirit={spirit.spirit}
-                  level={spirit.level}
-                  awakeningLevel={spirit.awakeningLevel}
-                  evolutionLevel={spirit.evolutionLevel}
-                  skillEnhancementLevel={spirit.skillEnhancementLevel}
-                  showLevelOverlays={true}
-                  showPlatform={true}
-                  showEnhancementLevel={true}
-                  showElementIcon={true}
-                  size="medium"
-                />
-                <div className="mt-3 flex gap-2 w-full">
-                  <button
-                    onClick={() => handleEditSpirit(spirit)}
-                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-xs font-medium transition-colors"
-                  >
-                    <Edit className="w-3 h-3" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSpirit(spirit.id)}
-                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded text-xs font-medium transition-colors"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    Delete
-                  </button>
+            {spirits.map((spirit) => {
+              const buildsUsingSpirit = getBuildsUsingSpirit(spirit.id);
+              const isUsedInBuilds = buildsUsingSpirit.length > 0;
+              const isHovered = hoveredSpiritId === spirit.id;
+
+              return (
+                <div
+                  key={spirit.id}
+                  className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center relative"
+                >
+                  {/* Usage Badge */}
+                  {isUsedInBuilds && (
+                    <div
+                      className="absolute top-0 left-0 z-50"
+                      onMouseEnter={() => setHoveredSpiritId(spirit.id)}
+                      onMouseLeave={() => setHoveredSpiritId(null)}
+                    >
+                      <div className="relative">
+                        <div className="bg-blue-600 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-tl-lg rounded-br-lg shadow-md cursor-help">
+                          Used in {buildsUsingSpirit.length}
+                        </div>
+
+                        {/* Hover Popup - no gap to prevent hover loss */}
+                        {isHovered && (
+                          <div className="absolute top-full left-0 pt-1">
+                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-3 min-w-[200px]">
+                              <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Used in these builds:
+                              </div>
+                              <div className="space-y-1">
+                                {buildsUsingSpirit.map((build) => (
+                                  <a
+                                    key={build.id}
+                                    href={`#/spirit-builder?build=${build.id}`}
+                                    className="block text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
+                                    onClick={() => setHoveredSpiritId(null)}
+                                  >
+                                    {build.name}
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <SpiritComponent
+                    spirit={spirit.spirit}
+                    level={spirit.level}
+                    awakeningLevel={spirit.awakeningLevel}
+                    evolutionLevel={spirit.evolutionLevel}
+                    skillEnhancementLevel={spirit.skillEnhancementLevel}
+                    showLevelOverlays={true}
+                    showPlatform={true}
+                    showEnhancementLevel={true}
+                    showElementIcon={true}
+                    size="medium"
+                  />
+                  <div className="mt-3 flex gap-2 w-full">
+                    <button
+                      onClick={() => handleEditSpirit(spirit)}
+                      className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-xs font-medium transition-colors"
+                    >
+                      <Edit className="w-3 h-3" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSpirit(spirit.id)}
+                      className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded text-xs font-medium transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {/* Add Spirit Placeholder Button */}
             <button

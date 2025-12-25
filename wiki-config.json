@@ -440,14 +440,31 @@
       "videoGuides": {
         "enabled": true,
         "allowSubmissions": true,
-        "requireAuthentication": true,
+        "allowRawUpload": true,
+        "requireAuthentication": false,
         "requireApproval": true,
         "dataFile": "public/data/video-guides.json",
-        "categories": ["beginner", "intermediate", "advanced", "pvp", "pve", "farming"],
+        "categories": ["beginner", "intermediate", "advanced", "farming", "promotion"],
         "difficulties": ["beginner", "intermediate", "advanced", "expert"],
-        "tags": ["tutorial", "guide", "tips", "strategy", "build", "farming", "pvp", "pve"],
+        "tags": ["tutorial", "guide", "tips", "strategy", "build", "farming", "pve", "promotion"],
         "showOnHomePage": true,
-        "homePageLimit": 6
+        "homePageLimit": 6,
+        "cdn": {
+          "provider": "github",
+          "github": {
+            "owner": "BenDol",
+            "repo": "SlayerLegendCDN",
+            "servingMode": "jsdelivr",
+            "maxFileSizeMB": 500,
+            "allowedFormats": ["mp4", "webm", "mov", "avi"],
+            "lfs": {
+              "enabled": false,
+              "useByDefault": false,
+              "thresholdMB": 10,
+              "batchAPI": "https://github.com/{owner}/{repo}.git/info/lfs/objects/batch"
+            }
+          }
+        }
       },
       "showInSidebar": true,
       "sidebarPosition": "top"

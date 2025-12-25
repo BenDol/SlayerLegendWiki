@@ -9,7 +9,7 @@ import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { setCache } from '../utils/buildCache';
 import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
-import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
+import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 import { createLogger } from '../utils/logger';
 
@@ -75,6 +75,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
     const shareChecksum = urlParams.get('share');
     const encodedBuild = urlParams.get('data');
+    const buildId = urlParams.get('build');
 
     // Load from new share system (short URL)
     if (shareChecksum) {
@@ -110,6 +111,43 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       };
       loadFromSharedUrl();
     }
+    // Load from saved builds by ID
+    else if (buildId && isAuthenticated && user) {
+      const loadFromSavedBuilds = async () => {
+        try {
+          setLoading(true);
+          logger.info('Loading saved build', { buildId });
+
+          const response = await fetch(`${getLoadDataEndpoint()}?type=skill-builds&userId=${user.id}`);
+          if (!response.ok) {
+            throw new Error('Failed to load builds from server');
+          }
+          const data = await response.json();
+          const builds = data.builds || [];
+
+          const savedBuild = builds.find(b => b.id === buildId);
+          if (savedBuild) {
+            const deserializedBuild = deserializeBuild(savedBuild, skills);
+            setBuildName(savedBuild.name || '');
+            setMaxSlots(savedBuild.maxSlots || 10);
+            setAutoMaxLevel(savedBuild.autoMaxLevel || false);
+            setBuild({ slots: deserializedBuild.slots });
+            setCurrentLoadedBuildId(buildId);
+            setHasUnsavedChanges(false);
+            logger.info('Saved build loaded successfully', { buildName: savedBuild.name });
+          } else {
+            logger.error('Build not found', { buildId });
+            alert('Build not found');
+          }
+        } catch (error) {
+          logger.error('Failed to load saved build', { error });
+          alert(`Failed to load build: ${error.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadFromSavedBuilds();
+    }
     // Fallback to old encoded system
     else if (encodedBuild) {
       try {
@@ -141,7 +179,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         setHasUnsavedChanges(true);
       }
     }
-  }, [skills, isModal, loadDraft]); // Trigger when skills load
+  }, [skills, isModal, loadDraft, isAuthenticated, user]); // Trigger when skills load
 
   // Load initial build in modal mode
   useEffect(() => {
@@ -865,7 +903,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         )}
 
         {/* Settings Bar */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex flex-col gap-4">
             {/* Settings Row */}
             <div className="flex items-center gap-4 sm:gap-6 flex-wrap">

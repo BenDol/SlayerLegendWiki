@@ -13,7 +13,7 @@ import SoulWeaponEngravingGrid from './SoulWeaponEngravingGrid';
 import CustomDropdown from './CustomDropdown';
 import ValidatedInput from './ValidatedInput';
 import SavedBuildsPanel from './SavedBuildsPanel';
-import { getSaveDataEndpoint } from '../utils/apiEndpoints.js';
+import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { validateBuildName, validateCompletionEffect, STRING_LIMITS } from '../utils/validation';
 import { setCache } from '../utils/buildCache';
 import { createLogger } from '../utils/logger';
@@ -420,9 +420,11 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
     const shareChecksum = urlParams.get('share');
+    const buildId = urlParams.get('build');
 
     // Skip if no share checksum OR if we've already loaded this exact checksum
-    if (!shareChecksum || loadedShareChecksum.current === shareChecksum) return;
+    if (!shareChecksum && !buildId) return;
+    if (shareChecksum && loadedShareChecksum.current === shareChecksum) return;
 
     if (shareChecksum) {
       loadedShareChecksum.current = shareChecksum; // Mark this checksum as being loaded
@@ -638,7 +640,131 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
       };
       loadFromSharedUrl();
     }
-  }, [weapons, engravings, allWeapons, wikiConfig]);
+    // Load from saved builds by ID
+    else if (buildId && isAuthenticated && user) {
+      const loadFromSavedBuilds = async () => {
+        try {
+          setLoading(true);
+          setLoadingSharedBuild(true); // Prevent grid initialization
+          logger.info('Loading saved build', { buildId });
+
+          const response = await fetch(`${getLoadDataEndpoint()}?type=engraving-builds&userId=${user.id}`);
+          if (!response.ok) {
+            throw new Error('Failed to load builds from server');
+          }
+          const data = await response.json();
+          const builds = data.builds || [];
+
+          const savedBuild = builds.find(b => b.id === buildId);
+          if (savedBuild) {
+            // Load the build data (same structure as shared builds)
+            setBuildName(savedBuild.name || '');
+
+            logger.debug('Saved build data received', {
+              hasWeaponId: !!savedBuild.weaponId,
+              weaponId: savedBuild.weaponId,
+              hasGridState: !!savedBuild.gridState,
+              hasInventory: !!savedBuild.inventory,
+              hasPieces: !!savedBuild.pieces
+            });
+
+            // Support both old format (gridState) and new optimized format (pieces)
+            if (savedBuild.pieces) {
+              // Optimized format: pieces array with anchor coordinates
+              logger.debug('Loading pieces from saved build (optimized format)');
+
+              const gridWeapon = weapons.find(w => w.id === savedBuild.weaponId);
+              if (gridWeapon) {
+                const gridSize = gridWeapon.gridType === '4x4' ? 4 : 5;
+                const newGrid = Array(gridSize).fill(null).map(() =>
+                  Array(gridSize).fill(null).map(() => ({
+                    active: false,
+                    piece: null
+                  }))
+                );
+
+                // Mark active slots
+                gridWeapon.activeSlots.forEach(slot => {
+                  if (slot.row < gridSize && slot.col < gridSize) {
+                    newGrid[slot.row][slot.col].active = true;
+                  }
+                });
+
+                // Place pieces on the grid
+                savedBuild.pieces.forEach(piece => {
+                  const shape = engravings.find(e => e.id === piece.shapeId);
+                  if (shape) {
+                    const pattern = getRotatedPattern(shape.pattern, piece.rotation);
+                    pattern.forEach(({ row, col }) => {
+                      const gridRow = piece.row + row;
+                      const gridCol = piece.col + col;
+                      if (gridRow < gridSize && gridCol < gridSize) {
+                        newGrid[gridRow][gridCol].piece = {
+                          ...piece,
+                          shape
+                        };
+                      }
+                    });
+                  }
+                });
+
+                setGridState(newGrid);
+                logger.debug('Grid state set from saved build (optimized format)');
+              }
+            } else if (savedBuild.gridState) {
+              // Old format: full grid state
+              logger.debug('Loading grid state from saved build (legacy format)');
+              setGridState(savedBuild.gridState);
+            }
+
+            // Load inventory
+            if (savedBuild.inventory) {
+              setInventory(savedBuild.inventory);
+            }
+
+            // Load weapon
+            if (savedBuild.weaponId) {
+              const baseWeapon = allWeapons.find(w => w.id === savedBuild.weaponId);
+              const gridWeapon = weapons.find(w => w.id === savedBuild.weaponId);
+
+              if (baseWeapon && gridWeapon) {
+                const mergedWeapon = {
+                  ...gridWeapon,
+                  image: baseWeapon.image,
+                  attack: baseWeapon.attack,
+                  requirements: baseWeapon.requirements
+                };
+                hasInitializedGridForWeapon.current = `${mergedWeapon.id}-${mergedWeapon.name}`;
+                setSelectedWeapon(mergedWeapon);
+              } else if (gridWeapon) {
+                hasInitializedGridForWeapon.current = `${gridWeapon.id}-${gridWeapon.name}`;
+                setSelectedWeapon(gridWeapon);
+              } else if (baseWeapon) {
+                hasInitializedGridForWeapon.current = `${baseWeapon.id}-${baseWeapon.name}`;
+                setSelectedWeapon(baseWeapon);
+              }
+            }
+
+            setIsGridDesigner(false);
+            setForceDesignMode(false);
+            setCurrentLoadedBuildId(buildId);
+            setHasUnsavedChanges(false);
+            logger.info('Saved build loaded successfully', { buildName: savedBuild.name });
+          } else {
+            logger.error('Build not found', { buildId });
+            alert('Build not found');
+          }
+        } catch (error) {
+          logger.error('Failed to load saved build', { error });
+          alert(`Failed to load build: ${error.message}`);
+        } finally {
+          setLoading(false);
+          setLoadingSharedBuild(false);
+        }
+      };
+      loadFromSavedBuilds();
+    }
+  }, [weapons, engravings, allWeapons, wikiConfig, isAuthenticated, user]);
 
   // Load all weapons with submissions after config and weapons load
   useEffect(() => {

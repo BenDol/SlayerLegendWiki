@@ -6,6 +6,7 @@ import { useLoginFlow } from '../../wiki-framework/src/hooks/useLoginFlow';
 import LoginModal from '../../wiki-framework/src/components/auth/LoginModal';
 import { getCache, setCache, mergeCacheWithGitHub } from '../utils/buildCache';
 import { getSaveDataEndpoint, getDeleteDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
+import { getUserLoadouts } from '../services/battleLoadouts';
 import { getSkillGradeColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
 
@@ -194,7 +195,34 @@ const SavedBuildsPanel = ({
 
   const deleteBuild = async (buildId) => {
     if (!user || !isAuthenticated) return;
+
+    // First confirmation: Standard delete prompt
     if (!confirm('Delete this build?')) return;
+
+    // Check if this build is used in any battle loadouts
+    try {
+      const loadouts = await getUserLoadouts(user.id, user.login);
+      const usedInLoadouts = loadouts.filter(loadout => {
+        if (buildType === 'skill-builds' || buildType === 'skill_builds') {
+          return loadout.skillBuildId === buildId;
+        } else if (buildType === 'engraving-builds' || buildType === 'engraving_builds') {
+          return loadout.soulWeaponBuild?.weaponId &&
+                 savedBuilds.find(b => b.id === buildId && b.weaponId === loadout.soulWeaponBuild.weaponId);
+        }
+        return false;
+      });
+
+      // Second confirmation: Warning if build is used in loadouts
+      if (usedInLoadouts.length > 0) {
+        const loadoutNames = usedInLoadouts.map(l => l.name).join(', ');
+        const buildTypeName = buildType === 'skill-builds' || buildType === 'skill_builds' ? 'skill build' : 'soul weapon engraving build';
+        if (!confirm(`⚠️ Warning: This ${buildTypeName} is used in ${usedInLoadouts.length} battle loadout(s): ${loadoutNames}\n\nDeleting it will remove it from those loadouts. Continue?`)) {
+          return;
+        }
+      }
+    } catch (err) {
+      logger.error('Failed to check loadout usage, continuing with deletion:', { error: err });
+    }
 
     setError(null);
 
@@ -305,6 +333,11 @@ const SavedBuildsPanel = ({
     }
 
     onLoadBuild(build);
+
+    // Update URL with build parameter
+    const currentHash = window.location.hash.split('?')[0];
+    const newHash = `${currentHash}?build=${build.id}`;
+    window.history.replaceState(null, '', newHash);
   };
 
   if (!isAuthenticated) {

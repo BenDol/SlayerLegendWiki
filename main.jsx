@@ -430,6 +430,7 @@ const MyCollectionsPage = React.lazy(() => import('./src/pages/MyCollectionsPage
 const SoulWeaponEngravingBuilderPage = React.lazy(() => import('./src/pages/SoulWeaponEngravingBuilderPage.jsx'));
 const DonatePage = React.lazy(() => import('./src/pages/DonatePage.jsx'));
 const ContentCreatorsPage = React.lazy(() => import('./wiki-framework/src/pages/ContentCreatorsPage.jsx'));
+const SkillStonesPage = React.lazy(() => import('./src/pages/SkillStonesPage.jsx'));
 
 // Base routes that are always registered
 const baseRoutes = [
@@ -476,6 +477,11 @@ const baseRoutes = [
   {
     path: 'creators',
     component: <ContentCreatorsPage />,
+    suspense: true
+  },
+  {
+    path: 'skill-stones',
+    component: <SkillStonesPage />,
     suspense: true
   }
 ];

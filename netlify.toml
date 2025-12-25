@@ -35,14 +35,14 @@
   # Directory containing serverless functions
   directory = "netlify/functions"
 
-  # Node bundler (use esbuild for fast builds)
+  # Node bundler (use esbuild for fast builds with ESM format)
   node_bundler = "esbuild"
 
   # External packages (don't bundle these)
   external_node_modules = ["@octokit/rest", "octokit"]
 
   # Increase bundle timeout for first load
-  included_files = ["../../wiki-config.json"]
+  included_files = ["../../wiki-config.json", "../../wiki-framework/**/*"]
 
 # Dev server configuration
 [dev]

@@ -1,0 +1,60 @@
+{
+  "stoneTypes": {
+    "cooldown": {
+      "name": "Cooldown Stone",
+      "icon": "hourglass-down",
+      "description": "Skill cooldown reduction",
+      "shape": "triangle",
+      "bonuses": {
+        "A": -4,
+        "B": -7
+      },
+      "bonusFormat": "{value}%"
+    },
+    "time": {
+      "name": "Time Stone",
+      "icon": "lightning-up",
+      "description": "Skill duration bonus",
+      "shape": "square",
+      "bonuses": {
+        "A": 4,
+        "B": 7
+      },
+      "bonusFormat": "+{value}%"
+    },
+    "heat": {
+      "name": "Heat Stone",
+      "icon": "sword-down",
+      "description": "Skill's required attacks reduction",
+      "shape": "diamond",
+      "bonuses": {
+        "A": -4,
+        "B": -7
+      },
+      "bonusFormat": "{value}%"
+    }
+  },
+  "elements": {
+    "fire": {
+      "name": "Fire",
+      "color": "#d62828",
+      "glowColor": "#ff0000"
+    },
+    "water": {
+      "name": "Water",
+      "color": "#2845d6",
+      "glowColor": "#0066ff"
+    },
+    "wind": {
+      "name": "Wind",
+      "color": "#00d9d9",
+      "glowColor": "#00ffff"
+    },
+    "earth": {
+      "name": "Earth",
+      "color": "#d6a828",
+      "glowColor": "#ffcc00"
+    }
+  },
+  "tiers": ["A", "B"]
+}

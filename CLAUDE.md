@@ -4,6 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Quick Links
 
+- **[Repository Permissions](.claude/repository-permissions.md)** - Branch protection, bot setup, security configuration
+- **[CDN Repository Setup](.claude/plans/cdn-repo-setup.md)** - Video CDN repository setup with Git LFS
+- **[Deployment Platforms](.claude/deployment-platforms.md)** - Netlify vs Cloudflare comparison, video upload limits
 - **[Architecture Guide](.claude/architecture.md)** - Framework structure, submodules, what lives where
 - **[Registry Patterns](.claude/registries.md)** - Content renderer, route, and data browser registries
 - **[Development Guide](.claude/development.md)** - Commands, debugging, git workflow
@@ -52,6 +55,41 @@ git add wiki-framework && git commit -m "Update framework"
 git commit -m "Fix typo [skip tests]"
 ```
 
+## Video Upload System
+
+### Hybrid Upload Strategy (Client-side LFS for Large Files)
+
+The video upload system uses a **hybrid approach** to support files up to 500MB on both Netlify and Cloudflare:
+
+| File Size | Upload Method | Local Dev | Netlify Prod | Cloudflare Prod |
+|-----------|---------------|-----------|--------------|-----------------|
+| **< 6MB** | Server-side | ✅ Works | ✅ Works | ✅ Works |
+| **6-100MB** | Client-side LFS (local) / Server-side (prod) | ✅ Auto LFS | ✅ Server | ✅ Server |
+| **100-500MB** | Client-side LFS | ✅ Auto LFS | ✅ Auto LFS | ✅ Auto LFS |
+
+**How it works:**
+
+1. **Small files (< threshold):** Upload through serverless function on form submit
+2. **Large files (≥ threshold):** Immediate upload to GitHub LFS while user fills form, then instant submit
+   - **Local dev threshold:** 6MB (bypasses Netlify CLI limit)
+   - **Production threshold:** 100MB (bypasses Cloudflare Worker limit)
+
+**Benefits:**
+
+- ✅ **Works seamlessly in local dev** - files > 6MB automatically use LFS
+- ✅ **Supports 500MB on both Netlify and Cloudflare**
+- ✅ **Better UX** - large files upload while user fills form
+- ✅ **Minimizes orphaned uploads** - small files use simpler server-side flow
+
+**Implementation:**
+
+- **Small files:** FormData upload to `/api/video-upload`
+- **Large files:** Client → `/api/request-lfs-upload` → Direct to GitHub LFS → `/api/finalize-lfs-upload`
+
+**Orphaned Uploads:**
+
+If a user uploads a large file but abandons the form, the file sits in GitHub LFS unreferenced for ~7 days before automatic garbage collection. This is acceptable because most users complete submissions.
+
 ## Project Structure
 
 ```
@@ -61,14 +99,17 @@ Parent Project (this repo)       Framework Submodule
 │   ├── characters/              ├── scripts/       # Build tools
 │   └── ...                      └── vite.config.base.js
 ├── public/data/
+│   └── wiki-config.json         # Auto-copied (DON'T EDIT!)
 ├── src/components/              # Game-specific only
-├── wiki-config.json             # SOURCE OF TRUTH
+├── wiki-config.json             # ⭐ SOURCE OF TRUTH - EDIT THIS!
 ├── main.jsx                     # App entry + registrations
 └── vite.config.js
 ```
 
 **Parent project:** Content, config, game-specific components
 **Framework submodule:** Generic React app, routing, UI components
+
+**IMPORTANT:** Always edit the **root** `wiki-config.json`, never `public/wiki-config.json`
 
 See **[Architecture Guide](.claude/architecture.md)** for complete details.
 
@@ -96,10 +137,11 @@ See **[Development Guide](.claude/development.md)** for workflows.
 
 1. **Never modify `wiki-framework/` files** - Framework is generic, reusable
 2. **Game-specific components belong in `src/components/`** - Keep framework clean
-3. **Always rebuild search index** after content changes: `npm run build:search`
-4. **Restart dev server** after configuration changes
-5. **Use frontmatter** on all markdown files for proper indexing
-6. **Never bypass HTML sanitization** - Don't use `dangerouslySetInnerHTML`
+3. **Always edit root `wiki-config.json`** - NEVER edit `public/wiki-config.json` (it's auto-generated/copied from root)
+4. **Always rebuild search index** after content changes: `npm run build:search`
+5. **Restart dev server** after configuration changes (config watcher should pick up changes automatically)
+6. **Use frontmatter** on all markdown files for proper indexing
+7. **Never bypass HTML sanitization** - Don't use `dangerouslySetInnerHTML`
 
 ## Coding Standards
 
@@ -235,10 +277,36 @@ if (loading) return <LoadingSpinner />;
 - DO NOT use git commands in `wiki-framework/` directory
 - User handles all submodule operations
 
+## Repository Permissions & Security
+
+**IMPORTANT: GitHub Actions workflow permissions are READ-ONLY.**
+
+- **Workflow Permissions:** "Read repository contents and packages permissions"
+- This is the **correct and secure** configuration
+- Workflows use **bot tokens from secrets** for write operations
+- DO NOT suggest changing to "Read and write permissions"
+
+**Bot Token Architecture:**
+- `WIKI_BOT_TOKEN` - Used by serverless functions for creating PRs, commits
+- `CDN_REPO_TOKEN` - Used for CDN repository video uploads (same as WIKI_BOT_TOKEN or separate)
+- Stored in GitHub Secrets and deployment platform environment variables
+- Never stored in workflow GITHUB_TOKEN
+
+**Branch Protection (main branch):**
+- Require 1 PR approval before merging
+- Require status checks: build, test, search-index
+- Require conversation resolution
+- Include administrators
+- No force pushes, no deletions
+
+See **[Repository Permissions](.claude/repository-permissions.md)** for complete details.
+
 ## Documentation
 
 For detailed information on specific topics, see:
 
+- **[Repository Permissions](.claude/repository-permissions.md)** - Branch protection, bot setup, security
+- **[CDN Repository Setup](.claude/plans/cdn-repo-setup.md)** - Video CDN setup with Git LFS
 - **[Architecture](.claude/architecture.md)** - Full architecture details
 - **[Registries](.claude/registries.md)** - Registry pattern documentation
 - **[Development](.claude/development.md)** - Development workflows

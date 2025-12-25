@@ -1,4 +1,4 @@
-const { createLogger } = require('../../../src/utils/logger');
+import { createLogger } from '../../../src/utils/logger.js';
 const logger = createLogger('GithubBot');
 
 // Cache for loaded achievement deciders
@@ -340,8 +340,12 @@ export async function handleGithubBot(adapter, configAdapter, cryptoAdapter) {
         return await handleApproveCreator(adapter, octokit, body);
       case 'delete-creator-submission':
         return await handleDeleteCreatorSubmission(adapter, octokit, body);
+      case 'submit-video-guide':
+        return await handleSubmitVideoGuide(adapter, octokit, body);
       case 'delete-video-guide':
         return await handleDeleteVideoGuide(adapter, octokit, body);
+      case 'get-pending-video-guide-deletions':
+        return await handleGetPendingVideoGuideDeletions(adapter, octokit, body);
       default:
         return adapter.createJsonResponse(400, { error: `Unknown action: ${action}` });
     }
@@ -3075,6 +3079,247 @@ async function handleDeleteCreatorSubmission(adapter, octokit, { owner, repo, cr
 }
 
 /**
+ * Submit video guide (YouTube link)
+ * Creates a PR to add guide to video-guides.json
+ * Supports both authenticated and anonymous submissions
+ */
+async function handleSubmitVideoGuide(adapter, octokit, body) {
+  const { owner, repo, guideData, userEmail, verificationToken, userToken } = body;
+
+  // Validate required fields
+  if (!owner || !repo || !guideData) {
+    return adapter.createJsonResponse(400, {
+      error: 'Missing required fields: owner, repo, guideData'
+    });
+  }
+
+  if (!guideData.videoUrl || !guideData.title || !guideData.description) {
+    return adapter.createJsonResponse(400, {
+      error: 'Missing required guide fields: videoUrl, title, description'
+    });
+  }
+
+  try {
+    // Determine if authenticated or anonymous
+    let submittedBy = 'anonymous';
+    let useOctokit = octokit; // Bot token by default
+
+    if (userToken) {
+      // Authenticated user - validate token and get user info
+      const userOctokit = new Octokit({
+        auth: userToken,
+        userAgent: 'GitHub-Wiki-Bot/1.0'
+      });
+
+      try {
+        const { data: userData } = await userOctokit.rest.users.getAuthenticated();
+        submittedBy = userData.login;
+        useOctokit = userOctokit; // Use user's token for PR
+        logger.info('Authenticated video guide submission', { username: submittedBy });
+      } catch (error) {
+        logger.warn('Token validation failed, falling back to anonymous', { error: error.message });
+      }
+    }
+
+    // For anonymous submissions, verify email
+    if (!userToken) {
+      if (!userEmail || !verificationToken) {
+        return adapter.createJsonResponse(400, {
+          error: 'Anonymous submissions require email verification'
+        });
+      }
+
+      // Verify email token
+      const jwt = await import('../jwt.js');
+      const secret = adapter.getEnv('EMAIL_VERIFICATION_SECRET');
+      if (!secret) {
+        return adapter.createJsonResponse(500, { error: 'Email verification not configured' });
+      }
+
+      try {
+        const decoded = await jwt.verify(verificationToken, secret);
+        if (!decoded || decoded.email !== userEmail) {
+          return adapter.createJsonResponse(400, { error: 'Email verification expired or invalid' });
+        }
+        logger.debug('Email verification token valid', { email: userEmail });
+      } catch (error) {
+        logger.warn('Email verification failed', { error: error.message });
+        return adapter.createJsonResponse(400, { error: 'Email verification expired or invalid' });
+      }
+    }
+
+    // Fetch current video-guides.json
+    const { data: fileData } = await useOctokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: 'public/data/video-guides.json',
+      ref: 'main'
+    });
+
+    // Decode and parse
+    const currentContent = Buffer.from(fileData.content, 'base64').toString('utf8');
+    const videoGuidesData = JSON.parse(currentContent);
+    const existingGuides = videoGuidesData.videoGuides || [];
+
+    // Check for duplicate URL
+    const duplicateUrl = existingGuides.find(g => g.videoUrl === guideData.videoUrl);
+    if (duplicateUrl) {
+      return adapter.createJsonResponse(400, { error: 'This video has already been submitted' });
+    }
+
+    // Generate unique ID
+    const id = generateGuideId(guideData.title, existingGuides);
+
+    // Extract YouTube video ID for thumbnail
+    const videoIdMatch = guideData.videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+    const thumbnailUrl = videoIdMatch
+      ? `https://i.ytimg.com/vi/${videoIdMatch[1]}/maxresdefault.jpg`
+      : null;
+
+    // Build new guide entry
+    const newGuide = {
+      id,
+      sourceType: 'youtube',
+      videoUrl: guideData.videoUrl,
+      title: guideData.title,
+      description: guideData.description,
+      thumbnailUrl,
+      submittedBy,
+      submittedAt: new Date().toISOString(),
+      featured: false
+    };
+
+    // Add optional fields
+    if (guideData.creator) newGuide.creator = guideData.creator;
+    if (guideData.category) newGuide.category = guideData.category;
+    if (guideData.tags && Array.isArray(guideData.tags) && guideData.tags.length > 0) newGuide.tags = guideData.tags;
+    if (guideData.difficulty) newGuide.difficulty = guideData.difficulty;
+
+    // Add to guides array
+    existingGuides.push(newGuide);
+    videoGuidesData.videoGuides = existingGuides;
+
+    // Serialize
+    const updatedContent = JSON.stringify(videoGuidesData, null, 2);
+    const updatedContentBase64 = Buffer.from(updatedContent).toString('base64');
+
+    // Create branch
+    const branchName = `video-guide-${id}-${Date.now()}`;
+    const { data: mainRef } = await useOctokit.rest.git.getRef({
+      owner,
+      repo,
+      ref: 'heads/main'
+    });
+
+    await useOctokit.rest.git.createRef({
+      owner,
+      repo,
+      ref: `refs/heads/${branchName}`,
+      sha: mainRef.object.sha
+    });
+
+    // Commit file
+    await useOctokit.rest.repos.createOrUpdateFileContents({
+      owner,
+      repo,
+      path: 'public/data/video-guides.json',
+      message: `Add video guide: ${guideData.title}`,
+      content: updatedContentBase64,
+      branch: branchName,
+      sha: fileData.sha
+    });
+
+    // Create PR body
+    const prBody = `## Video Guide Submission
+
+**Title:** ${guideData.title}
+**Video:** ${guideData.videoUrl}
+**Description:** ${guideData.description}
+${guideData.creator ? `**Creator:** ${guideData.creator}` : ''}
+${guideData.category ? `**Category:** ${guideData.category}` : ''}
+${guideData.difficulty ? `**Difficulty:** ${guideData.difficulty}` : ''}
+${guideData.tags && guideData.tags.length > 0 ? `**Tags:** ${guideData.tags.join(', ')}` : ''}
+
+---
+
+Submitted by ${userToken ? `@${submittedBy}` : 'anonymous user'}
+
+**For reviewers:** Please review the video content before merging to ensure it's appropriate and follows community guidelines.`;
+
+    // Prepare labels
+    const labels = ['video-guide'];
+
+    // Add ref label for anonymous submissions (enables linking later)
+    // GitHub labels max 50 chars: "ref:" (4) + hash (46) = 50
+    if (!userToken && userEmail) {
+      const { hashEmail } = await import('../utils.js');
+      const fullHash = await hashEmail(userEmail);
+      const { createEmailLabel } = await import('../../../wiki-framework/src/utils/githubLabelUtils.js');
+      const LABEL_MAX_HASH_LENGTH = 46; // Max hash chars that fit in GitHub label (50 - len('ref:'))
+      const refLabel = createEmailLabel(fullHash, LABEL_MAX_HASH_LENGTH);
+      labels.push(refLabel);
+      labels.push('linkable'); // Enable account linking for anonymous submissions
+      logger.debug('Added ref label for anonymous submission', { refLabel });
+    }
+
+    // Create PR
+    const { data: pr } = await useOctokit.rest.pulls.create({
+      owner,
+      repo,
+      title: `[Video Guide] ${guideData.title}`,
+      body: prBody,
+      head: branchName,
+      base: 'main'
+    });
+
+    // Add labels
+    if (labels.length > 0) {
+      await useOctokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number: pr.number,
+        labels
+      });
+    }
+
+    logger.info('Video guide PR created successfully', {
+      prNumber: pr.number,
+      prUrl: pr.html_url,
+      guideId: id,
+      submittedBy
+    });
+
+    return adapter.createJsonResponse(200, {
+      prNumber: pr.number,
+      prUrl: pr.html_url,
+      guideId: id
+    });
+  } catch (error) {
+    logger.error('Failed to submit video guide', { error: error.message });
+    return adapter.createJsonResponse(500, { error: error.message });
+  }
+}
+
+// Helper: Generate unique guide ID (URL-safe slug)
+function generateGuideId(title, existingGuides) {
+  // Create base slug from title
+  let slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  // Ensure uniqueness
+  let finalSlug = slug;
+  let counter = 1;
+  while (existingGuides.some(g => g.id === finalSlug)) {
+    finalSlug = `${slug}-${counter}`;
+    counter++;
+  }
+
+  return finalSlug;
+}
+
+/**
  * Delete video guide (admin only)
  * Creates a PR to remove guide from video-guides.json
  */
@@ -3191,6 +3436,15 @@ Deleted by @${adminUsername}
       base: 'main'
     });
 
+    // Add labels to track this deletion PR
+    const labels = ['delete-video-guide', `guide-id:${guideId}`];
+    await octokit.rest.issues.addLabels({
+      owner,
+      repo,
+      issue_number: pr.number,
+      labels
+    });
+
     logger.info('Video guide deletion PR created', {
       prNumber: pr.number,
       prUrl: pr.html_url,
@@ -3206,6 +3460,55 @@ Deleted by @${adminUsername}
     });
   } catch (error) {
     logger.error('Failed to delete video guide', { error: error.message, guideId });
+    return adapter.createJsonResponse(500, { error: error.message });
+  }
+}
+
+/**
+ * Get pending video guide deletion PRs
+ * Fetches open PRs with 'delete-video-guide' label
+ * Required: owner, repo
+ */
+async function handleGetPendingVideoGuideDeletions(adapter, octokit, { owner, repo }) {
+  if (!owner || !repo) {
+    return adapter.createJsonResponse(400, { error: 'Missing required fields: owner, repo' });
+  }
+
+  try {
+    // Fetch all open PRs with 'delete-video-guide' label
+    const { data: prs } = await octokit.rest.pulls.list({
+      owner,
+      repo,
+      state: 'open',
+      per_page: 100
+    });
+
+    // Filter PRs with delete-video-guide label and extract guide ID from labels
+    const deletionPRs = prs
+      .filter(pr => pr.labels.some(label => label.name === 'delete-video-guide'))
+      .map(pr => {
+        // Extract guide ID from guide-id: label
+        const guideIdLabel = pr.labels.find(label => label.name.startsWith('guide-id:'));
+        const guideId = guideIdLabel ? guideIdLabel.name.replace('guide-id:', '') : null;
+
+        return {
+          prNumber: pr.number,
+          prUrl: pr.html_url,
+          guideId,
+          title: pr.title,
+          createdAt: pr.created_at,
+          createdBy: pr.user.login
+        };
+      })
+      .filter(pr => pr.guideId); // Only return PRs with valid guide IDs
+
+    logger.debug('Fetched pending video guide deletions', { count: deletionPRs.length });
+
+    return adapter.createJsonResponse(200, {
+      deletions: deletionPRs
+    });
+  } catch (error) {
+    logger.error('Failed to fetch pending video guide deletions', { error: error.message });
     return adapter.createJsonResponse(500, { error: error.message });
   }
 }

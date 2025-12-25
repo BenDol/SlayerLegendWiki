@@ -199,6 +199,20 @@ export function createSuccessResponse(data, statusCode = 200) {
 }
 
 /**
+ * Hash email address for privacy-preserving identification
+ * Uses SHA-256 to create a consistent hash for rate limiting and user linking
+ * @param {string} email - Email address to hash
+ * @returns {Promise<string>} Hex-encoded SHA-256 hash
+ */
+export async function hashEmail(email) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(email);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
  * Get environment configuration
  * @param {Object} env - Environment object (process.env for Netlify, context.env for Cloudflare)
  * @returns {{botToken?: string, owner?: string, repo?: string, error?: string}}

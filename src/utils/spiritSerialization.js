@@ -72,7 +72,7 @@ export const deserializeSpirit = (serializedSpirit, spiritsData, recordId = null
  * @returns {Object} Serialized slot
  */
 export const serializeSlot = (slot) => {
-  if (!slot || !slot.spirit) {
+  if (!slot) {
     return {
       type: "base",
       spiritId: null,
@@ -84,10 +84,23 @@ export const serializeSlot = (slot) => {
   }
 
   // If slot has mySpiritId, it's a collection spirit (reference)
+  // Check this BEFORE checking spirit, because deleted collection spirits have spirit: null
   if (slot.mySpiritId) {
     return {
       type: "collection",
       mySpiritId: slot.mySpiritId
+    };
+  }
+
+  // Empty slot (no spirit and no collection reference)
+  if (!slot.spirit) {
+    return {
+      type: "base",
+      spiritId: null,
+      level: 1,
+      awakeningLevel: 0,
+      evolutionLevel: 4,
+      skillEnhancementLevel: 0
     };
   }
 

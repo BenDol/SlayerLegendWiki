@@ -1,0 +1,81 @@
+.skill-stone-example {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.skill-stone-example h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.skill-stone-example h3 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.skill-stone-example h4 {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.skill-stone-example__section {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.skill-stone-example__tier {
+  margin-bottom: 2rem;
+}
+
+.skill-stone-example__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.skill-stone-example__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skill-stone-example__label {
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.skill-stone-example__sizes {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-end;
+  padding: 2rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.skill-stone-example__usage {
+  margin-top: 2rem;
+}
+
+.skill-stone-example__usage pre {
+  background: #2d2d2d;
+  color: #f8f8f2;
+  padding: 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}

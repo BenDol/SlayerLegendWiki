@@ -221,6 +221,11 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
     if (!confirmed) return;
 
     onLoadLoadout(loadout);
+
+    // Update URL with loadout parameter
+    const currentHash = window.location.hash.split('?')[0];
+    const newHash = `${currentHash}?loadout=${loadout.id}`;
+    window.history.replaceState(null, '', newHash);
   };
 
   if (!isAuthenticated) {

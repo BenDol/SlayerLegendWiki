@@ -13,6 +13,11 @@ pages_build_output_dir = "dist"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Note: Cloudflare Workers have a 100MB request body limit
+# This affects video uploads - files larger than 100MB cannot be uploaded
+# through Cloudflare Pages. For larger files, deploy to Netlify instead,
+# or implement client-side direct upload to R2/LFS.
+
 # Environment variables for local development
 # IMPORTANT: Never commit actual secrets! Use .dev.vars for local secrets
 [vars]

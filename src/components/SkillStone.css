@@ -1,0 +1,298 @@
+.skill-stone {
+  position: relative;
+  display: inline-block;
+  --border-width: 3px;
+  --glow-intensity: 0.8;
+}
+
+/* Size variants */
+.skill-stone--small {
+  width: 60px;
+  height: 60px;
+}
+
+.skill-stone--medium {
+  width: 80px;
+  height: 80px;
+}
+
+.skill-stone--large {
+  width: 100px;
+  height: 100px;
+}
+
+/* Glowing border layer */
+.skill-stone__border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  filter: drop-shadow(0 0 8px var(--element-glow))
+          drop-shadow(0 0 12px var(--element-glow))
+          drop-shadow(0 0 16px var(--element-glow));
+}
+
+/* Background layer with gradient */
+.skill-stone__background {
+  position: absolute;
+  top: var(--border-width);
+  left: var(--border-width);
+  right: var(--border-width);
+  bottom: var(--border-width);
+  z-index: 2;
+  background: radial-gradient(
+    circle at center,
+    var(--element-color) 0%,
+    color-mix(in srgb, var(--element-color) 60%, black) 50%,
+    color-mix(in srgb, var(--element-color) 30%, black) 100%
+  );
+}
+
+/* Center circular glow */
+.skill-stone__center-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--element-glow) 40%, white) 0%,
+    transparent 70%
+  );
+  z-index: 3;
+}
+
+/* Main icon */
+.skill-stone__icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 45%;
+  height: 45%;
+  color: white;
+  z-index: 4;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.skill-stone__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Element badge (top-right corner) */
+.skill-stone__element-badge {
+  position: absolute;
+  top: -8%;
+  right: -8%;
+  width: 28%;
+  height: 28%;
+  background: color-mix(in srgb, var(--element-color) 80%, black);
+  border: 2px solid var(--element-glow);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  box-shadow: 0 0 6px var(--element-glow),
+              0 0 10px var(--element-glow),
+              inset 0 0 8px rgba(0, 0, 0, 0.4);
+  color: white;
+}
+
+.skill-stone__element-badge svg {
+  width: 60%;
+  height: 60%;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Tier badge (bottom) - diamond shape */
+.skill-stone__tier-badge {
+  position: absolute;
+  bottom: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20%;
+  height: 20%;
+  background: #1a1a1a;
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.75em;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* === SHAPE-SPECIFIC STYLES === */
+
+/* Triangle (Inverted) - equilateral triangle (all sides equal) */
+.skill-stone--triangle {
+  --border-width: 3px;
+}
+
+.skill-stone--triangle .skill-stone__border {
+  clip-path: polygon(50% 93%, 0% 6%, 100% 6%);
+  background: var(--element-glow);
+}
+
+.skill-stone--triangle .skill-stone__background {
+  clip-path: polygon(50% 88%, 2% 6.5%, 98% 6.5%);
+}
+
+/* Adjust icon positioning for triangle to center it better */
+.skill-stone--triangle .skill-stone__icon {
+  top: 35%;
+  width: 30%;
+  height: 30%;
+}
+
+.skill-stone--triangle .skill-stone__center-glow {
+  top: 35%;
+}
+
+/* Move tier badge up for triangle */
+.skill-stone--triangle .skill-stone__tier-badge {
+  bottom: 10%;
+}
+
+/* Square */
+.skill-stone--square .skill-stone__border {
+  clip-path: polygon(
+    10% 0%, 90% 0%,
+    100% 10%, 100% 90%,
+    90% 100%, 10% 100%,
+    0% 90%, 0% 10%
+  );
+  background: var(--element-glow);
+}
+
+.skill-stone--square .skill-stone__background {
+  clip-path: polygon(
+    10% 0%, 90% 0%,
+    100% 10%, 100% 90%,
+    90% 100%, 10% 100%,
+    0% 90%, 0% 10%
+  );
+}
+
+.skill-stone--square .skill-stone__center-glow {
+  width: 70%;
+  height: 70%;
+}
+
+/* Diamond */
+.skill-stone--diamond .skill-stone__border {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: var(--element-glow);
+  transform: rotate(0deg);
+}
+
+.skill-stone--diamond .skill-stone__background {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* Move element badge for diamond to top-right edge */
+.skill-stone--diamond .skill-stone__element-badge {
+  top: 15%;
+  right: 5%;
+}
+
+/* Adjust icon size for diamond */
+.skill-stone--diamond .skill-stone__icon {
+  width: 41%;
+  height: 41%;
+}
+
+/* Move tier badge down for diamond */
+.skill-stone--diamond .skill-stone__tier-badge {
+  bottom: -5%;
+}
+
+/* === TOOLTIP === */
+.skill-stone__tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid var(--element-color);
+  border-radius: 4px;
+  padding: 8px 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.skill-stone:hover .skill-stone__tooltip {
+  opacity: 1;
+}
+
+.skill-stone__tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.95);
+}
+
+.skill-stone__tooltip-title {
+  color: var(--element-glow);
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-bottom: 4px;
+}
+
+.skill-stone__tooltip-effect {
+  color: #ddd;
+  font-size: 0.85em;
+}
+
+/* === ANIMATIONS === */
+.skill-stone {
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.skill-stone:hover {
+  transform: scale(1.05);
+}
+
+.skill-stone:hover .skill-stone__border {
+  filter: drop-shadow(0 0 12px var(--element-glow))
+          drop-shadow(0 0 18px var(--element-glow))
+          drop-shadow(0 0 24px var(--element-glow));
+}
+
+/* Loading and error states */
+.skill-stone-loading,
+.skill-stone-error {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px dashed #666;
+  border-radius: 4px;
+  color: #999;
+  font-size: 0.8em;
+}
+
+.skill-stone-error {
+  color: #d62828;
+  border-color: #d62828;
+}

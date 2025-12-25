@@ -118,7 +118,24 @@
       "Bash(for i in {201..290})",
       "Bash(do [ -f \"public/images/equipment/weapons/sword_$i.png\" ])",
       "WebFetch(domain:en.namu.wiki)",
-      "Bash(Select-String -Pattern \"6dfde566d074|Build Share|skill.*build|checksum\" -Context 2,2)"
+      "Bash(git log:*)",
+      "Bash(Select-String -Pattern \"delete|Delete|DELETE|spirit|Spirit|SPIRIT|build|Build|BUILD\" -Context 2,2)",
+      "Bash(dir /b:*)",
+      "Bash(for file in request-lfs-upload.js finalize-lfs-upload.js video-upload.js)",
+      "Bash(do mv \"$file\" \"$file%.js.mjs\")",
+      "Bash(for file in *.mjs)",
+      "Bash(do mv \"$file\" \"$file%.mjs.js\")",
+      "Bash(xargs -I {} sh -c 'echo \"\"{}:\"\" && head -3 {} | tail -1')",
+      "Bash(Select-String -Path \"server-output.log\" -Pattern \"ERROR|error|Failed|Could not resolve|Top-level await|format\")",
+      "Bash(dir \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\functions\\\\_shared\")",
+      "Bash(dir:*)",
+      "Bash(xargs:*)",
+      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\functions\\\\_shared\\\\jwt.js\")",
+      "Bash(Select-Object -Last 5)",
+      "Bash(Get-ChildItem \"external\\\\backups\\\\excluded-images\\\\other\" -Filter \"*.png\")",
+      "Bash(Select-Object -First 20 Name)",
+      "Bash(Get-ChildItem \"public\\\\images\\\\other\" -Filter \"*.png\")",
+      "Bash(Select-Object Name)"
     ]
   }
 }

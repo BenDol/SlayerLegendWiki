@@ -123,6 +123,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
     const shareChecksum = urlParams.get('share');
     const encodedBuild = urlParams.get('data');
+    const buildId = urlParams.get('build');
 
     // Load from new share system (short URL)
     if (shareChecksum) {
@@ -157,6 +158,42 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
         }
       };
       loadFromSharedUrl();
+    }
+    // Load from saved builds by ID
+    else if (buildId && isAuthenticated && user) {
+      const loadFromSavedBuilds = async () => {
+        try {
+          setLoading(true);
+          logger.info('Loading saved build', { buildId });
+
+          const response = await fetch(`${getLoadDataEndpoint()}?type=spirit-builds&userId=${user.id}`);
+          if (!response.ok) {
+            throw new Error('Failed to load builds from server');
+          }
+          const data = await response.json();
+          const builds = data.builds || [];
+
+          const savedBuild = builds.find(b => b.id === buildId);
+          if (savedBuild) {
+            const deserializedBuild = deserializeBuild(savedBuild, spirits, mySpirits);
+            setBuildName(savedBuild.name || '');
+            setBuild({ slots: normalizeSlots(deserializedBuild.slots) });
+            setCurrentLoadedBuildId(buildId);
+            setHasUnsavedChanges(false);
+            setHasLoadedInitialData(true);
+            logger.info('Saved build loaded successfully', { buildName: savedBuild.name });
+          } else {
+            logger.error('Build not found', { buildId });
+            alert('Build not found');
+          }
+        } catch (error) {
+          logger.error('Failed to load saved build', { error });
+          alert(`Failed to load build: ${error.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadFromSavedBuilds();
     }
     // Fallback to old encoded system
     else if (encodedBuild) {
@@ -237,7 +274,9 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     const deserializedBuild = deserializeBuild(initialBuild, spirits, mySpirits);
     setBuild({ slots: normalizeSlots(deserializedBuild.slots) });
     setHasUnsavedChanges(true); // Mark as having changes to block navigation
-  }, [spirits, isModal, initialBuild, mySpiritsLoaded, isAuthenticated, user?.id, mySpirits]);
+  }, [spirits, isModal, initialBuild, mySpiritsLoaded, isAuthenticated, user?.id]);
+  // NOTE: mySpirits is intentionally NOT in dependencies to prevent re-deserializing
+  // when collection spirits are updated, which would overwrite user's current changes
 
   const loadSpirits = async () => {
     try {
@@ -697,45 +736,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
         mySpiritId: savedSpirit.id
       };
       setBuild({ slots: newSlots });
-
-      // Auto-save the build if it has already been saved before
-      if (buildName && buildName.trim() !== '') {
-        logger.info('Auto-saving build after adding collection spirit reference');
-
-        // Wait for state to update
-        setTimeout(async () => {
-          try {
-            // Use the existing serializeBuild utility
-            const serializedBuild = serializeBuild({ slots: newSlots });
-            serializedBuild.name = buildName;
-
-            const response = await fetch(getSaveDataEndpoint(), {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                type: 'spirit-builds',
-                username: user.login,
-                userId: user.id,
-                data: serializedBuild,
-              }),
-            });
-
-            if (response.ok) {
-              const data = await response.json();
-              const sortedBuilds = data.builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-              setSavedBuilds(sortedBuilds);
-              setHasUnsavedChanges(false);
-              logger.info('Build auto-saved successfully after collection spirit save');
-            }
-          } catch (error) {
-            logger.error('Failed to auto-save build', { error });
-            // Don't show error to user, just log it
-            setHasUnsavedChanges(true);
-          }
-        }, 100);
-      } else {
-        setHasUnsavedChanges(true);
-      }
+      setHasUnsavedChanges(true); // Mark as having changes (draft auto-save will handle persistence)
 
       alert(`${slot.spirit.name} has been saved to your spirit collection!`);
 
@@ -821,46 +822,70 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
   };
 
   const handleLevelChange = async (index, newLevel) => {
-    const newSlots = [...build.slots];
-    newSlots[index].level = newLevel;
-    setBuild({ slots: newSlots });
+    let updatedSlots;
+
+    // Use functional setState to get the latest state
+    setBuild(prevBuild => {
+      const newSlots = [...prevBuild.slots];
+      newSlots[index].level = newLevel;
+      updatedSlots = newSlots;
+      return { slots: newSlots };
+    });
 
     // Update collection if this is a collection spirit
-    if (newSlots[index].type === 'collection') {
-      await updateCollectionSpirit(newSlots[index]);
+    if (updatedSlots[index].type === 'collection') {
+      await updateCollectionSpirit(updatedSlots[index]);
     }
   };
 
   const handleAwakeningLevelChange = async (index, newAwakeningLevel) => {
-    const newSlots = [...build.slots];
-    newSlots[index].awakeningLevel = newAwakeningLevel;
-    setBuild({ slots: newSlots });
+    let updatedSlots;
+
+    // Use functional setState to get the latest state
+    setBuild(prevBuild => {
+      const newSlots = [...prevBuild.slots];
+      newSlots[index].awakeningLevel = newAwakeningLevel;
+      updatedSlots = newSlots; // Capture for collection update
+      return { slots: newSlots };
+    });
 
     // Update collection if this is a collection spirit
-    if (newSlots[index].type === 'collection') {
-      await updateCollectionSpirit(newSlots[index]);
+    if (updatedSlots[index].type === 'collection') {
+      await updateCollectionSpirit(updatedSlots[index]);
     }
   };
 
   const handleEvolutionChange = async (index, newEvolution) => {
-    const newSlots = [...build.slots];
-    newSlots[index].evolutionLevel = newEvolution;
-    setBuild({ slots: newSlots });
+    let updatedSlots;
+
+    // Use functional setState to get the latest state
+    setBuild(prevBuild => {
+      const newSlots = [...prevBuild.slots];
+      newSlots[index].evolutionLevel = newEvolution;
+      updatedSlots = newSlots;
+      return { slots: newSlots };
+    });
 
     // Update collection if this is a collection spirit
-    if (newSlots[index].type === 'collection') {
-      await updateCollectionSpirit(newSlots[index]);
+    if (updatedSlots[index].type === 'collection') {
+      await updateCollectionSpirit(updatedSlots[index]);
     }
   };
 
   const handleSkillEnhancementChange = async (index, newSkillEnhancement) => {
-    const newSlots = [...build.slots];
-    newSlots[index].skillEnhancementLevel = newSkillEnhancement;
-    setBuild({ slots: newSlots });
+    let updatedSlots;
+
+    // Use functional setState to get the latest state
+    setBuild(prevBuild => {
+      const newSlots = [...prevBuild.slots];
+      newSlots[index].skillEnhancementLevel = newSkillEnhancement;
+      updatedSlots = newSlots;
+      return { slots: newSlots };
+    });
 
     // Update collection if this is a collection spirit
-    if (newSlots[index].type === 'collection') {
-      await updateCollectionSpirit(newSlots[index]);
+    if (updatedSlots[index].type === 'collection') {
+      await updateCollectionSpirit(updatedSlots[index]);
     }
   };
 
@@ -1314,6 +1339,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
           currentLoadedBuildId={currentLoadedBuildId}
           defaultExpanded={!isModal}
           savedBuilds={savedBuilds}
+          mySpiritsFromParent={mySpirits}
         />
       </div>
 

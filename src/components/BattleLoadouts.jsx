@@ -109,6 +109,7 @@ const BattleLoadouts = () => {
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
     const shareChecksum = urlParams.get('share');
     const encodedLoadout = urlParams.get('data');
+    const loadoutId = urlParams.get('loadout');
 
     // Load from new share system (short URL)
     if (shareChecksum) {
@@ -148,6 +149,46 @@ const BattleLoadouts = () => {
       };
 
       loadSharedBuild();
+    }
+    // Load from saved loadouts by ID
+    else if (loadoutId && isAuthenticated && user) {
+      const loadFromSavedLoadouts = async () => {
+        try {
+          setLoading(true);
+          logger.info('Loading saved loadout', { loadoutId });
+
+          const response = await fetch(`${getLoadDataEndpoint()}?type=battle-loadouts&userId=${user.id}`);
+          if (!response.ok) {
+            throw new Error('Failed to load loadouts from server');
+          }
+          const data = await response.json();
+          const loadouts = data.loadouts || [];
+
+          const savedLoadout = loadouts.find(l => l.id === loadoutId);
+          if (savedLoadout) {
+            // Deserialize the loadout
+            const deserializedLoadout = {
+              ...savedLoadout,
+              skillBuild: savedLoadout.skillBuild ? deserializeSkillBuild(savedLoadout.skillBuild, skills) : null,
+              spiritBuild: savedLoadout.spiritBuild ? deserializeSpiritBuild(savedLoadout.spiritBuild, spirits, mySpirits) : null
+            };
+            setCurrentLoadout(deserializedLoadout);
+            setLoadoutName(deserializedLoadout.name || '');
+            setCurrentLoadedLoadoutId(loadoutId);
+            setHasUnsavedChanges(false);
+            logger.info('Saved loadout loaded successfully', { loadoutName: deserializedLoadout.name });
+          } else {
+            logger.error('Loadout not found', { loadoutId });
+            alert('Loadout not found');
+          }
+        } catch (error) {
+          logger.error('Failed to load saved loadout', { error });
+          alert(`Failed to load loadout: ${error.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadFromSavedLoadouts();
     }
     // Fallback to old encoded system
     else if (encodedLoadout) {

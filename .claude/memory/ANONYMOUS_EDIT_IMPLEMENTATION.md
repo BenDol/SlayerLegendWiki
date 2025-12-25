@@ -1,6 +1,6 @@
-# Anonymous Edit System - Implementation Complete ✅
+# Anonymous Edit System - Serverless Implementation ✅
 
-Both server and serverless modes for anonymous editing have been fully implemented!
+The serverless anonymous editing system has been fully implemented using GitHub Actions + Issues!
 
 ## What's Been Built
 
@@ -32,9 +32,6 @@ Both server and serverless modes for anonymous editing have been fully implement
 - ✅ Easy filtering: `is:issue label:wiki:anonymous-edit label:section:equipment`
 - ✅ Status tracking: `is:issue label:status:failed` shows failed edits
 - ✅ Auto-applied: Labels added automatically based on edit data
-- ✅ Setup utility: `node setup-labels.js` creates all labels
-
-**Documentation:** See [LABEL_SYSTEM.md](./server-example/LABEL_SYSTEM.md)
 
 ### 🌟 Serverless Mode (GitHub Actions + Issues)
 
@@ -71,360 +68,199 @@ Both server and serverless modes for anonymous editing have been fully implement
 - ✅ 15-40 second response time
 - ✅ Automatic rate limiting by GitHub
 
-### 🚀 Server Mode (Express Backend)
+## 📚 Configuration
 
-**Created:**
-1. `server-example/anonymous-edit-server.js` - Complete Express server with:
-   - Rate limiting (5 edits/hour/IP)
-   - Input validation & sanitization
-   - GitHub API integration (Octokit)
-   - Health check endpoint
-   - Comprehensive error handling
-   - Detailed logging
+### Enable Anonymous Edits
 
-2. `server-example/package.json` - All dependencies
-3. `server-example/.env.example` - Environment configuration template
-
-**Features:**
-- ✅ Real-time response (< 2 seconds)
-- ✅ Custom rate limiting
-- ✅ Custom validation rules
-- ✅ IP-based access control
-- ✅ Ready for production deployment
-
-### 🎨 Frontend Integration
-
-**Updated `PageEditorPage.jsx`:**
-1. **Mode detection** - Automatically uses server or serverless based on config
-2. **Anonymous mode state** - Tracks when user chose anonymous editing
-3. **Two-button UI** - "Sign In to Edit" vs "Edit Anonymously"
-4. **Anonymous banner** - Amber warning when editing anonymously
-5. **Progress updates** - Shows status during submission
-6. **Unified handleAnonymousSave()** - Supports both modes seamlessly
-
-**Features:**
-- ✅ Graceful fallback between modes
-- ✅ Progress indicators for both modes
-- ✅ Clear user feedback
-- ✅ Easy mode switching (just update config)
-
-### 📚 Documentation
-
-**Complete documentation suite:**
-
-1. **[ANONYMOUS_EDITS_OVERVIEW.md](./server-example/ANONYMOUS_EDITS_OVERVIEW.md)** - Main overview
-   - What is anonymous editing
-   - How both modes work
-   - Feature comparison
-   - Configuration guide
-   - Integration with other features
-
-2. **[CHOOSING_MODE.md](./server-example/CHOOSING_MODE.md)** - Decision guide
-   - Detailed comparison table
-   - Use case recommendations
-   - Cost analysis
-   - Real-world examples
-   - Decision tree
-
-3. **[SERVERLESS_SETUP.md](./server-example/SERVERLESS_SETUP.md)** - Serverless guide
-   - How serverless mode works
-   - 5-minute setup guide
-   - Technical details
-   - Troubleshooting
-   - Advanced customization
-
-4. **[QUICKSTART.md](./server-example/QUICKSTART.md)** - Server quick start
-   - 10-minute setup guide
-   - Step-by-step instructions
-   - Testing guide
-   - Production deployment options
-
-5. **[README.md](./server-example/README.md)** - Complete server docs
-   - Detailed setup instructions
-   - API documentation
-   - Security best practices
-   - Deployment guides (VPS, Serverless, Docker)
-   - Troubleshooting
-
-### ⚙️ Configuration
-
-**Updated `wiki-config.json`:**
+In `wiki-config.json` / `public/wiki-config.json`:
 
 ```json
 {
-  "features": {
-    "editRequestCreator": {
-      "mode": "auto",
-      "forks": {
+  "wiki": {
+    "features": {
+      "anonymousEditing": {
         "enabled": true,
-        "autoSync": true,
-        "keepForkUpdated": true
-      },
-      "anonymous": {
-        "enabled": false,        // Set to true to enable
-        "mode": "server",         // "server" or "serverless"
-        "serverEndpoint": "",     // Only needed for server mode
-        "attributionFormat": "Contributed anonymously via wiki editor"
-      },
-      "permissions": {
-        "requireAuth": true,      // Set to false for anonymous
-        "fallbackToFork": true
+        "mode": "serverless",
+        "requireApproval": true
       }
     }
   }
 }
 ```
 
-**Configuration options:**
-- `anonymous.enabled` - Enable/disable anonymous editing
-- `anonymous.mode` - Choose "server" or "serverless"
-- `anonymous.serverEndpoint` - Backend URL (server mode only)
-- `anonymous.attributionFormat` - Custom attribution message
-- `permissions.requireAuth` - Allow unauthenticated access
+### Configuration Options
 
-## How It Works
+- **`enabled`**: Enable/disable anonymous editing
+- **`mode`**: Always use `"serverless"` (GitHub Actions)
+- **`requireApproval`**: Creates PR for review (recommended: `true`)
 
-### User Flow (Both Modes)
+## 🎯 User Experience Flow
 
-1. User visits wiki (not logged in)
-2. Clicks "Edit" button
-3. Sees "Choose Edit Mode" screen:
-   - 👤 **Sign In to Edit** - Get credited, earn prestige
-   - 🕶️ **Edit Anonymously** - Quick edit, no credit
-4. Chooses anonymous mode
-5. Sees amber banner: "Editing Anonymously"
-6. Makes edits in editor
-7. Clicks "Submit Edit Request"
-8. **Mode-specific processing:**
-   - **Server**: Sends to Express backend → PR created → Success (< 2s)
-   - **Serverless**: Creates issue → Actions run → PR created → Success (15-40s)
-9. Sees success screen with PR link
-10. PR goes through normal review process
+### For Anonymous Users
 
-### Technical Flow
+1. ✅ Click "Edit" button on any page
+2. ✅ Choose "Edit Anonymously" option
+3. ✅ Make changes in editor
+4. ✅ Submit edit → Creates GitHub Issue
+5. ✅ Real-time progress updates:
+   - Creating edit request...
+   - Processing edit...
+   - Creating pull request...
+   - Done! PR link provided
+6. ✅ Total time: 15-40 seconds
 
-**Server Mode:**
+### For Maintainers
+
+1. ✅ Automatic PR creation with full context
+2. ✅ Review changes with diff view
+3. ✅ Merge or request changes
+4. ✅ Issue auto-closes on PR creation
+5. ✅ Full audit trail in Issues tab
+6. ✅ Easy filtering with labels
+
+## 🔍 Monitoring & Management
+
+### Find Anonymous Edits
+
+**All anonymous edits:**
 ```
-Frontend → HTTP POST → Express Server → GitHub API → PR Created → Response → Frontend
+is:issue label:wiki:anonymous-edit
 ```
 
-**Serverless Mode:**
+**By status:**
 ```
-Frontend → GitHub Issue → Actions Trigger → Workflow Runs → PR Created → Issue Comment → Frontend Polls → Response
+is:issue label:status:processing
+is:issue label:status:completed
+is:issue label:status:failed
 ```
 
-## Three Complete Contribution Workflows
+**By section:**
+```
+is:issue label:section:equipment label:wiki:anonymous-edit
+```
 
-Your wiki now supports **three independent contribution modes**:
+**Failed edits (needs attention):**
+```
+is:issue label:status:failed is:open
+```
 
-### 1. Direct Branch (Authenticated + Write Access)
-- User has write access to repository
-- Creates branch directly on main repo
-- Opens PR from main repo
-- Fast, no fork needed
+### Pull Requests Created
 
-### 2. Fork Workflow (Authenticated + No Write Access)
-- User lacks write access
-- System auto-creates/syncs user's fork
-- Creates branch on user's fork
-- Opens cross-repo PR (fork → upstream)
-- Standard open-source contribution model
+All PRs have labels too:
+```
+is:pr label:anonymous label:wiki:edit
+is:pr label:section:equipment is:open
+```
 
-### 3. Anonymous Mode (Unauthenticated)
-- User not logged in
-- Two implementation options:
-  - **Server**: Bot creates PR via Express server (real-time)
-  - **Serverless**: `github-actions[bot]` creates PR via workflow (delayed)
-- No prestige earned
-- Lower barrier to entry
-
-**All three modes work together seamlessly!**
-
-## Testing Checklist
+## 🧪 Testing
 
 ### Test Serverless Mode
 
-1. ✅ Enable in config: `mode: "serverless"`
-2. ✅ Open wiki in incognito window
-3. ✅ Click Edit → Choose "Edit Anonymously"
-4. ✅ Make small edit
-5. ✅ Submit and wait 15-40 seconds
-6. ✅ Verify PR created by `github-actions[bot]`
-7. ✅ Check issue was created and auto-closed
-
-### Test Server Mode
-
-1. ✅ Start backend server: `cd server-example && npm start`
-2. ✅ Enable in config: `mode: "server"`, `serverEndpoint: "http://localhost:3001/api/anonymous-edit"`
+1. ✅ Enable in config: `mode: "serverless"`, `enabled: true`
+2. ✅ Ensure `.github/workflows/anonymous-edit.yml` exists
 3. ✅ Open wiki in incognito window
 4. ✅ Click Edit → Choose "Edit Anonymously"
-5. ✅ Make small edit
-6. ✅ Submit and see instant response (< 2s)
-7. ✅ Verify PR created by your bot account
+5. ✅ Make a test edit and submit
+6. ✅ Wait for processing (15-40 seconds)
+7. ✅ Verify:
+   - Issue created in GitHub Issues
+   - Issue has correct labels
+   - PR was created and linked
+   - Issue auto-closed
+   - PR has proper labels and description
+   - Changes are correct
 
-### Test Mode Switching
+**Test successful? ✅ Anonymous editing is working!**
 
-1. ✅ Start with serverless mode
-2. ✅ Submit anonymous edit
-3. ✅ Switch to server mode in config
-4. ✅ Restart wiki
-5. ✅ Submit another anonymous edit
-6. ✅ Verify both PRs exist (different creators)
+### Troubleshooting
 
-## Security Features
+**Issue created but no PR:**
+- Check workflow run in Actions tab
+- Verify workflow has `issues: write` and `pull-requests: write` permissions
+- Check workflow logs for errors
 
-Both modes implement:
-- ✅ Input validation (required fields, data types)
-- ✅ Content sanitization (remove scripts, XSS prevention)
-- ✅ Path traversal prevention (no `..` or absolute paths)
-- ✅ Size limits (100KB max content)
-- ✅ Rate limiting (GitHub/custom)
-- ✅ CORS protection
-- ✅ Pull request review before merge
+**No issue created:**
+- Check browser console for errors
+- Verify `anonymousEditing.enabled: true` in config
+- Check that labels exist (should auto-create)
 
-**Server mode adds:**
-- Custom rate limiting (5/hour/IP, configurable)
-- IP-based access control
-- Custom CAPTCHA integration (optional)
-- Server-side logging
+**Workflow fails:**
+- Check Actions logs for detailed error
+- Common issues:
+  - Missing permissions
+  - Invalid markdown in edit
+  - Branch name conflicts
 
-**Serverless mode provides:**
-- GitHub's built-in rate limiting
-- No secrets to manage (uses GITHUB_TOKEN)
-- Full audit trail via Issues
-- Zero attack surface (no server to hack)
+## 📦 Implementation Files
 
-## Production Deployment
+### Core Services
 
-### Serverless Mode (Easiest)
-
-**No deployment needed!**
-1. Workflow is already in `.github/workflows/`
-2. Just enable in config
-3. Done!
-
-**Costs:** $0/month (public repos)
-
-### Server Mode Options
-
-**Option 1: VPS (DigitalOcean, Linode)**
-```bash
-git clone your-repo
-cd server-example
-npm install
-npm install -g pm2
-cp .env.example .env
-nano .env  # Configure
-pm2 start anonymous-edit-server.js
-pm2 save
-pm2 startup
-```
-**Cost:** $5-20/month
-
-**Option 2: Serverless Functions (Vercel)**
-- Convert to Vercel function
-- One-click deploy
-- Set environment variables in dashboard
-**Cost:** Free tier available, $20/month pro
-
-**Option 3: Docker**
-```bash
-docker build -t wiki-anon-server ./server-example
-docker run -p 3001:3001 --env-file .env wiki-anon-server
-```
-**Cost:** Depends on hosting
-
-## What's Next?
-
-### Immediate Next Steps
-
-1. **Choose your mode:**
-   - Read [CHOOSING_MODE.md](./server-example/CHOOSING_MODE.md)
-   - Most wikis: Choose **Serverless**
-   - High-traffic: Choose **Server**
-
-2. **Set up chosen mode:**
-   - **Serverless:** [SERVERLESS_SETUP.md](./server-example/SERVERLESS_SETUP.md) (5 min)
-   - **Server:** [QUICKSTART.md](./server-example/QUICKSTART.md) (15 min)
-
-3. **Test thoroughly:**
-   - Test in incognito window
-   - Verify PR creation
-   - Check attribution
-   - Test rate limiting
-
-4. **Deploy to production:**
-   - **Serverless:** Already deployed (it's just a workflow)
-   - **Server:** Deploy backend, update config
-
-### Optional Enhancements
-
-- Add CAPTCHA (server mode)
-- Implement moderation queue (draft PRs)
-- Add content filters (spam detection)
-- Create custom attribution messages
-- Add analytics/monitoring
-- Implement IP whitelist/blacklist (server mode)
-
-## Files Created/Modified
-
-### New Files
-
-**Serverless:**
-- `.github/workflows/anonymous-edit.yml` - GitHub Actions workflow
-- `wiki-framework/src/services/github/anonymousEdits.js` - Frontend service
+**Frontend:**
+- `wiki-framework/src/services/github/anonymousEdits.js` - Issue creation & polling
 - `wiki-framework/src/services/github/issueLabels.js` - Label management
 
-**Server:**
-- `server-example/anonymous-edit-server.js` - Express server
-- `server-example/package.json` - Dependencies
-- `server-example/.env.example` - Configuration template
+**Backend:**
+- `.github/workflows/anonymous-edit.yml` - GitHub Actions workflow
+- Creates PRs automatically from issues
 
-**Utilities:**
-- `server-example/setup-labels.js` - Label setup script
+### UI Components
 
-**Documentation:**
-- `server-example/ANONYMOUS_EDITS_OVERVIEW.md` - Complete overview
-- `server-example/CHOOSING_MODE.md` - Mode comparison guide
-- `server-example/SERVERLESS_SETUP.md` - Serverless setup
-- `server-example/QUICKSTART.md` - Server quick start
-- `server-example/LABEL_SYSTEM.md` - Label system guide
-- This file: `ANONYMOUS_EDIT_IMPLEMENTATION.md` - Implementation summary
-
-### Modified Files
-
+**Editor:**
 - `wiki-framework/src/pages/PageEditorPage.jsx` - Added anonymous mode support
-- `wiki-config.json` - Added anonymous configuration
-- `public/wiki-config.json` - Added anonymous configuration
-- `server-example/README.md` - Added mode references
+- Modal to choose between signed-in and anonymous editing
+- Progress indicators for serverless processing
+
+### Configuration
+
+- `wiki-config.json` - Feature configuration
+- `public/wiki-config.json` - Public config copy
+
+## 🚀 Production Deployment
+
+### Requirements
+
+✅ **Zero setup needed!** Just enable in config.
+
+The serverless architecture runs entirely on GitHub:
+- Issues for request queue
+- Actions for processing
+- Pull Requests for review
+- No external hosting required
+- No maintenance needed
+
+### Cost Analysis
+
+**Serverless Mode:**
+- **Public repos:** FREE (unlimited Actions minutes)
+- **Private repos:** 2000 free Actions minutes/month
+- **Estimate:** ~30 seconds per edit = ~4000 free edits/month
+- **After free tier:** $0.008 per minute = ~$0.004 per edit
+
+**Recommendation:** Use serverless mode for all wikis. It's free, reliable, and maintenance-free.
+
+## 🎉 What's Complete
+
+✅ **Serverless anonymous editing** - Fully working
+✅ **Comprehensive label system** - 26 labels across 4 categories
+✅ **GitHub Actions workflow** - Automatic PR creation
+✅ **Frontend integration** - Anonymous edit UI
+✅ **Progress tracking** - Real-time status updates
+✅ **Error handling** - Comprehensive error messages
+✅ **Documentation** - This file!
 
 ## Support & Troubleshooting
 
-- **Overview:** [ANONYMOUS_EDITS_OVERVIEW.md](./server-example/ANONYMOUS_EDITS_OVERVIEW.md)
-- **Choosing Mode:** [CHOOSING_MODE.md](./server-example/CHOOSING_MODE.md)
-- **Serverless Setup:** [SERVERLESS_SETUP.md](./server-example/SERVERLESS_SETUP.md)
-- **Server Setup:** [QUICKSTART.md](./server-example/QUICKSTART.md) or [README.md](./server-example/README.md)
 - **Browser Console:** Check for frontend errors
-- **Actions Logs:** Check workflow runs (serverless)
-- **Server Logs:** Check PM2/Docker logs (server)
+- **Actions Logs:** Check workflow runs for backend errors
+- **Issues Tab:** Monitor anonymous edit queue and status
+- **Pull Requests:** Review created PRs from anonymous edits
 
-## Success! 🎉
+## 🎊 Ready to Use!
 
-You now have a complete anonymous editing system with two implementation options:
+Anonymous editing via serverless mode is production-ready and requires zero maintenance.
 
-✅ **Serverless Mode** - Zero cost, zero maintenance
-✅ **Server Mode** - Real-time, full control
-✅ **Complete Documentation** - 5 comprehensive guides
-✅ **Security** - Built-in protection for both modes
-✅ **Flexibility** - Switch modes anytime
-✅ **Production Ready** - Tested and documented
-
-**Ready to enable anonymous editing?**
-
-Start with [ANONYMOUS_EDITS_OVERVIEW.md](./server-example/ANONYMOUS_EDITS_OVERVIEW.md) and choose your mode!
+Just enable it in your config and start accepting anonymous contributions!
 
 ---
 
-**Questions? Feedback?**
-
-Open an issue or discussion on GitHub. Enjoy your new anonymous editing system!
+*Last updated: 2024-12 - Serverless-only architecture*
