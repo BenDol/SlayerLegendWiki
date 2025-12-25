@@ -1,20 +1,3 @@
 {
-  "videoGuides": [
-    {
-      "id": "test-2",
-      "sourceType": "youtube",
-      "videoUrl": "https://www.youtube.com/watch?v=YhSVSDPzDVQ",
-      "title": "Test 2",
-      "description": "Test test",
-      "thumbnailUrl": "https://i.ytimg.com/vi/YhSVSDPzDVQ/maxresdefault.jpg",
-      "submittedBy": "BenDol",
-      "submittedAt": "2025-12-25T06:16:00.183Z",
-      "featured": false,
-      "category": "beginner",
-      "tags": [
-        "test"
-      ],
-      "difficulty": "beginner"
-    }
-  ]
+  "videoGuides": []
 }
