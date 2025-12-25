@@ -1,3 +1,20 @@
 {
-  "videoGuides": []
+  "videoGuides": [
+    {
+      "id": "test",
+      "sourceType": "youtube",
+      "videoUrl": "https://www.youtube.com/watch?v=V39j9oU-LcU",
+      "title": "Test",
+      "description": "Test test",
+      "thumbnailUrl": "https://i.ytimg.com/vi/V39j9oU-LcU/maxresdefault.jpg",
+      "submittedBy": "anonymous",
+      "submittedAt": "2025-12-25T06:00:31.051Z",
+      "featured": false,
+      "category": "beginner",
+      "tags": [
+        "test"
+      ],
+      "difficulty": "intermediate"
+    }
+  ]
 }
