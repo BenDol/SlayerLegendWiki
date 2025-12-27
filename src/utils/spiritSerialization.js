@@ -161,6 +161,22 @@ export const deserializeSlot = (slot, spiritsData, mySpirits = []) => {
 
   // BASE SPIRIT (Snapshot) - already deserialized
   if (slot.spirit && typeof slot.spirit === 'object' && slot.spirit.name) {
+    // Auto-upgrade to collection spirit if it exists in mySpirits
+    if ((slot.type === "base" || !slot.type) && mySpirits && mySpirits.length > 0) {
+      const collectionSpirit = mySpirits.find(ms => ms.spiritId === slot.spirit.id);
+      if (collectionSpirit) {
+        return {
+          type: "collection",
+          mySpiritId: collectionSpirit.id,
+          spirit: slot.spirit,
+          level: collectionSpirit.level,
+          awakeningLevel: collectionSpirit.awakeningLevel,
+          evolutionLevel: collectionSpirit.evolutionLevel,
+          skillEnhancementLevel: collectionSpirit.skillEnhancementLevel
+        };
+      }
+    }
+
     return {
       type: slot.type || "base",
       spirit: slot.spirit,
@@ -174,6 +190,23 @@ export const deserializeSlot = (slot, spiritsData, mySpirits = []) => {
   // BASE SPIRIT (Snapshot) - needs deserialization (includes migration from old format)
   if (slot.type === "base" || slot.spiritId !== undefined) {
     const spirit = spiritsData.find(s => s.id === slot.spiritId);
+
+    // Auto-upgrade to collection spirit if it exists in mySpirits
+    if (mySpirits && mySpirits.length > 0) {
+      const collectionSpirit = mySpirits.find(ms => ms.spiritId === slot.spiritId);
+      if (collectionSpirit) {
+        return {
+          type: "collection",
+          mySpiritId: collectionSpirit.id,
+          spirit: spirit || null,
+          level: collectionSpirit.level,
+          awakeningLevel: collectionSpirit.awakeningLevel,
+          evolutionLevel: collectionSpirit.evolutionLevel,
+          skillEnhancementLevel: collectionSpirit.skillEnhancementLevel
+        };
+      }
+    }
+
     return {
       type: "base",
       spirit: spirit || null,
