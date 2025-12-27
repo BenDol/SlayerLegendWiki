@@ -196,6 +196,6 @@ function parseHeaders(headersText) {
   return headers;
 }
 
-module.exports = {
+export {
   parseMultipartFormData,
 };

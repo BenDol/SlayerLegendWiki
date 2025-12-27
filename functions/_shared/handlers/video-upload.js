@@ -531,7 +531,7 @@ function generateContentPRBody(params) {
   return lines.filter(line => line !== '').join('\n');
 }
 
-module.exports = {
+export {
   handleVideoUpload,
   createContentPR,
 };

@@ -1300,9 +1300,6 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         // Restore currentLoadedBuildId for saved build highlighting
         if (draft.currentLoadedBuildId !== undefined) {
           setCurrentLoadedBuildId(draft.currentLoadedBuildId);
-          logger.debug('Restored currentLoadedBuildId from draft', {
-            buildId: draft.currentLoadedBuildId
-          });
         }
 
         logger.debug('Draft loaded and deserialized - Designer grid', {
@@ -2409,10 +2406,6 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
     setInventory(deserialized.inventory);
     setHasUnsavedChanges(false);
     setCurrentLoadedBuildId(savedBuild.id);
-    logger.debug('Set currentLoadedBuildId after loading build', {
-      buildId: savedBuild.id,
-      buildName: savedBuild.name
-    });
 
     // Update locked inventory indices
     updateLockedInventoryIndices(deserialized.inventory, deserialized.gridState);

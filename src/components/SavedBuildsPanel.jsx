@@ -510,15 +510,6 @@ const SavedBuildsPanel = ({
             <div className="max-h-[230px] overflow-y-auto space-y-2 pr-2">
               {savedBuilds.map((build) => {
                 const isCurrentlyLoaded = currentLoadedBuildId === build.id;
-                if (buildType === 'engraving-builds' && build === savedBuilds[0]) {
-                  logger.debug('SavedBuildsPanel highlight check', {
-                    currentLoadedBuildId,
-                    firstBuildId: build.id,
-                    firstBuildName: build.name,
-                    isCurrentlyLoaded,
-                    allBuildIds: savedBuilds.map(b => b.id)
-                  });
-                }
                 return (
                   <div
                     key={build.id}
