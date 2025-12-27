@@ -23,6 +23,7 @@ import SpiritSprite from './SpiritSprite';
  * @param {boolean} showSkillName - Show skill name below name (default: false)
  * @param {boolean} showElementIcon - Show element icon overlay on sprite (default: true)
  * @param {boolean} showEnhancementLevel - Show enhancement level below name (default: false)
+ * @param {boolean} showName - Show spirit name (default: true)
  * @param {string} subtitle - Optional subtitle text to show below name
  * @param {string} size - Size variant: 'small', 'medium', 'large' (default: 'medium')
  * @param {string} className - Additional CSS classes for container
@@ -39,6 +40,7 @@ const SpiritComponent = ({
   showSkillName = false,
   showElementIcon = true,
   showEnhancementLevel = false,
+  showName = true,
   subtitle = null,
   size = 'medium',
   className = '',
@@ -171,9 +173,11 @@ const SpiritComponent = ({
       {/* Spirit Info Below */}
       <div className="flex flex-col items-center gap-0.5 w-full">
         {/* Spirit Name */}
-        <div className={`${sizeConfig.nameText} font-bold text-gray-900 dark:text-white text-center truncate w-full px-1`}>
-          {spirit.name}
-        </div>
+        {showName && (
+          <div className={`${sizeConfig.nameText} font-bold text-gray-900 dark:text-white text-center truncate w-full px-1`}>
+            {spirit.name}
+          </div>
+        )}
 
         {/* Subtitle (if provided) */}
         {subtitle && (

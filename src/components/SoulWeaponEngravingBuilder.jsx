@@ -392,9 +392,10 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
       designerGrid,
       gridType,
       completionAtk,
-      completionHp
+      completionHp,
+      currentLoadedBuildId // Preserve loaded build ID for highlighting
     };
-  }, [buildName, selectedWeapon, gridState, inventory, highestUnlockedWeapon, designerGrid, gridType, completionAtk, completionHp]);
+  }, [buildName, selectedWeapon, gridState, inventory, highestUnlockedWeapon, designerGrid, gridType, completionAtk, completionHp, currentLoadedBuildId]);
 
   // Draft storage hook
   const { loadDraft, clearDraft } = useDraftStorage(
@@ -712,14 +713,30 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                 logger.debug('Grid state set from saved build (optimized format)');
               }
             } else if (savedBuild.gridState) {
-              // Old format: full grid state
+              // Old format: full grid state - need to deserialize (reconstruct shape objects)
               logger.debug('Loading grid state from saved build (legacy format)');
-              setGridState(savedBuild.gridState);
+
+              const deserializedGridState = savedBuild.gridState.map(row =>
+                row.map(cell => ({
+                  active: cell.active,
+                  piece: cell.piece ? {
+                    ...cell.piece,
+                    shape: engravings.find(e => e.id === cell.piece.shapeId)
+                  } : null
+                }))
+              );
+
+              setGridState(deserializedGridState);
             }
 
-            // Load inventory
+            // Load inventory - need to deserialize (reconstruct shape objects)
             if (savedBuild.inventory) {
-              setInventory(savedBuild.inventory);
+              const deserializedInventory = savedBuild.inventory.map(item => item ? {
+                ...item,
+                shape: engravings.find(e => e.id === item.shapeId)
+              } : null);
+
+              setInventory(deserializedInventory);
             }
 
             // Load weapon
@@ -1280,10 +1297,108 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
           setCompletionHp(draft.completionHp);
         }
 
+        // Restore currentLoadedBuildId for saved build highlighting
+        if (draft.currentLoadedBuildId !== undefined) {
+          setCurrentLoadedBuildId(draft.currentLoadedBuildId);
+          logger.debug('Restored currentLoadedBuildId from draft', {
+            buildId: draft.currentLoadedBuildId
+          });
+        }
+
         logger.debug('Draft loaded and deserialized - Designer grid', {
           gridType: draft.gridType,
           designerGridSize: draft.designerGrid ? `${draft.designerGrid.length}x${draft.designerGrid[0]?.length || 0}` : 'none'
         });
+      }
+      // Load from initialBuild (e.g., from Battle Loadouts)
+      else if (initialBuild) {
+        logger.debug('Loading initialBuild', {
+          weaponId: initialBuild.weaponId,
+          weaponName: initialBuild.weaponName
+        });
+
+        // Find the weapon (merge grid data with base weapon data)
+        const baseWeapon = filteredAllWeapons.find(w => w.id === initialBuild.weaponId);
+        const gridWeapon = weaponsData.weapons?.find(w => w.id === initialBuild.weaponId);
+
+        let weapon;
+        if (gridWeapon && baseWeapon) {
+          // Merge grid data with base weapon data
+          weapon = {
+            ...gridWeapon,
+            image: baseWeapon.image,
+            attack: baseWeapon.attack,
+            requirements: baseWeapon.requirements
+          };
+          logger.debug('Loaded weapon from initialBuild (merged)', {
+            name: weapon.name,
+            id: weapon.id
+          });
+        } else if (gridWeapon) {
+          weapon = gridWeapon;
+          logger.debug('Loaded weapon from initialBuild (grid only)', {
+            name: weapon.name
+          });
+        } else if (baseWeapon) {
+          weapon = baseWeapon;
+          logger.debug('Loaded weapon from initialBuild (base only)', {
+            name: weapon.name
+          });
+        } else {
+          logger.error('Weapon not found for initialBuild', {
+            weaponId: initialBuild.weaponId,
+            weaponName: initialBuild.weaponName
+          });
+        }
+
+        if (weapon) {
+          // Mark this weapon as already initialized
+          const weaponKey = `${weapon.id}-${weapon.name}`;
+          hasInitializedGridForWeapon.current = weaponKey;
+          setSelectedWeapon(weapon);
+
+          // Deserialize gridState (restore shape objects from IDs)
+          if (initialBuild.gridState) {
+            const gridState = initialBuild.gridState.map(row =>
+              row.map(cell => ({
+                active: cell.active,
+                piece: cell.piece ? {
+                  ...cell.piece,
+                  shape: engravingsData.shapes.find(e => e.id === cell.piece.shapeId)
+                } : null
+              }))
+            );
+            setGridState(gridState);
+          }
+
+          // Deserialize inventory (restore shape objects from IDs)
+          if (initialBuild.inventory) {
+            const deserializedInventory = initialBuild.inventory.map(item => item ? {
+              ...item,
+              shape: engravingsData.shapes.find(e => e.id === item.shapeId)
+            } : null);
+            setInventory(deserializedInventory);
+
+            // Update locked inventory indices to match placed pieces
+            if (initialBuild.gridState) {
+              const locked = [];
+              initialBuild.gridState.forEach(row => {
+                row.forEach(cell => {
+                  if (cell.piece) {
+                    locked.push(cell.piece.inventoryIndex);
+                  }
+                });
+              });
+              setLockedInventoryIndices([...new Set(locked.filter(i => i !== undefined))]);
+            }
+          }
+
+          logger.info('Initial build loaded successfully', {
+            weaponName: weapon.name,
+            gridCellsWithPieces: initialBuild.gridState ?
+              initialBuild.gridState.flat().filter(c => c.piece).length : 0
+          });
+        }
       }
 
     } catch (error) {
@@ -2294,6 +2409,10 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
     setInventory(deserialized.inventory);
     setHasUnsavedChanges(false);
     setCurrentLoadedBuildId(savedBuild.id);
+    logger.debug('Set currentLoadedBuildId after loading build', {
+      buildId: savedBuild.id,
+      buildName: savedBuild.name
+    });
 
     // Update locked inventory indices
     updateLockedInventoryIndices(deserialized.inventory, deserialized.gridState);

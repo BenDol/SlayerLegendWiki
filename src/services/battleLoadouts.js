@@ -3,6 +3,7 @@ import { createUserIdLabel } from '../../wiki-framework/src/utils/githubLabelUti
 import { createLogger } from '../utils/logger';
 import { eventBus, EventNames } from '../../wiki-framework/src/services/eventBus.js';
 import { queueAchievementCheck } from '../../wiki-framework/src/services/achievements/achievementQueue.js';
+import { deserializeSoulWeaponBuild } from '../utils/battleLoadoutSerializer.js';
 
 const logger = createLogger('BattleLoadouts');
 
@@ -97,6 +98,36 @@ export async function getUserLoadouts(owner, repo, username, userId = null) {
     try {
       const loadouts = JSON.parse(loadoutsIssue.body || '[]');
       logger.debug(`Loaded ${loadouts.length} loadouts for ${username}`);
+
+      // Deserialize soul weapon builds (reconstruct shape objects from shapeIds)
+      const shapesResponse = await fetch('/data/soul-weapon-engravings.json').catch(err => {
+        logger.warn('Failed to load shapes for deserialization', { error: err });
+        return null;
+      });
+
+      if (shapesResponse && shapesResponse.ok) {
+        const shapesData = await shapesResponse.json();
+        // The JSON file has shapes in a "shapes" property, not as a direct array
+        const shapes = shapesData.shapes || [];
+
+        if (shapes.length > 0) {
+          // Deserialize each loadout's soul weapon build
+          const deserializedLoadouts = loadouts.map(loadout => {
+            if (loadout.soulWeaponBuild) {
+              return {
+                ...loadout,
+                soulWeaponBuild: deserializeSoulWeaponBuild(loadout.soulWeaponBuild, shapes)
+              };
+            }
+            return loadout;
+          });
+
+          logger.debug(`Deserialized ${deserializedLoadouts.filter(l => l.soulWeaponBuild).length} soul weapon builds`);
+          return Array.isArray(deserializedLoadouts) ? deserializedLoadouts : [];
+        }
+      }
+
+      // If shapes couldn't be loaded, return loadouts as-is (will have serialized soul weapon builds)
       return Array.isArray(loadouts) ? loadouts : [];
     } catch (parseError) {
       logger.error(`Failed to parse loadouts data for ${username}`, { error: parseError });

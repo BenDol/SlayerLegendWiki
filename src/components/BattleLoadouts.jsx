@@ -7,6 +7,8 @@ import SpiritBuilderModal from './SpiritBuilderModal';
 import SpiritComponent from './SpiritComponent';
 import SoulWeaponEngravingBuilderModal from './SoulWeaponEngravingBuilderModal';
 import SoulWeaponEngravingGrid from './SoulWeaponEngravingGrid';
+import SkillStoneBuilderModal from './SkillStoneBuilderModal';
+import SkillStone from './SkillStone';
 import SavedLoadoutsPanel from './SavedLoadoutsPanel';
 import ValidatedInput from './ValidatedInput';
 import { encodeLoadout, decodeLoadout } from '../../wiki-framework/src/utils/battleLoadoutEncoder';
@@ -16,6 +18,7 @@ import { saveBuild, loadBuild, generateShareUrl } from '../../wiki-framework/src
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
 import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { serializeBuild, deserializeBuild, serializeBuildForSharing } from '../utils/spiritSerialization';
+import { serializeLoadoutForStorage, serializeLoadoutForSharing, deserializeSoulWeaponBuild } from '../utils/battleLoadoutSerializer';
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 import { createLogger } from '../utils/logger';
 
@@ -42,7 +45,9 @@ const BattleLoadouts = () => {
   const [skills, setSkills] = useState([]);
   const [spirits, setSpirits] = useState([]);
   const [mySpirits, setMySpirits] = useState([]);
+  const [shapes, setShapes] = useState([]); // Soul weapon engraving shapes
   const [allWeapons, setAllWeapons] = useState([]); // All weapons for soul weapon preview
+  const [stoneData, setStoneData] = useState(null); // Skill stones data
   const [allSkillBuilds, setAllSkillBuilds] = useState([]);
   const [allSpiritBuilds, setAllSpiritBuilds] = useState([]);
   const [userBuildsLoaded, setUserBuildsLoaded] = useState(false);
@@ -50,6 +55,7 @@ const BattleLoadouts = () => {
   const [showSkillBuilder, setShowSkillBuilder] = useState(false);
   const [showSpiritBuilder, setShowSpiritBuilder] = useState(false);
   const [showSoulWeaponBuilder, setShowSoulWeaponBuilder] = useState(false);
+  const [showSkillStoneBuilder, setShowSkillStoneBuilder] = useState(false);
   const [showSkillInfo, setShowSkillInfo] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -74,10 +80,16 @@ const BattleLoadouts = () => {
     { loadoutName, currentLoadout }
   );
 
-  // Load skills, spirits, and weapons data
+  // Load skills, spirits, weapons, shapes, and stone data
   useEffect(() => {
+    logger.info('BattleLoadouts: Starting initial data load (skills, spirits, weapons, shapes, stone data)');
     const loadData = async () => {
-      await Promise.all([loadSkills(), loadSpirits(), loadWeapons()]);
+      try {
+        await Promise.all([loadSkills(), loadSpirits(), loadWeapons(), loadShapes(), loadStoneData()]);
+        logger.info('BattleLoadouts: All initial data loaded successfully');
+      } catch (error) {
+        logger.error('BattleLoadouts: Error during initial data load', { error: error.message, stack: error.stack });
+      }
     };
     loadData();
   }, []);
@@ -98,7 +110,7 @@ const BattleLoadouts = () => {
 
   // Load loadout from URL
   useEffect(() => {
-    if (skills.length === 0 || spirits.length === 0) return; // Wait for skills and spirits to load
+    if (skills.length === 0 || spirits.length === 0 || shapes.length === 0) return; // Wait for skills, spirits, and shapes to load
 
     // If authenticated, wait for user builds to load before processing draft
     if (isAuthenticated && user?.id && !userBuildsLoaded) {
@@ -127,11 +139,12 @@ const BattleLoadouts = () => {
           const buildData = await loadBuild(owner, repo, shareChecksum);
 
           if (buildData.type === 'battle-loadouts') {
-            // Deserialize skill build and spirit build (pass mySpirits for collection resolution)
+            // Deserialize skill build, spirit build, and soul weapon build
             const deserializedLoadout = {
               ...buildData.data,
               skillBuild: buildData.data.skillBuild ? deserializeSkillBuild(buildData.data.skillBuild, skills) : null,
-              spiritBuild: buildData.data.spiritBuild ? deserializeSpiritBuild(buildData.data.spiritBuild, spirits, mySpirits) : null
+              spiritBuild: buildData.data.spiritBuild ? deserializeSpiritBuild(buildData.data.spiritBuild, spirits, mySpirits) : null,
+              soulWeaponBuild: buildData.data.soulWeaponBuild ? deserializeSoulWeaponBuild(buildData.data.soulWeaponBuild, shapes) : null
             };
             setCurrentLoadout(deserializedLoadout);
             setLoadoutName(deserializedLoadout.name || '');
@@ -166,17 +179,28 @@ const BattleLoadouts = () => {
 
           const savedLoadout = loadouts.find(l => l.id === loadoutId);
           if (savedLoadout) {
-            // Deserialize the loadout
-            const deserializedLoadout = {
-              ...savedLoadout,
-              skillBuild: savedLoadout.skillBuild ? deserializeSkillBuild(savedLoadout.skillBuild, skills) : null,
-              spiritBuild: savedLoadout.spiritBuild ? deserializeSpiritBuild(savedLoadout.spiritBuild, spirits, mySpirits) : null
-            };
-            setCurrentLoadout(deserializedLoadout);
-            setLoadoutName(deserializedLoadout.name || '');
+            logger.info('LOAD: Found saved loadout', {
+              loadoutId,
+              loadoutName: savedLoadout.name,
+              hasSkillStoneBuild: !!savedLoadout.skillStoneBuild,
+              skillStoneBuild: savedLoadout.skillStoneBuild
+            });
+
+            // Resolve the loadout (handles both build IDs and embedded builds)
+            const resolvedLoadout = resolveLoadoutBuilds(savedLoadout);
+
+            logger.info('LOAD: Resolved loadout', {
+              hasSkillBuild: !!resolvedLoadout.skillBuild,
+              hasSpiritBuild: !!resolvedLoadout.spiritBuild,
+              hasSkillStoneBuild: !!resolvedLoadout.skillStoneBuild,
+              skillStoneBuild: resolvedLoadout.skillStoneBuild
+            });
+
+            setCurrentLoadout(resolvedLoadout);
+            setLoadoutName(resolvedLoadout.name || '');
             setCurrentLoadedLoadoutId(loadoutId);
             setHasUnsavedChanges(false);
-            logger.info('Saved loadout loaded successfully', { loadoutName: deserializedLoadout.name });
+            logger.info('Saved loadout loaded successfully', { loadoutName: resolvedLoadout.name });
           } else {
             logger.error('Loadout not found', { loadoutId });
             alert('Loadout not found');
@@ -195,11 +219,12 @@ const BattleLoadouts = () => {
       try {
         const decodedLoadout = decodeLoadout(encodedLoadout);
         if (decodedLoadout) {
-          // Deserialize skill build and spirit build (pass mySpirits for collection resolution)
+          // Deserialize skill build, spirit build, and soul weapon build
           const deserializedLoadout = {
             ...decodedLoadout,
             skillBuild: decodedLoadout.skillBuild ? deserializeSkillBuild(decodedLoadout.skillBuild, skills) : null,
-            spiritBuild: decodedLoadout.spiritBuild ? deserializeSpiritBuild(decodedLoadout.spiritBuild, spirits, mySpirits) : null
+            spiritBuild: decodedLoadout.spiritBuild ? deserializeSpiritBuild(decodedLoadout.spiritBuild, spirits, mySpirits) : null,
+            soulWeaponBuild: decodedLoadout.soulWeaponBuild ? deserializeSoulWeaponBuild(decodedLoadout.soulWeaponBuild, shapes) : null
           };
           setCurrentLoadout(deserializedLoadout);
           setLoadoutName(deserializedLoadout.name || '');
@@ -213,31 +238,62 @@ const BattleLoadouts = () => {
     else {
       const draft = loadDraft();
       if (draft) {
+        logger.debug('Loading draft', {
+          hasSkillBuildId: !!draft.currentLoadout.skillBuildId,
+          hasSpirBuildId: !!draft.currentLoadout.spiritBuildId,
+          hasSkillBuild: !!draft.currentLoadout.skillBuild,
+          hasSpiritBuild: !!draft.currentLoadout.spiritBuild,
+          skillBuildHasId: !!draft.currentLoadout.skillBuild?.id,
+          spiritBuildHasId: !!draft.currentLoadout.spiritBuild?.id
+        });
+
         setLoadoutName(draft.loadoutName || '');
 
-        // Check if draft uses new format (build IDs) or old format (full builds)
-        if (draft.currentLoadout.skillBuildId !== undefined || draft.currentLoadout.spiritBuildId !== undefined) {
-          // New format - resolve build IDs to full builds
-          logger.debug('Loading draft with build IDs', {
-            skillBuildId: draft.currentLoadout.skillBuildId,
-            spiritBuildId: draft.currentLoadout.spiritBuildId
-          });
-          const resolvedLoadout = resolveLoadoutBuilds(draft.currentLoadout);
-          setCurrentLoadout(resolvedLoadout);
-        } else {
-          // Old format - deserialize embedded builds
-          logger.debug('Loading draft with embedded builds');
-          const deserializedLoadout = {
-            ...draft.currentLoadout,
-            skillBuild: draft.currentLoadout.skillBuild ? deserializeSkillBuild(draft.currentLoadout.skillBuild, skills) : null,
-            spiritBuild: draft.currentLoadout.spiritBuild ? deserializeSpiritBuild(draft.currentLoadout.spiritBuild, spirits, mySpirits) : null
-          };
-          setCurrentLoadout(deserializedLoadout);
-        }
+        // Always use resolveLoadoutBuilds which handles both build IDs and embedded builds
+        const resolvedLoadout = resolveLoadoutBuilds(draft.currentLoadout);
+
+        logger.debug('Draft resolved', {
+          hasSkillBuild: !!resolvedLoadout.skillBuild,
+          hasSpiritBuild: !!resolvedLoadout.spiritBuild,
+          skillBuildId: resolvedLoadout.skillBuild?.id,
+          spiritBuildId: resolvedLoadout.spiritBuild?.id
+        });
+
+        setCurrentLoadout(resolvedLoadout);
         setHasUnsavedChanges(true);
       }
     }
-  }, [skills, spirits, mySpirits, allSkillBuilds, allSpiritBuilds, userBuildsLoaded, isAuthenticated, user?.id, loadDraft]);
+  }, [skills, spirits, mySpirits, shapes, allSkillBuilds, allSpiritBuilds, userBuildsLoaded, isAuthenticated, user?.id, loadDraft]);
+
+  // Re-deserialize soul weapon build when shapes become available
+  useEffect(() => {
+    logger.debug('Re-deserialization useEffect triggered', {
+      shapesLength: shapes.length,
+      hasSoulWeaponBuild: !!currentLoadout.soulWeaponBuild,
+      hasGridState: !!currentLoadout.soulWeaponBuild?.gridState
+    });
+
+    if (shapes.length > 0 && currentLoadout.soulWeaponBuild) {
+      // Check if soul weapon build needs deserialization (has shapeId but no shape in pieces)
+      const gridState = currentLoadout.soulWeaponBuild.gridState;
+      if (gridState && Array.isArray(gridState)) {
+        const needsDeserialization = gridState.some(row =>
+          row.some(cell => cell.piece && cell.piece.shapeId && !cell.piece.shape)
+        );
+
+        logger.debug('Deserialization check', { needsDeserialization });
+
+        if (needsDeserialization) {
+          logger.info('Re-deserializing soul weapon build after shapes loaded');
+          const deserializedSoulWeaponBuild = deserializeSoulWeaponBuild(currentLoadout.soulWeaponBuild, shapes);
+          setCurrentLoadout(prev => ({
+            ...prev,
+            soulWeaponBuild: deserializedSoulWeaponBuild
+          }));
+        }
+      }
+    }
+  }, [shapes, currentLoadout.soulWeaponBuild]);
 
   const loadSkills = async () => {
     try {
@@ -270,6 +326,34 @@ const BattleLoadouts = () => {
       logger.debug('Loaded weapons', { count: Array.isArray(data) ? data.length : 0 });
     } catch (error) {
       logger.error('Failed to load weapons', { error });
+    }
+  };
+
+  const loadStoneData = async () => {
+    try {
+      const response = await fetch('/data/skill_stones.json');
+      const data = await response.json();
+      setStoneData(data);
+      logger.debug('Loaded skill stones data');
+    } catch (error) {
+      logger.error('Failed to load skill stones', { error });
+    }
+  };
+
+  const loadShapes = async () => {
+    try {
+      logger.debug('Starting to load soul weapon engraving shapes');
+      const response = await fetch('/data/soul-weapon-engravings.json');
+      logger.debug('Shapes fetch response received', { ok: response.ok, status: response.status });
+      const data = await response.json();
+      // The JSON file has shapes in a "shapes" property, not as a direct array
+      const shapesArray = data.shapes || [];
+      logger.debug('Shapes data parsed', { isArray: Array.isArray(shapesArray), length: shapesArray.length });
+      setShapes(Array.isArray(shapesArray) ? shapesArray : []);
+      logger.info('Loaded soul weapon engraving shapes', { count: shapesArray.length });
+    } catch (error) {
+      logger.error('Failed to load shapes', { error: error.message, stack: error.stack });
+      setShapes([]);
     }
   };
 
@@ -436,6 +520,7 @@ const BattleLoadouts = () => {
       skillBuildId: loadout.skillBuild?.id || null,
       spiritBuildId: loadout.spiritBuild?.id || null,
       soulWeaponBuild: loadout.soulWeaponBuild || null,
+      skillStoneBuild: loadout.skillStoneBuild || null,
       spirit: loadout.spirit ? { spiritId: loadout.spirit.id } : null,
       skillStone: loadout.skillStone,
       promotionAbility: loadout.promotionAbility,
@@ -458,6 +543,7 @@ const BattleLoadouts = () => {
         gridState: loadout.soulWeaponBuild.gridState,
         inventory: loadout.soulWeaponBuild.inventory
       } : null,
+      skillStoneBuild: loadout.skillStoneBuild || null,
       spirit: loadout.spirit ? { spiritId: loadout.spirit.id } : null,
       skillStone: loadout.skillStone,
       promotionAbility: loadout.promotionAbility,
@@ -475,9 +561,29 @@ const BattleLoadouts = () => {
 
     // Resolve skill build
     if (loadout.skillBuildId) {
+      logger.debug('Resolving skill build', {
+        skillBuildId: loadout.skillBuildId,
+        allSkillBuildsCount: allSkillBuilds.length,
+        allSkillBuildIds: allSkillBuilds.map(b => b.id)
+      });
+
       const found = allSkillBuilds.find(b => b.id === loadout.skillBuildId);
       if (found) {
+        logger.debug('Skill build found before deserialization', {
+          foundId: found.id,
+          foundName: found.name,
+          hasSlots: !!found.slots
+        });
+
         skillBuild = deserializeSkillBuild(found, skills);
+
+        logger.debug('Skill build after deserialization', {
+          hasSkillBuild: !!skillBuild,
+          skillBuildId: skillBuild?.id,
+          skillBuildName: skillBuild?.name,
+          skillBuildMaxSlots: skillBuild?.maxSlots,
+          slotsCount: skillBuild?.slots?.length
+        });
       } else {
         // Build not found - mark as missing
         skillBuild = {
@@ -486,11 +592,18 @@ const BattleLoadouts = () => {
           name: 'Deleted Build',
           slots: []
         };
-        logger.warn('Skill build not found', { skillBuildId: loadout.skillBuildId });
+        logger.warn('Skill build not found', {
+          skillBuildId: loadout.skillBuildId,
+          availableBuilds: allSkillBuilds.map(b => ({ id: b.id, name: b.name }))
+        });
       }
     }
     // Handle old embedded format (migration)
     else if (loadout.skillBuild) {
+      logger.debug('Using embedded skill build (migration)', {
+        hasId: !!loadout.skillBuild.id,
+        id: loadout.skillBuild.id
+      });
       skillBuild = deserializeSkillBuild(loadout.skillBuild, skills);
     }
 
@@ -529,11 +642,22 @@ const BattleLoadouts = () => {
       spiritBuild = normalizeSpiritBuild(spiritBuild);
     }
 
+    // Deserialize soul weapon build (reconstruct shape objects from shapeIds)
+    let soulWeaponBuild = null;
+    if (loadout.soulWeaponBuild && shapes.length > 0) {
+      soulWeaponBuild = deserializeSoulWeaponBuild(loadout.soulWeaponBuild, shapes);
+      logger.debug('Deserialized soul weapon build in resolveLoadoutBuilds');
+    } else if (loadout.soulWeaponBuild) {
+      // Shapes not loaded yet, pass through as-is (will be deserialized later)
+      soulWeaponBuild = loadout.soulWeaponBuild;
+      logger.warn('Soul weapon build present but shapes not loaded yet');
+    }
+
     return {
       ...loadout,
       skillBuild,
       spiritBuild,
-      soulWeaponBuild: loadout.soulWeaponBuild || null
+      soulWeaponBuild
     };
   };
 
@@ -585,6 +709,10 @@ const BattleLoadouts = () => {
       logger.debug('loadoutsMatch: soulWeaponBuild mismatch');
       return false;
     }
+    if (JSON.stringify(currentLoadout.skillStoneBuild) !== JSON.stringify(savedLoadout.skillStoneBuild)) {
+      logger.debug('loadoutsMatch: skillStoneBuild mismatch');
+      return false;
+    }
     if (JSON.stringify(currentLoadout.skillStone) !== JSON.stringify(savedLoadout.skillStone)) {
       logger.debug('loadoutsMatch: skillStone mismatch');
       return false;
@@ -616,6 +744,7 @@ const BattleLoadouts = () => {
       currentLoadout.skillBuild !== null ||
       currentLoadout.spiritBuild !== null ||
       currentLoadout.soulWeaponBuild !== null ||
+      currentLoadout.skillStoneBuild !== null ||
       currentLoadout.spirit !== null ||
       currentLoadout.skillStone !== null ||
       currentLoadout.promotionAbility !== null ||
@@ -694,6 +823,18 @@ const BattleLoadouts = () => {
   const handleClearSoulWeaponBuild = () => {
     if (!confirm('Remove soul weapon build from this loadout?')) return;
     setCurrentLoadout(prev => ({ ...prev, soulWeaponBuild: null }));
+  };
+
+  // Handle skill stone build save
+  const handleSkillStoneBuildSave = (build) => {
+    setCurrentLoadout(prev => ({ ...prev, skillStoneBuild: build }));
+    setShowSkillStoneBuilder(false);
+  };
+
+  // Clear skill stone build
+  const handleClearSkillStoneBuild = () => {
+    if (!confirm('Remove skill stone build from this loadout?')) return;
+    setCurrentLoadout(prev => ({ ...prev, skillStoneBuild: null }));
   };
 
   // Remove individual spirit from slot
@@ -1013,18 +1154,21 @@ const BattleLoadouts = () => {
       }
 
       // Step 3: Serialize loadout with build IDs
-      const loadoutData = {
+      // Use dedicated serializer to optimize data (especially soul weapon builds)
+      const loadoutToSave = {
+        ...currentLoadout,
         name: loadoutName,
-        skillBuildId: skillBuildId,
-        spiritBuildId: spiritBuildId,
-        soulWeaponBuild: currentLoadout.soulWeaponBuild || null,
-        spirit: currentLoadout.spirit ? { spiritId: currentLoadout.spirit.id } : null,
-        skillStone: currentLoadout.skillStone,
-        promotionAbility: currentLoadout.promotionAbility,
-        familiar: currentLoadout.familiar
+        skillBuild: currentLoadout.skillBuild ? { ...currentLoadout.skillBuild, id: skillBuildId } : null,
+        spiritBuild: currentLoadout.spiritBuild ? { ...currentLoadout.spiritBuild, id: spiritBuildId } : null
       };
+      const loadoutData = serializeLoadoutForStorage(loadoutToSave);
 
-      logger.debug('Saving battle loadout', { loadoutData });
+      logger.info('SAVE: Preparing to save battle loadout', {
+        loadoutName: loadoutData.name,
+        hasSkillStoneBuild: !!loadoutData.skillStoneBuild,
+        hasSoulWeaponBuild: !!loadoutData.soulWeaponBuild,
+        soulWeaponBuildSize: loadoutData.soulWeaponBuild ? JSON.stringify(loadoutData.soulWeaponBuild).length : 0
+      });
 
       const response = await fetch(getSaveDataEndpoint(), {
         method: 'POST',
@@ -1055,6 +1199,17 @@ const BattleLoadouts = () => {
       const savedLoadout = data.loadouts?.find(l => l.name === loadoutName);
       if (savedLoadout) {
         setCurrentLoadedLoadoutId(savedLoadout.id);
+        logger.info('SAVE: Loadout saved successfully', {
+          loadoutId: savedLoadout.id,
+          loadoutName: savedLoadout.name,
+          hasSkillStoneBuildInResponse: !!savedLoadout.skillStoneBuild,
+          skillStoneBuildInResponse: savedLoadout.skillStoneBuild
+        });
+      } else {
+        logger.warn('SAVE: Could not find saved loadout in response', {
+          loadoutName,
+          responseLoadoutCount: data.loadouts?.length
+        });
       }
 
       setSaveSuccess(true);
@@ -1420,11 +1575,11 @@ const BattleLoadouts = () => {
           />
 
           {/* Skill Stones - Row 2, Col 1 */}
-          <PlaceholderSection
-            title="Skill Stones"
-            description="Skill Stone Builder coming soon"
-            icon="💎"
-            matchHeight={true}
+          <SkillStoneSection
+            skillStoneBuild={currentLoadout.skillStoneBuild}
+            onEdit={() => setShowSkillStoneBuilder(true)}
+            onClear={handleClearSkillStoneBuild}
+            stoneData={stoneData}
           />
 
           {/* Promotion Abilities - Row 2, Col 2 */}
@@ -1523,6 +1678,14 @@ const BattleLoadouts = () => {
         onSave={handleSoulWeaponBuildSave}
       />
 
+      {/* Skill Stone Builder Modal */}
+      <SkillStoneBuilderModal
+        isOpen={showSkillStoneBuilder}
+        onClose={() => setShowSkillStoneBuilder(false)}
+        initialBuild={currentLoadout.skillStoneBuild}
+        onSave={handleSkillStoneBuildSave}
+      />
+
       {/* Skill Information Modal */}
       <SkillInformation
         skill={selectedSkill}
@@ -1549,8 +1712,8 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick, onDragStart,
   // Show missing indicator if skill build is marked as missing
   if (skillBuild?.missing) {
     return (
-      <div style={{ paddingBottom: '2.5rem' }} className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 border border-gray-200 dark:border-gray-800">
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
+      <div style={{ paddingBottom: '2rem' }} className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 border border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
           <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Skills to use</span>
         </div>
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -1570,8 +1733,8 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick, onDragStart,
   }
 
   return (
-    <div style={{ paddingBottom: '2.5rem' }} className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 border border-gray-200 dark:border-gray-800">
-      <div className="flex items-center justify-between mb-3 sm:mb-4">
+    <div style={{ paddingBottom: '2rem' }} className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 border border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Skills to use</span>
         </div>
@@ -1596,10 +1759,10 @@ const SkillsSection = ({ skillBuild, onEdit, onClear, onSkillClick, onDragStart,
 
       {skillBuild ? (
         <div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3 md:mb-4">
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">
             Build: <span className="text-gray-900 dark:text-white font-medium">{skillBuild.name}</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 md:gap-4 justify-items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 justify-items-center">
             {skillBuild.slots.slice(0, 10).map((slot, index) => (
               <SkillSlot
                 key={index}
@@ -1825,6 +1988,12 @@ const SoulWeaponSection = ({ soulWeaponBuild, onEdit, onClear, allWeapons }) => 
     }
   };
 
+  // Check if soul weapon build is properly deserialized
+  const isDeserialized = soulWeaponBuild?.gridState ?
+    !soulWeaponBuild.gridState.some(row =>
+      row.some(cell => cell.piece && cell.piece.shapeId && !cell.piece.shape)
+    ) : true;
+
   // Find the weapon object for the build
   const weapon = soulWeaponBuild?.weaponId
     ? allWeapons.find(w => w.id === soulWeaponBuild.weaponId)
@@ -1864,6 +2033,11 @@ const SoulWeaponSection = ({ soulWeaponBuild, onEdit, onClear, allWeapons }) => 
       </div>
 
       {soulWeaponBuild ? (
+        !isDeserialized ? (
+          <div className="bg-gray-100 dark:bg-gray-800/50 rounded-lg border border-gray-300 dark:border-gray-700 p-4 w-full">
+            <p className="text-center text-gray-500 dark:text-gray-400 text-sm">Loading soul weapon data...</p>
+          </div>
+        ) : (
         <div className="flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-4 lg:gap-6">
           {weapon ? (
             <>
@@ -1942,6 +2116,7 @@ const SoulWeaponSection = ({ soulWeaponBuild, onEdit, onClear, allWeapons }) => 
             </div>
           )}
         </div>
+        )
       ) : (
         <button
           onClick={onEdit}
@@ -1950,6 +2125,86 @@ const SoulWeaponSection = ({ soulWeaponBuild, onEdit, onClear, allWeapons }) => 
           <div className="text-center px-2">
             <Plus className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
             <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">No soul weapon build configured</p>
+            <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click here or "Create" to get started</p>
+          </div>
+        </button>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Skill Stones Section Component
+ */
+const SkillStoneSection = ({ skillStoneBuild, onEdit, onClear, stoneData }) => {
+  const handleClear = () => {
+    if (window.confirm('Are you sure you want to clear the skill stone build? This cannot be undone.')) {
+      onClear();
+    }
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="text-2xl sm:text-3xl">💎</span>
+          <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Skill Stones</span>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={onEdit}
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
+          >
+            <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>{skillStoneBuild ? 'Edit' : 'Create'}</span>
+          </button>
+          {skillStoneBuild && (
+            <button
+              onClick={handleClear}
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
+            >
+              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {skillStoneBuild ? (
+        <div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3">
+            Build: <span className="text-gray-900 dark:text-white font-medium">{skillStoneBuild.name}</span>
+          </div>
+          <div className="grid grid-cols-3 gap-4 justify-items-center">
+            {skillStoneBuild.slots.map((slot, index) => (
+              <div key={index} className="flex flex-col items-center gap-2">
+                {slot.element && slot.tier ? (
+                  <SkillStone
+                    stoneType={slot.type}
+                    element={slot.element}
+                    tier={slot.tier}
+                    data={stoneData}
+                    size="medium"
+                  />
+                ) : (
+                  <div className="w-24 h-28 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400 dark:text-gray-500 text-xs">Empty</span>
+                  </div>
+                )}
+                <span className="text-xs text-gray-600 dark:text-gray-400">
+                  {stoneData?.stoneTypes[slot.type]?.name || slot.type}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={onEdit}
+          className="w-full flex items-center justify-center py-8 sm:py-10 md:py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+        >
+          <div className="text-center px-2">
+            <Plus className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">No skill stone build configured</p>
             <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click here or "Create" to get started</p>
           </div>
         </button>
@@ -1986,6 +2241,7 @@ function createEmptyLoadout(name) {
     skillBuild: null,
     spiritBuild: null,
     soulWeaponBuild: null,
+    skillStoneBuild: null,
     spirit: null,
     skillStone: null,
     promotionAbility: null,

@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import './SkillStone.css';
 
 /**
@@ -11,9 +12,13 @@ import './SkillStone.css';
  * @param {string} tier - Tier: 'A' or 'B'
  * @param {object} data - Skill stones data from skill_stones.json (optional, will fetch if not provided)
  * @param {string} size - Size: 'small', 'medium', 'large' (default: 'medium')
+ * @param {boolean} disableHover - If true, disables hover scale and tooltip effects (default: false)
  */
-const SkillStone = ({ stoneType, element, tier = 'A', data, size = 'medium' }) => {
+const SkillStone = ({ stoneType, element, tier = 'A', data, size = 'medium', disableHover = false }) => {
   const [stoneData, setStoneData] = React.useState(data);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [tooltipPosition, setTooltipPosition] = React.useState({ left: 0, top: 0 });
+  const stoneRef = React.useRef(null);
 
   React.useEffect(() => {
     if (!data) {
@@ -23,6 +28,24 @@ const SkillStone = ({ stoneType, element, tier = 'A', data, size = 'medium' }) =
         .catch(err => console.error('Failed to load skill stones data:', err));
     }
   }, [data]);
+
+  // Position tooltip on hover
+  const handleMouseEnter = () => {
+    if (disableHover || !stoneRef.current) return;
+
+    const rect = stoneRef.current.getBoundingClientRect();
+
+    // Position tooltip above the stone, centered
+    const left = rect.left + rect.width / 2;
+    const top = rect.top - 10; // 10px above the stone
+
+    setTooltipPosition({ left, top });
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
 
   if (!stoneData) {
     return <div className="skill-stone-loading">Loading...</div>;
@@ -39,13 +62,17 @@ const SkillStone = ({ stoneType, element, tier = 'A', data, size = 'medium' }) =
   const bonusText = stone.bonusFormat.replace('{value}', bonus);
 
   return (
-    <div
-      className={`skill-stone skill-stone--${size} skill-stone--${stone.shape} skill-stone--${element}`}
-      style={{
-        '--element-color': elementData.color,
-        '--element-glow': elementData.glowColor
-      }}
-    >
+    <>
+      <div
+        ref={stoneRef}
+        className={`skill-stone skill-stone--${size} skill-stone--${stone.shape} skill-stone--${element} ${disableHover ? 'skill-stone--no-hover' : ''}`}
+        style={{
+          '--element-color': elementData.color,
+          '--element-glow': elementData.glowColor
+        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
       {/* Glowing border */}
       <div className="skill-stone__border"></div>
 
@@ -69,17 +96,31 @@ const SkillStone = ({ stoneType, element, tier = 'A', data, size = 'medium' }) =
       <div className="skill-stone__tier-badge">
         {tier}
       </div>
+    </div>
 
-      {/* Tooltip */}
-      <div className="skill-stone__tooltip">
+    {/* Tooltip - Rendered to body via portal to escape parent transforms */}
+    {isHovered && !disableHover && createPortal(
+      <div
+        className="skill-stone__tooltip"
+        style={{
+          left: `${tooltipPosition.left}px`,
+          top: `${tooltipPosition.top}px`,
+          transform: 'translate(-50%, -100%)',
+          opacity: 1,
+          '--element-color': elementData.color,
+          '--element-glow': elementData.glowColor
+        }}
+      >
         <div className="skill-stone__tooltip-title">
           {elementData.name} {stone.name} ({tier})
         </div>
         <div className="skill-stone__tooltip-effect">
           {stone.description}: {bonusText}
         </div>
-      </div>
-    </div>
+      </div>,
+      document.body
+    )}
+    </>
   );
 };
 

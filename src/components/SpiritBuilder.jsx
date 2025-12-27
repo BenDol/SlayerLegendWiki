@@ -8,7 +8,7 @@ import ValidatedInput from './ValidatedInput';
 import { encodeBuild, decodeBuild } from '../../wiki-framework/src/components/wiki/BuildEncoder';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { useConfigStore } from '../../wiki-framework/src/store/configStore';
-import { setCache } from '../utils/buildCache';
+import { setCache, getCache } from '../utils/buildCache';
 import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
 import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
@@ -324,8 +324,17 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
     }
 
     try {
+      // Check cache first
+      const cached = getCache('my_spirits', user.id);
+      if (cached && Array.isArray(cached)) {
+        logger.debug('Loaded my-spirits from cache', { count: cached.length });
+        setMySpirits(cached);
+        setMySpiritsLoaded(true);
+        return;
+      }
+
       const endpoint = `${getLoadDataEndpoint()}?type=my-spirits&userId=${user.id}`;
-      logger.info('Loading my-spirits collection', { userId: user.id, endpoint });
+      logger.info('Loading my-spirits collection from API', { userId: user.id, endpoint });
       const response = await fetch(endpoint);
 
       logger.info('My-spirits response received', {
@@ -355,6 +364,10 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       // API returns { spirits: [...] }, extract the array
       const spiritsArray = data.spirits || data || [];
       setMySpirits(Array.isArray(spiritsArray) ? spiritsArray : []);
+
+      // Update cache with fetched data
+      setCache('my_spirits', user.id, spiritsArray);
+
       setMySpiritsLoaded(true); // Mark as loaded even if empty
       logger.info('Loaded my-spirits collection successfully', {
         count: spiritsArray?.length || 0,
@@ -682,6 +695,13 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       // The response should contain the saved spirits array
       // Find the newly saved spirit (it should be the one matching our spiritId)
       const savedSpirits = Array.isArray(responseData) ? responseData : (responseData.spirits || []);
+
+      // Update cache with the response data
+      if (savedSpirits && savedSpirits.length > 0) {
+        setCache('my_spirits', user.id, savedSpirits);
+        logger.debug('Updated my-spirits cache after save', { count: savedSpirits.length });
+      }
+
       const savedSpirit = savedSpirits.find(s => s.spiritId === spiritData.spiritId && s.level === spiritData.level);
 
       if (!savedSpirit || !savedSpirit.id) {
@@ -1295,6 +1315,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
   const handleSaveBuild = () => {
     if (onSave) {
       const buildData = {
+        id: currentLoadedBuildId, // Preserve build ID for existing builds
         name: buildName,
         slots: build.slots
       };

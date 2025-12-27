@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { Share2, Download, Upload, Settings, Trash2, Copy, Check, Save, Loader, CheckCircle2 } from 'lucide-react';
-import SkillSlot from './SkillSlot';
-import SkillSelector from './SkillSelector';
+import { Share2, Download, Upload, Trash2, Check, Save, Loader, CheckCircle2 } from 'lucide-react';
+import SkillStoneSlot from './SkillStoneSlot';
+import SkillStoneSelector from './SkillStoneSelector';
 import SavedBuildsPanel from './SavedBuildsPanel';
 import ValidatedInput from './ValidatedInput';
 import { encodeBuild, decodeBuild } from '../../wiki-framework/src/components/wiki/BuildEncoder';
@@ -13,17 +13,17 @@ import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 import { createLogger } from '../utils/logger';
 
-const logger = createLogger('SkillBuilder');
+const logger = createLogger('SkillStoneBuilder');
 
 /**
- * SkillBuilder Component
+ * SkillStoneBuilder Component
  *
- * Main component for creating and sharing skill builds
+ * Main component for creating and sharing skill stone builds
  * Features:
- * - Configurable skill slots (1-10)
+ * - 3 fixed slots (Cooldown, Time, Heat)
+ * - Element and tier selection for each slot
  * - URL sharing with encoded build data
  * - Import/Export builds as JSON
- * - Build statistics
  * - Draft auto-save to localStorage
  *
  * @param {boolean} isModal - If true, renders in modal mode with Save button instead of Share
@@ -31,21 +31,18 @@ const logger = createLogger('SkillBuilder');
  * @param {function} onSave - Callback when Save is clicked in modal mode
  * @param {boolean} allowSavingBuilds - If true, shows build name field and save-related UI (default: true)
  */
-const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave = null, allowSavingBuilds = true }, ref) => {
+const SkillStoneBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave = null, allowSavingBuilds = true }, ref) => {
   const { isAuthenticated, user } = useAuthStore();
-  const [skills, setSkills] = useState([]);
+  const [stoneData, setStoneData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [buildName, setBuildName] = useState('');
-  const [maxSlots, setMaxSlots] = useState(10);
-  const [autoMaxLevel, setAutoMaxLevel] = useState(false);
   const [build, setBuild] = useState({
-    slots: Array(10).fill(null).map(() => ({ skill: null, level: 1 }))
+    slots: createEmptySlots()
   });
-  const [showSkillSelector, setShowSkillSelector] = useState(false);
+  const [showStoneSelector, setShowStoneSelector] = useState(false);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState(null);
   const [copied, setCopied] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [draggedSlotIndex, setDraggedSlotIndex] = useState(null);
   const [currentLoadedBuildId, setCurrentLoadedBuildId] = useState(null);
   const [savedBuilds, setSavedBuilds] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -56,20 +53,20 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
   // Draft storage hook for auto-save/restore
   const { loadDraft, clearDraft } = useDraftStorage(
-    'skillBuilder',
+    'skillStoneBuilder',
     user,
     isModal,
-    { buildName, maxSlots, autoMaxLevel, build }
+    { buildName, build }
   );
 
-  // Load skills data
+  // Load stone data
   useEffect(() => {
-    loadSkills();
+    loadStoneData();
   }, []);
 
-  // Load build from URL after skills are loaded (only in page mode)
+  // Load build from URL after data is loaded (only in page mode)
   useEffect(() => {
-    if (skills.length === 0) return; // Wait for skills to load
+    if (!stoneData) return; // Wait for stone data to load
     if (isModal) return; // Skip URL loading in modal mode
 
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
@@ -91,11 +88,9 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
           const buildData = await loadSharedBuild(owner, repo, shareChecksum);
 
-          if (buildData.type === 'skill-builds') {
-            const deserializedBuild = deserializeBuild(buildData.data, skills);
+          if (buildData.type === 'skill-stone-builds') {
             setBuildName(buildData.data.name || '');
-            setMaxSlots(buildData.data.maxSlots || 10);
-            setBuild({ slots: deserializedBuild.slots });
+            setBuild({ slots: buildData.data.slots || createEmptySlots() });
             setHasUnsavedChanges(true);
             logger.info('Shared build loaded successfully');
           } else {
@@ -118,7 +113,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           setLoading(true);
           logger.info('Loading saved build', { buildId });
 
-          const response = await fetch(`${getLoadDataEndpoint()}?type=skill-builds&userId=${user.id}`);
+          const response = await fetch(`${getLoadDataEndpoint()}?type=skill-stone-builds&userId=${user.id}`);
           if (!response.ok) {
             throw new Error('Failed to load builds from server');
           }
@@ -127,11 +122,8 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
           const savedBuild = builds.find(b => b.id === buildId);
           if (savedBuild) {
-            const deserializedBuild = deserializeBuild(savedBuild, skills);
             setBuildName(savedBuild.name || '');
-            setMaxSlots(savedBuild.maxSlots || 10);
-            setAutoMaxLevel(savedBuild.autoMaxLevel || false);
-            setBuild({ slots: deserializedBuild.slots });
+            setBuild({ slots: savedBuild.slots || createEmptySlots() });
             setCurrentLoadedBuildId(buildId);
             setHasUnsavedChanges(false);
             logger.info('Saved build loaded successfully', { buildName: savedBuild.name });
@@ -154,11 +146,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         const decodedBuild = decodeBuild(encodedBuild);
         if (decodedBuild) {
           setBuildName(decodedBuild.name || '');
-          setMaxSlots(decodedBuild.maxSlots || 10);
-
-          // Deserialize build (convert skill IDs back to full skill objects)
-          const deserializedBuild = deserializeBuild(decodedBuild, skills);
-          setBuild({ slots: deserializedBuild.slots });
+          setBuild({ slots: decodedBuild.slots || createEmptySlots() });
           setHasUnsavedChanges(true); // Mark as having changes to block navigation
         }
       } catch (error) {
@@ -170,134 +158,64 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       const draft = loadDraft();
       if (draft) {
         setBuildName(draft.buildName || '');
-        setMaxSlots(draft.maxSlots || 10);
-        setAutoMaxLevel(draft.autoMaxLevel || false);
-
-        // Deserialize build to ensure skill objects are current
-        const deserializedBuild = deserializeBuild(draft.build, skills);
-        setBuild(deserializedBuild);
+        setBuild(draft.build || { slots: createEmptySlots() });
         setHasUnsavedChanges(true);
       }
     }
-  }, [skills, isModal, loadDraft, isAuthenticated, user]); // Trigger when skills load
+  }, [stoneData, isModal, loadDraft, isAuthenticated, user]); // Trigger when stone data loads
 
   // Load initial build in modal mode
   useEffect(() => {
-    if (skills.length === 0) return; // Wait for skills to load
+    if (!stoneData) return; // Wait for stone data to load
     if (!isModal || !initialBuild) return; // Only in modal mode with initial data
 
-    setBuildName(initialBuild.name || 'My Build');
-    setMaxSlots(initialBuild.maxSlots || 10);
-
-    // Deserialize build to ensure skill objects are current
-    const deserializedBuild = deserializeBuild(initialBuild, skills);
-    setBuild({ slots: deserializedBuild.slots });
+    setBuildName(initialBuild.name || 'My Skill Stone Build');
+    setBuild({ slots: initialBuild.slots || createEmptySlots() });
     setHasUnsavedChanges(true); // Mark as having changes to block navigation
-  }, [skills, isModal, initialBuild]);
+  }, [stoneData, isModal, initialBuild]);
 
-  const loadSkills = async () => {
+  const loadStoneData = async () => {
     try {
-      const response = await fetch('/data/skills.json');
+      const response = await fetch('/data/skill_stones.json');
       const data = await response.json();
-      setSkills(data);
+      setStoneData(data);
     } catch (error) {
-      logger.error('Failed to load skills', { error });
+      logger.error('Failed to load skill stones data', { error });
     } finally {
       setLoading(false);
     }
   };
 
   /**
-   * Serialize build for URL encoding (skill objects -> skill IDs only)
-   * This makes URLs resilient to skill data changes
+   * Serialize build for storage (already minimal format)
    */
   const serializeBuild = (buildToSerialize) => {
     return {
       name: buildToSerialize.name || buildName,
-      maxSlots: buildToSerialize.maxSlots || maxSlots,
-      slots: buildToSerialize.slots.map(slot => ({
-        skillId: slot.skillId !== undefined ? slot.skillId : (slot.skill?.id || null),
-        level: slot.level
-      }))
+      slots: buildToSerialize.slots
     };
   };
 
   /**
-   * Deserialize build after decoding (skill IDs -> full skill objects)
-   * Handles both new format (IDs) and old format (full objects) for backward compatibility
-   */
-  const deserializeBuild = (serializedBuild, skillsArray) => {
-    return {
-      slots: serializedBuild.slots.map(slot => {
-        // Handle new format (skillId)
-        if (slot.skillId !== undefined) {
-          const skill = skillsArray.find(s => s.id === slot.skillId);
-          return {
-            skill: skill || null,
-            level: slot.level || 1
-          };
-        }
-        // Handle old format (full skill object) for backward compatibility
-        else if (slot.skill) {
-          // Try to find skill by ID first, fallback to name
-          let skill = skillsArray.find(s => s.id === slot.skill.id);
-          if (!skill) {
-            skill = skillsArray.find(s => s.name === slot.skill.name);
-          }
-          return {
-            skill: skill || slot.skill, // Use found skill or keep old data
-            level: slot.level || 1
-          };
-        }
-        // Empty slot
-        else {
-          return { skill: null, level: 1 };
-        }
-      })
-    };
-  };
-
-  /**
-   * Compare current build with a saved build to check if they match
+   * Check if current build matches a saved build
    */
   const buildsMatch = (savedBuild) => {
     if (!savedBuild) return false;
-
-    // Check name and maxSlots
     if (savedBuild.name !== buildName) return false;
-    if (savedBuild.maxSlots !== maxSlots) return false;
 
-    // Serialize both for consistent comparison (handles both serialized and deserialized formats)
-    const currentSerialized = serializeBuild({ ...build, name: buildName, maxSlots });
-    const savedSerialized = serializeBuild(savedBuild);
-
-    // Compare serialized slots
-    if (currentSerialized.slots.length !== savedSerialized.slots.length) return false;
-
-    for (let i = 0; i < currentSerialized.slots.length; i++) {
-      const currentSlot = currentSerialized.slots[i];
-      const savedSlot = savedSerialized.slots[i];
-
-      if (currentSlot.skillId !== savedSlot.skillId) return false;
-      if (currentSlot.level !== savedSlot.level) return false;
-    }
-
-    return true;
+    return JSON.stringify(build.slots) === JSON.stringify(savedBuild.slots);
   };
 
   /**
    * Check if current build matches any saved build and update highlighting
-   * Note: This only tracks which build is loaded, not unsaved changes
    */
   useEffect(() => {
-    // Check if there's any content
-    const hasContent = buildName.trim() !== '' || build.slots.some(slot => slot.skill !== null);
+    const hasContent = buildName.trim() !== '' || build.slots.some(slot => slot.element !== null);
 
     if (!isAuthenticated || savedBuilds.length === 0) {
       if (currentLoadedBuildId !== null) {
         setCurrentLoadedBuildId(null);
       }
-      // If not authenticated or no saved builds, only update if no content
       if (!hasContent && hasUnsavedChanges) {
         setHasUnsavedChanges(false);
       } else if (hasContent && !hasUnsavedChanges) {
@@ -306,121 +224,45 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       return;
     }
 
-    // Find matching build
     const matchingBuild = savedBuilds.find(savedBuild => buildsMatch(savedBuild));
 
     if (matchingBuild) {
       setCurrentLoadedBuildId(matchingBuild.id);
-      // Don't automatically clear hasUnsavedChanges when matching
-      // It should only be cleared when explicitly loading or after successful save
+      // Don't automatically clear hasUnsavedChanges
     } else {
       setCurrentLoadedBuildId(null);
-      // Mark as having changes if there's content and no match
       if (hasContent && !hasUnsavedChanges) {
         setHasUnsavedChanges(true);
       }
     }
-  }, [buildName, maxSlots, build, savedBuilds, isAuthenticated, hasUnsavedChanges]);
+  }, [buildName, build, savedBuilds, isAuthenticated, hasUnsavedChanges]);
 
   // Handle slot actions
   const handleSelectSlot = (index) => {
     setSelectedSlotIndex(index);
-    setShowSkillSelector(true);
+    setShowStoneSelector(true);
   };
 
-  const handleSkillSelected = (skill) => {
+  const handleStoneSelected = (element, tier) => {
     if (selectedSlotIndex === null) return;
-
-    // Check if skill is already equipped in another slot
-    const isAlreadyEquipped = build.slots.some((slot, index) =>
-      slot.skill && slot.skill.id === skill.id && index !== selectedSlotIndex
-    );
-
-    if (isAlreadyEquipped) {
-      alert('This skill is already equipped in another slot!');
-      return;
-    }
 
     const newSlots = [...build.slots];
     newSlots[selectedSlotIndex] = {
-      skill: skill,
-      level: autoMaxLevel ? (skill.maxLevel || 130) : 1
+      type: newSlots[selectedSlotIndex].type,
+      element: element,
+      tier: tier
     };
     setBuild({ slots: newSlots });
   };
 
-  const handleRemoveSkill = (index) => {
+  const handleRemoveStone = (index) => {
     const newSlots = [...build.slots];
-    newSlots[index] = { skill: null, level: 1 };
+    newSlots[index] = {
+      type: newSlots[index].type,
+      element: null,
+      tier: null
+    };
     setBuild({ slots: newSlots });
-  };
-
-  const handleLevelChange = (index, newLevel) => {
-    const newSlots = [...build.slots];
-    newSlots[index].level = newLevel;
-    setBuild({ slots: newSlots });
-  };
-
-  // Drag and drop handlers
-  const handleDragStart = (e, index) => {
-    setDraggedSlotIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e, index) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = (e, targetIndex) => {
-    e.preventDefault();
-
-    if (draggedSlotIndex === null || draggedSlotIndex === targetIndex) {
-      setDraggedSlotIndex(null);
-      return;
-    }
-
-    const newSlots = [...build.slots];
-    const draggedSlot = newSlots[draggedSlotIndex];
-    const targetSlot = newSlots[targetIndex];
-
-    // Swap slots
-    newSlots[draggedSlotIndex] = targetSlot;
-    newSlots[targetIndex] = draggedSlot;
-
-    setBuild({ slots: newSlots });
-    setDraggedSlotIndex(null);
-
-    // Save immediately if in modal mode and build has an ID (already saved)
-    if (isModal && initialBuild?.id && buildName && isAuthenticated && user) {
-      logger.info('Saving after drag reorder', { buildId: initialBuild.id });
-
-      (async () => {
-        try {
-          const serializedBuild = serializeBuild({ ...build, slots: newSlots, name: buildName, maxSlots });
-          const buildData = {
-            name: serializedBuild.name,
-            maxSlots: serializedBuild.maxSlots,
-            slots: serializedBuild.slots,
-          };
-
-          await fetch(getSaveDataEndpoint(), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'skill-builds',
-              username: user.login,
-              userId: user.id,
-              data: buildData,
-            }),
-          });
-
-          logger.info('Saved after drag', { buildId: initialBuild.id });
-        } catch (error) {
-          logger.error('Failed to save after drag', { error });
-        }
-      })();
-    }
   };
 
   // Share build
@@ -436,22 +278,17 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       const owner = config.wiki.repository.owner;
       const repo = config.wiki.repository.repo;
 
-      // Serialize build to only include skill IDs
-      const serializedBuild = serializeBuild({ ...build, name: buildName, maxSlots });
-      const buildData = {
-        name: serializedBuild.name,
-        maxSlots: serializedBuild.maxSlots,
-        slots: serializedBuild.slots
-      };
+      // Serialize build
+      const serializedBuild = serializeBuild({ ...build, name: buildName });
 
       // Save build and get checksum
-      const checksum = await saveSharedBuild(owner, repo, 'skill-builds', buildData);
+      const checksum = await saveSharedBuild(owner, repo, 'skill-stone-builds', serializedBuild);
 
       logger.debug('Generated checksum', { checksum });
 
       // Generate share URL
       const baseURL = window.location.origin + window.location.pathname;
-      const shareURL = generateShareUrl(baseURL, 'skill-builds', checksum);
+      const shareURL = generateShareUrl(baseURL, 'skill-stone-builds', checksum);
 
       await navigator.clipboard.writeText(shareURL);
 
@@ -460,39 +297,38 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
       logger.info('Share URL copied to clipboard');
 
-      // Trigger donation prompt on successful share
+      // Trigger donation prompt
       window.triggerDonationPrompt?.({
         messages: [
-          "Sharing your OP build? Nice! ⚔️",
-          "That's a build worth flexing! 💪",
-          "Your friends are gonna love this one! 🎮",
-          "Spreading the meta like a pro! 🔥",
+          "Sharing your stone setup? Nice! 💎",
+          "That's a solid build! ⚡",
+          "Your friends will love this! 🔥",
+          "Spreading the knowledge! 📚",
         ]
       });
     } catch (error) {
       logger.error('Failed to generate share URL', { error });
       setShareError(error.message || 'Failed to generate share URL');
 
-      // Fallback to old method if share service fails
+      // Fallback to old method
       try {
         logger.warn('Falling back to old encoding method');
-        const serializedBuild = serializeBuild({ ...build, name: buildName, maxSlots });
+        const serializedBuild = serializeBuild({ ...build, name: buildName });
         const encoded = encodeBuild(serializedBuild);
         if (encoded) {
           const baseURL = window.location.origin + window.location.pathname;
-          const shareURL = `${baseURL}#/skill-builder?data=${encoded}`;
+          const shareURL = `${baseURL}#/skill-stone-builder?data=${encoded}`;
           await navigator.clipboard.writeText(shareURL);
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
           logger.info('Fallback URL copied to clipboard');
 
-          // Trigger donation prompt on successful share (fallback)
           window.triggerDonationPrompt?.({
             messages: [
-              "Sharing your OP build? Nice! ⚔️",
-              "That's a build worth flexing! 💪",
-              "Your friends are gonna love this one! 🎮",
-              "Spreading the meta like a pro! 🔥",
+              "Sharing your stone setup? Nice! 💎",
+              "That's a solid build! ⚡",
+              "Your friends will love this! 🔥",
+              "Spreading the knowledge! 📚",
             ]
           });
         }
@@ -509,7 +345,6 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
   const handleExportBuild = () => {
     const buildData = {
       name: buildName,
-      maxSlots,
       slots: build.slots,
       exportedAt: new Date().toISOString()
     };
@@ -520,18 +355,17 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${buildName.replace(/\s+/g, '_')}.json`;
+    link.download = `${buildName.replace(/\s+/g, '_')}_skill_stones.json`;
     link.click();
 
     URL.revokeObjectURL(url);
 
-    // Trigger donation prompt on successful export
     window.triggerDonationPrompt?.({
       messages: [
-        "Smart move backing that up! 💾",
-        "Data safety first, nice! 🛡️",
-        "A true strategist saves their work! 📝",
-        "Exporting the goods, I see! 📦",
+        "Backing up your stones! 💾",
+        "Smart move saving that! 🛡️",
+        "Data safety first! 📝",
+        "Secured your build! 🔒",
       ]
     });
   };
@@ -541,19 +375,16 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check if there are actual meaningful changes (not just initial state)
     const hasActualChanges = hasUnsavedChanges && (
       buildName.trim() !== '' ||
-      build.slots.some(slot => slot.skill !== null)
+      build.slots.some(slot => slot.element !== null)
     );
 
-    // Check for unsaved changes before importing
     if (hasActualChanges) {
       const confirmed = window.confirm(
         'You have unsaved changes. Importing a build will discard your current changes. Continue?'
       );
       if (!confirmed) {
-        // Reset file input
         event.target.value = '';
         return;
       }
@@ -564,20 +395,15 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       try {
         const buildData = JSON.parse(e.target.result);
         setBuildName(buildData.name || '');
-        setMaxSlots(buildData.maxSlots || 10);
+        setBuild({ slots: buildData.slots || createEmptySlots() });
+        setHasUnsavedChanges(true);
 
-        // Deserialize build to ensure skill objects are current
-        const deserializedBuild = deserializeBuild(buildData, skills);
-        setBuild({ slots: deserializedBuild.slots });
-        setHasUnsavedChanges(true); // Mark as having changes to block navigation
-
-        // Trigger donation prompt on successful import
         window.triggerDonationPrompt?.({
           messages: [
-            "Loading up the good stuff? 📥",
-            "Fresh builds incoming! 🚀",
+            "Loading up the stones! 📥",
+            "Fresh setup incoming! 🚀",
             "Time to try something new! ✨",
-            "Importing excellence, I see! 🎯",
+            "Imported successfully! 🎯",
           ]
         });
       } catch (error) {
@@ -587,29 +413,26 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     };
     reader.readAsText(file);
 
-    // Reset file input for next import
     event.target.value = '';
   };
 
   // Clear build
   const handleClearBuild = () => {
-    if (!confirm('Clear all skills from this build?')) return;
-    setBuild({ slots: Array(maxSlots).fill(null).map(() => ({ skill: null, level: 1 })) });
+    if (!confirm('Clear all stones from this build?')) return;
+    setBuild({ slots: createEmptySlots() });
     setBuildName('');
-    setHasUnsavedChanges(false); // No content after clearing
-    setCurrentLoadedBuildId(null); // No loaded build after clearing
-    clearDraft(); // Clear localStorage draft
+    setHasUnsavedChanges(false);
+    setCurrentLoadedBuildId(null);
+    clearDraft();
   };
 
   // Load build from saved builds
   const handleLoadBuild = (savedBuild) => {
-    // Check if there are actual meaningful changes (not just initial state)
     const hasActualChanges = hasUnsavedChanges && (
       buildName.trim() !== '' ||
-      build.slots.some(slot => slot.skill !== null)
+      build.slots.some(slot => slot.element !== null)
     );
 
-    // Check for unsaved changes before loading
     if (hasActualChanges) {
       const confirmed = window.confirm(
         'You have unsaved changes. Loading this build will discard your current changes. Continue?'
@@ -618,21 +441,16 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     }
 
     setBuildName(savedBuild.name);
-    setMaxSlots(savedBuild.maxSlots);
+    setBuild({ slots: savedBuild.slots || createEmptySlots() });
+    setHasUnsavedChanges(true);
+    setCurrentLoadedBuildId(savedBuild.id);
 
-    // Deserialize build to ensure skill objects are current
-    const deserializedBuild = deserializeBuild(savedBuild, skills);
-    setBuild({ slots: deserializedBuild.slots });
-    setHasUnsavedChanges(true); // Mark as having changes to block navigation
-    setCurrentLoadedBuildId(savedBuild.id); // Track which build is currently loaded
-
-    // Trigger donation prompt on successful load
     window.triggerDonationPrompt?.({
       messages: [
-        "Back to the classics! 📚",
+        "Back to a classic! 📚",
         "Revisiting perfection? 😎",
         "That was a good one! 👌",
-        "Loading up your masterpiece! 🎨",
+        "Loading your masterpiece! 🎨",
       ]
     });
   };
@@ -646,13 +464,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     setSaveSuccess(false);
 
     try {
-      // Serialize build to only store IDs (reduces storage and is resilient to data changes)
-      const serializedBuild = serializeBuild({ ...build, name: buildName, maxSlots });
-      const buildData = {
-        name: serializedBuild.name,
-        maxSlots: serializedBuild.maxSlots,
-        slots: serializedBuild.slots, // Only store { skillId, level }
-      };
+      const serializedBuild = serializeBuild({ ...build, name: buildName });
 
       const response = await fetch(getSaveDataEndpoint(), {
         method: 'POST',
@@ -660,10 +472,10 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'skill-builds',
+          type: 'skill-stone-builds',
           username: user.login,
           userId: user.id,
-          data: buildData,
+          data: serializedBuild,
         }),
       });
 
@@ -676,22 +488,17 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       const sortedBuilds = data.builds.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       setSavedBuilds(sortedBuilds);
 
-      // Find the saved build ID (it's the one with the matching name)
       const savedBuild = sortedBuilds.find(b => b.name === buildName);
       if (savedBuild) {
         setCurrentLoadedBuildId(savedBuild.id);
       }
 
       setSaveSuccess(true);
-      setHasUnsavedChanges(false); // Clear unsaved changes after successful save
+      setHasUnsavedChanges(false);
 
-      // Cache the updated builds
-      setCache('skill_builds', user.id, sortedBuilds);
-
-      // Clear localStorage draft after successful save
+      setCache('skill_stone_builds', user.id, sortedBuilds);
       clearDraft();
 
-      // Hide success message after 2 seconds
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (err) {
       logger.error('Failed to save build', { error: err });
@@ -705,54 +512,22 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
   const handleSaveBuild = () => {
     if (onSave) {
       const buildData = {
-        id: currentLoadedBuildId, // Preserve build ID for existing builds
         name: buildName,
-        maxSlots,
         slots: build.slots
       };
       onSave(buildData);
     }
   };
 
-  // Expose saveBuild function to parent via ref (for modal footer button)
+  // Expose saveBuild function to parent via ref
   useImperativeHandle(ref, () => ({
     saveBuild: handleSaveBuild
   }));
 
-  // Get element icon
-  const getElementIcon = (element) => {
-    const icons = {
-      Fire: '/images/icons/typeicon_fire_1.png',
-      Water: '/images/icons/typeicon_water_1.png',
-      Wind: '/images/icons/typeicon_wind_1.png',
-      Earth: '/images/icons/typeicon_earth s_1.png'
-    };
-    return icons[element];
-  };
-
-  // Calculate build stats
-  const getEquippedSkillsCount = () => {
-    return build.slots.filter(slot => slot.skill !== null).length;
-  };
-
-  const getElementDistribution = () => {
-    const distribution = {};
-    build.slots.forEach(slot => {
-      if (slot.skill) {
-        const attr = slot.skill.attribute;
-        // Only count skills with valid element types (exclude null, undefined, or empty string)
-        if (attr && attr !== '') {
-          distribution[attr] = (distribution[attr] || 0) + 1;
-        }
-      }
-    });
-    return distribution;
-  };
-
   if (loading) {
     return (
       <div className={`flex items-center justify-center ${isModal ? 'min-h-[400px]' : 'min-h-screen'} bg-gradient-to-b from-gray-900 to-black`}>
-        <div className="text-white text-xl">Loading skills...</div>
+        <div className="text-white text-xl">Loading skill stones...</div>
       </div>
     );
   }
@@ -763,9 +538,9 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       {!isModal && (
         <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Skill Builder</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Skill Stone Builder</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              Create and share skill builds with up to 10 configurable skill slots.
+              Configure your skill stones: Cooldown Stone, Time Stone, and Heat Stone.
             </p>
           </div>
         </div>
@@ -776,19 +551,20 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         <SavedBuildsPanel
           currentBuild={build}
           buildName={buildName}
-          maxSlots={maxSlots}
           onLoadBuild={handleLoadBuild}
           allowSavingBuilds={false}
           currentLoadedBuildId={currentLoadedBuildId}
           onBuildsChange={setSavedBuilds}
           defaultExpanded={!isModal}
           externalBuilds={savedBuilds}
+          buildType='skill-stone-builds'
+          buildData={build}
         />
       </div>
 
       {/* Main Content */}
       <div className={`${isModal ? 'px-4 pt-1 pb-3' : 'max-w-7xl mx-auto px-3 sm:px-4 pt-1 pb-3'}`}>
-        {/* Build Name Panel - Controlled by allowSavingBuilds */}
+        {/* Build Name Panel */}
         {allowSavingBuilds && (
           <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-start gap-2">
@@ -831,7 +607,6 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
                 </button>
               )}
             </div>
-            {/* Save Error Message */}
             {saveError && (
               <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
                 {saveError}
@@ -894,7 +669,6 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
                 <span>Clear</span>
               </button>
             </div>
-            {/* Share Error Message */}
             {shareError && (
               <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
                 {shareError}
@@ -903,123 +677,20 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
           </div>
         )}
 
-        {/* Settings Bar */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
-          <div className="flex flex-col gap-4">
-            {/* Settings Row */}
-            <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <Settings className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Max Slots:</label>
-                <select
-                  value={maxSlots}
-                  onChange={(e) => {
-                    const newMax = parseInt(e.target.value);
-                    setMaxSlots(newMax);
-                    const newSlots = [...build.slots];
-                    while (newSlots.length < newMax) {
-                      newSlots.push({ skill: null, level: 1 });
-                    }
-                    setBuild({ slots: newSlots.slice(0, newMax) });
-                  }}
-                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                >
-                  {[...Array(10)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>{i + 1}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex items-center">
-                <label htmlFor="autoMaxLevel" className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    id="autoMaxLevel"
-                    checked={autoMaxLevel}
-                    onChange={(e) => setAutoMaxLevel(e.target.checked)}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 flex-shrink-0"
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    Auto-max level
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            {/* Stats Row */}
-            <div className="flex items-center gap-4 sm:gap-6 text-sm flex-wrap pt-2 border-t border-gray-200 dark:border-gray-700">
-              <div>
-                <span className="text-gray-600 dark:text-gray-400">Equipped:</span>
-                <span className="ml-2 font-semibold text-gray-900 dark:text-white">{getEquippedSkillsCount()}/{maxSlots}</span>
-              </div>
-
-              {/* Element Distribution */}
-              {Object.entries(getElementDistribution()).map(([element, count]) => (
-                <div key={element} className="flex items-center gap-1.5" title={element}>
-                  <img
-                    src={getElementIcon(element)}
-                    alt={element}
-                    className="w-4 h-4 cursor-help"
-                  />
-                  <span className="font-semibold text-gray-900 dark:text-white">{count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Skill Slots Grid */}
+        {/* Skill Stone Slots */}
         <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 justify-items-center">
-            {build.slots.slice(0, maxSlots).map((slot, index) => (
-              <SkillSlot
+          <div className="grid grid-cols-3 gap-6 justify-items-center">
+            {build.slots.map((slot, index) => (
+              <SkillStoneSlot
                 key={index}
-                skill={slot.skill}
-                level={slot.level}
-                isLocked={index >= maxSlots}
-                slotNumber={index + 1}
+                slot={slot}
                 slotIndex={index}
-                onSelectSkill={() => handleSelectSlot(index)}
-                onRemoveSkill={() => handleRemoveSkill(index)}
-                onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                isDragging={draggedSlotIndex === index}
+                onSelectStone={() => handleSelectSlot(index)}
+                onRemoveStone={() => handleRemoveStone(index)}
+                readOnly={false}
+                stoneData={stoneData}
               />
             ))}
-          </div>
-        </div>
-
-        {/* Bulk Level Actions */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
-          <div className="flex justify-center gap-2">
-            <button
-              onClick={() => {
-                if (confirm('Set all equipped skills to level 1?')) {
-                  const newSlots = build.slots.map(slot =>
-                    slot.skill ? { ...slot, level: 1 } : slot
-                  );
-                  setBuild({ slots: newSlots });
-                }
-              }}
-              className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs font-medium transition-colors"
-            >
-              Min All Levels
-            </button>
-            <button
-              onClick={() => {
-                if (confirm('Set all equipped skills to their maximum level?')) {
-                  const newSlots = build.slots.map(slot =>
-                    slot.skill ? { ...slot, level: slot.skill.maxLevel || 130 } : slot
-                  );
-                  setBuild({ slots: newSlots });
-                }
-              }}
-              className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs font-medium transition-colors"
-            >
-              Max All Levels
-            </button>
           </div>
         </div>
 
@@ -1027,30 +698,39 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         <div className="bg-blue-50 dark:bg-blue-900/10 rounded-lg p-4 border border-blue-200 dark:border-blue-900">
           <h3 className="text-base font-semibold mb-2 text-blue-900 dark:text-blue-100">How to Use:</h3>
           <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-            <li>• Click the <span className="font-medium">+ icon</span> on an empty slot to add a skill</li>
-            <li>• Click on a skill to remove it from your build</li>
-            <li>• Click the <span className="font-medium">level badge</span> to adjust skill levels</li>
+            <li>• Click the <span className="font-medium">+ icon</span> on an empty slot to add a stone</li>
+            <li>• First select an <span className="font-medium">element</span> (Fire, Water, Wind, Earth)</li>
+            <li>• Then select a <span className="font-medium">tier</span> (A or B)</li>
+            <li>• Click on a stone to remove it from your build</li>
             <li>• Use <span className="font-medium">Share</span> to get a shareable URL for your build</li>
             <li>• Use <span className="font-medium">Export/Import</span> to save and load builds as files</li>
           </ul>
         </div>
       </div>
 
-      {/* Skill Selector Modal */}
-      <SkillSelector
-        isOpen={showSkillSelector}
-        onClose={() => setShowSkillSelector(false)}
-        onSelectSkill={handleSkillSelected}
-        skills={skills}
-        currentBuild={build}
+      {/* Stone Selector Modal */}
+      <SkillStoneSelector
+        isOpen={showStoneSelector}
+        onClose={() => setShowStoneSelector(false)}
+        onSelectStone={handleStoneSelected}
+        stoneType={selectedSlotIndex !== null ? build.slots[selectedSlotIndex].type : 'cooldown'}
+        stoneData={stoneData}
       />
     </div>
   );
 });
 
-SkillBuilder.displayName = 'SkillBuilder';
+/**
+ * Create empty slots (3 fixed slots for Cooldown, Time, Heat)
+ */
+function createEmptySlots() {
+  return [
+    { type: 'cooldown', element: null, tier: null },
+    { type: 'time', element: null, tier: null },
+    { type: 'heat', element: null, tier: null }
+  ];
+}
 
-export default SkillBuilder;
+SkillStoneBuilder.displayName = 'SkillStoneBuilder';
 
-
-
+export default SkillStoneBuilder;

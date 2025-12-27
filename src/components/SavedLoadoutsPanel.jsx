@@ -6,9 +6,12 @@ import { useLoginFlow } from '../../wiki-framework/src/hooks/useLoginFlow';
 import LoginModal from '../../wiki-framework/src/components/auth/LoginModal';
 import { getUserLoadouts } from '../services/battleLoadouts';
 import { getCache, setCache, mergeCacheWithGitHub } from '../utils/buildCache';
-import { getDeleteDataEndpoint } from '../utils/apiEndpoints.js';
+import { getDeleteDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { getSkillGradeColor, getEquipmentRarityColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
+import { deserializeSoulWeaponBuild, deserializeSkillBuild } from '../utils/battleLoadoutSerializer.js';
+import { deserializeBuild as deserializeSpiritBuild } from '../utils/spiritSerialization.js';
+import SkillStone from './SkillStone';
 
 const logger = createLogger('SavedLoadoutsPanel');
 
@@ -31,15 +34,88 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
   const [isExpanded, setIsExpanded] = useState(true);
   const [skills, setSkills] = useState([]);
   const [spirits, setSpirits] = useState([]);
+  const [shapes, setShapes] = useState([]);
+  const [weapons, setWeapons] = useState([]);
+  const [stoneData, setStoneData] = useState(null);
+  const [allSkillBuilds, setAllSkillBuilds] = useState([]);
+  const [allSpiritBuilds, setAllSpiritBuilds] = useState([]);
+  const [mySpirits, setMySpirits] = useState([]);
 
   // Use external loadouts if provided (controlled mode), otherwise use internal state
-  const savedLoadouts = externalLoadouts !== null ? externalLoadouts : internalSavedLoadouts;
+  const rawLoadouts = externalLoadouts !== null ? externalLoadouts : internalSavedLoadouts;
 
-  // Load skills and spirits data
+  // Resolve build IDs to full builds for display
+  const savedLoadouts = rawLoadouts.map(loadout => {
+    let skillBuild = null;
+    let spiritBuild = null;
+
+    // Resolve skill build
+    if (loadout.skillBuildId) {
+      logger.debug('Resolving skill build for loadout', {
+        loadoutId: loadout.id,
+        skillBuildId: loadout.skillBuildId,
+        allSkillBuildsCount: allSkillBuilds.length,
+        skillsCount: skills.length
+      });
+
+      const found = allSkillBuilds.find(b => b.id === loadout.skillBuildId);
+      if (found) {
+        logger.debug('Found skill build, deserializing', {
+          foundId: found.id,
+          foundName: found.name,
+          slotsCount: found.slots?.length
+        });
+
+        skillBuild = deserializeSkillBuild(found, skills);
+
+        logger.debug('Skill build deserialized', {
+          hasSkillBuild: !!skillBuild,
+          slotsCount: skillBuild?.slots?.length,
+          firstSlot: skillBuild?.slots?.[0]
+        });
+      } else {
+        logger.warn('Skill build not found', {
+          skillBuildId: loadout.skillBuildId,
+          availableIds: allSkillBuilds.map(b => b.id)
+        });
+      }
+    } else if (loadout.skillBuild) {
+      logger.debug('Using embedded skill build', { hasSlots: !!loadout.skillBuild.slots });
+      skillBuild = loadout.skillBuild; // Already deserialized
+    }
+
+    // Resolve spirit build
+    if (loadout.spiritBuildId) {
+      const found = allSpiritBuilds.find(b => b.id === loadout.spiritBuildId);
+      if (found) {
+        spiritBuild = deserializeSpiritBuild(found, spirits, mySpirits);
+      }
+    } else if (loadout.spiritBuild) {
+      spiritBuild = loadout.spiritBuild; // Already deserialized
+    }
+
+    return {
+      ...loadout,
+      skillBuild,
+      spiritBuild
+    };
+  });
+
+  // Load skills, spirits, shapes, weapons, and stone data
   useEffect(() => {
     loadSkills();
     loadSpirits();
+    loadShapes();
+    loadWeapons();
+    loadStoneData();
   }, []);
+
+  // Load user's builds and spirits
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      loadUserBuildsAndSpirits();
+    }
+  }, [isAuthenticated, user?.id]);
 
   // Load saved loadouts on mount
   useEffect(() => {
@@ -73,6 +149,69 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
     }
   };
 
+  const loadShapes = async () => {
+    try {
+      const response = await fetch('/data/soul-weapon-engravings.json');
+      const data = await response.json();
+      // The JSON file has shapes in a "shapes" property, not as a direct array
+      const shapesArray = data.shapes || [];
+      setShapes(Array.isArray(shapesArray) ? shapesArray : []);
+    } catch (err) {
+      logger.error('Failed to load shapes:', { error: err });
+      setShapes([]);
+    }
+  };
+
+  const loadWeapons = async () => {
+    try {
+      const response = await fetch('/data/soul-weapons.json');
+      const data = await response.json();
+      setWeapons(Array.isArray(data) ? data : []);
+    } catch (err) {
+      logger.error('Failed to load weapons:', { error: err });
+      setWeapons([]);
+    }
+  };
+
+  const loadStoneData = async () => {
+    try {
+      logger.debug('Loading stone data...');
+      const response = await fetch('/data/skill_stones.json');
+      logger.debug('Stone data response', { ok: response.ok, status: response.status });
+      const data = await response.json();
+      logger.debug('Stone data loaded', { hasTypes: !!data.types, data });
+      setStoneData(data);
+    } catch (err) {
+      logger.error('Failed to load stone data:', { error: err.message, stack: err.stack });
+      setStoneData(null);
+    }
+  };
+
+  const loadUserBuildsAndSpirits = async () => {
+    if (!user?.id) return;
+
+    try {
+      // Load all three collections in parallel
+      const loadDataEndpoint = getLoadDataEndpoint();
+      const [skillBuildsRes, spiritBuildsRes, mySpiritsRes] = await Promise.all([
+        fetch(`${loadDataEndpoint}?type=skill-builds&userId=${user.id}`),
+        fetch(`${loadDataEndpoint}?type=spirit-builds&userId=${user.id}`),
+        fetch(`${loadDataEndpoint}?type=my-spirits&userId=${user.id}`)
+      ]);
+
+      // Parse responses
+      const skillBuildsData = skillBuildsRes.ok ? await skillBuildsRes.json() : { builds: [] };
+      const spiritBuildsData = spiritBuildsRes.ok ? await spiritBuildsRes.json() : { builds: [] };
+      const mySpiritsData = mySpiritsRes.ok ? await mySpiritsRes.json() : { spirits: [] };
+
+      setAllSkillBuilds(skillBuildsData.builds || []);
+      setAllSpiritBuilds(spiritBuildsData.builds || []);
+      setMySpirits(mySpiritsData.spirits || []);
+    } catch (error) {
+      logger.error('Failed to load user builds and spirits', { error });
+    }
+  };
+
   const loadLoadouts = async () => {
     if (!user || !config) return;
 
@@ -81,9 +220,22 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
 
     try {
       // Get cached loadouts
-      const cachedLoadouts = getCache('battle_loadouts', user.id);
+      let cachedLoadouts = getCache('battle_loadouts', user.id);
 
-      // Fetch from GitHub
+      // Deserialize cached soul weapon builds (reconstruct shape objects)
+      if (cachedLoadouts && shapes.length > 0) {
+        cachedLoadouts = cachedLoadouts.map(loadout => {
+          if (loadout.soulWeaponBuild) {
+            return {
+              ...loadout,
+              soulWeaponBuild: deserializeSoulWeaponBuild(loadout.soulWeaponBuild, shapes)
+            };
+          }
+          return loadout;
+        });
+      }
+
+      // Fetch from GitHub (already deserialized by getUserLoadouts service)
       const githubLoadouts = await getUserLoadouts(
         config.wiki.repository.owner,
         config.wiki.repository.repo,
@@ -171,6 +323,14 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
   };
 
   const getLoadoutSkills = (loadout) => {
+    logger.debug('getLoadoutSkills called', {
+      loadoutId: loadout.id,
+      hasSkillBuild: !!loadout.skillBuild,
+      hasSlots: !!loadout.skillBuild?.slots,
+      slotsCount: loadout.skillBuild?.slots?.length,
+      firstSlot: loadout.skillBuild?.slots?.[0]
+    });
+
     if (!loadout.skillBuild?.slots) return [];
     if (!Array.isArray(skills) || skills.length === 0) return [];
 
@@ -187,7 +347,12 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
         }
         return null;
       })
-      .filter(skill => skill !== null);
+      .filter(skill => skill); // Remove nulls and undefined (truthy check)
+
+    logger.debug('getLoadoutSkills result', {
+      loadoutId: loadout.id,
+      skillsCount: loadoutSkills.length
+    });
 
     return loadoutSkills;
   };
@@ -212,6 +377,39 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
       .filter(spirit => spirit !== null);
 
     return loadoutSpirits;
+  };
+
+  const getLoadoutWeapon = (loadout) => {
+    if (!loadout.soulWeaponBuild?.weaponId) return null;
+    if (!Array.isArray(weapons) || weapons.length === 0) return null;
+
+    const weapon = weapons.find(w => w.id === loadout.soulWeaponBuild.weaponId);
+    return weapon || null;
+  };
+
+  const getLoadoutStones = (loadout) => {
+    logger.debug('getLoadoutStones called', {
+      loadoutId: loadout.id,
+      hasSkillStoneBuild: !!loadout.skillStoneBuild,
+      hasSlots: !!loadout.skillStoneBuild?.slots,
+      slotsCount: loadout.skillStoneBuild?.slots?.length,
+      hasStoneData: !!stoneData,
+      skillStoneBuild: loadout.skillStoneBuild
+    });
+
+    if (!loadout.skillStoneBuild?.slots) return [];
+    if (!stoneData) return [];
+
+    // Get stones from the skill stone build
+    const stones = loadout.skillStoneBuild.slots.filter(slot => slot.type && slot.element && slot.tier);
+
+    logger.debug('getLoadoutStones result', {
+      loadoutId: loadout.id,
+      stonesCount: stones.length,
+      stones
+    });
+
+    return stones;
   };
 
   const handleLoadLoadout = (loadout) => {
@@ -362,7 +560,25 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
 
                 {/* Preview Icons */}
                 <div className="flex-shrink-0 flex gap-2 items-center">
-                  {/* Spirits Section (Left) */}
+                  {/* Skill Stones Section (First - hidden on mobile) */}
+                  {getLoadoutStones(loadout).length > 0 && (
+                    <div className="hidden sm:flex flex-shrink-0 -space-x-8 justify-end">
+                      {getLoadoutStones(loadout).map((stone, index) => (
+                        <div key={index} style={{ transform: 'scale(0.36)', transformOrigin: 'right' }}>
+                          <SkillStone
+                            stoneType={stone.type}
+                            element={stone.element}
+                            tier={stone.tier}
+                            data={stoneData}
+                            size="small"
+                            disableHover={true}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Spirits Section */}
                   {getLoadoutSpirits(loadout).length > 0 && (
                     <div className="flex flex-wrap gap-0.5 max-w-[52px] sm:max-w-none">
                       {getLoadoutSpirits(loadout).map((spirit, index) => {
@@ -380,6 +596,22 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+
+                  {/* Soul Weapon Section (hidden on mobile) */}
+                  {getLoadoutWeapon(loadout) && (
+                    <div className="hidden sm:block flex-shrink-0">
+                      <div
+                        className="w-[32px] h-[32px] sm:w-[38px] sm:h-[38px] rounded-lg border border-purple-500 dark:border-purple-400 overflow-hidden bg-gray-900"
+                        title={getLoadoutWeapon(loadout).name}
+                      >
+                        <img
+                          src={getLoadoutWeapon(loadout).image}
+                          alt={getLoadoutWeapon(loadout).name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
                     </div>
                   )}
 

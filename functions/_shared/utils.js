@@ -6,7 +6,7 @@
 /**
  * Valid data types supported by the system
  */
-export const VALID_DATA_TYPES = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'engraving-builds', 'grid-submission'];
+export const VALID_DATA_TYPES = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'engraving-builds', 'skill-stone-builds', 'grid-submission'];
 
 /**
  * Configuration for each data type
@@ -39,6 +39,12 @@ export const DATA_TYPE_CONFIGS = {
   'engraving-builds': {
     label: 'engraving-builds',
     titlePrefix: '[Soul Weapon Engraving]',
+    itemsName: 'builds',
+    maxItems: 50,
+  },
+  'skill-stone-builds': {
+    label: 'skill-stone-builds',
+    titlePrefix: '[Skill Stone Build]',
     itemsName: 'builds',
     maxItems: 50,
   },

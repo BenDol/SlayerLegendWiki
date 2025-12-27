@@ -134,9 +134,10 @@
 
 /* === SHAPE-SPECIFIC STYLES === */
 
-/* Triangle (Inverted) - equilateral triangle (all sides equal) */
+/* Triangle (Cooldown Stone) - scaled proportionally */
 .skill-stone--triangle {
   --border-width: 3px;
+  transform: scale(1.0) !important;
 }
 
 .skill-stone--triangle .skill-stone__border {
@@ -164,7 +165,11 @@
   bottom: 10%;
 }
 
-/* Square */
+/* Square (Time Stone) - scaled to 0.85 */
+.skill-stone--square {
+  transform: scale(0.85) !important;
+}
+
 .skill-stone--square .skill-stone__border {
   clip-path: polygon(
     10% 0%, 90% 0%,
@@ -189,7 +194,12 @@
   height: 70%;
 }
 
-/* Diamond */
+/* Diamond (Heat Stone) - scaled proportionally, thicker border */
+.skill-stone--diamond {
+  transform: scale(1.039) !important;
+  --border-width: 4px;
+}
+
 .skill-stone--diamond .skill-stone__border {
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   background: var(--element-glow);
@@ -219,24 +229,15 @@
 
 /* === TOOLTIP === */
 .skill-stone__tooltip {
-  position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
+  position: fixed;
   background: rgba(0, 0, 0, 0.95);
   border: 1px solid var(--element-color);
   border-radius: 4px;
   padding: 8px 12px;
   white-space: nowrap;
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s;
-  z-index: 100;
+  z-index: 9999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.skill-stone:hover .skill-stone__tooltip {
-  opacity: 1;
 }
 
 .skill-stone__tooltip::after {
@@ -247,6 +248,7 @@
   transform: translateX(-50%);
   border: 6px solid transparent;
   border-top-color: rgba(0, 0, 0, 0.95);
+  margin-top: 0;
 }
 
 .skill-stone__tooltip-title {
@@ -271,10 +273,55 @@
   transform: scale(1.05);
 }
 
+/* Hover states for size-adjusted stones */
+.skill-stone--triangle:hover {
+  transform: scale(1.05) !important; /* 1.0 * 1.05 */
+}
+
+.skill-stone--square:hover {
+  transform: scale(0.8925) !important; /* 0.85 * 1.05 */
+}
+
+.skill-stone--diamond:hover {
+  transform: scale(1.091) !important; /* 1.039 * 1.05 */
+}
+
 .skill-stone:hover .skill-stone__border {
   filter: drop-shadow(0 0 12px var(--element-glow))
           drop-shadow(0 0 18px var(--element-glow))
           drop-shadow(0 0 24px var(--element-glow));
+}
+
+/* Disable hover effects when disableHover is true */
+.skill-stone--no-hover {
+  cursor: default;
+  pointer-events: none;
+}
+
+.skill-stone--no-hover:hover {
+  transform: scale(1) !important;
+}
+
+.skill-stone--no-hover.skill-stone--triangle:hover {
+  transform: scale(1.0) !important;
+}
+
+.skill-stone--no-hover.skill-stone--square:hover {
+  transform: scale(0.85) !important;
+}
+
+.skill-stone--no-hover.skill-stone--diamond:hover {
+  transform: scale(1.039) !important;
+}
+
+.skill-stone--no-hover:hover .skill-stone__border {
+  filter: drop-shadow(0 0 8px var(--element-glow))
+          drop-shadow(0 0 12px var(--element-glow))
+          drop-shadow(0 0 16px var(--element-glow));
+}
+
+.skill-stone--no-hover .skill-stone__tooltip {
+  display: none;
 }
 
 /* Loading and error states */

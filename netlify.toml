@@ -38,8 +38,14 @@
   # Node bundler (use esbuild for fast builds with ESM format)
   node_bundler = "esbuild"
 
-  # External packages (don't bundle these)
-  external_node_modules = ["@octokit/rest", "octokit"]
+  # External packages (don't bundle these - speeds up function loading)
+  external_node_modules = [
+    "@octokit/rest",
+    "octokit",
+    "leo-profanity",
+    "jsonwebtoken",
+    "gray-matter"
+  ]
 
   # Increase bundle timeout for first load
   included_files = ["../../wiki-config.json", "../../wiki-framework/**/*"]

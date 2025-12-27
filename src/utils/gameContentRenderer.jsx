@@ -5,6 +5,7 @@ import SpiritSprite from '../components/SpiritSprite';
 import SpiritCard from '../components/SpiritCard';
 import ContributionBanner from '../components/ContributionBanner';
 import Emoticon from '../components/Emoticon';
+import BattleLoadoutCard from '../components/BattleLoadoutCard';
 import { VideoGuideCard } from '../../wiki-framework/src/components/contentCreators';
 
 /**
@@ -146,6 +147,20 @@ export const processGameSyntax = (content) => {
   // Process <!-- video-guide:... --> format (legacy)
   processed = processed.replace(/<!--\s*video-guide:\s*([^-]+?)\s*-->/gi, (match, identifier) => {
     return `{{VIDEO_GUIDE:${identifier}}}`;
+  });
+
+  // Process {{battle-loadout:...}} format
+  // Syntax: {{battle-loadout:IDENTIFIER:MODE}}
+  // Examples: {{battle-loadout:loadout-123:detailed}}, {{battle-loadout:abc123:compact}}
+  processed = processed.replace(/\{\{\s*battle-loadout:\s*([^:}]+?)\s*(?::\s*(\w+?)\s*)?\}\}/gi, (match, identifier, mode) => {
+    const modeStr = mode || 'detailed';
+    return `{{BATTLE_LOADOUT:${identifier}:${modeStr}}}`;
+  });
+
+  // Process <!-- battle-loadout:... --> format (legacy)
+  processed = processed.replace(/<!--\s*battle-loadout:\s*([^:]+?)(?::(\w+?))?\s*-->/gi, (match, identifier, mode) => {
+    const modeStr = mode || 'detailed';
+    return `{{BATTLE_LOADOUT:${identifier}:${modeStr}}}`;
   });
 
   // Process {{emoticon:...}} format
@@ -339,13 +354,26 @@ export const CustomParagraph = ({ node, children, ...props }) => {
     );
   }
 
+  // Check for standalone battle loadout marker
+  const loadoutMatch = content.match(/^\{\{BATTLE_LOADOUT:([^:]+?)(?::(\w+?))?\}\}$/);
+  if (loadoutMatch) {
+    const identifier = loadoutMatch[1].trim();
+    const mode = loadoutMatch[2] || 'detailed';
+
+    return (
+      <div>
+        <BattleLoadoutCard identifier={identifier} mode={mode} />
+      </div>
+    );
+  }
+
   // Check for inline markers (markers mixed with text)
   if (content.includes('{{')) {
     const parts = [];
     let lastIndex = 0;
 
     // Match all markers in the content
-    const markerRegex = /\{\{(SKILL|EQUIPMENT|SPIRIT|DATA|SPIRIT_SPRITE|EMOTICON|VIDEO_GUIDE):([^}]+)\}\}/g;
+    const markerRegex = /\{\{(SKILL|EQUIPMENT|SPIRIT|DATA|SPIRIT_SPRITE|EMOTICON|VIDEO_GUIDE|BATTLE_LOADOUT):([^}]+)\}\}/g;
     let match;
 
     while ((match = markerRegex.exec(content)) !== null) {
@@ -654,7 +682,7 @@ export const CustomListItem = ({ node, children, ...props }) => {
     let lastIndex = 0;
 
     // Match all markers in the content
-    const markerRegex = /\{\{(SKILL|EQUIPMENT|SPIRIT|DATA|SPIRIT_SPRITE|EMOTICON|VIDEO_GUIDE):([^}]+)\}\}/g;
+    const markerRegex = /\{\{(SKILL|EQUIPMENT|SPIRIT|DATA|SPIRIT_SPRITE|EMOTICON|VIDEO_GUIDE|BATTLE_LOADOUT):([^}]+)\}\}/g;
     let match;
 
     while ((match = markerRegex.exec(content)) !== null) {

@@ -326,7 +326,7 @@ const SavedSpiritBuildsPanel = ({
 
           {/* Awakening Stars */}
           {awakeningStars > 0 && (
-            <div className="flex items-center justify-center gap-0.5 absolute -bottom-1 left-1/2 -translate-x-1/2">
+            <div className="flex items-center justify-center gap-0.1 absolute -bottom-1 left-1/2 -translate-x-1/2">
               {Array.from({ length: 5 }).map((_, index) => (
                 <img
                   key={index}

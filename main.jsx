@@ -6,7 +6,7 @@ import AppWrapper from './src/components/AppWrapper.jsx';
 import ErrorBoundary from './wiki-framework/src/components/common/ErrorBoundary.jsx';
 import './wiki-framework/src/styles/index.css';
 import './src/styles/custom.css';
-import { Ghost, Sparkles, Sword, Video } from 'lucide-react';
+import { Ghost, Sparkles, Sword, Video, Swords } from 'lucide-react';
 
 // Initialize bot token for comment system (prevents users from closing comment issues)
 import { initializeBotOctokit } from './wiki-framework/src/services/github/api.js';
@@ -34,6 +34,7 @@ import DataSelector from './src/components/DataSelector.jsx';
 import SpiritPicker from './src/components/SpiritPicker.jsx';
 import SkillPicker from './src/components/SkillPicker.jsx';
 import EquipmentPicker from './src/components/EquipmentPicker.jsx';
+import BattleLoadoutPicker from './src/components/BattleLoadoutPicker.jsx';
 import { VideoGuidePicker } from './wiki-framework/src/components/contentCreators/index.js';
 
 // Register custom markdown processors for skill/equipment cards and data injection
@@ -45,6 +46,7 @@ registerDataSelector(DataSelector);
 registerPicker('spirit', SpiritPicker, { icon: Ghost, label: 'Spirit' });
 registerPicker('skill', SkillPicker, { icon: Sparkles, label: 'Skill' });
 registerPicker('equipment', EquipmentPicker, { icon: Sword, label: 'Equipment' });
+registerPicker('battle-loadout', BattleLoadoutPicker, { icon: Swords, label: 'Battle Loadout' });
 
 // Video guide picker is conditionally registered based on config
 // This is done after config loads to check features.contentCreators.enabled
@@ -387,6 +389,7 @@ registerBuildTypes({
   'spirit-builds': '/spirit-builder',
   'battle-loadouts': '/battle-loadouts',
   'soul-weapon-engraving': '/soul-weapon-engraving',
+  'skill-stone-builds': '/skill-stone-builder',
 });
 
 // Register data files for Data Browser (Ctrl+Shift+B)
@@ -480,7 +483,7 @@ const baseRoutes = [
     suspense: true
   },
   {
-    path: 'skill-stones',
+    path: 'skill-stone-builder',
     component: <SkillStonesPage />,
     suspense: true
   }

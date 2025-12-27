@@ -135,7 +135,21 @@
       "Bash(Get-ChildItem \"external\\\\backups\\\\excluded-images\\\\other\" -Filter \"*.png\")",
       "Bash(Select-Object -First 20 Name)",
       "Bash(Get-ChildItem \"public\\\\images\\\\other\" -Filter \"*.png\")",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" log --oneline --follow -5 netlify/functions/video-upload.js)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" log --oneline --follow -5 functions/api/video-upload.js)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show --stat HEAD)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show HEAD:functions/api/video-upload.js)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show HEAD~1:functions/api/video-upload.js)",
+      "Bash(Get-ChildItem -Path \"functions\" -Recurse -Filter \"*.js\")",
+      "Bash(Select-String -Pattern \"public/data|/public/\")",
+      "Bash(New-Item -Path \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\src\\\\pages\\\\SkillStonesPage.jsx\" -ItemType File -Force)",
+      "Bash(Select-String -Pattern \"Loadout data|skillStone\" -Context 2,2)",
+      "Bash(Select-String -Pattern \"skillStoneBuild|hasSkillStoneBuild|BattleLoadoutCard\" -Context 2,2)",
+      "Bash(Select-String -Pattern \"drastically|Expected|Received\" -Context 2,2)",
+      "Bash(Test-Path \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\public\\\\data\\\\soul-weapon-engravings.json\")",
+      "Bash(Select-Object -Last 50)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" status --short)"
     ]
   }
 }

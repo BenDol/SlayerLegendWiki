@@ -9,6 +9,7 @@ import { getSaveDataEndpoint, getDeleteDataEndpoint, getLoadDataEndpoint } from 
 import { getUserLoadouts } from '../services/battleLoadouts';
 import { getSkillGradeColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
+import SkillStone from './SkillStone';
 
 const logger = createLogger('SavedBuildsPanel');
 
@@ -46,6 +47,7 @@ const SavedBuildsPanel = ({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [weapons, setWeapons] = useState([]);
   const [skills, setSkills] = useState([]);
+  const [stoneData, setStoneData] = useState(null);
 
   // Use external builds if provided (controlled mode), otherwise use internal state
   const savedBuilds = externalBuilds !== null ? externalBuilds : internalSavedBuilds;
@@ -61,6 +63,13 @@ const SavedBuildsPanel = ({
   useEffect(() => {
     if (buildType === 'skill-builds') {
       loadSkills();
+    }
+  }, [buildType]);
+
+  // Load stone data for skill stone builds
+  useEffect(() => {
+    if (buildType === 'skill-stone-builds') {
+      loadStoneData();
     }
   }, [buildType]);
 
@@ -88,6 +97,16 @@ const SavedBuildsPanel = ({
       setSkills(data || []);
     } catch (err) {
       logger.error('Failed to load skills:', { error: err });
+    }
+  };
+
+  const loadStoneData = async () => {
+    try {
+      const response = await fetch('/data/skill_stones.json');
+      const data = await response.json();
+      setStoneData(data || null);
+    } catch (err) {
+      logger.error('Failed to load stone data:', { error: err });
     }
   };
 
@@ -302,9 +321,34 @@ const SavedBuildsPanel = ({
         }
         return null;
       })
-      .filter(skill => skill !== null);
+      .filter(skill => skill); // Remove nulls and undefined (truthy check)
 
     return buildSkills;
+  };
+
+  const getBuildStones = (build) => {
+    if (!build.slots || !stoneData) return [];
+
+    // Map over all 3 slots (even if empty) to maintain structure
+    return build.slots.map((slot, index) => {
+      if (!slot.element || !slot.tier) {
+        return { isEmpty: true, type: slot.type };
+      }
+
+      const stoneType = stoneData.stoneTypes[slot.type];
+      const tierData = stoneType?.tiers?.[slot.tier];
+      const elementData = tierData?.elements?.[slot.element];
+
+      return {
+        isEmpty: false,
+        type: slot.type,
+        element: slot.element,
+        tier: slot.tier,
+        stoneType: stoneType,
+        tierData: tierData,
+        elementData: elementData
+      };
+    });
   };
 
   const handleLoadBuild = (build) => {
@@ -320,6 +364,8 @@ const SavedBuildsPanel = ({
       );
       const hasPiecesInInventory = currentBuild?.inventory?.some(piece => piece !== null);
       hasContent = hasPiecesInGrid || hasPiecesInInventory;
+    } else if (buildType === 'skill-stone-builds') {
+      hasContent = currentBuild?.slots?.some(slot => slot?.element && slot?.tier);
     } else {
       // Generic check for other build types
       hasContent = true; // Always confirm for unknown types
@@ -464,6 +510,15 @@ const SavedBuildsPanel = ({
             <div className="max-h-[230px] overflow-y-auto space-y-2 pr-2">
               {savedBuilds.map((build) => {
                 const isCurrentlyLoaded = currentLoadedBuildId === build.id;
+                if (buildType === 'engraving-builds' && build === savedBuilds[0]) {
+                  logger.debug('SavedBuildsPanel highlight check', {
+                    currentLoadedBuildId,
+                    firstBuildId: build.id,
+                    firstBuildName: build.name,
+                    isCurrentlyLoaded,
+                    allBuildIds: savedBuilds.map(b => b.id)
+                  });
+                }
                 return (
                   <div
                     key={build.id}
@@ -516,6 +571,9 @@ const SavedBuildsPanel = ({
                         {buildType === 'engraving-builds' && build.weaponName && (
                           <span>{build.weaponName}</span>
                         )}
+                        {buildType === 'skill-stone-builds' && build.slots && (
+                          <span>{build.slots.filter(s => s.element && s.tier).length}/3 stones</span>
+                        )}
                       </div>
                     </button>
 
@@ -549,6 +607,34 @@ const SavedBuildsPanel = ({
                           className="w-10 h-10 object-contain"
                           title={build.weaponName}
                         />
+                      </div>
+                    )}
+
+                    {/* Skill Stone Icons for skill stone builds */}
+                    {buildType === 'skill-stone-builds' && stoneData && (
+                      <div className="flex-shrink-0 flex gap-1">
+                        {getBuildStones(build).map((stone, index) => (
+                          <div key={index} className="flex flex-col items-center">
+                            {stone.isEmpty ? (
+                              <div className="w-8 h-10 border border-dashed border-gray-300 dark:border-gray-600 rounded flex items-center justify-center">
+                                <span className="text-gray-400 text-xs">-</span>
+                              </div>
+                            ) : (
+                              <>
+                                <SkillStone
+                                  stoneType={stone.type}
+                                  element={stone.element}
+                                  tier={stone.tier}
+                                  data={stoneData}
+                                  size="small"
+                                />
+                                <div className="text-[8px] text-gray-600 dark:text-gray-400 text-center mt-0.5 max-w-[32px] leading-tight">
+                                  {stone.tierData?.bonus}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     )}
 

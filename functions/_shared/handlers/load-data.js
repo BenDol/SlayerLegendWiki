@@ -39,7 +39,7 @@ export async function handleLoadData(adapter, configAdapter) {
     }
 
     // Validate type
-    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'engraving-builds'];
+    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'engraving-builds', 'skill-stone-builds'];
     if (!validTypes.includes(type)) {
       return adapter.createJsonResponse(400, {
         error: `Invalid type. Must be one of: ${validTypes.join(', ')}`
