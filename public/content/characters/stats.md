@@ -50,3 +50,4 @@ order: 0
 - **After completing the three trials you unlock the final trial: Superhuman Power. Completing this trial further increases your level cap for Death Strike.**
 
 # <span class="text-gray-900 dark:text-gray-100"><u>Slayer Promotion Additional Ability</u></span>
+**As you progress through promotions, you unlock an additional stat boost for the attribute of your choice. There are a total of seven stat slots available. After unlocking all seven slots, subsequent promotions apply multipliers to each slot in sequence, cycling back to the first slot once all slots have been boosted.**
