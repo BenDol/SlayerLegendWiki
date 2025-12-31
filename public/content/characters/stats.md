@@ -33,7 +33,7 @@ order: 0
 
 
 # <span class="text-gray-900 dark:text-gray-100"><u>Growth Points</u></span>
-**As you level up and use the Training Diary, you will unlock more stat points to allocate to your stats. These additional stats are divided into two categories: combat stats and miscellaneous stats.**
+**As you level up and use the Training Diary, you will unlock more stat points to allocate to your stats. These additional stats are divided into two categories: combat stats and miscellaneous stats. You can reset growth points for<img src="/images/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />3000.** 
 - **The combat stats refer to your ATK, HP, HP Recovery, and Critical Damage as explained above.**
 - The **<span class="text-purple-600 dark:text-purple-400">miscellaneous stats</span> are supplementary and provide support both in and out of combat.**
 
@@ -48,3 +48,5 @@ order: 0
 **This feature is unlocked when your <span class="text-red-700 dark:text-red-300">main stats</span> such as ATK, HP, and HP Recovery reach level 25000. Each time you increase these stats by 25000 levels, your level cap for Death Strike will also increase.**
 - **To increase your level cap for Death Strike, you must complete three trials: Strength, Iron Body, and Strong Heart.**
 - **After completing the three trials you unlock the final trial: Superhuman Power. Completing this trial further increases your level cap for Death Strike.**
+
+# <span class="text-gray-900 dark:text-gray-100"><u>Slayer Promotion Additional Ability</u></span>
