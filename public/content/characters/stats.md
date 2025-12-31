@@ -49,5 +49,12 @@ order: 0
 - **To increase your level cap for Death Strike, you must complete three trials: Strength, Iron Body, and Strong Heart.**
 - **After completing the three trials you unlock the final trial: Superhuman Power. Completing this trial further increases your level cap for Death Strike.**
 
+
 # <span class="text-gray-900 dark:text-gray-100"><u>Slayer Promotion Additional Ability</u></span>
 **As you progress through promotions, you unlock an additional stat boost for the attribute of your choice. There are a total of seven stat slots available. After unlocking all seven slots, subsequent promotions apply multipliers to each slot in sequence, cycling back to the first slot once all slots have been boosted.**
+| **Stats** | **Percentages (%)** |
+|----------|----------|
+|**Extra ATK**|3-5 6-8 9-12 13-18 19-27 28-40|
+|**Crit Dmg**|Insert text here|
+
+Legend: | Common | Great | Rare | Epic | Legendary | Mythic
