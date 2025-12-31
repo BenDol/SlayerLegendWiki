@@ -11,6 +11,9 @@
       "defaultImage": "/images/og-default.svg",
       "twitterCard": "summary_large_image"
     },
+    "social": {
+      "discord": "https://discord.gg/slayerlegendsna2"
+    },
     "repository": {
       "owner": "BenDol",
       "repo": "SlayerLegendWiki",
