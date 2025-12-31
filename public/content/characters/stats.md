@@ -47,8 +47,4 @@ order: 0
 # <span class="text-gray-900 dark:text-gray-100"><u>Growing Knowledge</u></span>
 **This feature is unlocked when your <span class="text-red-700 dark:text-red-300">main stats</span> such as ATK, HP, and HP Recovery reach level 25000. Each time you increase these stats by 25000 levels, your level cap for Death Strike will also increase.**
 - **To increase your level cap for Death Strike, you must complete three trials: Strength, Iron Body, and Strong Heart.**
-  - Strength
-  - Iron Body
-  - Strong Heart
 - **After completing the three trials you unlock the final trial: Superhuman Power. Completing this trial further increases your level cap for Death Strike.**
-  - Superhuman Power
