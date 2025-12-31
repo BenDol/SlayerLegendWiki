@@ -39,7 +39,7 @@ export const handleSkillSelect = (data, editorApi) => {
   // Format: {{skill:Fire Slash:detailed}} or {{skill:1:compact}}
   let skillSyntax = `{{skill:${skill.name}:${mode}}}`;
 
-  // Apply alignment wrapper if needed
+  // Apply alignment wrapper if needed (block-level)
   if (alignment && alignment !== 'none') {
     let style;
     if (alignment === 'center') {
@@ -50,11 +50,12 @@ export const handleSkillSelect = (data, editorApi) => {
       style = 'display: flex; justify-content: flex-end;';
     }
     skillSyntax = `<div style="${style}">\n\n${skillSyntax}\n\n</div>`;
+    // Block-level with alignment: add newlines for proper spacing
+    editorApi.insertAtCursor(`\n\n${skillSyntax}  \n\n`);
+  } else {
+    // Inline (no alignment): insert without newlines at cursor position
+    editorApi.insertAtCursor(skillSyntax);
   }
-
-  // Insert at cursor position with trailing spaces and paragraph breaks
-  // Two spaces at end of line create hard break, blank line separates blocks
-  editorApi.insertAtCursor(`\n\n${skillSyntax}  \n\n`);
 };
 
 // Handle equipment selection from picker
@@ -90,7 +91,7 @@ export const handleEquipmentSelect = (data, editorApi) => {
   // Format: {{equipment:Innocence:detailed}} or {{equipment:1:compact}}
   let equipmentSyntax = `{{equipment:${equipment.name}:${mode}}}`;
 
-  // Apply alignment wrapper if needed
+  // Apply alignment wrapper if needed (block-level)
   if (alignment && alignment !== 'none') {
     let style;
     if (alignment === 'center') {
@@ -101,11 +102,12 @@ export const handleEquipmentSelect = (data, editorApi) => {
       style = 'display: flex; justify-content: flex-end;';
     }
     equipmentSyntax = `<div style="${style}">\n\n${equipmentSyntax}\n\n</div>`;
+    // Block-level with alignment: add newlines for proper spacing
+    editorApi.insertAtCursor(`\n\n${equipmentSyntax}  \n\n`);
+  } else {
+    // Inline (no alignment): insert without newlines at cursor position
+    editorApi.insertAtCursor(equipmentSyntax);
   }
-
-  // Insert at cursor position with trailing spaces and paragraph breaks
-  // Two spaces at end of line create hard break, blank line separates blocks
-  editorApi.insertAtCursor(`\n\n${equipmentSyntax}  \n\n`);
 };
 
 // Handle spirit selection from picker
@@ -143,7 +145,7 @@ export const handleSpiritSelect = (data, editorApi) => {
   const displayType = inline ? 'inline' : 'block';
   let spiritSyntax = `{{spirit:${spirit.name}:${mode}:${level}:${displayType}}}`;
 
-  // Apply alignment wrapper if needed
+  // Apply alignment wrapper if needed (block-level)
   if (alignment && alignment !== 'none') {
     let style;
     if (alignment === 'center') {
@@ -154,11 +156,12 @@ export const handleSpiritSelect = (data, editorApi) => {
       style = 'display: flex; justify-content: flex-end;';
     }
     spiritSyntax = `<div style="${style}">\n\n${spiritSyntax}\n\n</div>`;
+    // Block-level with alignment: add newlines for proper spacing
+    editorApi.insertAtCursor(`\n\n${spiritSyntax}  \n\n`);
+  } else {
+    // Inline (no alignment): insert without newlines at cursor position
+    editorApi.insertAtCursor(spiritSyntax);
   }
-
-  // Insert at cursor position with trailing spaces and paragraph breaks
-  // Two spaces at end of line create hard break, blank line separates blocks
-  editorApi.insertAtCursor(`\n\n${spiritSyntax}  \n\n`);
 };
 
 // Handle battle loadout selection from picker
