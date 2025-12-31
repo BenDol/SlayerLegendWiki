@@ -11,7 +11,7 @@ category: Characters
 date: 2025-12-21T00:00:00.000Z
 order: 0
 ---
-# <span class="text-gray-900 dark:text-gray-100"><u>Combat Stats</u></span>
+# <span class="text-gray-900 dark:text-gray-100">Combat Stats</span>
 **Your combat stats are divided into two categories: main stats and critical stats.**
 - **Your <span class="text-red-700 dark:text-red-300">main stats</span> are attributes that will be leveled most frequently throughout the game.**
   - The current maximum level cap is 1750000.
@@ -20,41 +20,41 @@ order: 0
   - Death Strike and Death Strike % are unlocked once your Critical Hit Rate reaches level 100.
 
 
-## <span class="text-red-700 dark:text-red-300"><u>Main Stats</u></span>
+## <span class="text-red-700 dark:text-red-300">Main Stats</span>
 | **Attack (ATK)** <img src="/images/icons/icon_growth01_powerup 2_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **Health Points (HP)** <img src="/images/icons/icon_growth02_hpup_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **HP Recovery** <img src="/images/icons/icon_growth03_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> |
 |----------|----------|----------|
 |This attribute determines how much damage you deal.|This attribute determines your maximum health.|This attribute determines your health regeneration rate.|
 
 
-## <span class="text-blue-800 dark:text-blue-300"><u>Critical Stats</u></span>
+## <span class="text-blue-800 dark:text-blue-300">Critical Stats</span>
 | **Critical Damage (Crit Dmg)** <img src="/images/icons/icon_growth04_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **Critical Hit Rate (Crit %)** <img src="/images/icons/icon_growth05_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **Death Strike** <img src="/images/icons/icon_growth06_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **Death Strike %** <img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2025/12/29f69bf1c244423387a3a4ddcbec2947.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 41px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | 
 |----------|----------|----------|----------|
 |This attribute determines how much critical damage you deal.|This attribute determines your critical hit chance.|This attribute enhances your critical damage.|This attribute determines your death strike hit chance.| 
 
 
-# <span class="text-gray-900 dark:text-gray-100"><u>Growth Points</u></span>
+# <span class="text-gray-900 dark:text-gray-100">Growth Points</span>
 **As you level up and use the Training Diary, you will unlock more stat points to allocate to your stats. These additional stats are divided into two categories: combat stats and miscellaneous stats. You can reset growth points for<img src="/images/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />3000.** 
 - **The combat stats refer to your ATK, HP, HP Recovery, and Critical Damage as explained above.**
 - The **<span class="text-purple-600 dark:text-purple-400">miscellaneous stats</span> are supplementary and provide support both in and out of combat.**
 
 
-## <span class="text-purple-600 dark:text-purple-400"><u>Miscellaneous Stats</u></span>
+## <span class="text-purple-600 dark:text-purple-400">Miscellaneous Stats</span>
 | **Luck (LUK)** <img src="/images/icons/icon_growth_lv05_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **Accuracy (ACC)** <img src="/images/icons/icon_growth_lv06_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" />| **Dodge** <img src="/images/icons/icon_growth_lv07_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" />|
 |----------|----------|----------|
 |This attribute determines the amount of gold you receive from defeating monsters.|This attribute determines your attack accuracy relative to the enemy’s level.|This attribute determines how often you can evade enemy attacks relative to their level.|
 
 
-# <span class="text-gray-900 dark:text-gray-100"><u>Growing Knowledge</u></span>
+# <span class="text-gray-900 dark:text-gray-100">Growing Knowledge</span>
 **This feature is unlocked when your <span class="text-red-700 dark:text-red-300">main stats</span> such as ATK, HP, and HP Recovery reach level 25000. Each time you increase these stats by 25000 levels, your level cap for Death Strike will also increase.**
 - **To increase your level cap for Death Strike, you must complete three trials: Strength, Iron Body, and Strong Heart.**
 - **After completing the three trials you unlock the final trial: Superhuman Power. Completing this trial further increases your level cap for Death Strike.**
 
 
-# <span class="text-gray-900 dark:text-gray-100"><u>Slayer Promotion Additional Ability</u></span>
+# <span class="text-gray-900 dark:text-gray-100">Slayer Promotion Additional Ability</span>
 **As you progress through promotions, you unlock an additional stat boost for the attribute of your choice. There are a total of seven stat slots available. After unlocking all seven slots, subsequent promotions apply multipliers to each slot in sequence, cycling back to the first slot once all slots have been boosted.**
 | **Stats** | **Percentages (%)** |
 |----------|----------|
 |**Extra ATK**|3-5 6-8 9-12 13-18 19-27 28-40|
 |**Crit Dmg**|Insert text here|
 
-Legend: | Common | Great | Rare | Epic | Legendary | Mythic
+Legend (Probability): | Common (%) | Great (%) | Rare (%) | Epic (%) | Legendary (%) | Mythic (%)
