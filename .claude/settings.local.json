@@ -201,7 +201,9 @@
       "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show --stat e7b3c75c445071cdc173a4cc8883e378b78224f5)",
       "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show e7b3c75c445071cdc173a4cc8883e378b78224f5 --no-stat)",
       "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show e7b3c75c445071cdc173a4cc8883e378b78224f5 src/utils/pickerHandlers.js)",
-      "Bash(git -C:*)"
+      "Bash(git -C:*)",
+      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\.gitignore\")",
+      "Bash(Select-String -Pattern \"\\\\.env|\\\\.dev\\\\.vars\")"
     ]
   }
 }
