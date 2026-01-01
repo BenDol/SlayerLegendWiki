@@ -80,8 +80,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Add the backup file (not gitignored for monthly backups)
-          git add backups/issues/issues-backup-*.json
+          # Add the backup file (force to override gitignore for monthly commits)
+          git add -f backups/issues/issues-backup-*.json
 
           # Commit if there are changes
           if git diff --staged --quiet; then

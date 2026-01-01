@@ -99,6 +99,8 @@ gh issue create --title "Restored: <original title>" --body "<original body + me
 
 See [`.github/workflows/backup-issues.yml`](../../.github/workflows/backup-issues.yml) for implementation details.
 
+**Note**: Backup JSON files are gitignored by default to keep the repository clean from daily backups. Monthly commits use `git add -f` to force-add the backup file, overriding gitignore.
+
 ## Backup Schedule
 
 - **Time**: Daily at 2 AM UTC
