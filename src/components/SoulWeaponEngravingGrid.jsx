@@ -89,7 +89,7 @@ const SoulWeaponEngravingGrid = ({
       className={`grid gap-1 p-2 rounded-lg relative ${
         isComplete
           ? 'bg-gradient-to-br from-cyan-400/20 to-blue-500/20 ring-1 ring-cyan-400'
-          : 'bg-gray-900 dark:bg-black'
+          : 'bg-gray-100 dark:bg-gray-900'
       } ${className}`}
       style={{
         gridTemplateColumns: `repeat(${gridSize}, ${adjustedCellSize}px)`,
@@ -142,9 +142,9 @@ const SoulWeaponEngravingGrid = ({
                 border-2 transition-all relative
                 ${cell.active
                   ? interactive
-                    ? 'bg-gray-700 dark:bg-gray-600 border-gray-600 dark:border-gray-500'
-                    : 'bg-gray-800 dark:bg-gray-700 border-gray-700 dark:border-gray-600'
-                  : 'bg-gray-900 dark:bg-black border-gray-800 dark:border-gray-900 opacity-30'}
+                    ? 'bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500'
+                    : 'bg-gray-300 dark:bg-gray-700 border-gray-400 dark:border-gray-600'
+                  : 'bg-gray-50 dark:bg-black border-gray-200 dark:border-gray-900 opacity-30'}
               `}
               style={{
                 width: `${adjustedCellSize}px`,

@@ -771,8 +771,8 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center ${isModal ? 'min-h-[400px]' : 'min-h-screen'} bg-gradient-to-b from-gray-900 to-black`}>
-        <div className="text-white text-xl">Loading skills...</div>
+      <div className={`flex items-center justify-center ${isModal ? 'min-h-[400px]' : 'min-h-screen'} bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-black`}>
+        <div className="text-gray-900 dark:text-white text-xl">Loading skills...</div>
       </div>
     );
   }
@@ -810,7 +810,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       <div className={`${isModal ? 'px-4 pt-1 pb-3' : 'max-w-7xl mx-auto px-3 sm:px-4 pt-1 pb-3'}`}>
         {/* Build Name Panel - Controlled by allowSavingBuilds */}
         {allowSavingBuilds && (
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-start gap-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap pt-2">Build Name:</label>
               <div className="flex-1">
@@ -862,7 +862,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
 
         {/* Actions Panel */}
         {!isModal && (
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleShareBuild}
@@ -924,7 +924,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         )}
 
         {/* Settings Bar */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex flex-col gap-4">
             {/* Settings Row */}
             <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
@@ -989,7 +989,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         </div>
 
         {/* Skill Slots Grid */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 justify-items-center">
             {build.slots.slice(0, maxSlots).map((slot, index) => (
               <SkillSlot
@@ -1012,7 +1012,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         </div>
 
         {/* Bulk Level Actions */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
           <div className="flex justify-center gap-2">
             <button
               onClick={() => {

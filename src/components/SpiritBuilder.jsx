@@ -1425,8 +1425,8 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center ${isModal ? 'min-h-[400px]' : 'min-h-screen'} bg-gradient-to-b from-gray-900 to-black`}>
-        <div className="text-white text-xl">Loading spirits...</div>
+      <div className={`flex items-center justify-center ${isModal ? 'min-h-[400px]' : 'min-h-screen'} bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-black`}>
+        <div className="text-gray-900 dark:text-white text-xl">Loading spirits...</div>
       </div>
     );
   }
@@ -1463,7 +1463,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       <div className={`${isModal ? 'px-4 pt-1 pb-3' : 'max-w-7xl mx-auto px-3 sm:px-4 pt-1 pb-3'}`}>
         {/* Build Name Panel */}
         {allowSavingBuilds && (
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-start gap-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap pt-2">Build Name:</label>
               <div className="flex-1">
@@ -1514,7 +1514,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
         {/* Actions Panel */}
         {!isModal && (
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleShareBuild}
@@ -1576,7 +1576,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
         )}
 
         {/* Spirit Slots */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
           <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-8">
             {/* Companion Slot (Slot 0) */}
             <SpiritSlot
@@ -1654,7 +1654,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
 
         {/* Saved Spirits Gallery */}
         {isAuthenticated && (
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
+          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm mb-4">
             <SavedSpiritsGallery
               onSelectSpirit={handleSavedSpiritSelected}
               excludedSpiritIds={build.slots.map(slot => slot.spirit?.id).filter(Boolean)}

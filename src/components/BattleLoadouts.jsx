@@ -1487,7 +1487,7 @@ const BattleLoadouts = () => {
         />
 
         {/* Loadout Name Panel */}
-        <div className={`bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm transition-all ${highlightNameField ? 'ring-4 ring-red-500 ring-opacity-50' : ''}`}>
+        <div className={`bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm transition-all ${highlightNameField ? 'ring-4 ring-red-500 ring-opacity-50' : ''}`}>
           <div className="flex flex-col sm:flex-row sm:items-start gap-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap pt-2">Loadout Name:</label>
             <div className="flex-1">
@@ -1507,7 +1507,7 @@ const BattleLoadouts = () => {
         </div>
 
         {/* Actions Panel */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleShareLoadout}
@@ -1625,7 +1625,7 @@ const BattleLoadouts = () => {
         {isAuthenticated && (
           <div className="sticky bottom-0 left-0 right-0 z-40 mt-6">
             <div className="max-w-7xl mx-auto px-3 sm:px-4">
-              <div className="bg-white dark:bg-gray-900 rounded-t-lg border border-gray-200 dark:border-gray-700 border-b-0 shadow-2xl py-3">
+              <div className="bg-gray-100 dark:bg-gray-900 rounded-t-lg border border-gray-200 dark:border-gray-700 border-b-0 shadow-2xl py-3">
                 <div className="flex flex-col items-center gap-2">
                   {/* Error Message */}
                   {saveError && (

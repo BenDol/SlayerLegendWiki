@@ -203,7 +203,10 @@
       "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show e7b3c75c445071cdc173a4cc8883e378b78224f5 src/utils/pickerHandlers.js)",
       "Bash(git -C:*)",
       "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\.gitignore\")",
-      "Bash(Select-String -Pattern \"\\\\.env|\\\\.dev\\\\.vars\")"
+      "Bash(Select-String -Pattern \"\\\\.env|\\\\.dev\\\\.vars\")",
+      "Bash(Select-String -Pattern \"\\(SpiritCard|SkillBuildCard|BattleLoadoutCard\\)\")",
+      "Bash(Select-Object -First 10)",
+      "Bash(identify:*)"
     ]
   }
 }

@@ -227,7 +227,7 @@ const EquipmentCard = ({ name, id, equipment, mode = 'detailed', type = 'soul-we
 
   if (mode === 'advanced') {
     return (
-      <div className={`not-prose bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border-2 my-2 ${rarityGlow.border} ${rarityGlow.glow} max-w-md`}>
+      <div className={`not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-raised overflow-hidden border-2 my-2 ${rarityGlow.border} ${rarityGlow.glow} max-w-md`}>
         {/* Header with gradient background */}
         <div className={`bg-gradient-to-r ${rarityColor} p-2 text-white`}>
           <div className="flex items-start gap-2">
@@ -369,7 +369,7 @@ const EquipmentCard = ({ name, id, equipment, mode = 'detailed', type = 'soul-we
 
   // Default: detailed mode
   return (
-    <div className={`not-prose bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border-2 my-2 ${rarityGlow.border} ${rarityGlow.glow} max-w-md`}>
+    <div className={`not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-raised overflow-hidden border-2 my-2 ${rarityGlow.border} ${rarityGlow.glow} max-w-md`}>
       {/* Header with gradient background */}
       <div className={`bg-gradient-to-r ${rarityColor} p-2 text-white`}>
         <div className="flex items-start gap-2">

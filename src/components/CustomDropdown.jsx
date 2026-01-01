@@ -183,7 +183,7 @@ const CustomDropdown = ({
       {isOpen && (
         <div
           ref={menuRef}
-          className="absolute z-[150] w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-[60vh] md:max-h-96 overflow-y-auto overscroll-contain"
+          className="absolute z-[150] w-full mt-1 bg-surface-elevated dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-floating max-h-[60vh] md:max-h-96 overflow-y-auto overscroll-contain"
           style={{
             WebkitOverflowScrolling: 'touch'
           }}

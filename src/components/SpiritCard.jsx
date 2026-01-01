@@ -69,7 +69,7 @@ const SpiritCard = ({ id, name, spirit, mode = 'detailed', level = 0, inline = t
 
   if (loading) {
     return (
-      <div className="not-prose bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 animate-pulse">
+      <div className="not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-md p-6 animate-pulse">
         <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
         <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-2"></div>
         <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
@@ -109,7 +109,7 @@ const SpiritCard = ({ id, name, spirit, mode = 'detailed', level = 0, inline = t
   if (mode === 'compact') {
     const displayClass = inline ? 'inline-flex' : 'flex';
     return (
-      <div className={`not-prose ${displayClass} items-center gap-2 bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 px-2.5 py-1.5 my-1 max-w-fit`}>
+      <div className={`not-prose ${displayClass} items-center gap-2 bg-surface-primary dark:bg-gray-800 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 px-2.5 py-1.5 my-1 max-w-fit`}>
         {/* Animated Spirit Sprite - Compact Size */}
         <div className="w-8 h-8 flex-shrink-0">
           <SpiritSprite
@@ -145,7 +145,7 @@ const SpiritCard = ({ id, name, spirit, mode = 'detailed', level = 0, inline = t
 
   if (mode === 'advanced') {
     return (
-      <div className="not-prose bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 my-2">
+      <div className="not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 my-2">
         {/* Header */}
         <div className={`bg-gradient-to-br ${typeGradient} p-3 text-white`}>
           <div className="flex items-start gap-3">
@@ -241,7 +241,7 @@ const SpiritCard = ({ id, name, spirit, mode = 'detailed', level = 0, inline = t
 
   // Default: detailed mode
   return (
-    <div className="not-prose bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 my-2">
+    <div className="not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 my-2">
       {/* Header */}
       <div className={`bg-gradient-to-br ${typeGradient} p-3 text-white`}>
         <div className="flex items-center gap-3">

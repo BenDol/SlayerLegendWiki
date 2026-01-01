@@ -387,7 +387,7 @@ const MySpiritCollection = () => {
                   {/* Usage Badge */}
                   {isUsedInBuilds && (
                     <div
-                      className="absolute top-0 left-0 z-50"
+                      className="absolute top-0 left-0 z-10"
                       onMouseEnter={() => setHoveredSpiritId(spirit.id)}
                       onMouseLeave={() => setHoveredSpiritId(null)}
                     >
@@ -398,7 +398,7 @@ const MySpiritCollection = () => {
 
                         {/* Hover Popup - no gap to prevent hover loss */}
                         {isHovered && (
-                          <div className="absolute top-full left-0 pt-1">
+                          <div className="absolute top-full left-0 pt-1 z-40">
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-3 min-w-[200px]">
                               <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 Used in these builds:

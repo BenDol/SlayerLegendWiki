@@ -327,7 +327,7 @@ const SkillBuildCard = ({ identifier, mode = 'detailed', showActions = true }) =
   }
 
   return (
-    <div className={`skill-build-card bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 ${scaleClass}`}>
+    <div className={`skill-build-card bg-surface-primary dark:bg-gray-800 rounded-lg shadow-floating overflow-hidden border border-gray-200 dark:border-gray-700 ${scaleClass}`}>
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3">
         <div className="flex items-center justify-between">
@@ -381,7 +381,7 @@ const SkillBuildCard = ({ identifier, mode = 'detailed', showActions = true }) =
 
         {/* Stats Panel - Detailed Mode */}
         {currentMode === 'detailed' && (
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+          <div className="mt-4 p-3 bg-surface-secondary dark:bg-gray-700/50 shadow-sm rounded-lg">
             <div className="flex items-center gap-4 text-sm flex-wrap">
               {/* Element Distribution with Icons */}
               {Object.entries(getElementDistribution()).map(([element, count]) => (
@@ -401,7 +401,7 @@ const SkillBuildCard = ({ identifier, mode = 'detailed', showActions = true }) =
         {/* Stats Panel - Advanced Mode */}
         {currentMode === 'advanced' && (
           <div className="mt-4 space-y-3">
-            <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <div className="p-3 bg-surface-secondary dark:bg-gray-700/50 shadow-sm rounded-lg">
               <div className="flex items-center gap-4 text-sm flex-wrap">
                 <div>
                   <span className="text-gray-600 dark:text-gray-400">Total MP:</span>

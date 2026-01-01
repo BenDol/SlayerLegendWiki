@@ -4893,7 +4893,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
       {/* Build Name Panel - Controlled by allowSavingBuilds */}
       {allowSavingBuilds && (
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-start gap-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap pt-2">Build Name:</label>
             <div className="flex-1">
@@ -4948,7 +4948,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
       {/* Actions Panel */}
       {!isModal && (
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3 sm:p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleShareBuild}
@@ -5069,7 +5069,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
       )}
 
       {/* Weapon Selector */}
-      <div className="bg-white dark:bg-gray-900 rounded-lg p-3 sm:p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+      <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3 sm:p-4 mb-4 border border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Soul Weapon Dropdown */}
           <div>
@@ -5530,7 +5530,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         {/* Grid Display */}
         <div
           ref={gridContainerRef}
-          className="bg-white dark:bg-gray-900 rounded-lg p-2 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm"
+          className="bg-gray-100 dark:bg-gray-900 rounded-lg p-2 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm"
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -6046,7 +6046,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         </div>
 
         {/* Inventory */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-2 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-2 sm:p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
               Piece Inventory
@@ -6159,7 +6159,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                   onClick={() => !piece && !isLocked && handleOpenPieceSelector(index)}
                   className={`
                     aspect-square rounded-lg border-2 p-2 transition-all relative overflow-hidden
-                    ${piece ? (isLocked ? 'bg-gray-900 dark:bg-gray-800 cursor-not-allowed' : 'bg-gray-800 dark:bg-gray-700 cursor-grab active:cursor-grabbing') : 'bg-gray-900 dark:bg-gray-800 border-gray-700 hover:border-green-500 cursor-pointer'}
+                    ${piece ? (isLocked ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : 'bg-gray-50 dark:bg-gray-700 cursor-grab active:cursor-grabbing') : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-green-500 cursor-pointer'}
                     ${draggingIndex === index ? 'opacity-50' : ''}
                     ${!piece ? 'opacity-50 hover:opacity-70' : ''}
                     ${isLocked ? 'opacity-60' : ''}
@@ -6345,10 +6345,10 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
           onClick={handleCloseLevelEditor}
         >
           <div
-            className="bg-gray-800 dark:bg-gray-900 border-2 border-blue-500 rounded-lg p-4 shadow-2xl"
+            className="bg-white dark:bg-gray-900 border-2 border-blue-500 rounded-lg p-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="text-white text-sm font-semibold mb-3 text-center">
+            <div className="text-gray-900 dark:text-white text-sm font-semibold mb-3 text-center">
               Set Level
             </div>
             <div className="flex items-center gap-2">
@@ -6498,7 +6498,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Preview
                 </label>
-                <div className="bg-gray-800 dark:bg-gray-700 rounded-lg p-4 flex items-center justify-center border border-gray-600">
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 flex items-center justify-center border border-gray-300 dark:border-gray-600">
                   <div className="relative w-32 h-32">
                     {selectedShape && (
                       <>

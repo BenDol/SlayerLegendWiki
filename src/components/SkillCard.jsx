@@ -63,7 +63,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
 
   if (loading) {
     return (
-      <div className="not-prose bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 animate-pulse">
+      <div className="not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-raised p-6 animate-pulse">
         <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
         <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-2"></div>
         <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
@@ -136,7 +136,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
 
   if (mode === 'advanced') {
     return (
-      <div className="not-prose bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 my-2">
+      <div className="not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-raised overflow-hidden border border-gray-200 dark:border-gray-700 my-2">
         {/* Compact Header */}
         <div className={`bg-gradient-to-r ${attributeGradient} p-2.5 text-white`}>
           <div className="flex items-start gap-3">
@@ -178,42 +178,42 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-3 gap-1.5">
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-1.5 text-center">
+            <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-1.5 text-center shadow-sm">
               <div className="text-[9px] text-gray-500 dark:text-gray-500">MP Cost</div>
               <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
                 {skillData.mpCost}
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-1.5 text-center">
+            <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-1.5 text-center shadow-sm">
               <div className="text-[9px] text-gray-500 dark:text-gray-500">Cooldown</div>
               <div className="text-sm font-bold text-purple-600 dark:text-purple-400">
                 {skillData.cooldown}s
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-1.5 text-center">
+            <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-1.5 text-center shadow-sm">
               <div className="text-[9px] text-gray-500 dark:text-gray-500">Range</div>
               <div className="text-sm font-bold text-green-600 dark:text-green-400">
                 {skillData.range === 0 ? 'Self' : skillData.range}
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-1.5 text-center">
+            <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-1.5 text-center shadow-sm">
               <div className="text-[9px] text-gray-500 dark:text-gray-500">Unlocks</div>
               <div className="text-sm font-bold text-orange-600 dark:text-orange-400">
                 Lv {skillData.enterLevel}
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-1.5 text-center">
+            <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-1.5 text-center shadow-sm">
               <div className="text-[9px] text-gray-500 dark:text-gray-500">Max Lv</div>
               <div className="text-sm font-bold text-red-600 dark:text-red-400">
                 {skillData.maxLevel}
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-1.5 text-center">
+            <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-1.5 text-center shadow-sm">
               <div className="text-[9px] text-gray-500 dark:text-gray-500">Base</div>
               <div className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
                 {skillData.baseValue}%
@@ -222,7 +222,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
           </div>
 
           {/* Upgrade Summary */}
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-2 flex items-center justify-between text-xs">
+          <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-2 flex items-center justify-between text-xs shadow-sm">
             <div>
               <span className="text-gray-500 dark:text-gray-500">Per Level: </span>
               <span className="font-bold text-gray-800 dark:text-gray-200">+{skillData.upgradeValue}%</span>
@@ -234,7 +234,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
           </div>
 
           {/* Damage Scaling Table */}
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-2">
+          <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-2 shadow-sm">
             <div className="text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase mb-1.5">
               Damage Scaling
             </div>
@@ -257,7 +257,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
 
   // Default: detailed mode (compact version - about half the size)
   return (
-    <div className="not-prose bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 my-2">
+    <div className="not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-raised overflow-hidden border border-gray-200 dark:border-gray-700 my-2">
       {/* Compact Header */}
       <div className={`bg-gradient-to-r ${attributeGradient} p-2 text-white`}>
         <div className="flex items-center gap-2">
@@ -294,21 +294,21 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
       <div className="p-3">
         {/* Stats Grid - Only essential stats */}
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-2 text-center">
+          <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-2 text-center shadow-sm">
             <div className="text-[10px] text-gray-500 dark:text-gray-500">MP</div>
             <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
               {skillData.mpCost}
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-2 text-center">
+          <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-2 text-center shadow-sm">
             <div className="text-[10px] text-gray-500 dark:text-gray-500">CD</div>
             <div className="text-sm font-bold text-purple-600 dark:text-purple-400">
               {skillData.cooldown}s
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded p-2 text-center">
+          <div className="bg-surface-tertiary dark:bg-gray-900/50 rounded p-2 text-center shadow-sm">
             <div className="text-[10px] text-gray-500 dark:text-gray-500">Power</div>
             <div className="text-sm font-bold text-yellow-600 dark:text-yellow-400">
               {skillData.baseValue}%

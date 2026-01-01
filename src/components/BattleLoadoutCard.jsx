@@ -450,7 +450,7 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
   // Render based on mode
   return (
     <>
-      <div className="not-prose bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+      <div className="not-prose bg-surface-primary dark:bg-gray-800 rounded-lg shadow-floating overflow-hidden border border-gray-200 dark:border-gray-700">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3">
           <div className="flex items-center justify-between">

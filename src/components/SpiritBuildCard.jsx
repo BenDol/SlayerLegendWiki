@@ -286,7 +286,7 @@ const SpiritBuildCard = ({ identifier, mode = 'detailed', showActions = true }) 
   }
 
   return (
-    <div className={`spirit-build-card bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 ${scaleClass}`}>
+    <div className={`spirit-build-card bg-surface-primary dark:bg-gray-800 rounded-lg shadow-floating overflow-hidden border border-gray-200 dark:border-gray-700 ${scaleClass}`}>
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3">
         <div className="flex items-center justify-between">
@@ -356,7 +356,7 @@ const SpiritBuildCard = ({ identifier, mode = 'detailed', showActions = true }) 
 
         {/* Stats Panel - Detailed Mode */}
         {currentMode === 'detailed' && (
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+          <div className="mt-4 p-3 bg-surface-secondary dark:bg-gray-700/50 shadow-sm rounded-lg">
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
                 <div className="text-gray-600 dark:text-gray-400">Spirits</div>
@@ -383,7 +383,7 @@ const SpiritBuildCard = ({ identifier, mode = 'detailed', showActions = true }) 
         {/* Stats Panel - Advanced Mode */}
         {currentMode === 'advanced' && (
           <div className="mt-4 space-y-3">
-            <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <div className="p-3 bg-surface-secondary dark:bg-gray-700/50 shadow-sm rounded-lg">
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
                   <div className="text-gray-600 dark:text-gray-400">Spirits</div>
@@ -405,7 +405,7 @@ const SpiritBuildCard = ({ identifier, mode = 'detailed', showActions = true }) 
                 </div>
               </div>
             </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <div className="p-3 bg-surface-secondary dark:bg-gray-700/50 shadow-sm rounded-lg">
               <div className="text-sm">
                 <div className="text-gray-600 dark:text-gray-400 mb-2">Awakening Stats</div>
                 <div className="grid grid-cols-2 gap-2">

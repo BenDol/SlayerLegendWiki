@@ -1,3 +1,4 @@
+import React from 'react';
 import SkillCard from '../components/SkillCard';
 import EquipmentCard from '../components/EquipmentCard';
 import DataInjector from '../components/DataInjector';
@@ -23,13 +24,22 @@ import { VideoGuideCard } from '../../wiki-framework/src/components/contentCreat
  * - {{spirit:Loar:compact:4}} or <!-- spirit:Loar:compact:4 --> (compact, level 4, inline)
  * - {{spirit:Loar:compact:4:block}} or <!-- spirit:Loar:compact:4:block --> (compact, level 4, block)
  * - {{data:spirits:1}} or <!-- data:spirits:1 --> (defaults to card template)
- * - {{data:spirits:1:inline}} or <!-- data:spirits:1:inline -->
+ * - {{data:spirits:1:inline}} or <!-- data:spirits:1:inline --> (inline template with ID)
+ * - {{data:promotions:13:classATK}} or <!-- data:promotions:13:classATK --> (specific field, styled)
+ * - {{data:promotions:13:classATK:true:true}} (specific field, no styling for custom table styles)
  * - {{spirit-sprite:1:0}} or <!-- spirit-sprite:1:0 -->
  * - {{contribution-banner:auto-generated}} or <!-- contribution-banner:auto-generated -->
  * - {{emoticon:1}} or {{emoticon:Hello}} - Emoticon by ID or name (defaults to large size)
  * - {{emoticon:1:medium}} or {{emoticon:Hello:small}} - Emoticon with custom size
  * - {{emoticon:Sleep:original}} - Emoticon at native resolution (no scaling)
  * - Size options: small (24px), medium (32px), large (48px), xlarge (64px), original (native)
+ *
+ * Data injection parameters:
+ * - source: Data source (e.g., 'spirits', 'promotions')
+ * - id: Item identifier
+ * - fieldOrTemplate: Template name ('card', 'inline', 'table') or field path ('name', 'skill.cooldown')
+ * - showId (optional): Show ID number (default: true, only for inline template)
+ * - noStyle (optional): Remove styling from field values (default: false, only for field paths)
  *
  * @param {string} content - Markdown content
  * @returns {string} - Processed content with internal markers
@@ -83,17 +93,20 @@ export const processGameSyntax = (content) => {
 
   // Process {{data:...}} format (this is the autocomplete output, needs uppercase conversion)
   // Match lowercase 'data:' and convert to uppercase 'DATA:'
-  processed = processed.replace(/\{\{\s*data:\s*([^:}]+?)\s*:\s*([^:}]+?)\s*(?::\s*([^:}]+?)\s*)?(?::\s*([^}]+?)\s*)?\}\}/gi, (match, source, id, fieldOrTemplate, showId) => {
+  // Syntax: {{data:source:id:fieldOrTemplate:showId:noStyle}}
+  processed = processed.replace(/\{\{\s*data:\s*([^:}]+?)\s*:\s*([^:}]+?)\s*(?::\s*([^:}]+?)\s*)?(?::\s*([^:}]+?)\s*)?(?::\s*([^}]+?)\s*)?\}\}/gi, (match, source, id, fieldOrTemplate, showId, noStyle) => {
     const thirdParam = (fieldOrTemplate || 'card').trim();
     const fourthParam = showId !== undefined ? showId.trim() : 'true';
-    return `{{DATA:${source}:${id}:${thirdParam}:${fourthParam}}}`;
+    const fifthParam = noStyle !== undefined ? noStyle.trim() : 'false';
+    return `{{DATA:${source}:${id}:${thirdParam}:${fourthParam}:${fifthParam}}}`;
   });
 
   // Process <!-- data:... --> format (legacy)
-  processed = processed.replace(/<!--\s*data:\s*([^:]+?):([^:]+?)(?::([^:]+?))?(?::([^-]+?))?\s*-->/gi, (match, source, id, fieldOrTemplate, showId) => {
+  processed = processed.replace(/<!--\s*data:\s*([^:]+?):([^:]+?)(?::([^:]+?))?(?::([^:]+?))?(?::([^-]+?))?\s*-->/gi, (match, source, id, fieldOrTemplate, showId, noStyle) => {
     const thirdParam = (fieldOrTemplate || 'card').trim();
     const fourthParam = showId !== undefined ? showId.trim() : 'true';
-    return `{{DATA:${source}:${id}:${thirdParam}:${fourthParam}}}`;
+    const fifthParam = noStyle !== undefined ? noStyle.trim() : 'false';
+    return `{{DATA:${source}:${id}:${thirdParam}:${fourthParam}:${fifthParam}}}`;
   });
 
   // Process {{spirit-sprite:...}} format
@@ -264,6 +277,105 @@ const extractTextContent = (children) => {
 };
 
 /**
+ * Helper function to recursively process children while preserving React element structure
+ * This preserves formatting elements like <strong>, <em> while processing markers
+ */
+const processChildrenWithMarkers = (children) => {
+  if (typeof children === 'string') {
+    // Process markers in text
+    if (!children.includes('{{')) {
+      return children;
+    }
+
+    const parts = [];
+    let lastIndex = 0;
+
+    // Match all markers in the content
+    const markerRegex = /\{\{(SKILL|EQUIPMENT|DATA|SPIRIT_SPRITE|EMOTICON):([^}]+)\}\}/g;
+    let match;
+
+    while ((match = markerRegex.exec(children)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(children.substring(lastIndex, match.index));
+      }
+
+      const type = match[1];
+      const params = match[2];
+
+      // Process marker based on type
+      if (type === 'SKILL') {
+        const [skillIdentifier, mode = 'detailed'] = params.split(':');
+        const isId = /^\d+$/.test(skillIdentifier);
+        const cardProps = isId
+          ? { id: parseInt(skillIdentifier), mode }
+          : { name: skillIdentifier, mode };
+        parts.push(<SkillCard key={match.index} {...cardProps} />);
+      } else if (type === 'EQUIPMENT') {
+        const [equipmentIdentifier, mode = 'detailed'] = params.split(':');
+        const isId = /^\d+$/.test(equipmentIdentifier);
+        const cardProps = isId
+          ? { id: parseInt(equipmentIdentifier), mode }
+          : { name: equipmentIdentifier, mode };
+        parts.push(<EquipmentCard key={match.index} {...cardProps} />);
+      } else if (type === 'DATA') {
+        const paramParts = params.split(':');
+        const source = paramParts[0]?.trim();
+        const id = paramParts[1]?.trim();
+        const fieldOrTemplate = (paramParts[2] || 'card').trim();
+        const showId = paramParts[3] !== undefined ? paramParts[3].trim() === 'true' : true;
+        const noStyle = paramParts[4] !== undefined ? paramParts[4].trim() === 'true' : false;
+
+        if (source && id) {
+          parts.push(<DataInjector key={match.index} source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} noStyle={noStyle} />);
+        }
+      } else if (type === 'SPIRIT_SPRITE') {
+        const paramParts = params.split(':');
+        const spiritId = parseInt(paramParts[0]);
+        const level = parseInt(paramParts[1] || '0');
+        const size = paramParts[2] || 'small';
+
+        if (!isNaN(spiritId)) {
+          parts.push(
+            <span key={match.index} className="inline-block align-middle mx-1">
+              <SpiritSprite spiritId={spiritId} level={level} size={size} showInfo={false} />
+            </span>
+          );
+        }
+      } else if (type === 'EMOTICON') {
+        const [idOrName, size = 'medium'] = params.split(':');
+        const isId = /^\d+$/.test(idOrName);
+        const emoticonProps = isId
+          ? { id: parseInt(idOrName), size }
+          : { name: idOrName, size };
+        parts.push(<Emoticon key={match.index} {...emoticonProps} />);
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < children.length) {
+      parts.push(children.substring(lastIndex));
+    }
+
+    return parts.length === 1 ? parts[0] : parts;
+  }
+
+  if (Array.isArray(children)) {
+    return children.map((child, idx) => processChildrenWithMarkers(child));
+  }
+
+  // If it's a React element, clone it and recursively process its children
+  if (React.isValidElement(children)) {
+    const processedChildren = processChildrenWithMarkers(children.props.children);
+
+    // Clone the element with processed children
+    return React.cloneElement(children, {}, processedChildren);
+  }
+
+  return children;
+};
+
+/**
  * Custom paragraph renderer that detects and renders skill/equipment cards and data injections
  * Use this with ReactMarkdown's components prop
  *
@@ -344,17 +456,18 @@ export const CustomParagraph = ({ node, children, ...props }) => {
   }
 
   // Check for standalone data injection marker
-  const dataMatch = content.match(/^\{\{DATA:([^:]+?):([^:]+?)(?::([^:]+?))?(?::([^}]+?))?\}\}$/);
+  const dataMatch = content.match(/^\{\{DATA:([^:]+?):([^:]+?)(?::([^:]+?))?(?::([^:]+?))?(?::([^}]+?))?\}\}$/);
   if (dataMatch) {
     const source = dataMatch[1].trim();
     const id = dataMatch[2].trim();
     const fieldOrTemplate = (dataMatch[3] || 'card').trim();
     const showId = dataMatch[4] !== undefined ? dataMatch[4].trim() === 'true' : true;
+    const noStyle = dataMatch[5] !== undefined ? dataMatch[5].trim() === 'true' : false;
 
     // Wrap in div to avoid <p><div> nesting warning (card/table templates render block-level divs)
     return (
       <div>
-        <DataInjector source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} />
+        <DataInjector source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} noStyle={noStyle} />
       </div>
     );
   }
@@ -553,9 +666,10 @@ export const CustomParagraph = ({ node, children, ...props }) => {
         const id = paramParts[1]?.trim();
         const fieldOrTemplate = (paramParts[2] || 'card').trim();
         const showId = paramParts[3] !== undefined ? paramParts[3].trim() === 'true' : true;
+        const noStyle = paramParts[4] !== undefined ? paramParts[4].trim() === 'true' : false;
 
         if (source && id) {
-          parts.push(<DataInjector key={match.index} source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} />);
+          parts.push(<DataInjector key={match.index} source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} noStyle={noStyle} />);
         }
       } else if (type === 'SPIRIT_SPRITE') {
         const paramParts = params.split(':');
@@ -719,90 +833,18 @@ const processInlineMarkers = (content) => {
  * Custom table cell renderer to support inline markers in tables
  */
 export const CustomTableCell = ({ node, children, ...props }) => {
-  // Handle different types of children
-  let content;
-  if (Array.isArray(children)) {
-    content = children.map(c => String(c)).join('').trim();
-  } else {
-    content = String(children).trim();
-  }
+  // Extract text to check for markers
+  const content = extractTextContent(children).trim();
 
   // Check if contains markers
   if (!content.includes('{{')) {
     return <td {...props}>{children}</td>;
   }
 
-  // Split by markers and process each part
-  const parts = [];
-  let lastIndex = 0;
+  // Process children recursively while preserving formatting (bold, italic, etc.)
+  const processedChildren = processChildrenWithMarkers(children);
 
-  // Match all markers in the content
-  const markerRegex = /\{\{(SKILL|EQUIPMENT|DATA|SPIRIT_SPRITE|EMOTICON):([^}]+)\}\}/g;
-  let match;
-
-  while ((match = markerRegex.exec(content)) !== null) {
-    // Add text before the marker
-    if (match.index > lastIndex) {
-      parts.push(content.substring(lastIndex, match.index));
-    }
-
-    const type = match[1];
-    const params = match[2];
-
-    // Process based on type
-    if (type === 'SKILL') {
-      const [skillIdentifier, mode = 'detailed'] = params.split(':');
-      const isId = /^\d+$/.test(skillIdentifier);
-      const cardProps = isId
-        ? { id: parseInt(skillIdentifier), mode }
-        : { name: skillIdentifier, mode };
-      parts.push(<SkillCard key={`skill-${match.index}`} {...cardProps} />);
-    } else if (type === 'EQUIPMENT') {
-      const [equipmentIdentifier, mode = 'detailed'] = params.split(':');
-      const isId = /^\d+$/.test(equipmentIdentifier);
-      const cardProps = isId
-        ? { id: parseInt(equipmentIdentifier), mode }
-        : { name: equipmentIdentifier, mode };
-      parts.push(<EquipmentCard key={`equipment-${match.index}`} {...cardProps} />);
-    } else if (type === 'DATA') {
-      const paramParts = params.split(':');
-      const source = paramParts[0]?.trim();
-      const id = paramParts[1]?.trim();
-      const fieldOrTemplate = (paramParts[2] || 'card').trim();
-
-      if (source && id) {
-        parts.push(<DataInjector key={`data-${match.index}`} source={source} id={id} fieldOrTemplate={fieldOrTemplate} />);
-      }
-    } else if (type === 'SPIRIT_SPRITE') {
-      const paramParts = params.split(':');
-      const spiritId = parseInt(paramParts[0]);
-      const level = parseInt(paramParts[1] || '0');
-
-      if (!isNaN(spiritId)) {
-        parts.push(
-          <span key={`sprite-${match.index}`} className="inline-block align-middle mx-1">
-            <SpiritSprite spiritId={spiritId} level={level} size="small" showInfo={false} />
-          </span>
-        );
-      }
-    } else if (type === 'EMOTICON') {
-      const [idOrName, size = 'medium'] = params.split(':');
-      const isId = /^\d+$/.test(idOrName);
-      const emoticonProps = isId
-        ? { id: parseInt(idOrName), size }
-        : { name: idOrName, size };
-      parts.push(<Emoticon key={`emoticon-${match.index}`} {...emoticonProps} />);
-    }
-
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Add remaining text
-  if (lastIndex < content.length) {
-    parts.push(content.substring(lastIndex));
-  }
-
-  return <td {...props}>{parts.length === 1 ? parts[0] : parts}</td>;
+  return <td {...props}>{processedChildren}</td>;
 };
 
 /**
@@ -862,9 +904,10 @@ export const CustomListItem = ({ node, children, ...props }) => {
         const id = paramParts[1]?.trim();
         const fieldOrTemplate = (paramParts[2] || 'card').trim();
         const showId = paramParts[3] !== undefined ? paramParts[3].trim() === 'true' : true;
+        const noStyle = paramParts[4] !== undefined ? paramParts[4].trim() === 'true' : false;
 
         if (source && id) {
-          parts.push(<DataInjector key={match.index} source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} />);
+          parts.push(<DataInjector key={match.index} source={source} id={id} fieldOrTemplate={fieldOrTemplate} showId={showId} noStyle={noStyle} />);
         }
       } else if (type === 'SPIRIT_SPRITE') {
         const paramParts = params.split(':');
@@ -935,90 +978,18 @@ export const CustomListItem = ({ node, children, ...props }) => {
  * Custom table header cell renderer to support inline markers
  */
 export const CustomTableHeaderCell = ({ node, children, ...props }) => {
-  // Handle different types of children
-  let content;
-  if (Array.isArray(children)) {
-    content = children.map(c => String(c)).join('').trim();
-  } else {
-    content = String(children).trim();
-  }
+  // Extract text to check for markers
+  const content = extractTextContent(children).trim();
 
   // Check if contains markers
   if (!content.includes('{{')) {
     return <th {...props}>{children}</th>;
   }
 
-  // Split by markers and process each part
-  const parts = [];
-  let lastIndex = 0;
+  // Process children recursively while preserving formatting (bold, italic, etc.)
+  const processedChildren = processChildrenWithMarkers(children);
 
-  // Match all markers in the content
-  const markerRegex = /\{\{(SKILL|EQUIPMENT|DATA|SPIRIT_SPRITE|EMOTICON):([^}]+)\}\}/g;
-  let match;
-
-  while ((match = markerRegex.exec(content)) !== null) {
-    // Add text before the marker
-    if (match.index > lastIndex) {
-      parts.push(content.substring(lastIndex, match.index));
-    }
-
-    const type = match[1];
-    const params = match[2];
-
-    // Process based on type (same as table cell)
-    if (type === 'SKILL') {
-      const [skillIdentifier, mode = 'detailed'] = params.split(':');
-      const isId = /^\d+$/.test(skillIdentifier);
-      const cardProps = isId
-        ? { id: parseInt(skillIdentifier), mode }
-        : { name: skillIdentifier, mode };
-      parts.push(<SkillCard key={`skill-${match.index}`} {...cardProps} />);
-    } else if (type === 'EQUIPMENT') {
-      const [equipmentIdentifier, mode = 'detailed'] = params.split(':');
-      const isId = /^\d+$/.test(equipmentIdentifier);
-      const cardProps = isId
-        ? { id: parseInt(equipmentIdentifier), mode }
-        : { name: equipmentIdentifier, mode };
-      parts.push(<EquipmentCard key={`equipment-${match.index}`} {...cardProps} />);
-    } else if (type === 'DATA') {
-      const paramParts = params.split(':');
-      const source = paramParts[0]?.trim();
-      const id = paramParts[1]?.trim();
-      const fieldOrTemplate = (paramParts[2] || 'card').trim();
-
-      if (source && id) {
-        parts.push(<DataInjector key={`data-${match.index}`} source={source} id={id} fieldOrTemplate={fieldOrTemplate} />);
-      }
-    } else if (type === 'SPIRIT_SPRITE') {
-      const paramParts = params.split(':');
-      const spiritId = parseInt(paramParts[0]);
-      const level = parseInt(paramParts[1] || '0');
-
-      if (!isNaN(spiritId)) {
-        parts.push(
-          <span key={`sprite-${match.index}`} className="inline-block align-middle mx-1">
-            <SpiritSprite spiritId={spiritId} level={level} size="small" showInfo={false} />
-          </span>
-        );
-      }
-    } else if (type === 'EMOTICON') {
-      const [idOrName, size = 'medium'] = params.split(':');
-      const isId = /^\d+$/.test(idOrName);
-      const emoticonProps = isId
-        ? { id: parseInt(idOrName), size }
-        : { name: idOrName, size };
-      parts.push(<Emoticon key={`emoticon-${match.index}`} {...emoticonProps} />);
-    }
-
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Add remaining text
-  if (lastIndex < content.length) {
-    parts.push(content.substring(lastIndex));
-  }
-
-  return <th {...props}>{parts.length === 1 ? parts[0] : parts}</th>;
+  return <th {...props}>{processedChildren}</th>;
 };
 
 /**

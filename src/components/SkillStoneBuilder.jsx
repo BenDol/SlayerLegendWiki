@@ -544,8 +544,8 @@ const SkillStoneBuilder = forwardRef(({ isModal = false, initialBuild = null, on
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center ${isModal ? 'min-h-[400px]' : 'min-h-screen'} bg-gradient-to-b from-gray-900 to-black`}>
-        <div className="text-white text-xl">Loading skill stones...</div>
+      <div className={`flex items-center justify-center ${isModal ? 'min-h-[400px]' : 'min-h-screen'} bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-black`}>
+        <div className="text-gray-900 dark:text-white text-xl">Loading skill stones...</div>
       </div>
     );
   }
