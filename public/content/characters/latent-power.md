@@ -25,8 +25,8 @@ order: 0
 
 
 **If the random allocation of stats is not to your liking you can reset them and try again. There are two ways to do this: reset and advanced reset.**
-- **Reset allows you to reset your stats using<img src="/images/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />diamonds or<img src="/images/goods/Goods_Dice_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />dice.**
-- **Advanced reset allows you to reset your stats while keeping your old stats or choosing new ones. This also uses<img src="/images/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />diamonds or<img src="/images/goods/Goods_Dice_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />dice but at a higher cost.**
+- **[Reset] allows you to reset your stats using<img src="/images/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />diamonds or<img src="/images/goods/Goods_Dice_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />dice.**
+- **[Advanced Reset] allows you to reset your stats while keeping your old stats or choosing new ones. This also uses<img src="/images/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />diamonds or<img src="/images/goods/Goods_Dice_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />dice but at a higher cost.**
 
 
 # <span class="text-gray-900 dark:text-gray-100">Awakened Latent Power</span>
@@ -38,5 +38,5 @@ order: 0
 
 
 **There are two ways to ignite using your <img src="/images/goods/Goods_AwakenDragonForce_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: -2px 0 0 0;" data-inline="true" /><span class="text-amber-600 dark:text-amber-400">Dragon Spark</span>: ignite once or random ignite.**
-- **Ignite once**
-- **Random ignite**
+- **[Ignite Once] allows you to obtain a single upgrade with a 100% success rate. The cost in <img src="/images/goods/Goods_AwakenDragonForce_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: -2px 0 0 0;" data-inline="true" /><span class="text-amber-600 dark:text-amber-400">Dragon Spark</span> remains the same each time.**
+- **[Random Ignite] allows you to obtain 1 to 5 upgrades with a success rate that decreases as the number of upgrades increases. There is also a chance to lose 1 to 5 upgrades, making it a gamble compared to [Ignite Once]. The cost in <img src="/images/goods/Goods_AwakenDragonForce_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: -2px 0 0 0;" data-inline="true" /><span class="text-amber-600 dark:text-amber-400">Dragon Spark</span> varies and can be low or high depending on the number of upgrades attempted.**
