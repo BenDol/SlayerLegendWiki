@@ -60,9 +60,9 @@ order: 0
 |**Extra HP Recovery**|Insert text here|Increases HP recovery rate.|
 |**Extra MP**|Insert text here|Increases maximum MP.|
 |**Extra MP Recovery**|Insert text here|Increases MP recovery rate.|
-|**Extra Accuracy**|Insert text here|Increases accuracy to reduce the chance of missing attacks.|
-|**Dodge**|Insert text here|Increases dodge to improve the chance of evading enemy attacks.|
-|**CC Resist**|Insert text here|Increases CC resistance to reduce the chance of being knocked back by enemies.|
+|**Extra Accuracy**|Insert text here|Reduces the chance of missing attacks.|
+|**Dodge**|Insert text here|Improves the chance of evading enemy attacks.|
+|**CC Resist**|Insert text here|Reduces the chance of being knocked back by enemies.|
 |**Extra Monster Gold**|Insert text here|Increases gold earned from defeating monsters.|
 |**Extra EXP**|Insert text here|Increases experience gained.|
 
