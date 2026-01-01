@@ -121,7 +121,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       return;
     }
 
-    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const urlParams = new URLSearchParams(window.location.search);
     const shareChecksum = urlParams.get('share');
     const encodedBuild = urlParams.get('data');
     const buildId = urlParams.get('build');
@@ -1130,7 +1130,7 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
       logger.debug('Generated checksum', { checksum });
 
       // Generate share URL
-      const baseURL = window.location.origin + window.location.pathname;
+      const baseURL = window.location.origin;
       const shareURL = generateShareUrl(baseURL, 'spirit-builds', checksum);
 
       await navigator.clipboard.writeText(shareURL);
@@ -1159,8 +1159,8 @@ const SpiritBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave
         const serializedBuild = serializeBuildForSharing(build);
         const encoded = encodeBuild(serializedBuild);
         if (encoded) {
-          const baseURL = window.location.origin + window.location.pathname;
-          const shareURL = `${baseURL}#/spirit-builder?data=${encoded}`;
+          const baseURL = window.location.origin;
+          const shareURL = `${baseURL}/spirit-builder?data=${encoded}`;
           await navigator.clipboard.writeText(shareURL);
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);

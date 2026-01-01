@@ -70,7 +70,7 @@ const SkillStoneBuilder = forwardRef(({ isModal = false, initialBuild = null, on
     if (!stoneData) return; // Wait for stone data to load
     if (isModal) return; // Skip URL loading in modal mode
 
-    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const urlParams = new URLSearchParams(window.location.search);
     const shareChecksum = urlParams.get('share');
     const encodedBuild = urlParams.get('data');
     const buildId = urlParams.get('build');
@@ -318,8 +318,8 @@ const SkillStoneBuilder = forwardRef(({ isModal = false, initialBuild = null, on
         const serializedBuild = serializeBuild({ ...build, name: buildName });
         const encoded = encodeBuild(serializedBuild);
         if (encoded) {
-          const baseURL = window.location.origin + window.location.pathname;
-          const shareURL = `${baseURL}#/skill-stone-builder?data=${encoded}`;
+          const baseURL = window.location.origin;
+          const shareURL = `${baseURL}/skill-stone-builder?data=${encoded}`;
           await navigator.clipboard.writeText(shareURL);
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);

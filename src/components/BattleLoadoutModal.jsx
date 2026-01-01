@@ -20,7 +20,7 @@ const BattleLoadoutModal = ({ isOpen, onClose, initialLoadout }) => {
     if (isOpen && initialLoadout) {
       // Encode loadout and navigate to editor
       const encoded = encodeLoadout(initialLoadout);
-      window.location.href = `#/battle-loadouts?data=${encoded}`;
+      window.location.href = `/battle-loadouts?data=${encoded}`;
     }
   }, [isOpen, initialLoadout]);
 

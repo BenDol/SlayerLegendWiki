@@ -73,7 +73,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
     if (skills.length === 0) return; // Wait for skills to load
     if (isModal) return; // Skip URL loading in modal mode
 
-    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const urlParams = new URLSearchParams(window.location.search);
     const shareChecksum = urlParams.get('share');
     const encodedBuild = urlParams.get('data');
     const buildId = urlParams.get('build');
@@ -454,7 +454,7 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
       logger.debug('Generated checksum', { checksum });
 
       // Generate share URL
-      const baseURL = window.location.origin + window.location.pathname;
+      const baseURL = window.location.origin;
       const shareURL = generateShareUrl(baseURL, 'skill-builds', checksum);
 
       await navigator.clipboard.writeText(shareURL);
@@ -483,8 +483,8 @@ const SkillBuilder = forwardRef(({ isModal = false, initialBuild = null, onSave 
         const serializedBuild = serializeBuild({ ...build, name: buildName, maxSlots });
         const encoded = encodeBuild(serializedBuild);
         if (encoded) {
-          const baseURL = window.location.origin + window.location.pathname;
-          const shareURL = `${baseURL}#/skill-builder?data=${encoded}`;
+          const baseURL = window.location.origin;
+          const shareURL = `${baseURL}/skill-builder?data=${encoded}`;
           await navigator.clipboard.writeText(shareURL);
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);

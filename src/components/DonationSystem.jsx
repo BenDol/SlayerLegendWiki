@@ -24,8 +24,8 @@ const DonationSystem = () => {
 
   const handleDonateClick = () => {
     handleDonate();
-    // Use hash navigation since DonationSystem is outside Router context
-    window.location.hash = '#/donate';
+    // Navigate to donate page
+    window.location.href = '/donate';
   };
 
   // Extract messages from shouldShow (can be true or array of messages)

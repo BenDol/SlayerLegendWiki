@@ -407,7 +407,7 @@ const MySpiritCollection = () => {
                                 {buildsUsingSpirit.map((build) => (
                                   <a
                                     key={build.id}
-                                    href={`#/spirit-builder?build=${build.id}`}
+                                    href={`/spirit-builder?build=${build.id}`}
                                     className="block text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
                                     onClick={() => setHoveredSpiritId(null)}
                                   >

@@ -266,7 +266,7 @@ const SkillBuildPicker = ({ isOpen, onClose, onSelect, renderPreview = null }) =
                   : "No public skill builds found. Be the first to create one!"}
               </p>
               <button
-                onClick={() => (window.location.href = '#/skill-builder')}
+                onClick={() => (window.location.href = '/skill-builder')}
                 className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg"
               >
                 {isAuthenticated ? 'Create Your First Build' : 'Go to Skill Builder'}

@@ -253,7 +253,7 @@ const BattleLoadoutPicker = ({ isOpen, onClose, onSelect, renderPreview = null }
                   : "No public battle loadouts found. Be the first to create one!"}
               </p>
               <button
-                onClick={() => (window.location.href = '#/battle-loadouts')}
+                onClick={() => (window.location.href = '/battle-loadouts')}
                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
               >
                 {isAuthenticated ? 'Create Your First Loadout' : 'Go to Battle Loadouts'}

@@ -6,7 +6,7 @@ import MetaTags from '../components/MetaTags';
  * Skill Builder Page
  *
  * Standalone page for the skill builder
- * Accessible at /#/skill-builder
+ * Accessible at /skill-builder
  */
 const SkillBuilderPage = () => {
   return (

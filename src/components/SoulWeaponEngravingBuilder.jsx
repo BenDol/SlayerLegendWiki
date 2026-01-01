@@ -421,7 +421,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
   useEffect(() => {
     if (weapons.length === 0 || engravings.length === 0 || allWeapons.length === 0) return; // Wait for data to load
 
-    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const urlParams = new URLSearchParams(window.location.search);
     const shareChecksum = urlParams.get('share');
     const buildId = urlParams.get('build');
 
@@ -4546,7 +4546,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
       logger.debug('Generated checksum', { checksum });
 
       // Generate share URL
-      const baseURL = window.location.origin + window.location.pathname;
+      const baseURL = window.location.origin;
       const shareURL = generateShareUrl(baseURL, 'soul-weapon-engraving', checksum);
 
       await navigator.clipboard.writeText(shareURL);

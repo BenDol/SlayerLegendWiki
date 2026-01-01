@@ -488,9 +488,9 @@ const SavedBuildsPanel = ({
     onLoadBuild(build);
 
     // Update URL with build parameter
-    const currentHash = window.location.hash.split('?')[0];
-    const newHash = `${currentHash}?build=${build.id}`;
-    window.history.replaceState(null, '', newHash);
+    const currentPath = window.location.pathname;
+    const newUrl = `${currentPath}?build=${build.id}`;
+    window.history.replaceState(null, '', newUrl);
   };
 
   if (!isAuthenticated) {

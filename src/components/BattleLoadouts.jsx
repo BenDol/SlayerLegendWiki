@@ -119,7 +119,7 @@ const BattleLoadouts = () => {
       return;
     }
 
-    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const urlParams = new URLSearchParams(window.location.search);
     const shareChecksum = urlParams.get('share');
     const encodedLoadout = urlParams.get('data');
     const loadoutId = urlParams.get('loadout');
@@ -1299,7 +1299,7 @@ const BattleLoadouts = () => {
       const checksum = await saveBuild(owner, repo, 'battle-loadouts', serializedLoadout);
 
       // Generate share URL
-      const baseURL = window.location.origin + window.location.pathname;
+      const baseURL = window.location.origin;
       const shareURL = generateShareUrl(baseURL, 'battle-loadouts', checksum);
 
       logger.info('Share URL generated', { shareURL });
@@ -1329,8 +1329,8 @@ const BattleLoadouts = () => {
 
         const encoded = encodeLoadout(serializedLoadout);
         if (encoded) {
-          const baseURL = window.location.origin + window.location.pathname;
-          const shareURL = `${baseURL}#/battle-loadouts?data=${encoded}`;
+          const baseURL = window.location.origin;
+          const shareURL = `${baseURL}/battle-loadouts?data=${encoded}`;
 
           await navigator.clipboard.writeText(shareURL);
 

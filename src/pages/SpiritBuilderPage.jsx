@@ -6,7 +6,7 @@ import MetaTags from '../components/MetaTags';
  * SpiritBuilderPage Component
  *
  * Page wrapper for the Spirit Builder
- * Accessible at /#/spirit-builder
+ * Accessible at /spirit-builder
  */
 const SpiritBuilderPage = () => {
   return (

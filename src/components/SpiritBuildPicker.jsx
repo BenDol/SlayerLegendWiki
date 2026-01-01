@@ -172,7 +172,7 @@ const SpiritBuildPicker = ({ isOpen, onClose, onSelect, renderPreview = null }) 
                   : "No public spirit builds found. Be the first to create one!"}
               </p>
               <button
-                onClick={() => (window.location.href = '#/spirit-builder')}
+                onClick={() => (window.location.href = '/spirit-builder')}
                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
               >
                 {isAuthenticated ? 'Create Your First Build' : 'Go to Spirit Builder'}

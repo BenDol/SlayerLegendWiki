@@ -135,7 +135,7 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
           No saved spirits yet
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-500 text-center">
-          Visit <a href="/#/my-spirits" className="text-blue-600 dark:text-blue-400 hover:underline">My Spirit Collection</a> to add spirits
+          Visit <a href="/my-spirits" className="text-blue-600 dark:text-blue-400 hover:underline">My Spirit Collection</a> to add spirits
         </p>
       </div>
     );
@@ -145,7 +145,7 @@ const SavedSpiritsGallery = ({ onSelectSpirit, excludedSpiritIds = [] }) => {
     <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-3">
         <a
-          href="/#/my-spirits"
+          href="/my-spirits"
           className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors"
           title="Go to My Spirit Collection"
         >

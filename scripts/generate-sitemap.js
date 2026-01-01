@@ -29,17 +29,21 @@ const SECTION_CONFIG = {
 };
 
 // Static routes (tools, pages)
-// Using hash format (#/) for hash-based routing (createHashRouter)
+// Using browser routing for proper SEO
 const STATIC_ROUTES = [
-  { url: '/', priority: '1.0', changefreq: 'daily' }, // Root doesn't need hash
-  { url: '/#/skill-builder', priority: '0.9', changefreq: 'monthly' },
-  { url: '/#/spirit-builder', priority: '0.9', changefreq: 'monthly' },
-  { url: '/#/battle-loadouts', priority: '0.9', changefreq: 'monthly' },
-  { url: '/#/soul-weapon-engraving', priority: '0.9', changefreq: 'monthly' },
-  { url: '/#/my-collections', priority: '0.7', changefreq: 'monthly' },
-  { url: '/#/my-spirits', priority: '0.7', changefreq: 'monthly' },
-  { url: '/#/highscore', priority: '0.8', changefreq: 'daily' },
-  { url: '/#/donate', priority: '0.8', changefreq: 'monthly' },
+  { url: '/', priority: '1.0', changefreq: 'daily' },
+  { url: '/skill-builder', priority: '0.9', changefreq: 'monthly' },
+  { url: '/spirit-builder', priority: '0.9', changefreq: 'monthly' },
+  { url: '/battle-loadouts', priority: '0.9', changefreq: 'monthly' },
+  { url: '/soul-weapon-engraving', priority: '0.9', changefreq: 'monthly' },
+  { url: '/skill-stone-builder', priority: '0.9', changefreq: 'monthly' },
+  { url: '/my-collections', priority: '0.7', changefreq: 'monthly' },
+  { url: '/my-spirits', priority: '0.7', changefreq: 'monthly' },
+  { url: '/spirits/viewer', priority: '0.6', changefreq: 'monthly' },
+  { url: '/highscore', priority: '0.8', changefreq: 'daily' },
+  { url: '/creators', priority: '0.7', changefreq: 'weekly' },
+  { url: '/changelog', priority: '0.7', changefreq: 'weekly' },
+  { url: '/donate', priority: '0.8', changefreq: 'monthly' },
 ];
 
 /**
@@ -69,7 +73,7 @@ function getMdFiles(dir, fileList = [], baseDir = dir) {
 }
 
 /**
- * Convert file path to URL with hash for hash-based routing
+ * Convert file path to URL for browser routing
  */
 function pathToUrl(filePath) {
   // Remove .md extension and convert to URL format
@@ -80,9 +84,8 @@ function pathToUrl(filePath) {
     url = url.replace(/\/(home|index)$/, '');
   }
 
-  // Use hash format (#/) for hash-based routing (createHashRouter)
-  // Root path doesn't need hash, content pages do
-  return url === '' ? '/' : `/#/${url}`;
+  // Use clean URLs for browser routing
+  return url === '' ? '/' : `/${url}`;
 }
 
 /**

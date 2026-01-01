@@ -69,23 +69,23 @@ const AppWrapper = ({ children }) => {
     let updatePagePathRef = null;
 
     const updatePagePath = () => {
-      const hash = window.location.hash;
-      logger.trace('updatePagePath called', { hash });
+      const pathname = window.location.pathname;
+      logger.trace('updatePagePath called', { pathname });
 
-      // Only track content pages (format: #/section/page-name or #/getting-started, etc.)
-      // Exclude special pages like #/skill-builder, #/donate, #/search
+      // Only track content pages (format: /section/page-name or /getting-started, etc.)
+      // Exclude special pages like /skill-builder, /donate, /search
       const specialPages = [
-        'skill-builder', 'spirit-builder', 'battle-loadouts',
-        'soul-weapon-engraving', 'my-spirits', 'my-collections',
-        'spirits/viewer', 'donate', 'search', 'profile', 'maintenance',
-        'page-history', 'contributor-highscore', 'my-edits'
+        '/skill-builder', '/spirit-builder', '/battle-loadouts',
+        '/soul-weapon-engraving', '/my-spirits', '/my-collections',
+        '/spirits/viewer', '/donate', '/search', '/profile', '/maintenance',
+        '/page-history', '/contributor-highscore', '/my-edits'
       ];
 
-      if (hash && hash.startsWith('#/')) {
-        const path = hash.slice(2); // Remove #/
+      if (pathname && pathname !== '/') {
+        const path = pathname.startsWith('/') ? pathname.slice(1) : pathname;
 
         // Check if it's a special page
-        const isSpecialPage = specialPages.some(sp => path.startsWith(sp));
+        const isSpecialPage = specialPages.some(sp => pathname.startsWith(sp));
 
         if (!isSpecialPage && path) {
           logger.debug('Tracking content page', { path });
@@ -95,34 +95,34 @@ const AppWrapper = ({ children }) => {
           setCurrentPagePath(null);
         }
       } else {
-        logger.trace('No hash or invalid hash, not tracking');
+        logger.trace('Homepage or invalid path, not tracking');
         setCurrentPagePath(null);
       }
     };
 
     updatePagePathRef = updatePagePath;
 
-    // Update on hash change
-    window.addEventListener('hashchange', updatePagePath);
-    logger.trace('hashchange listener attached');
+    // Update on navigation (popstate for back/forward)
+    window.addEventListener('popstate', updatePagePath);
+    logger.trace('popstate listener attached');
 
     // Initial update - call immediately
     updatePagePath();
 
-    // Also poll for hash changes as backup (in case event listener breaks)
-    let lastHash = window.location.hash;
+    // Also poll for path changes as backup (in case event listener breaks)
+    let lastPath = window.location.pathname;
     const pollInterval = setInterval(() => {
-      if (window.location.hash !== lastHash) {
-        logger.trace('Hash changed detected by polling');
-        lastHash = window.location.hash;
+      if (window.location.pathname !== lastPath) {
+        logger.trace('Path changed detected by polling');
+        lastPath = window.location.pathname;
         updatePagePathRef();
       }
     }, 500); // Check every 500ms
 
     // Cleanup
     return () => {
-      logger.trace('Cleaning up hashchange listener and poll interval');
-      window.removeEventListener('hashchange', updatePagePath);
+      logger.trace('Cleaning up popstate listener and poll interval');
+      window.removeEventListener('popstate', updatePagePath);
       clearInterval(pollInterval);
     };
   }, []);

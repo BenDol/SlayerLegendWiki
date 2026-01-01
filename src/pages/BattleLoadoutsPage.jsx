@@ -6,7 +6,7 @@ import MetaTags from '../components/MetaTags';
  * Battle Loadouts Page
  *
  * Standalone page for the battle loadouts system
- * Accessible at /#/battle-loadouts
+ * Accessible at /battle-loadouts
  */
 const BattleLoadoutsPage = () => {
   return (

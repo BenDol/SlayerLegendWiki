@@ -10,7 +10,7 @@
   // Configuration
   const CONFIG = {
     // Selector to find the logo image
-    logoSelector: 'header a[href="/"] img, header a[href*="/#/"] img',
+    logoSelector: 'header a[href="/"] img',
 
     // ID to add to the logo
     logoId: 'logo',
