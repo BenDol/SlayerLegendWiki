@@ -1,5 +1,6 @@
-# CDN Redirect for game assets (jsDelivr proxy)
-/images/content/*  https://cdn.jsdelivr.net/gh/BenDol/SlayerLegendCDN@main/game-assets/images/:splat  200
+# Game assets load directly from CDN (jsDelivr)
+# Images with /images/content/* paths are resolved client-side by CustomImage component
+# See src/utils/gameContentRenderer.jsx and src/services/imageService.js
 
 # Cloudflare Pages SPA routing fallback
 # Serve index.html for all routes that don't match static files

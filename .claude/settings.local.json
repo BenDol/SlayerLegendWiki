@@ -217,7 +217,9 @@
       "Bash(if [ -d \"C:/Projects/slayerlegend/wiki/public/content\" ])",
       "Bash(then echo \"Directory exists\")",
       "Bash(else echo \"Directory does NOT exist\")",
-      "Bash(npm run prebuild:*)"
+      "Bash(npm run prebuild:*)",
+      "Bash(Get-Content \"game-assets/images/image-index.json\")",
+      "Bash(Select-String -Pattern '\"\"path\"\":')"
     ]
   }
 }

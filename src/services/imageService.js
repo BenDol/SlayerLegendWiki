@@ -168,6 +168,7 @@ export async function getSkillImage(skillName, attribute) {
   if (imageIndex && imageIndex.images) {
     // Search for images matching the skill name
     const searchTerm = skillName.toLowerCase().replace(/\s+/g, '');
+    const basePath = imageIndex.path || '';  // e.g., "/images"
 
     // Search through images
     for (const image of imageIndex.images) {
@@ -177,7 +178,12 @@ export async function getSkillImage(skillName, attribute) {
         const keywords = image.keywords.map(k => k.toLowerCase().replace(/\s+/g, ''));
 
         if (filename.includes(searchTerm) || keywords.some(k => k.includes(searchTerm))) {
-          return image.path;
+          // Convert CDN path to wiki path
+          // CDN: basePath + image.path (e.g., "/images" + "/icons/fire.png" = "/images/icons/fire.png")
+          // Wiki: /images/content/icons/fire.png (strip /images/, prepend /images/content/)
+          const cdnPath = basePath + image.path;
+          const relativePath = cdnPath.replace(/^\/images\//, '/');
+          return `/images/content${relativePath}`;
         }
       }
     }
@@ -218,4 +224,45 @@ export function getAllElementIcons() {
     '/images/content/icons/typeicon_earth s_1.png',
     '/images/content/skills/Icon_skillCard.png',
   ];
+}
+
+/**
+ * Convert /images/content/* path to full CDN URL
+ * @param {string} imagePath - Relative path starting with /images/content/
+ * @returns {Promise<string>} Full CDN URL or original path if CDN not configured
+ */
+export async function resolveImageUrl(imagePath) {
+  // Only process /images/content/* paths
+  if (!imagePath || !imagePath.startsWith('/images/content/')) {
+    return imagePath;
+  }
+
+  // Get CDN base URL from config
+  const cdnBaseUrl = await getCdnBaseUrl();
+
+  if (!cdnBaseUrl) {
+    // CDN not configured, return original path (for local dev fallback)
+    logger.debug('CDN not configured, using original path', { imagePath });
+    return imagePath;
+  }
+
+  // Extract path after /images/content/ (e.g., /images/content/icons/fire.png → icons/fire.png)
+  const relativePath = imagePath.replace('/images/content/', '');
+
+  // Construct full CDN URL with /images/ prefix
+  // CDN structure: <base>/game-assets/images/icons/fire.png
+  const cdnUrl = `${cdnBaseUrl}/images/${relativePath}`;
+
+  logger.debug('Resolved image URL', { imagePath, cdnUrl });
+
+  return cdnUrl;
+}
+
+/**
+ * Resolve multiple image URLs at once
+ * @param {Array<string>} imagePaths - Array of image paths
+ * @returns {Promise<Array<string>>} Array of resolved CDN URLs
+ */
+export async function resolveImageUrls(imagePaths) {
+  return Promise.all(imagePaths.map(path => resolveImageUrl(path)));
 }
