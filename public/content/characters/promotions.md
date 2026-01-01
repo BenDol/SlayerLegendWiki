@@ -1,7 +1,7 @@
 ---
 id: promotions
 title: Promotions
-description: A brief overview of the available promotions and the stat boosts they grant upon completion.
+description: A brief overview of the available character promotions and the stat boosts they grant upon completion.
 tags:
   - character
   - promotion
