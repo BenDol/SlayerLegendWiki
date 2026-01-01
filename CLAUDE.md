@@ -157,6 +157,76 @@ git commit -m "Fix typo [skip tests]"
 # See .claude/cloudflare-pages-deployment.md for full deployment guide
 ```
 
+## Dynamic Page Loading & Conditional Deployments
+
+The wiki supports **dynamic page loading** which fetches markdown content from GitHub instead of bundled static files. This eliminates the need for full rebuilds when only content changes.
+
+### Configuration
+
+Enable in `wiki-config.json`:
+```json
+{
+  "features": {
+    "dynamicPageLoading": {
+      "enabled": true,          // Master toggle
+      "cacheTTL": 300000,       // 5 minutes (in milliseconds)
+      "fallbackToStatic": true, // Fall back to bundled files if GitHub unavailable
+      "allowStaleOnRateLimit": true  // Use expired cache when rate limited
+    }
+  }
+}
+```
+
+### Conditional Deployments (GitHub Actions)
+
+When `dynamicPageLoading.enabled = true`, content-only commits automatically skip Cloudflare deployments to conserve build quota. This is handled by `.github/workflows/conditional-deploy.yml`.
+
+**Behavior:**
+- ✅ **Content-only commits** (`public/content/*.md` only) → No deploy (pages load from GitHub)
+- ✅ **Code/config commits** → Full deploy triggered
+- ✅ **Submodule updates** (`wiki-framework` changes) → Full deploy triggered
+- ✅ **Dynamic loading disabled** → All commits deploy (backward compatible)
+
+**Commit Message Overrides:**
+```bash
+# Force deploy even if only content changed
+git commit -m "Update content [deploy-required]"
+
+# Skip deploy even if code changed (manual override)
+git commit -m "Refactor [skip-deploy]"
+```
+
+**Keywords:**
+- `[deploy-required]` or `[force-deploy]` - Force full deploy
+- `[skip-deploy]` or `[no-deploy]` - Skip deploy
+
+**Setup Required:**
+1. Disable automatic Cloudflare deploys (Settings → Builds & deployments)
+2. Create deploy hook in Cloudflare Pages dashboard
+3. Add `CLOUDFLARE_DEPLOY_HOOK` secret to GitHub repo
+
+### How It Works
+
+**With Dynamic Loading Enabled:**
+1. User edits markdown page via wiki editor
+2. Commit pushed to GitHub (no Cloudflare deploy triggered)
+3. Next page load fetches fresh content from GitHub API
+4. Content cached locally for 5 minutes
+5. Cache invalidated automatically on next edit
+
+**Cost Savings:**
+- Before: Every edit = 1 build (20 edits/day = 600 builds/month)
+- After: Only code changes = builds (typically 30-50/month)
+- Stays within Cloudflare Pages free tier (500 builds/month)
+
+### Cache Behavior
+
+- **Fresh cache**: Content served from localStorage (< 5 minutes old)
+- **Cache miss**: Fetches from GitHub, caches locally
+- **Rate limited**: Uses stale cache (< 24 hours old), shows warning banner
+- **GitHub down**: Falls back to bundled static files, shows warning banner
+- **After edit**: Cache purged immediately, fresh fetch on next load
+
 ## Video Upload System
 
 ### Hybrid Upload Strategy (Client-side LFS for Large Files)

@@ -193,7 +193,15 @@
       "Bash(Select-String -Pattern \"Avatar|avatar|CustomAvatar|useCustomAvatar\" -Context 1,1)",
       "Bash(Start-Sleep -Seconds 10)",
       "Bash(Get-Content \"C:\\\\Users\\\\dolb9\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Projects-slayerlegend-wiki\\\\tasks\\\\bb16855.output\" -Tail 50)",
-      "Bash(Get-Content \".wrangler/server.log\" -Tail 100)"
+      "Bash(Get-Content \".wrangler/server.log\" -Tail 100)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\wiki-framework\" diff HEAD)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\wiki-framework\" status --short)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" diff wiki-config.json)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" log -1 --stat)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show --stat e7b3c75c445071cdc173a4cc8883e378b78224f5)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show e7b3c75c445071cdc173a4cc8883e378b78224f5 --no-stat)",
+      "Bash(git -C \"C:\\\\Projects\\\\slayerlegend\\\\wiki\" show e7b3c75c445071cdc173a4cc8883e378b78224f5 src/utils/pickerHandlers.js)",
+      "Bash(git -C:*)"
     ]
   }
 }

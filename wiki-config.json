@@ -314,6 +314,12 @@
     "preserveDraftsOnUpdate": true,
     "forceRelogOnUpdate": false,
     "enableRemoteLoggingInDev": true,
+    "dynamicPageLoading": {
+      "enabled": true,
+      "cacheTTL": 300000,
+      "fallbackToStatic": true,
+      "allowStaleOnRateLimit": true
+    },
     "branchIndicator": {
       "enabled": false
     },
