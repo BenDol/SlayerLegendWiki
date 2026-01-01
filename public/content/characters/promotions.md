@@ -10,7 +10,7 @@ category: Characters
 date: 2025-12-21T00:00:00.000Z
 order: 0
 ---
-# <span class="text-gray-900 dark:text-gray-100">PROMOTION OVERVIEW</span>
+# <span class="text-gray-900 dark:text-gray-100">Promotion Overview</span>
 **Here are the current promotions and the boosts they provide upon completion.**
 
 
