@@ -316,7 +316,7 @@
     "enableRemoteLoggingInDev": true,
     "dynamicPageLoading": {
       "enabled": true,
-      "cacheTTL": 300000,
+      "cacheTTL": 120000,
       "fallbackToStatic": true,
       "allowStaleOnRateLimit": true
     },
