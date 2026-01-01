@@ -128,7 +128,8 @@ async function loadImageIndex() {
   if (imageIndexCache) return imageIndexCache;
 
   const cdnBaseUrl = await getCdnBaseUrl();
-  const cdnUrl = cdnBaseUrl ? `${cdnBaseUrl}/image-index.json` : null;
+  // Image index is located at game-assets/images/image-index.json
+  const cdnUrl = cdnBaseUrl ? `${cdnBaseUrl}/images/image-index.json` : null;
 
   imageIndexCache = await loadJSONWithCache(
     cdnUrl,

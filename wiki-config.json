@@ -327,7 +327,7 @@
         "github": {
           "owner": "BenDol",
           "repo": "SlayerLegendCDN",
-          "basePath": "game-assets/images",
+          "basePath": "game-assets",
           "servingMode": "jsdelivr",
           "branch": "main"
         }

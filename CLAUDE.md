@@ -470,13 +470,19 @@ if (loading) return <LoadingSpinner />;
 
 **IMPORTANT: Claude should NEVER handle git commits or pushes.**
 
-- User handles all git operations manually
-- Claude makes code changes only
+**🚨 PROHIBITED GIT COMMANDS:**
+- **NEVER** use `git add` - User stages changes manually
+- **NEVER** use `git commit` - User creates commits manually
+- **NEVER** use `git push` - User pushes changes manually
+
+**Allowed behavior:**
+- Claude makes code changes only (using Read, Edit, Write tools)
+- User handles ALL git operations manually
 - User reviews and commits with their own messages
 
 **Framework submodule:**
 - Often in detached HEAD state (normal)
-- DO NOT use git commands in `wiki-framework/` directory
+- **DO NOT** use ANY git commands in `wiki-framework/` directory
 - User handles all submodule operations
 
 ## Repository Permissions & Security
