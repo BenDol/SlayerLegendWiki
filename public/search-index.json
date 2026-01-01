@@ -1,0 +1,993 @@
+[
+  {
+    "id": "andy/overview-introduction",
+    "title": "Overview & Introduction",
+    "description": "This section offers a brief overview of the progression guide and includes a table of contents to support navigation through the remaining sections.",
+    "content": "OVERVIEW Hello! Welcome to the Slayer Legend guide created by me (Andy). This guide is designed to break down how to progress efficiently in the game as a F2P player or a light spender (definitely not 🐳 status). While there are surely extreme min-max strategies out there, everything here comes from my own experience with characters on both Server 1 and Server 2. I’ve been playing Slayer Legend for about three years now, so I’d like to think I have a solid grasp of how things work. So without fu",
+    "section": "andy",
+    "sectionTitle": "Andy",
+    "pageId": "overview-introduction",
+    "url": "/andy/overview-introduction",
+    "tags": [
+      "guide"
+    ],
+    "category": "Progression",
+    "date": "2025-12-29",
+    "order": 0
+  },
+  {
+    "id": "characters/index",
+    "title": "Characters",
+    "description": "Master your character's progression through stats, promotions, enhancement, and more",
+    "content": "Characters {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "characters",
+    "sectionTitle": "Characters",
+    "pageId": "index",
+    "url": "/characters/index",
+    "tags": [
+      "characters",
+      "progression",
+      "stats",
+      "promotions"
+    ],
+    "category": "Characters",
+    "date": "2025-12-13T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "characters/latent-power",
+    "title": "Latent Power",
+    "description": "A brief overview of latent power and the process of awakening it.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Latent Power Overview</span> This content is unlocked after obtaining your first <img src=\"/images/items/uiitemDragonForce.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: -2px 0 0 0;\" data-inline=\"true\" /><span class=\"text-cyan-600 dark:text-cyan-400\">Dragon Power</span> from the Ancient Dragon in the Shelter of Sleeping Flame and can then be used to enhance your stats. Stats c",
+    "section": "characters",
+    "sectionTitle": "Characters",
+    "pageId": "latent-power",
+    "url": "/characters/latent-power",
+    "tags": [
+      "character",
+      "latent-power",
+      "progression",
+      "stats"
+    ],
+    "category": "Characters",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "characters/promotions",
+    "title": "Promotions",
+    "description": "A brief overview of the available promotions and the stat boosts they grant upon completion.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Promotion Overview</span> Here are the current promotions and the boosts they provide upon completion. | <span class=\"text-gray-900 dark:text-gray-100\">PROMOTION</span> | <span class=\"text-gray-900 dark:text-gray-100\">BOOST</span> |----------|----------| | <span class=\"text-gray-600 dark:text-gray-400\">STONE </span><img src=\"/images/promotions/0-stone.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 27px; ",
+    "section": "characters",
+    "sectionTitle": "Characters",
+    "pageId": "promotions",
+    "url": "/characters/promotions",
+    "tags": [
+      "character",
+      "promotion",
+      "progression"
+    ],
+    "category": "Characters",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "characters/stats",
+    "title": "Character Stats",
+    "description": "A brief overview of the available stats and their effects.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Character Level</span> As you progress through your Slayer Legend journey, you will earn<img src=\"/images/goods/GoodsExp.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: 0 0.25em;\" data-inline=\"true\" />experience (EXP) that allows you to unlock new skills, gain stat points, and more. <span class=\"text-gray-900 dark:text-gray-100\">Combat Stats</span> Your combat stats are divided",
+    "section": "characters",
+    "sectionTitle": "Characters",
+    "pageId": "stats",
+    "url": "/characters/stats",
+    "tags": [
+      "character",
+      "stats",
+      "mechanics",
+      "optimization"
+    ],
+    "category": "Characters",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "characters/training-log",
+    "title": "Training Diary",
+    "description": "A brief overview of the training diary system.",
+    "content": "Training Diary {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "characters",
+    "sectionTitle": "Characters",
+    "pageId": "training-log",
+    "url": "/characters/training-log",
+    "tags": [
+      "character",
+      "progression",
+      "achievements"
+    ],
+    "category": "Characters",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "companions/companion-builds",
+    "title": "Companion Builds",
+    "description": "Comprehensive guide to companion build strategies, optimal companion selection, stat priorities, and team compositions for different content types",
+    "content": "Companion Builds {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "companions",
+    "sectionTitle": "Companions",
+    "pageId": "companion-builds",
+    "url": "/companions/companion-builds",
+    "tags": [
+      "companions",
+      "builds",
+      "strategy",
+      "optimization"
+    ],
+    "category": "Companions",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "companions/ellie",
+    "title": "Ellie",
+    "description": "Guide to Ellie, your first companion character. Learn her abilities, optimal builds, and enhancement strategies",
+    "content": "Ellie {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "companions",
+    "sectionTitle": "Companions",
+    "pageId": "ellie",
+    "url": "/companions/ellie",
+    "tags": [
+      "companions",
+      "ellie",
+      "support"
+    ],
+    "category": "Companions",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "companions/enhancement",
+    "title": "Companion Enhancement",
+    "description": "Complete guide to companion enhancement system, leveling companions, stat upgrades, evolution, and maximizing companion power",
+    "content": "Companion Enhancement {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "companions",
+    "sectionTitle": "Companions",
+    "pageId": "enhancement",
+    "url": "/companions/enhancement",
+    "tags": [
+      "companions",
+      "enhancement",
+      "progression",
+      "stats"
+    ],
+    "category": "Companions",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "companions/index",
+    "title": "Companions",
+    "description": "Guide to companion characters, their abilities, enhancement, and promotion systems in Slayer Legend",
+    "content": "Companions {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "companions",
+    "sectionTitle": "Companions",
+    "pageId": "index",
+    "url": "/companions/index",
+    "tags": [
+      "companions",
+      "characters",
+      "progression"
+    ],
+    "category": "Companions",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "companions/luna",
+    "title": "Luna",
+    "description": "Guide to Luna, an offensive combat companion. Learn her abilities, damage builds, and enhancement strategies",
+    "content": "Luna {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "companions",
+    "sectionTitle": "Companions",
+    "pageId": "luna",
+    "url": "/companions/luna",
+    "tags": [
+      "companions",
+      "luna",
+      "offense"
+    ],
+    "category": "Companions",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "companions/miho",
+    "title": "Miho",
+    "description": "Guide to Miho, a defensive tank companion. Learn her tanking abilities, survivability builds, and enhancement strategies",
+    "content": "Miho {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "companions",
+    "sectionTitle": "Companions",
+    "pageId": "miho",
+    "url": "/companions/miho",
+    "tags": [
+      "companions",
+      "miho",
+      "tank"
+    ],
+    "category": "Companions",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "companions/promotion-option",
+    "title": "Promotion Option",
+    "description": "The player can use dice to produce random companion promotion options",
+    "content": "Recommended Rolls Typically the player will benefit from having companions with full pages of max roll for attack. If the player is lacking mana recovery (ie. running out of mana when using fulg) it would help to add one or two rolls of mana recovery. Options Extra ATK(%) : <span class=\"text-gray-400 dark:text-gray-400\">3</span> / <span class=\"text-green-600 dark:text-green-400\">4</span> / <span class=\"text-orange-600 dark:text-orange-400\">6</span> / <span class=\"text-purple-600 dark:text-purple",
+    "section": "companions",
+    "sectionTitle": "Companions",
+    "pageId": "promotion-option",
+    "url": "/companions/promotion-option",
+    "tags": [
+      "promotionoption"
+    ],
+    "category": "Companions",
+    "date": "2025-12-14",
+    "order": 0
+  },
+  {
+    "id": "companions/zeke",
+    "title": "Zeke",
+    "description": "Guide to Zeke, a balanced all-rounder companion. Learn his versatile abilities, hybrid builds, and enhancement strategies",
+    "content": "Zeke {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "companions",
+    "sectionTitle": "Companions",
+    "pageId": "zeke",
+    "url": "/companions/zeke",
+    "tags": [
+      "companions",
+      "zeke",
+      "balanced"
+    ],
+    "category": "Companions",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "database/skills",
+    "title": "Skill Database",
+    "description": "Complete database of all skills in Slayer Legend",
+    "content": "Skill Database {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "database",
+    "sectionTitle": "Database",
+    "pageId": "skills",
+    "url": "/database/skills",
+    "tags": [
+      "skills",
+      "database"
+    ],
+    "category": "Database",
+    "date": "2025-12-13T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "equipment/accessories",
+    "title": "Accessories",
+    "description": "Complete guide to accessory equipment, rings, necklaces, and other supplementary gear that provides stat bonuses and special effects",
+    "content": "Accessories {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page --> Anon",
+    "section": "equipment",
+    "sectionTitle": "Equipment",
+    "pageId": "accessories",
+    "url": "/equipment/accessories",
+    "tags": [
+      "equipment",
+      "accessories",
+      "rings",
+      "necklaces"
+    ],
+    "category": "Equipment",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "equipment/black-orbs",
+    "title": "Black Orbs",
+    "description": "Guide to Black Orbs, a rare and powerful crafting material used for advanced equipment upgrades and special enhancements",
+    "content": "Black Orbs {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "equipment",
+    "sectionTitle": "Equipment",
+    "pageId": "black-orbs",
+    "url": "/equipment/black-orbs",
+    "tags": [
+      "equipment",
+      "materials",
+      "black-orbs",
+      "crafting"
+    ],
+    "category": "Equipment",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "equipment/enhancement",
+    "title": "Equipment Enhancement",
+    "description": "Complete guide to enhancing equipment, upgrading gear stats, enhancement strategies, and maximizing equipment potential",
+    "content": "Equipment Enhancement {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "equipment",
+    "sectionTitle": "Equipment",
+    "pageId": "enhancement",
+    "url": "/equipment/enhancement",
+    "tags": [
+      "equipment",
+      "enhancement",
+      "upgrading",
+      "progression"
+    ],
+    "category": "Equipment",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "equipment/fusion",
+    "title": "Equipment Fusion",
+    "description": "Guide to equipment fusion system, combining and upgrading equipment, transferring stats, and recovering materials",
+    "content": "Equipment Fusion {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "equipment",
+    "sectionTitle": "Equipment",
+    "pageId": "fusion",
+    "url": "/equipment/fusion",
+    "tags": [
+      "equipment",
+      "fusion",
+      "crafting",
+      "upgrading"
+    ],
+    "category": "Equipment",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "equipment/index",
+    "title": "Equipment",
+    "description": "Comprehensive guide to weapons, armor, accessories, and equipment enhancement systems in Slayer Legend",
+    "content": "Equipment {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "equipment",
+    "sectionTitle": "Equipment",
+    "pageId": "index",
+    "url": "/equipment/index",
+    "tags": [
+      "equipment",
+      "gear",
+      "progression"
+    ],
+    "category": "Equipment",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "equipment/relics",
+    "title": "Relics",
+    "description": "Guide to Relics, powerful equipment pieces that provide unique bonuses, special effects, and end-game power",
+    "content": "Relics {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "equipment",
+    "sectionTitle": "Equipment",
+    "pageId": "relics",
+    "url": "/equipment/relics",
+    "tags": [
+      "equipment",
+      "relics",
+      "end-game"
+    ],
+    "category": "Equipment",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "equipment/soul-weapons",
+    "title": "Soul Weapons",
+    "description": "Guide to Soul Weapons, special endgame weapons with unique abilities, evolution systems, and powerful passive effects",
+    "content": "Soul Weapons {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "equipment",
+    "sectionTitle": "Equipment",
+    "pageId": "soul-weapons",
+    "url": "/equipment/soul-weapons",
+    "tags": [
+      "equipment",
+      "soul-weapons",
+      "weapons",
+      "end-game"
+    ],
+    "category": "Equipment",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "equipment/weapons",
+    "title": "Weapons Guide",
+    "description": "Complete guide to weapons, weapon types, stats, and progression in Slayer Legend",
+    "content": "Weapons Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "equipment",
+    "sectionTitle": "Equipment",
+    "pageId": "weapons",
+    "url": "/equipment/weapons",
+    "tags": [
+      "equipment",
+      "weapons",
+      "progression"
+    ],
+    "category": "Equipment",
+    "date": "2025-12-13T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "getting-started/core-mechanics",
+    "title": "Core Mechanics",
+    "description": "Understanding the fundamental game mechanics of Slayer Legend including stats, elements, combat systems, and progression",
+    "content": "Core Mechanics {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "getting-started",
+    "sectionTitle": "Getting Started",
+    "pageId": "core-mechanics",
+    "url": "/getting-started/core-mechanics",
+    "tags": [
+      "beginner",
+      "mechanics",
+      "combat",
+      "stats"
+    ],
+    "category": "Getting Started",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "getting-started/early-game-roadmap",
+    "title": "Early Game Roadmap",
+    "description": "Step-by-step guide for your first days in Slayer Legend, covering essential progression milestones and strategies",
+    "content": "Early Roadmap {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "getting-started",
+    "sectionTitle": "Getting Started",
+    "pageId": "early-game-roadmap",
+    "url": "/getting-started/early-game-roadmap",
+    "tags": [
+      "beginner",
+      "roadmap",
+      "progression",
+      "guide"
+    ],
+    "category": "Getting Started",
+    "date": "2025-12-22T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "getting-started/first-steps",
+    "title": "Your First Steps",
+    "description": "First hour guide",
+    "content": "First Steps {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "getting-started",
+    "sectionTitle": "Getting Started",
+    "pageId": "first-steps",
+    "url": "/getting-started/first-steps",
+    "tags": [
+      "beginner"
+    ],
+    "category": "Getting Started",
+    "date": "2025-12-13T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "getting-started/index",
+    "title": "Getting Started with Slayer Legend",
+    "description": "Welcome to the complete guide for Slayer Legend Idle RPG - learn the basics, master the systems, and become a legendary slayer",
+    "content": "Getting Started with Slayer Legend {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "getting-started",
+    "sectionTitle": "Getting Started",
+    "pageId": "index",
+    "url": "/getting-started/index",
+    "tags": [
+      "beginner",
+      "tutorial",
+      "getting-started",
+      "new-player"
+    ],
+    "category": "Getting Started",
+    "date": "2025-12-13T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "getting-started/installation",
+    "title": "Installation",
+    "description": "How to install and set up your wiki",
+    "content": "Installation Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "getting-started",
+    "sectionTitle": "Getting Started",
+    "pageId": "installation",
+    "url": "/getting-started/installation",
+    "tags": [
+      "installation",
+      "setup"
+    ],
+    "category": "Getting Started",
+    "date": "2025-12-13T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "getting-started/ui-guide",
+    "title": "UI Guide",
+    "description": "Complete guide to the user interface, menus, controls, and navigation in Slayer Legend",
+    "content": "UI Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "getting-started",
+    "sectionTitle": "Getting Started",
+    "pageId": "ui-guide",
+    "url": "/getting-started/ui-guide",
+    "tags": [
+      "beginner",
+      "ui",
+      "interface",
+      "tutorial"
+    ],
+    "category": "Getting Started",
+    "date": "2025-12-22T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "guides/index",
+    "title": "Guides",
+    "description": "Strategy guides and tips for Slayer Legend",
+    "content": "Guides {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "guides",
+    "sectionTitle": "Guides",
+    "pageId": "index",
+    "url": "/guides/index",
+    "tags": [
+      "guides",
+      "strategy",
+      "tips"
+    ],
+    "category": "Guides",
+    "date": "2025-12-16T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "meta/contributing",
+    "title": "Contributing",
+    "description": "Learn how to contribute to the Slayer Legend Wiki",
+    "content": "Contributing Thank you for your interest in contributing to the Slayer Legend Wiki! This guide will help you get started. Getting Started The Slayer Legend Wiki is a community-driven resource built using GitHub. All contributions are welcome, whether you're fixing typos, adding new content, or improving existing pages. Ways to Contribute 1. Edit Existing Pages 1. Navigate to any page on the wiki 2. Click the Edit button (requires GitHub login) 3. Make your changes in the editor 4. Add a brief su",
+    "section": "meta",
+    "sectionTitle": "Meta",
+    "pageId": "contributing",
+    "url": "/meta/contributing",
+    "tags": [
+      "meta",
+      "contributing"
+    ],
+    "category": "Meta",
+    "date": "2025-12-12T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "meta/emoticons",
+    "title": "Emoticons",
+    "description": "Learn how to use Slayer Legend emoticons in wiki pages",
+    "content": "Emoticons Slayer Legend emoticons can be used throughout the wiki to add personality and expression to your content! Available Emoticons Here are all the available emoticons: | ID | Name | Preview | Usage | |----|------|---------|-------| | 1 | Hello | {{emoticon:1}} | or | | 2 | Yep | {{emoticon:2}} | or | | 3 | Laugh | {{emoticon:3}} | or | | 4 | Okay | {{emoticon:4}} | or | | 5 | Cheer | {{emoticon:5}} | or | | 6 | Cool | {{emoticon:6}} | or | | 7 | Exhausted | {{emoticon:7}} | or | | 8 | Con",
+    "section": "meta",
+    "sectionTitle": "Meta",
+    "pageId": "emoticons",
+    "url": "/meta/emoticons",
+    "tags": [
+      "meta",
+      "emoticons",
+      "markup"
+    ],
+    "category": "Meta",
+    "date": "2025-12-23T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "meta/guidelines",
+    "title": "Editing Guidelines",
+    "description": "Style and formatting guidelines for wiki contributors",
+    "content": "Editing Guidelines This page outlines best practices for creating and editing content on the Slayer Legend Wiki. Page Structure Every page should include: Frontmatter Content Organization 1. Main heading () - Page title 2. Introduction - Brief overview of the topic 3. Sections () - Major topics 4. Subsections () - Detailed breakdown Writing Style Clarity - Use simple, clear language - Avoid jargon unless necessary - Define terms on first use - Keep sentences concise Formatting - Use bold for imp",
+    "section": "meta",
+    "sectionTitle": "Meta",
+    "pageId": "guidelines",
+    "url": "/meta/guidelines",
+    "tags": [
+      "meta",
+      "guidelines",
+      "style"
+    ],
+    "category": "Meta",
+    "date": "2025-12-12T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "progression/index",
+    "title": "Progression Systems",
+    "description": "Overview of character progression, leveling, and advancement systems in Slayer Legend",
+    "content": "Progression Systems {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "progression",
+    "sectionTitle": "Progression",
+    "pageId": "index",
+    "url": "/progression/index",
+    "tags": [
+      "progression",
+      "leveling",
+      "advancement"
+    ],
+    "category": "Progression",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "progression/leveling",
+    "title": "Leveling Guide",
+    "description": "Complete guide to leveling your character efficiently, experience sources, and level milestones",
+    "content": "Leveling Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "progression",
+    "sectionTitle": "Progression",
+    "pageId": "leveling",
+    "url": "/progression/leveling",
+    "tags": [
+      "progression",
+      "leveling",
+      "experience",
+      "guide"
+    ],
+    "category": "Progression",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "resources/farming",
+    "title": "Farming Strategies",
+    "description": "Comprehensive guide to efficient farming, resource optimization, and stage selection strategies",
+    "content": "Farming Strategies {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "resources",
+    "sectionTitle": "Resources",
+    "pageId": "farming",
+    "url": "/resources/farming",
+    "tags": [
+      "resources",
+      "farming",
+      "strategy",
+      "optimization"
+    ],
+    "category": "Resources",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "resources/gold",
+    "title": "Gold Farming Guide",
+    "description": "Complete guide to gold farming, optimal strategies, and maximizing gold income in Slayer Legend",
+    "content": "Gold Farming Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "resources",
+    "sectionTitle": "Resources",
+    "pageId": "gold",
+    "url": "/resources/gold",
+    "tags": [
+      "resources",
+      "gold",
+      "farming",
+      "currency"
+    ],
+    "category": "Resources",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "resources/index",
+    "title": "Resources & Farming",
+    "description": "Guide to all game resources, farming strategies, and resource management for optimal progression",
+    "content": "Resources & Farming {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "resources",
+    "sectionTitle": "Resources",
+    "pageId": "index",
+    "url": "/resources/index",
+    "tags": [
+      "resources",
+      "farming",
+      "gold",
+      "materials"
+    ],
+    "category": "Resources",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "resources/materials",
+    "title": "Materials & Crafting",
+    "description": "Guide to all crafting materials, farming locations, and material management strategies",
+    "content": "Materials & Crafting {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "resources",
+    "sectionTitle": "Resources",
+    "pageId": "materials",
+    "url": "/resources/materials",
+    "tags": [
+      "resources",
+      "materials",
+      "crafting",
+      "farming"
+    ],
+    "category": "Resources",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/earth-skills",
+    "title": "Earth Skills",
+    "description": "Comprehensive guide to earth element skills, sustained damage, and defensive strategies",
+    "content": "Earth Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "earth-skills",
+    "url": "/skills/earth-skills",
+    "tags": [
+      "skills",
+      "earth",
+      "elements",
+      "defense"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/fire-skills",
+    "title": "Fire Skills",
+    "description": "Comprehensive guide to fire element skills, their effects, and optimal usage strategies",
+    "content": "Fire Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "fire-skills",
+    "url": "/skills/fire-skills",
+    "tags": [
+      "skills",
+      "fire",
+      "elements"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/index",
+    "title": "Skills",
+    "description": "Master the art of combat with elemental skills, skill mastery, and strategic skill combinations",
+    "content": "Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "index",
+    "url": "/skills/index",
+    "tags": [
+      "skills",
+      "combat",
+      "elements"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/skill-builds",
+    "title": "Skill Builds",
+    "description": "Comprehensive guide to skill build templates, optimal skill combinations, elemental synergies, and strategies for different playstyles and content types",
+    "content": "Skill Builds {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "skill-builds",
+    "url": "/skills/skill-builds",
+    "tags": [
+      "skills",
+      "builds",
+      "strategy",
+      "optimization"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/skill-mastery",
+    "title": "Skill Mastery",
+    "description": "Guide to skill mastery system, leveling skills, and unlocking advanced skill features",
+    "content": "Skill Mastery {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "skill-mastery",
+    "url": "/skills/skill-mastery",
+    "tags": [
+      "skills",
+      "mastery",
+      "progression"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/skill-mechanics",
+    "title": "Skill Mechanics",
+    "description": "Complete guide to how skills work in Slayer Legend, including damage calculation, cooldowns, skill types, combos, and advanced skill mechanics",
+    "content": "Skill Mechanics {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "skill-mechanics",
+    "url": "/skills/skill-mechanics",
+    "tags": [
+      "skills",
+      "mechanics",
+      "combat",
+      "damage"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/skill-refinement",
+    "title": "Skill Refinement",
+    "description": "Guide to the Skill Refinement system, enhancing skills beyond normal levels for powerful permanent bonuses and advanced skill effects",
+    "content": "Skill Refinement {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "skill-refinement",
+    "url": "/skills/skill-refinement",
+    "tags": [
+      "skills",
+      "refinement",
+      "enhancement",
+      "progression"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/skill-stones",
+    "title": "Skill Stones",
+    "description": "Complete guide to Skill Stones, the primary materials for leveling and enhancing skills, including farming locations, usage strategies, and optimization",
+    "content": "Skill Stones {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "skill-stones",
+    "url": "/skills/skill-stones",
+    "tags": [
+      "skills",
+      "skill-stones",
+      "materials",
+      "farming"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/water-skills",
+    "title": "Water Skills",
+    "description": "Comprehensive guide to water element skills, crowd control effects, and defensive strategies",
+    "content": "Water Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "water-skills",
+    "url": "/skills/water-skills",
+    "tags": [
+      "skills",
+      "water",
+      "elements",
+      "crowd-control"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "skills/wind-skills",
+    "title": "Wind Skills",
+    "description": "Comprehensive guide to wind element skills, high-speed combat, mobility, and burst damage strategies",
+    "content": "Wind Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "skills",
+    "sectionTitle": "Skills",
+    "pageId": "wind-skills",
+    "url": "/skills/wind-skills",
+    "tags": [
+      "skills",
+      "wind",
+      "elements",
+      "mobility"
+    ],
+    "category": "Skills",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "spirits/index",
+    "title": "Spirits",
+    "description": "Overview of spirit companions, their abilities, and evolution system. Learn about all 12 spirits and how to maximize their potential",
+    "content": "Spirits {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "spirits",
+    "sectionTitle": "Spirits",
+    "pageId": "index",
+    "url": "/spirits/index",
+    "tags": [
+      "spirits",
+      "companions",
+      "progression"
+    ],
+    "category": "Spirits",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "spirits/information",
+    "title": "Spirit Information",
+    "description": "Complete guide to all Spirit characters, their unique skills, and strategic uses",
+    "content": "Spirit Information {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "spirits",
+    "sectionTitle": "Spirits",
+    "pageId": "information",
+    "url": "/spirits/information",
+    "tags": [
+      "spirits",
+      "companions",
+      "skills",
+      "strategy"
+    ],
+    "category": "Spirits",
+    "date": "2025-12-16T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "spirits/viewer",
+    "title": "Spirit Viewer",
+    "description": "Interactive tool to view all 12 spirits and their evolution animations across 8 levels. Explore idle, attack, and movement animations with customizable controls",
+    "content": "Spirit Viewer {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "spirits",
+    "sectionTitle": "Spirits",
+    "pageId": "viewer",
+    "url": "/spirits/viewer",
+    "tags": [
+      "spirits",
+      "tools",
+      "viewer"
+    ],
+    "category": "Spirits",
+    "date": "2025-12-21T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "stages/index",
+    "title": "Stages",
+    "description": "Guide to all stages, dungeons, and combat areas in Slayer Legend",
+    "content": "Stages {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "stages",
+    "sectionTitle": "Stages",
+    "pageId": "index",
+    "url": "/stages/index",
+    "tags": [
+      "stages",
+      "dungeons",
+      "progression"
+    ],
+    "category": "Stages",
+    "date": "2025-12-22T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "tools/index",
+    "title": "Tools & Calculators",
+    "description": "Interactive tools, simulators, and calculators for Slayer Legend",
+    "content": "Tools & Calculators {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "section": "tools",
+    "sectionTitle": "Tools",
+    "pageId": "index",
+    "url": "/tools/index",
+    "tags": [
+      "tools",
+      "calculators",
+      "simulator",
+      "build"
+    ],
+    "category": "Tools",
+    "date": "",
+    "order": 0
+  }
+]

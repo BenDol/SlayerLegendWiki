@@ -39,23 +39,40 @@ function readLabelsConfig() {
 
 /**
  * Get all existing labels in the repository
+ * Uses pagination to fetch ALL labels, not just the first 100
  */
 async function getExistingLabels() {
   console.log('📋 Fetching existing labels...');
 
   try {
-    const { data } = await octokit.rest.issues.listLabelsForRepo({
-      owner,
-      repo,
-      per_page: 100
-    });
+    // Use pagination to fetch all labels
+    const allLabels = [];
+    let page = 1;
+    let hasMore = true;
 
-    console.log(`   Found ${data.length} existing labels`);
+    while (hasMore) {
+      const { data } = await octokit.rest.issues.listLabelsForRepo({
+        owner,
+        repo,
+        per_page: 100,
+        page
+      });
 
-    // Convert to map for easy lookup
+      allLabels.push(...data);
+
+      // If we got less than 100 labels, we've reached the end
+      hasMore = data.length === 100;
+      page++;
+    }
+
+    console.log(`   Found ${allLabels.length} existing labels`);
+
+    // Convert to map for easy lookup (case-insensitive)
     const labelMap = new Map();
-    data.forEach(label => {
-      labelMap.set(label.name, {
+    allLabels.forEach(label => {
+      // Store with lowercase key for case-insensitive lookup
+      labelMap.set(label.name.toLowerCase(), {
+        originalName: label.name,
         color: label.color,
         description: label.description || ''
       });
@@ -151,7 +168,8 @@ async function syncLabels() {
   console.log('\n🔄 Processing labels...\n');
 
   for (const label of labelsToSync) {
-    const existing = existingLabels.get(label.name);
+    // Use lowercase for case-insensitive lookup
+    const existing = existingLabels.get(label.name.toLowerCase());
 
     if (!existing) {
       // Label doesn't exist - create it
