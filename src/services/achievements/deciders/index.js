@@ -6,6 +6,7 @@
  */
 
 import * as gameProgress from './gameProgress.js';
+import * as milestone from './milestone.js';
 
 /**
  * Custom decider registry
@@ -36,6 +37,9 @@ export const customDeciders = {
   // Social achievements - Game related
   'build-sharer': gameProgress.buildSharer,
   'popular-builder': gameProgress.popularBuilder,
+
+  // Milestone achievements
+  'donator': milestone.donator,
 };
 
 /**

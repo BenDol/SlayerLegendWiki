@@ -645,6 +645,17 @@
       "deciderId": "consistent",
       "hidden": false,
       "points": 25
+    },
+    {
+      "id": "donator",
+      "title": "Generous Supporter",
+      "description": "Support the wiki with a donation",
+      "icon": "💎",
+      "category": "milestone",
+      "rarity": "legendary",
+      "deciderId": "donator",
+      "hidden": false,
+      "points": 100
     }
   ]
 }
