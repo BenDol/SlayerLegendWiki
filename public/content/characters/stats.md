@@ -11,6 +11,9 @@ category: Characters
 date: 2025-12-21T00:00:00.000Z
 order: 0
 ---
+# <span class="text-gray-900 dark:text-gray-100">Character Level</span>
+**Insert text here. Talk about character levels and exp here.**
+
 # <span class="text-gray-900 dark:text-gray-100">Combat Stats</span>
 **Your combat stats are divided into two categories: main stats and critical stats.**
 - **Your <span class="text-red-700 dark:text-red-300">main stats</span> are attributes that will be leveled most frequently throughout the game.**
