@@ -2,6 +2,7 @@ import { createWikiConfigSync } from './wiki-framework/vite.config.base.js';
 import { loggerPlugin } from './wiki-framework/vite-plugin-logger.js';
 import { githubProxyPlugin } from './wiki-framework/vite-plugin-github-proxy.js';
 import { imageDbPlugin } from './wiki-framework/vite-plugin-image-db.js';
+import { localCdnPlugin } from './vite-plugin-local-cdn.js';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 /**
@@ -44,6 +45,7 @@ export default createWikiConfigSync({
     loggerPlugin(),
     githubProxyPlugin(),
     imageDbPlugin(),
+    localCdnPlugin(),
   ],
 
   // You can override any Vite settings here

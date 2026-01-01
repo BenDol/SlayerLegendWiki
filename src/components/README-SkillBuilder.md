@@ -75,7 +75,7 @@ The encoded data includes:
 
 ### Visual Design
 Mimics the game's UI with:
-- Game-accurate skill slot backgrounds (`/images/skills/skill_baseSlot_Wide.png`)
+- Game-accurate skill slot backgrounds (`/images/content/skills/skill_baseSlot_Wide.png`)
 - Rarity-based glow effects
 - Element-colored badges
 - Gradient backgrounds matching game aesthetic
@@ -83,7 +83,7 @@ Mimics the game's UI with:
 
 ## UI Assets Used
 
-From `public/images/skills/`:
+From `public/images/content/skills/`:
 - `skill_baseSlot_Wide.png` - Skill slot background
 - `skill_plusIcon.png` - Add button icon
 - `skill_LockedIcon.png` - Locked slot indicator

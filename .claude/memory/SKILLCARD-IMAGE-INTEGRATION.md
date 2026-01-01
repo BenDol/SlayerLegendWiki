@@ -10,7 +10,7 @@ Successfully integrated image database support into SkillCard components. Now sk
 **Purpose**: Lookup and manage skill images from the image database
 
 **Features**:
-- Searches `image-search-index.json` for skill-specific images
+- Searches `image-index.json` for skill-specific images
 - Smart fallback to element type icons (Fire, Water, Wind, Earth)
 - Caches image database for performance
 - Preloading support for element icons

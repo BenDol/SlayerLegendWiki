@@ -175,7 +175,7 @@ const EngravingPiece = ({
 
       {/* Draw gems at each filled cell */}
       {filledCells.map((filledCell) => {
-        const imageSrc = `/images/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`;
+        const imageSrc = `/images/content/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`;
 
         return (
           <div

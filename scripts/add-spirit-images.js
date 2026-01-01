@@ -13,7 +13,7 @@ for (const spirit of data.spirits) {
     const level = spriteLevel.level;
     // Only add if image field doesn't exist
     if (!spriteLevel.image) {
-      spriteLevel.image = `/images/spirits/Spirit_${String(spiritId).padStart(3, '0')}_${level}_6.png`;
+      spriteLevel.image = `/images/content/spirits/Spirit_${String(spiritId).padStart(3, '0')}_${level}_6.png`;
       addedCount++;
     }
   }

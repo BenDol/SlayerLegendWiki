@@ -426,7 +426,6 @@ registerDataFiles([
   'spirit-upgrades.json',
   'familiars.json',
   'image-index.json',
-  'image-search-index.json',
 ]);
 
 // Register game-specific custom routes with lazy loading for better startup performance

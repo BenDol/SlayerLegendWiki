@@ -28,7 +28,7 @@
         "type": "Scythe",
         "tiers": 4,
         "description": "Curved blade weapon for sweeping attacks",
-        "image": "/images/familiars/DemonScythe_1_01.png"
+        "image": "/images/content/familiars/DemonScythe_1_01.png"
       },
       {
         "id": "spear",
@@ -36,7 +36,7 @@
         "type": "Spear",
         "tiers": 4,
         "description": "Long-range piercing weapon",
-        "image": "/images/familiars/DemonSpear_1_01.png"
+        "image": "/images/content/familiars/DemonSpear_1_01.png"
       },
       {
         "id": "wand",
@@ -44,7 +44,7 @@
         "type": "Wand",
         "tiers": 4,
         "description": "Magical catalyst for elemental attacks",
-        "image": "/images/familiars/DemonWand_1_01.png"
+        "image": "/images/content/familiars/DemonWand_1_01.png"
       },
       {
         "id": "shadow",
@@ -52,13 +52,13 @@
         "type": "Shadow",
         "tiers": 4,
         "description": "Dark energy weapon",
-        "image": "/images/familiars/DemonShadow_1_01.png"
+        "image": "/images/content/familiars/DemonShadow_1_01.png"
       }
     ],
     "images": {
-      "attackStyle": "/images/familiars/Demon_AttackStyle_Display_01.png",
-      "attackRange": "/images/familiars/Demon_AttackRange_Display_01.png",
-      "attribute": "/images/familiars/Demon_Attribute_Display_01.png"
+      "attackStyle": "/images/content/familiars/Demon_AttackStyle_Display_01.png",
+      "attackRange": "/images/content/familiars/Demon_AttackRange_Display_01.png",
+      "attribute": "/images/content/familiars/Demon_Attribute_Display_01.png"
     },
     "skills": [
       {
@@ -98,7 +98,7 @@
         "type": "Scythe",
         "tiers": 4,
         "description": "Curved blade weapon for sweeping attacks",
-        "image": "/images/familiars/DemonScythe_2_01.png"
+        "image": "/images/content/familiars/DemonScythe_2_01.png"
       },
       {
         "id": "spear",
@@ -106,7 +106,7 @@
         "type": "Spear",
         "tiers": 4,
         "description": "Long-range piercing weapon",
-        "image": "/images/familiars/DemonSpear_2_01.png"
+        "image": "/images/content/familiars/DemonSpear_2_01.png"
       },
       {
         "id": "wand",
@@ -114,7 +114,7 @@
         "type": "Wand",
         "tiers": 4,
         "description": "Magical catalyst for elemental attacks",
-        "image": "/images/familiars/DemonWand_2_01.png"
+        "image": "/images/content/familiars/DemonWand_2_01.png"
       },
       {
         "id": "shadow",
@@ -122,13 +122,13 @@
         "type": "Shadow",
         "tiers": 4,
         "description": "Dark energy weapon",
-        "image": "/images/familiars/DemonShadow_2_01.png"
+        "image": "/images/content/familiars/DemonShadow_2_01.png"
       }
     ],
     "images": {
-      "attackStyle": "/images/familiars/Demon_AttackStyle_Display_02.png",
-      "attackRange": "/images/familiars/Demon_AttackRange_Display_02.png",
-      "attribute": "/images/familiars/Demon_Attribute_Display_02.png"
+      "attackStyle": "/images/content/familiars/Demon_AttackStyle_Display_02.png",
+      "attackRange": "/images/content/familiars/Demon_AttackRange_Display_02.png",
+      "attribute": "/images/content/familiars/Demon_Attribute_Display_02.png"
     },
     "skills": [
       {
@@ -168,7 +168,7 @@
         "type": "Scythe",
         "tiers": 4,
         "description": "Curved blade weapon for sweeping attacks",
-        "image": "/images/familiars/DemonScythe_3_01.png"
+        "image": "/images/content/familiars/DemonScythe_3_01.png"
       },
       {
         "id": "spear",
@@ -176,7 +176,7 @@
         "type": "Spear",
         "tiers": 4,
         "description": "Long-range piercing weapon",
-        "image": "/images/familiars/DemonSpear_3_01.png"
+        "image": "/images/content/familiars/DemonSpear_3_01.png"
       },
       {
         "id": "wand",
@@ -184,7 +184,7 @@
         "type": "Wand",
         "tiers": 4,
         "description": "Magical catalyst for elemental attacks",
-        "image": "/images/familiars/DemonWand_3_01.png"
+        "image": "/images/content/familiars/DemonWand_3_01.png"
       },
       {
         "id": "shadow",
@@ -192,13 +192,13 @@
         "type": "Shadow",
         "tiers": 4,
         "description": "Dark energy weapon",
-        "image": "/images/familiars/DemonShadow_3_01.png"
+        "image": "/images/content/familiars/DemonShadow_3_01.png"
       }
     ],
     "images": {
-      "attackStyle": "/images/familiars/Demon_AttackStyle_Display_03.png",
-      "attackRange": "/images/familiars/Demon_AttackRange_Display_03.png",
-      "attribute": "/images/familiars/Demon_Attribute_Display_03.png"
+      "attackStyle": "/images/content/familiars/Demon_AttackStyle_Display_03.png",
+      "attackRange": "/images/content/familiars/Demon_AttackRange_Display_03.png",
+      "attribute": "/images/content/familiars/Demon_Attribute_Display_03.png"
     },
     "skills": [
       {
@@ -238,7 +238,7 @@
         "type": "Scythe",
         "tiers": 4,
         "description": "Curved blade weapon for sweeping attacks",
-        "image": "/images/familiars/DemonScythe_4_01.png"
+        "image": "/images/content/familiars/DemonScythe_4_01.png"
       },
       {
         "id": "spear",
@@ -246,7 +246,7 @@
         "type": "Spear",
         "tiers": 4,
         "description": "Long-range piercing weapon",
-        "image": "/images/familiars/DemonSpear_4_01.png"
+        "image": "/images/content/familiars/DemonSpear_4_01.png"
       },
       {
         "id": "wand",
@@ -254,7 +254,7 @@
         "type": "Wand",
         "tiers": 4,
         "description": "Magical catalyst for elemental attacks",
-        "image": "/images/familiars/DemonWand_4_01.png"
+        "image": "/images/content/familiars/DemonWand_4_01.png"
       },
       {
         "id": "shadow",
@@ -262,13 +262,13 @@
         "type": "Shadow",
         "tiers": 4,
         "description": "Dark energy weapon",
-        "image": "/images/familiars/DemonShadow_4_01.png"
+        "image": "/images/content/familiars/DemonShadow_4_01.png"
       }
     ],
     "images": {
-      "attackStyle": "/images/familiars/Demon_AttackStyle_Display_04.png",
-      "attackRange": "/images/familiars/Demon_AttackRange_Display_04.png",
-      "attribute": "/images/familiars/Demon_Attribute_Display_04.png"
+      "attackStyle": "/images/content/familiars/Demon_AttackStyle_Display_04.png",
+      "attackRange": "/images/content/familiars/Demon_AttackRange_Display_04.png",
+      "attribute": "/images/content/familiars/Demon_Attribute_Display_04.png"
     },
     "skills": [
       {

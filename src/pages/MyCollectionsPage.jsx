@@ -40,7 +40,7 @@ const MyCollectionsPage = () => {
       <MetaTags
         title="My Collections"
         description="Manage and track your personal game collections. View your spirits, skills, equipment, and unlocked content across different collection types."
-        image="/images/tools/my-collections.png"
+        image="/images/content/tools/my-collections.png"
         url="/my-collections"
         keywords={['collections', 'my collection', 'tracker', 'progress', 'inventory']}
       />

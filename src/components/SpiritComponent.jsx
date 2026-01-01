@@ -97,15 +97,15 @@ const SpiritComponent = ({
 
   // Element icon mapping
   const elementIcons = {
-    Fire: '/images/icons/typeicon_fire_1.png',
-    Water: '/images/icons/typeicon_water_1.png',
-    Wind: '/images/icons/typeicon_wind_1.png',
-    Earth: '/images/icons/typeicon_earth s_1.png',
-    Light: '/images/icons/typeicon_random_1.png', // Fallback to random icon
-    Dark: '/images/icons/typeicon_random_1.png', // Fallback to random icon
+    Fire: '/images/content/icons/typeicon_fire_1.png',
+    Water: '/images/content/icons/typeicon_water_1.png',
+    Wind: '/images/content/icons/typeicon_wind_1.png',
+    Earth: '/images/content/icons/typeicon_earth s_1.png',
+    Light: '/images/content/icons/typeicon_random_1.png', // Fallback to random icon
+    Dark: '/images/content/icons/typeicon_random_1.png', // Fallback to random icon
   };
 
-  const elementIcon = elementIcons[spirit.element] || '/images/icons/typeicon_random_1.png';
+  const elementIcon = elementIcons[spirit.element] || '/images/content/icons/typeicon_random_1.png';
 
   return (
     <div
@@ -150,7 +150,7 @@ const SpiritComponent = ({
               {Array.from({ length: 5 }).map((_, index) => (
                 <img
                   key={index}
-                  src="/images/other/Star_1.png"
+                  src="/images/content/other/Star_1.png"
                   alt="star"
                   className={`${sizeConfig.star} ${index < awakeningStars ? 'opacity-100' : 'opacity-20'}`}
                 />

@@ -29,252 +29,252 @@
       "rarity": "Common 4",
       "probability": "0.1",
       "id": 1,
-      "image": "/images/equipment/weapons/sword_00.png"
+      "image": "/images/content/equipment/weapons/sword_00.png"
     },
     {
       "type": "Weapon",
       "rarity": "Common 3",
       "probability": "0.1",
       "id": 2,
-      "image": "/images/equipment/weapons/sword_01.png"
+      "image": "/images/content/equipment/weapons/sword_01.png"
     },
     {
       "type": "Weapon",
       "rarity": "Common 2",
       "probability": "0.1",
       "id": 3,
-      "image": "/images/equipment/weapons/sword_02.png"
+      "image": "/images/content/equipment/weapons/sword_02.png"
     },
     {
       "type": "Weapon",
       "rarity": "Common 1",
       "probability": "0.1",
       "id": 4,
-      "image": "/images/equipment/weapons/sword_03.png"
+      "image": "/images/content/equipment/weapons/sword_03.png"
     },
     {
       "type": "Weapon",
       "rarity": "Great 4",
       "probability": "0.1",
       "id": 5,
-      "image": "/images/equipment/weapons/sword_04.png"
+      "image": "/images/content/equipment/weapons/sword_04.png"
     },
     {
       "type": "Weapon",
       "rarity": "Great 3",
       "probability": "0.1",
       "id": 6,
-      "image": "/images/equipment/weapons/sword_05.png"
+      "image": "/images/content/equipment/weapons/sword_05.png"
     },
     {
       "type": "Weapon",
       "rarity": "Great 2",
       "probability": "0.1",
       "id": 7,
-      "image": "/images/equipment/weapons/sword_06.png"
+      "image": "/images/content/equipment/weapons/sword_06.png"
     },
     {
       "type": "Weapon",
       "rarity": "Great 1",
       "probability": "0.1",
       "id": 8,
-      "image": "/images/equipment/weapons/sword_07.png"
+      "image": "/images/content/equipment/weapons/sword_07.png"
     },
     {
       "type": "Weapon",
       "rarity": "Rare 4",
       "probability": "0.1",
       "id": 9,
-      "image": "/images/equipment/weapons/sword_08.png"
+      "image": "/images/content/equipment/weapons/sword_08.png"
     },
     {
       "type": "Weapon",
       "rarity": "Rare 3",
       "probability": "0.1",
       "id": 10,
-      "image": "/images/equipment/weapons/sword_09.png"
+      "image": "/images/content/equipment/weapons/sword_09.png"
     },
     {
       "type": "Weapon",
       "rarity": "Rare 2",
       "probability": "0.1",
       "id": 11,
-      "image": "/images/equipment/weapons/sword_10.png"
+      "image": "/images/content/equipment/weapons/sword_10.png"
     },
     {
       "type": "Weapon",
       "rarity": "Rare 1",
       "probability": "0.08",
       "id": 12,
-      "image": "/images/equipment/weapons/sword_11.png"
+      "image": "/images/content/equipment/weapons/sword_11.png"
     },
     {
       "type": "Weapon",
       "rarity": "Epic 4",
       "probability": "0.08",
       "id": 13,
-      "image": "/images/equipment/weapons/sword_12.png"
+      "image": "/images/content/equipment/weapons/sword_12.png"
     },
     {
       "type": "Weapon",
       "rarity": "Epic 3",
       "probability": "0.1",
       "id": 14,
-      "image": "/images/equipment/weapons/sword_13.png"
+      "image": "/images/content/equipment/weapons/sword_13.png"
     },
     {
       "type": "Weapon",
       "rarity": "Epic 2",
       "probability": "0.05",
       "id": 15,
-      "image": "/images/equipment/weapons/sword_14.png"
+      "image": "/images/content/equipment/weapons/sword_14.png"
     },
     {
       "type": "Weapon",
       "rarity": "Epic 1",
       "probability": "0.05",
       "id": 16,
-      "image": "/images/equipment/weapons/sword_15.png"
+      "image": "/images/content/equipment/weapons/sword_15.png"
     },
     {
       "type": "Weapon",
       "rarity": "Legendary 4",
       "probability": "0.03",
       "id": 17,
-      "image": "/images/equipment/weapons/sword_16.png"
+      "image": "/images/content/equipment/weapons/sword_16.png"
     },
     {
       "type": "Weapon",
       "rarity": "Legendary 3",
       "probability": "0.03",
       "id": 18,
-      "image": "/images/equipment/weapons/sword_17.png"
+      "image": "/images/content/equipment/weapons/sword_17.png"
     },
     {
       "type": "Accessory",
       "rarity": "Common 4",
       "probability": "0.5",
       "id": 1,
-      "image": "/images/equipment/accessories/Acc_000_1.png"
+      "image": "/images/content/equipment/accessories/Acc_000_1.png"
     },
     {
       "type": "Accessory",
       "rarity": "Common 3",
       "probability": "0.5",
       "id": 2,
-      "image": "/images/equipment/accessories/Acc_001.png"
+      "image": "/images/content/equipment/accessories/Acc_001.png"
     },
     {
       "type": "Accessory",
       "rarity": "Common 2",
       "probability": "0.5",
       "id": 3,
-      "image": "/images/equipment/accessories/Acc_002.png"
+      "image": "/images/content/equipment/accessories/Acc_002.png"
     },
     {
       "type": "Accessory",
       "rarity": "Common 1",
       "probability": "0.3",
       "id": 4,
-      "image": "/images/equipment/accessories/Acc_003.png"
+      "image": "/images/content/equipment/accessories/Acc_003.png"
     },
     {
       "type": "Accessory",
       "rarity": "Great 4",
       "probability": "0.3",
       "id": 5,
-      "image": "/images/equipment/accessories/Acc_004.png"
+      "image": "/images/content/equipment/accessories/Acc_004.png"
     },
     {
       "type": "Accessory",
       "rarity": "Great 3",
       "probability": "0.3",
       "id": 6,
-      "image": "/images/equipment/accessories/Acc_005.png"
+      "image": "/images/content/equipment/accessories/Acc_005.png"
     },
     {
       "type": "Accessory",
       "rarity": "Great 2",
       "probability": "0.3",
       "id": 7,
-      "image": "/images/equipment/accessories/Acc_006.png"
+      "image": "/images/content/equipment/accessories/Acc_006.png"
     },
     {
       "type": "Accessory",
       "rarity": "Great 1",
       "probability": "0.2",
       "id": 8,
-      "image": "/images/equipment/accessories/Acc_007.png"
+      "image": "/images/content/equipment/accessories/Acc_007.png"
     },
     {
       "type": "Accessory",
       "rarity": "Rare 4",
       "probability": "0.1",
       "id": 9,
-      "image": "/images/equipment/accessories/Acc_008.png"
+      "image": "/images/content/equipment/accessories/Acc_008.png"
     },
     {
       "type": "Accessory",
       "rarity": "Rare 3",
       "probability": "0.1",
       "id": 10,
-      "image": "/images/equipment/accessories/Acc_009.png"
+      "image": "/images/content/equipment/accessories/Acc_009.png"
     },
     {
       "type": "Accessory",
       "rarity": "Rare 2",
       "probability": "0.2",
       "id": 11,
-      "image": "/images/equipment/accessories/Acc_010.png"
+      "image": "/images/content/equipment/accessories/Acc_010.png"
     },
     {
       "type": "Accessory",
       "rarity": "Rare 1",
       "probability": "0.08",
       "id": 12,
-      "image": "/images/equipment/accessories/Acc_011.png"
+      "image": "/images/content/equipment/accessories/Acc_011.png"
     },
     {
       "type": "Accessory",
       "rarity": "Epic 4",
       "probability": "0.14",
       "id": 13,
-      "image": "/images/equipment/accessories/Acc_012.png"
+      "image": "/images/content/equipment/accessories/Acc_012.png"
     },
     {
       "type": "Accessory",
       "rarity": "Epic 3",
       "probability": "0.1",
       "id": 14,
-      "image": "/images/equipment/accessories/Acc_013.png"
+      "image": "/images/content/equipment/accessories/Acc_013.png"
     },
     {
       "type": "Accessory",
       "rarity": "Epic 2",
       "probability": "0.07",
       "id": 15,
-      "image": "/images/equipment/accessories/Acc_014.png"
+      "image": "/images/content/equipment/accessories/Acc_014.png"
     },
     {
       "type": "Accessory",
       "rarity": "Epic 1",
       "probability": "0.05",
       "id": 16,
-      "image": "/images/equipment/accessories/Acc_015.png"
+      "image": "/images/content/equipment/accessories/Acc_015.png"
     },
     {
       "type": "Accessory",
       "rarity": "Legendary 4",
       "probability": "0.04",
       "id": 17,
-      "image": "/images/equipment/accessories/Acc_016.png"
+      "image": "/images/content/equipment/accessories/Acc_016.png"
     },
     {
       "type": "Accessory",
       "rarity": "Legendary 3",
       "probability": "0.03",
       "id": 18,
-      "image": "/images/equipment/accessories/Acc_017.png"
+      "image": "/images/content/equipment/accessories/Acc_017.png"
     }
   ]
 }

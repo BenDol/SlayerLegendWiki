@@ -11,7 +11,7 @@ const SoulWeaponEngravingBuilderPage = () => {
       <MetaTags
         title="Soul Weapon Engraving"
         description="Plan and visualize soul weapon engraving layouts for Slayer Legend. Design optimal grid patterns, maximize stat bonuses, and share your engraving builds."
-        image="/images/tools/soul-weapon-engraving.png"
+        image="/images/content/tools/soul-weapon-engraving.png"
         url="/soul-weapon-engraving"
         keywords={['soul weapon', 'engraving', 'grid builder', 'engraving planner', 'soul weapon stats']}
       />

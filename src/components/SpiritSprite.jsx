@@ -701,7 +701,7 @@ const SpiritSprite = ({
               alt={`${spirit.name} - Level ${level} - Frame ${currentFrame}`}
               className="w-full h-full object-contain object-center"
               onError={(e) => {
-                e.target.src = '/images/placeholder-spirit.png'; // Fallback image
+                e.target.src = '/images/content/placeholder-spirit.png'; // Fallback image
               }}
             />
           )}

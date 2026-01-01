@@ -320,6 +320,19 @@
       "fallbackToStatic": true,
       "allowStaleOnRateLimit": true
     },
+    "gameAssets": {
+      "enabled": true,
+      "cdn": {
+        "provider": "github",
+        "github": {
+          "owner": "BenDol",
+          "repo": "SlayerLegendCDN",
+          "basePath": "game-assets/images",
+          "servingMode": "jsdelivr",
+          "branch": "main"
+        }
+      }
+    },
     "branchIndicator": {
       "enabled": false
     },

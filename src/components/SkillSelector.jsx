@@ -76,10 +76,10 @@ const SkillSelector = ({ isOpen, onClose, onSelectSkill, skills, currentBuild })
   // Get element icon
   const getElementIcon = (element) => {
     const icons = {
-      Fire: '/images/icons/typeicon_fire_1.png',
-      Water: '/images/icons/typeicon_water_1.png',
-      Wind: '/images/icons/typeicon_wind_1.png',
-      Earth: '/images/icons/typeicon_earth s_1.png'
+      Fire: '/images/content/icons/typeicon_fire_1.png',
+      Water: '/images/content/icons/typeicon_water_1.png',
+      Wind: '/images/content/icons/typeicon_wind_1.png',
+      Earth: '/images/content/icons/typeicon_earth s_1.png'
     };
     return icons[element];
   };
@@ -136,7 +136,7 @@ const SkillSelector = ({ isOpen, onClose, onSelectSkill, skills, currentBuild })
         {/* Header */}
         <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
-            <img src="/images/skills/Icon_skillCard.png" alt="" className="w-7 h-7 sm:w-8 sm:h-8" />
+            <img src="/images/content/skills/Icon_skillCard.png" alt="" className="w-7 h-7 sm:w-8 sm:h-8" />
             <span>Select a Skill</span>
           </h2>
           <button
@@ -240,7 +240,7 @@ const SkillSelector = ({ isOpen, onClose, onSelectSkill, skills, currentBuild })
                         alt={skill.name}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.target.src = '/images/skills/skill_deam.png';
+                          e.target.src = '/images/content/skills/skill_deam.png';
                         }}
                       />
 

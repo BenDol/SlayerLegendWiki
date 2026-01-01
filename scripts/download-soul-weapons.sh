@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Read the JSON file and download each image
-OUTPUT_DIR="public/images/equipment/soul-weapons"
+OUTPUT_DIR="public/images/content/equipment/soul-weapons"
 
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"

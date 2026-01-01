@@ -611,7 +611,7 @@ const CompactLoadout = ({ loadout, weapons, skillStonesData }) => {
                     alt={weapon.name}
                     className="w-full h-full object-contain"
                     onError={(e) => {
-                      e.target.src = '/images/equipment/weapons/sword_201.png';
+                      e.target.src = '/images/content/equipment/weapons/sword_201.png';
                     }}
                   />
                   {/* Name Tag Overlay */}
@@ -749,7 +749,7 @@ const DetailedLoadout = ({ loadout, weapons, skillStonesData }) => {
                       alt={weapon.name}
                       className="w-full h-full object-contain"
                       onError={(e) => {
-                        e.target.src = '/images/equipment/weapons/sword_201.png';
+                        e.target.src = '/images/content/equipment/weapons/sword_201.png';
                       }}
                     />
                     {/* Name Tag Overlay */}
@@ -908,7 +908,7 @@ const AdvancedLoadout = ({ loadout, weapons, skillStonesData }) => {
                       alt={weapon.name}
                       className="w-full h-full object-contain"
                       onError={(e) => {
-                        e.target.src = '/images/equipment/weapons/sword_201.png';
+                        e.target.src = '/images/content/equipment/weapons/sword_201.png';
                       }}
                     />
                     {/* Name Tag Overlay */}

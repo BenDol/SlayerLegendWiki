@@ -14,7 +14,7 @@ const SkillBuilderPage = () => {
       <MetaTags
         title="Skill Builder"
         description="Create and optimize skill builds for Slayer Legend. Plan your skill combinations, test different elements, and share builds with the community."
-        image="/images/tools/skill-builder.png"
+        image="/images/content/tools/skill-builder.png"
         url="/skill-builder"
         keywords={['skill builder', 'skills', 'builds', 'planner', 'simulator', 'skill combinations']}
       />

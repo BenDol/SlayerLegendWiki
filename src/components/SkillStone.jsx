@@ -149,7 +149,7 @@ const StoneIcon = ({ type }) => {
         </svg>
       );
     case 'sword-down':
-      return <img src="/images/ui/sword.png" alt="sword" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />;
+      return <img src="/images/content/ui/sword.png" alt="sword" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />;
     default:
       return null;
   }
@@ -161,10 +161,10 @@ const StoneIcon = ({ type }) => {
  */
 const ElementIcon = ({ element }) => {
   const iconMap = {
-    fire: '/images/icons/typeicon_fire_1.png',
-    water: '/images/icons/typeicon_water_1.png',
-    wind: '/images/icons/typeicon_wind_1.png',
-    earth: '/images/icons/typeicon_earth s_1.png'
+    fire: '/images/content/icons/typeicon_fire_1.png',
+    water: '/images/content/icons/typeicon_water_1.png',
+    wind: '/images/content/icons/typeicon_wind_1.png',
+    earth: '/images/content/icons/typeicon_earth s_1.png'
   };
 
   const iconSrc = iconMap[element];

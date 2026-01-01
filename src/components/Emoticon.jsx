@@ -83,7 +83,7 @@ const Emoticon = ({ id, name, size = 'large', alt, className = '', style = {} })
 
   // Get emoticon name for alt text
   const emoticonName = EMOTICON_MAP[emoticonId];
-  const imagePath = `/images/emoticons/Emoticon_${emoticonId}.png`;
+  const imagePath = `/images/content/emoticons/Emoticon_${emoticonId}.png`;
   const altText = alt || emoticonName;
 
   // Determine size

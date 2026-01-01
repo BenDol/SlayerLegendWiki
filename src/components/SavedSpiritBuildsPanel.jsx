@@ -444,7 +444,7 @@ const SavedSpiritBuildsPanel = ({
               {Array.from({ length: 5 }).map((_, index) => (
                 <img
                   key={index}
-                  src="/images/other/Star_1.png"
+                  src="/images/content/other/Star_1.png"
                   alt="star"
                   className={`w-2 h-2 ${index < awakeningStars ? 'opacity-100' : 'opacity-20'}`}
                 />

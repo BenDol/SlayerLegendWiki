@@ -50,10 +50,10 @@ const SkillSlot = ({
   // Get element icon
   const getElementIcon = (element) => {
     const icons = {
-      Fire: '/images/icons/typeicon_fire_1.png',
-      Water: '/images/icons/typeicon_water_1.png',
-      Wind: '/images/icons/typeicon_wind_1.png',
-      Earth: '/images/icons/typeicon_earth s_1.png'
+      Fire: '/images/content/icons/typeicon_fire_1.png',
+      Water: '/images/content/icons/typeicon_water_1.png',
+      Wind: '/images/content/icons/typeicon_wind_1.png',
+      Earth: '/images/content/icons/typeicon_earth s_1.png'
     };
     return icons[element];
   };
@@ -93,7 +93,7 @@ const SkillSlot = ({
         {/* Slot Background */}
         <div className="relative w-16 h-16 sm:w-16 sm:h-16">
           <img
-            src="/images/skills/skill_baseSlot_Wide.png"
+            src="/images/content/skills/skill_baseSlot_Wide.png"
             alt="Locked Slot"
             className="not-prose w-full h-full object-contain opacity-50 m-0"
           />
@@ -165,11 +165,11 @@ const SkillSlot = ({
         {/* Skill Icon with Rarity Glow */}
         <div className={`absolute inset-0 rounded-lg overflow-hidden border-2 ${gradeColors.border} ${gradeColors.glow}`}>
           <img
-            src={skill.icon || '/images/skills/skill_deam.png'}
+            src={skill.icon || '/images/content/skills/skill_deam.png'}
             alt={skill.name}
             className="not-prose block w-full h-full object-contain m-0"
             onError={(e) => {
-              e.target.src = '/images/skills/skill_deam.png';
+              e.target.src = '/images/content/skills/skill_deam.png';
             }}
           />
         </div>

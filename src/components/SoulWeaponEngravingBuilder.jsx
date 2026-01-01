@@ -2160,7 +2160,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
       // Load the image to get its natural dimensions
       const img = new Image();
-      const imageUrl = `/images/equipment/soul-weapons/SoulGem_0_4.png`; // Common rarity square
+      const imageUrl = `/images/content/equipment/soul-weapons/SoulGem_0_4.png`; // Common rarity square
 
       await new Promise((resolve, reject) => {
         img.onload = () => {
@@ -2208,7 +2208,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         const fallbackSize = getPieceImageSizeFallback(pattern);
         resolve(fallbackSize);
       };
-      img.src = `/images/equipment/soul-weapons/SoulGem_${rarity}_${shapeId}.png`;
+      img.src = `/images/content/equipment/soul-weapons/SoulGem_${rarity}_${shapeId}.png`;
     });
   };
 
@@ -2829,7 +2829,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
     // Create custom drag image (just the piece image, no box)
     const img = new Image();
-    img.src = `/images/equipment/soul-weapons/SoulGem_${piece.rarity}_${piece.shapeId}.png`;
+    img.src = `/images/content/equipment/soul-weapons/SoulGem_${piece.rarity}_${piece.shapeId}.png`;
     img.style.opacity = '0.7';
 
     // Set drag image at the center of the first filled cell
@@ -5729,7 +5729,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
                     {/* Draw gems at each filled cell */}
                     {filledCells.map((filledCell) => {
-                      const imgSrc = `/images/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`;
+                      const imgSrc = `/images/content/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`;
 
                       return (
                         <div
@@ -5884,7 +5884,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                         }}
                       >
                         <img
-                          src={`/images/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`}
+                          src={`/images/content/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`}
                           alt="gem"
                           draggable={false}
                           className="w-full h-full object-contain opacity-80"
@@ -6264,7 +6264,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
                       {/* Piece image - no resizing, natural size */}
                       <img
-                        src={`/images/equipment/soul-weapons/SoulGem_${piece.rarity}_${piece.shapeId}.png`}
+                        src={`/images/content/equipment/soul-weapons/SoulGem_${piece.rarity}_${piece.shapeId}.png`}
                         alt={piece.shape?.name || 'piece'}
                         className="max-w-full max-h-full"
                         draggable={false}
@@ -6328,7 +6328,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
           }}
         >
           <img
-            src={`/images/equipment/soul-weapons/SoulGem_${draggingPiece.rarity}_${draggingPiece.shapeId}.png`}
+            src={`/images/content/equipment/soul-weapons/SoulGem_${draggingPiece.rarity}_${draggingPiece.shapeId}.png`}
             alt={draggingPiece.shape?.name || 'piece'}
             className="w-16 h-16"
             style={{
@@ -6503,7 +6503,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                     {selectedShape && (
                       <>
                         <img
-                          src={`/images/equipment/soul-weapons/SoulGem_${selectedRarity}_${selectedShape.id}.png`}
+                          src={`/images/content/equipment/soul-weapons/SoulGem_${selectedRarity}_${selectedShape.id}.png`}
                           alt={selectedShape.name}
                           className="w-full h-full object-contain"
                           onError={(e) => {

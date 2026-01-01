@@ -6,7 +6,7 @@ const path = require('path');
  */
 
 const SOUL_WEAPONS_JSON = path.join(__dirname, '..', 'public', 'data', 'soul-weapons.json');
-const IMAGE_DIR = path.join(__dirname, '..', 'public', 'images', 'equipment', 'soul-weapons');
+const IMAGE_DIR = path.join(__dirname, '..', 'public', 'images', 'content', 'equipment', 'soul-weapons');
 
 console.log('Reading soul-weapons.json...');
 const soulWeapons = JSON.parse(fs.readFileSync(SOUL_WEAPONS_JSON, 'utf8'));
@@ -41,7 +41,7 @@ for (const weapon of soulWeapons) {
   const ext = imageExtensions[weaponId];
 
   const oldPath = weapon.image;
-  const newPath = `/images/equipment/soul-weapons/sword_2${paddedId}.${ext}`;
+  const newPath = `/images/content/equipment/soul-weapons/sword_2${paddedId}.${ext}`;
 
   if (oldPath !== newPath) {
     weapon.image = newPath;

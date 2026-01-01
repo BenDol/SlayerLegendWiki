@@ -6,11 +6,11 @@ const { URL } = require('url');
 
 /**
  * Download soul weapon images from the Korean Namu Wiki
- * Images will be saved to public/images/equipment/soul-weapons/
+ * Images will be saved to public/images/content/equipment/soul-weapons/
  * with names like sword_201.png, sword_202.png, etc.
  */
 
-const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'images', 'equipment', 'soul-weapons');
+const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'images', 'content', 'equipment', 'soul-weapons');
 const SOUL_WEAPONS_JSON = path.join(__dirname, '..', 'public', 'data', 'soul-weapons.json');
 
 // Create output directory if it doesn't exist

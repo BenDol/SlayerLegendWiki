@@ -2074,7 +2074,7 @@ const SoulWeaponSection = ({ soulWeaponBuild, onEdit, onClear, allWeapons }) => 
                       alt={weapon.name}
                       className="w-full h-full object-contain"
                       onError={(e) => {
-                        e.target.src = '/images/equipment/weapons/sword_201.png';
+                        e.target.src = '/images/content/equipment/weapons/sword_201.png';
                       }}
                     />
                     {/* Weapon Name Overlay */}

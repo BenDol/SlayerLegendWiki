@@ -8,7 +8,7 @@ const MySpiritCollectionPage = () => {
       <MetaTags
         title="My Spirit Collection"
         description="Track and manage your spirit collection in Slayer Legend. View your owned spirits, plan upgrades, and organize your spirit roster."
-        image="/images/tools/my-spirits.png"
+        image="/images/content/tools/my-spirits.png"
         url="/my-spirits"
         keywords={['spirit collection', 'my spirits', 'spirit tracker', 'spirit manager', 'collection']}
       />

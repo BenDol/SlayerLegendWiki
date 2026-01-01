@@ -24,12 +24,12 @@ const SpiritSelector = ({ isOpen, onClose, onSelectSpirit, currentBuild = null }
 
   // Element icon mapping
   const elementIcons = {
-    Fire: '/images/icons/typeicon_fire_1.png',
-    Water: '/images/icons/typeicon_water_1.png',
-    Wind: '/images/icons/typeicon_wind_1.png',
-    Earth: '/images/icons/typeicon_earth s_1.png',
-    Light: '/images/icons/typeicon_random_1.png',
-    Dark: '/images/icons/typeicon_random_1.png',
+    Fire: '/images/content/icons/typeicon_fire_1.png',
+    Water: '/images/content/icons/typeicon_water_1.png',
+    Wind: '/images/content/icons/typeicon_wind_1.png',
+    Earth: '/images/content/icons/typeicon_earth s_1.png',
+    Light: '/images/content/icons/typeicon_random_1.png',
+    Dark: '/images/content/icons/typeicon_random_1.png',
   };
 
   useEffect(() => {
@@ -176,7 +176,7 @@ const SpiritSelector = ({ isOpen, onClose, onSelectSpirit, currentBuild = null }
 
                         {/* Element Icon Overlay */}
                         <img
-                          src={elementIcons[spirit.element] || '/images/icons/typeicon_random_1.png'}
+                          src={elementIcons[spirit.element] || '/images/content/icons/typeicon_random_1.png'}
                           alt={spirit.element}
                           className="absolute -top-1 -right-1 w-6 h-6 drop-shadow-lg z-10"
                           title={spirit.element}
