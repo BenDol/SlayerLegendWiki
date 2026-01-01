@@ -30,4 +30,4 @@ order: 0
 
 
 # <span class="text-gray-900 dark:text-gray-100">Awakened Latent Power</span>
-**Insert here here.**
+**Insert text here.**
