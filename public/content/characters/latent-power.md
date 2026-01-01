@@ -19,8 +19,9 @@ order: 0
 |----------|----------|----------|----------|----------|
 |<div style="text-align: center;">**Strength (STR)**</div>|<div style="text-align: center;">**Health Points (HP)**</div>|<div style="text-align: center;">**HP Recovery (VIT)**</div>|<div style="text-align: center;">**Critical Damage (CRI)**</div>|<div style="text-align: center;">**Luck (LUK)**</div>|
 
-**There are five pages of stats that can be upgraded using<img src="/images/items/ui_item_DragonForce.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: 0 0.25em;" data-inline="true" /><span class="text-cyan-600 dark:text-cyan-400">Dragon Power</span>. Each stat can be upgraded up to 10 times and upgrades are randomly assigned when<img src="/images/items/ui_item_DragonForce.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: 0 0.25em;" data-inline="true" /><span class="text-cyan-600 dark:text-cyan-400">Dragon Power</span> is consumed.**
 
+**There are five pages of stats that can be upgraded using<img src="/images/items/ui_item_DragonForce.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: 0 0.25em;" data-inline="true" /><span class="text-cyan-600 dark:text-cyan-400">Dragon Power</span>. Each stat can be upgraded up to 10 times and upgrades are randomly assigned when<img src="/images/items/ui_item_DragonForce.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: 0 0.25em;" data-inline="true" /><span class="text-cyan-600 dark:text-cyan-400">Dragon Power</span> is consumed.**
+<div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/0b9a93bfa162423cb82e1ac90ce67c2f.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 537px; height: 923px; margin: 0 0.25em;" data-inline="true" /></div>
 
 
 # <span class="text-gray-900 dark:text-gray-100">Awakened Latent Power</span>
