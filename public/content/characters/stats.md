@@ -52,9 +52,18 @@ order: 0
 
 # <span class="text-gray-900 dark:text-gray-100">Slayer Promotion Additional Ability</span>
 **As you progress through promotions, you unlock an additional stat boost for the attribute of your choice. There are a total of seven stat slots available. After unlocking all seven slots, subsequent promotions apply multipliers to each slot in sequence, cycling back to the first slot once all slots have been boosted.**
-| **Stats** | **Percentages (%)** |
-|----------|----------|
-|**Extra ATK**|3-5 6-8 9-12 13-18 19-27 28-40|
-|**Crit Dmg**|Insert text here|
+| **STATS** | **PERCENTAGES (%)** | **DESCRIPTION**
+|----------|----------|----------|
+|**Extra ATK**|**<span class="text-gray-400 dark:text-gray-300">3-5</span> <span class="text-green-800 dark:text-green-600">6-8</span> <span class="text-orange-800 dark:text-orange-600">9-12</span> <span class="text-purple-600 dark:text-purple-400">13-18</span> <span class="text-red-600 dark:text-red-400">19-27</span> <span class="text-cyan-400 dark:text-cyan-300">28-40</span>**|Increases ATK damage.|
+|**Crit Dmg**|Insert text here|Increases critical damage.|
+|**Extra HP**|Insert text here|Increases maximum HP.|
+|**Extra HP Recovery**|Insert text here|Increases HP recovery rate.|
+|**Extra MP**|Insert text here|Increases maximum MP.|
+|**Extra Mana Recovery**|Insert text here|Increases MP recovery rate.|
+|**Extra Accuracy**|Insert text here|Increases accuracy to reduce the chance of missing attacks.|
+|**Dodge**|Insert text here|Increases dodge to improve the chance of evading enemy attacks.|
+|**CC Resist**|Insert text here|Increases CC resistance to reduce the chance of being knocked back by enemies.|
+|**Extra Monster Gold**|Insert text here|Increases gold earned from defeating monsters.|
+|**Extra EXP**|Insert text here|Increases experience gained.|
 
 **Legend (Probability): | <span class="text-gray-400 dark:text-gray-300">Common (23%)</span> | <span class="text-green-800 dark:text-green-600">Great (20%)</span> | <span class="text-orange-800 dark:text-orange-600">Rare (30%)</span> | <span class="text-purple-600 dark:text-purple-400">Epic (20%)</span> | <span class="text-red-600 dark:text-red-400">Legendary (5%)</span> | <span class="text-cyan-400 dark:text-cyan-300">Mythic (2%)</span>**
