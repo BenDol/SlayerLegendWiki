@@ -29,7 +29,7 @@ order: 0
 ## <span class="text-blue-800 dark:text-blue-300">Critical Stats</span>
 | **Critical Damage (Crit Dmg)** <img src="/images/icons/icon_growth04_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **Critical Hit Rate (Crit %)** <img src="/images/icons/icon_growth05_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **Death Strike** <img src="/images/icons/icon_growth06_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 40px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | **Death Strike %** <img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2025/12/29f69bf1c244423387a3a4ddcbec2947.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 41px; height: 40px; margin: 0 0.25em;" data-inline="true" /> | 
 |----------|----------|----------|----------|
-|This attribute determines how much critical damage you deal.|This attribute determines your critical hit chance.|This attribute enhances your critical damage.|This attribute determines your death strike hit chance.| 
+|This attribute determines your critical damage.|This attribute determines your critical hit chance.|This attribute enhances your critical damage.|This attribute determines your death strike hit chance.| 
 
 
 # <span class="text-gray-900 dark:text-gray-100">Growth Points</span>
