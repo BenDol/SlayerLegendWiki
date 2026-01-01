@@ -12,10 +12,10 @@ date: 2025-12-21T00:00:00.000Z
 order: 0
 ---
 # <span class="text-gray-900 dark:text-gray-100">Character Level</span>
-**As you progress through your Slayer Legend journey, you will earn<img src="/images/goods/Goods_Exp.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: 0 0.25em;" data-inline="true" />experience (EXP) that allows you to unlock new skills, gain stat points, and more.**
+**As you progress through your Slayer Legend journey, you will earn<img src="/images/goods/Goods_Exp.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />experience (EXP) that allows you to unlock new skills, gain stat points, and more.**
 
 # <span class="text-gray-900 dark:text-gray-100">Combat Stats</span>
-**Your combat stats are divided into two categories: main stats and critical stats.**
+**Your combat stats are divided into two categories: main stats and critical stats. Combat stats can be increased using<img src="/images/goods/Goods_Gold.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />gold.**
 - **Your <span class="text-red-700 dark:text-red-300">main stats</span> are attributes that will be leveled most frequently throughout the game.**
   - The current maximum level cap is 1,750,000.
   - Multiplier boosts are unlocked at levels 100,000 and 1,000,000.
