@@ -9,7 +9,7 @@ category: Getting Started
 date: 2025-12-13T00:00:00.000Z
 order: 0
 background:
-  path: /images/backgrounds/A Red Sunset Layer 01.png
+  path: /images/content/backgrounds/A Red Sunset Layer 01.png
   opacity: 0.2
   repeat: no-repeat
   size: cover

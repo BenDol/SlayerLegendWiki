@@ -73,9 +73,15 @@
   },
   {
     "id": "characters/stats",
+<<<<<<< HEAD
     "title": "Stats",
     "description": "A brief overview of the available character stats and their effects.",
     "content": "<span class=\"text-gray-900 dark:text-gray-100\">Character Level</span> As you progress through your Slayer Legend journey, you will earn<img src=\"/images/goods/GoodsExp.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;\" data-inline=\"true\" />experience (EXP) that allows you to unlock new skills, gain stat points, and more. <span class=\"text-gray-900 dark:text-gray-100\">Combat Stats</span> Your combat stats are divid",
+=======
+    "title": "Character Stats",
+    "description": "A brief overview of the available stats and their effects.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Character Level</span> As you progress through your Slayer Legend journey, you will earn<img src=\"/images/content/goods/GoodsExp.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;\" data-inline=\"true\" />experience (EXP) that allows you to unlock new skills, gain stat points, and more. <span class=\"text-gray-900 dark:text-gray-100\">Combat Stats</span> Your combat stats are divid",
+>>>>>>> 4b5d3f91 (Fix a bunch of regressions from the CDN move [force-deploy])
     "section": "characters",
     "sectionTitle": "Characters",
     "pageId": "stats",

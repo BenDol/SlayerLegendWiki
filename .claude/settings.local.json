@@ -212,7 +212,12 @@
       "Bash(git status:*)",
       "Bash(npm run test:framework:*)",
       "Bash(npm run test:*)",
-      "Bash(npm run build:vite:*)"
+      "Bash(npm run build:vite:*)",
+      "Bash(Test-Path \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\public\\\\content\")",
+      "Bash(if [ -d \"C:/Projects/slayerlegend/wiki/public/content\" ])",
+      "Bash(then echo \"Directory exists\")",
+      "Bash(else echo \"Directory does NOT exist\")",
+      "Bash(npm run prebuild:*)"
     ]
   }
 }

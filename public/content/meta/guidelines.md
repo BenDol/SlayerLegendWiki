@@ -59,9 +59,9 @@ date: 2025-12-12
 
 When adding images:
 
-1. Place images in `/public/images/` in appropriate subdirectories
+1. Game assets are served from CDN at `/images/content/` paths
 2. Use descriptive filenames: `promotion-mithril-tier.jpg`
-3. Add alt text: `![Mithril tier promotion](/images/promotions/mithril-tier.jpg)`
+3. Add alt text: `![Mithril tier promotion](/images/content/promotions/mithril-tier.jpg)`
 4. Optimize file sizes (keep under 500KB)
 
 ## Tables

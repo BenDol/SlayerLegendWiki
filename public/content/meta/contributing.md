@@ -58,7 +58,7 @@ The wiki supports GitHub-flavored Markdown:
 **Bold text**
 *Italic text*
 [Links](https://example.com)
-![Images](/images/example.png)
+![Images](/images/content/example.png)
 ```
 
 ## Getting Help
