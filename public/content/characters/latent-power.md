@@ -15,9 +15,9 @@ order: 0
 **This content is unlocked after obtaining your first<img src="/images/items/ui_item_DragonForce.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: 0 0.25em;" data-inline="true" />Dragon Power from the Ancient Dragon in the Shelter of Sleeping Flame. Dragon Power is consumed to enhance your stats.**
 
 
-| Header 1 | Header 2 | Header 3 | Header 3 | Header 3 |
+| <img src="/images/altar/DragonStat 1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" /> | <img src="/images/altar/DragonStat 2.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" /> | <img src="/images/altar/DragonStat 3.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" /> | <img src="/images/altar/DragonStat 4.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" /> | <img src="/images/altar/DragonStat 5.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" /> |
 |----------|----------|----------|----------|----------|
-|Strength (STR)|Health Points (HP)|HP Recovery (VIT)| Cell 3   | Cell 3   |
+|**Strength (STR)**|**Health Points (HP)**|**HP Recovery (VIT)**|**Critical Damage (CRI)**|**Luck (LUK)**|
 
 **There are five pages of possible stats you can upgrade using your Dragon Power.**
 
@@ -25,15 +25,3 @@ order: 0
 
 # <span class="text-gray-900 dark:text-gray-100">Awakened Latent Power</span>
 **Insert here here.**
-
-
-
-<img src="/images/altar/DragonStat 1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" />
-
-<img src="/images/altar/DragonStat 2.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" />
-
-<img src="/images/altar/DragonStat 3.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" />
-
-<img src="/images/altar/DragonStat 4.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" />
-
-<img src="/images/altar/DragonStat 5.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 49px; height: 51px; margin: 0 0.25em;" data-inline="true" />
