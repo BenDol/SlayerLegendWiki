@@ -10,6 +10,6 @@ category: Characters
 date: 2025-12-21T00:00:00.000Z
 order: 0
 ---
-# Training Diary
+# <span class="text-gray-900 dark:text-gray-100">Training Diary Overview</span>
 
-{{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->
+**Blah blah blah insert text**
