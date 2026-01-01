@@ -4,7 +4,6 @@ title: Training Diary
 description: A brief overview of the training diary system.
 tags:
   - character
-  - training-log
   - progression
   - achievements
 category: Characters
