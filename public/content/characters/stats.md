@@ -54,7 +54,7 @@ order: 0
 
 
 # <span class="text-gray-900 dark:text-gray-100">Slayer Promotion Additional Ability</span>
-**As you progress through promotions, you unlock an additional stat boost for the attribute of your choice. There are a total of seven stat slots available. After unlocking all seven slots, subsequent promotions apply multipliers to each slot in sequence, cycling back to the first slot once all slots have been boosted.**
+**As you progress through promotions, you unlock an additional stat boost for the attribute of your choice. There are a total of seven stat slots available. After unlocking all seven slots, subsequent promotions apply multipliers to each slot in sequence, cycling back to the first slot once all slots have been boosted. Stats can be rerolled using<img src="/images/goods/Goods_Dice_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />dice.**
 | **STATS** | **PERCENTAGES (%)** | **DESCRIPTION**
 |----------|----------|----------|
 |**Extra ATK**|**<span class="text-gray-400 dark:text-gray-300">3-5</span> <span class="text-green-800 dark:text-green-600">6-8</span> <span class="text-orange-800 dark:text-orange-600">9-12</span> <span class="text-purple-600 dark:text-purple-400">13-18</span> <span class="text-red-600 dark:text-red-400">19-27</span> <span class="text-cyan-400 dark:text-cyan-300">28-40</span>**|Increases ATK damage.|
