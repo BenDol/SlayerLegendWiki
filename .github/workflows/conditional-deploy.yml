@@ -91,11 +91,12 @@ jobs:
           RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}")
           echo "Response: $RESPONSE"
 
-          # Check if deploy was triggered successfully
-          if echo "$RESPONSE" | grep -q '"success":true'; then
+          # Check if deploy was triggered successfully (flexible grep for JSON formatting)
+          if echo "$RESPONSE" | grep -q '"success"[[:space:]]*:[[:space:]]*true'; then
             echo "✅ Deploy triggered successfully"
           else
             echo "❌ Deploy trigger failed"
+            echo "Expected success:true in response"
             exit 1
           fi
 
