@@ -1,7 +1,7 @@
 ---
 id: training-log
 title: Training Diary
-description: 'Guide to the Training Log system, tracking character progress, achievements, and unlocking rewards'
+description: A brief overview of the training diary system.
 tags:
   - character
   - training-log
