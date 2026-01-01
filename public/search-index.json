@@ -56,7 +56,7 @@
   {
     "id": "characters/promotions",
     "title": "Promotions",
-    "description": "A brief overview of the available promotions and the stat boosts they grant upon completion.",
+    "description": "A brief overview of the available character promotions and the stat boosts they grant upon completion.",
     "content": "<span class=\"text-gray-900 dark:text-gray-100\">Promotion Overview</span> Here are the current promotions and the boosts they provide upon completion. | <span class=\"text-gray-900 dark:text-gray-100\">PROMOTION</span> | <span class=\"text-gray-900 dark:text-gray-100\">BOOST</span> |----------|----------| | <span class=\"text-gray-600 dark:text-gray-400\">STONE </span><img src=\"/images/promotions/0-stone.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 27px; ",
     "section": "characters",
     "sectionTitle": "Characters",
@@ -73,8 +73,8 @@
   },
   {
     "id": "characters/stats",
-    "title": "Character Stats",
-    "description": "A brief overview of the available stats and their effects.",
+    "title": "Stats",
+    "description": "A brief overview of the available character stats and their effects.",
     "content": "<span class=\"text-gray-900 dark:text-gray-100\">Character Level</span> As you progress through your Slayer Legend journey, you will earn<img src=\"/images/goods/GoodsExp.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;\" data-inline=\"true\" />experience (EXP) that allows you to unlock new skills, gain stat points, and more. <span class=\"text-gray-900 dark:text-gray-100\">Combat Stats</span> Your combat stats are divid",
     "section": "characters",
     "sectionTitle": "Characters",
