@@ -57,4 +57,4 @@ order: 0
 |**Extra ATK**|3-5 6-8 9-12 13-18 19-27 28-40|
 |**Crit Dmg**|Insert text here|
 
-Legend (Probability): | Common (%) | Great (%) | Rare (%) | Epic (%) | Legendary (%) | Mythic (%)
+**Legend (Probability): | <span class="text-gray-400 dark:text-gray-300">Common (23%)</span> | <span class="text-green-800 dark:text-green-600">Great (20%)</span> | <span class="text-orange-800 dark:text-orange-600">Rare (30%)</span> | <span class="text-purple-600 dark:text-purple-400">Epic (20%)</span> | <span class="text-red-600 dark:text-red-400">Legendary (5%)</span> | <span class="text-cyan-400 dark:text-cyan-300">Mythic (2%)</span>**
