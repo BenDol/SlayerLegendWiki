@@ -94,7 +94,7 @@
     "id": "characters/training-log",
     "title": "Training Diary",
     "description": "A brief overview of the training diary system.",
-    "content": "Training Diary {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Training Diary Overview</span> Blah blah blah insert text",
     "section": "characters",
     "sectionTitle": "Characters",
     "pageId": "training-log",
