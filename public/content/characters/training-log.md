@@ -11,6 +11,6 @@ category: Characters
 date: 2025-12-21T00:00:00.000Z
 order: 0
 ---
-# Training Log
+# Training Diary
 
 {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->
