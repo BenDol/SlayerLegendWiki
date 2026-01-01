@@ -30,4 +30,13 @@ order: 0
 
 
 # <span class="text-gray-900 dark:text-gray-100">Awakened Latent Power</span>
-**This content is unlocked after achieving the Dragonos promotion. Your latent power is awakened and can now be used to enhance your stats with a new currency called <img src="/images/goods/Goods_AwakenDragonForce_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: -2px 0 0 0;" data-inline="true" /><span class="text-amber-600 dark:text-amber-400">Dragon Spark</span>.**
+**This content is unlocked after achieving the <img src="/images/promotions/12-dragonos.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 27px; height: 30px; margin: -2px 0 0 0;;" data-inline="true" />Dragonos promotion. Your latent power is awakened and can now be used to enhance your stats with a new currency called <img src="/images/goods/Goods_AwakenDragonForce_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: -2px 0 0 0;" data-inline="true" /><span class="text-amber-600 dark:text-amber-400">Dragon Spark</span>.**
+
+
+**There is a grading and star system that determines the strength of your awakened latent power. Higher grades indicate stronger awakened latent power. To progress to the next grade, you must complete the star system. Each grade requires six stars to upgrade. To earn a star, you must successfully ignite a total of 20 upgrades. Upgrades can be lost depending on how you choose to ignite.** 
+<div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/ad26791882804b029b89577771b1f893.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 340px; height: 600px; margin: 0 0.25em;" data-inline="true" /></div>
+
+
+**There are two ways to ignite using your <img src="/images/goods/Goods_AwakenDragonForce_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 25px; height: 25px; margin: -2px 0 0 0;" data-inline="true" /><span class="text-amber-600 dark:text-amber-400">Dragon Spark</span>: ignite once or random ignite.**
+- **Ignite once**
+- **Random ignite**
