@@ -1,7 +1,7 @@
 ---
 id: stats
-title: Character Stats
-description: A brief overview of the available stats and their effects.
+title: Stats
+description: A brief overview of the available character stats and their effects.
 tags:
   - character
   - stats
