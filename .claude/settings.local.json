@@ -219,7 +219,8 @@
       "Bash(else echo \"Directory does NOT exist\")",
       "Bash(npm run prebuild:*)",
       "Bash(Get-Content \"game-assets/images/image-index.json\")",
-      "Bash(Select-String -Pattern '\"\"path\"\":')"
+      "Bash(Select-String -Pattern '\"\"path\"\":')",
+      "Bash(Select-String -Pattern \"DynamicPageLoader|Failed to load|404|Page not found\" -Context 2,2)"
     ]
   }
 }
