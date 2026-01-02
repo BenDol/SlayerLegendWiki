@@ -17,21 +17,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: write  # Need write permission to create/update top contributor issues
+
+    env:
+      WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username
+      GITHUB_ACTIONS_BOT: github-actions[bot]  # GitHub Actions bot username
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history for accurate commit analysis
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Detect changed files
         id: changed-files
@@ -48,44 +44,304 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Calculate and update top contributors
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WIKI_BOT_TOKEN: ${{ secrets.WIKI_BOT_TOKEN }}
-          WIKI_BOT_USERNAME: slayer-wiki-bot
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-          CONTENT_PATH: 'public/content'
-          BOT_SERVICE_URL: ${{ vars.BOT_SERVICE_URL || secrets.BOT_SERVICE_URL }}
-        run: |
-          # Process each changed file
-          echo "${{ steps.changed-files.outputs.files }}" | while IFS= read -r file; do
-            if [ -z "$file" ]; then
-              continue
-            fi
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
+            const GITHUB_ACTIONS_BOT = process.env.GITHUB_ACTIONS_BOT || 'github-actions[bot]';
+            const CONTENT_PATH = 'public/content';
 
-            # Extract section and page from path: public/content/<section>/<page>.md
-            SECTION=$(echo "$file" | sed 's|public/content/\([^/]*\)/.*|\1|')
-            PAGE=$(echo "$file" | sed 's|public/content/[^/]*/\(.*\)\.md|\1|')
+            // Scoring weights (must match StarContributor.jsx)
+            const COMMIT_WEIGHT = 10;
+            const ADDITION_WEIGHT = 0.5;
+            const DELETION_WEIGHT = 0.5;
 
-            echo "Processing: $SECTION/$PAGE"
+            /**
+             * Calculate top contributor for a page
+             */
+            async function calculateTopContributor(sectionId, pageId) {
+              console.log(`[TopContributor] Calculating top contributor for ${sectionId}/${pageId}...`);
 
-            # Skip if file was deleted
-            if [ ! -f "$file" ]; then
-              echo "  Skipped (file deleted)"
-              continue
-            fi
+              const filePath = `${CONTENT_PATH}/${sectionId}/${pageId}.md`;
 
-            # Run top contributor calculation
-            node scripts/calculate-top-contributor.js "$SECTION" "$PAGE" || {
-              echo "  ⚠️ Warning: Failed to calculate top contributor"
-              # Continue with other files even if one fails
-              continue
+              try {
+                // Fetch ALL commits for the file (up to 100)
+                console.log(`[TopContributor] Fetching commits for ${filePath}...`);
+                const { data: commitList } = await github.rest.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: filePath,
+                  per_page: 100,
+                });
+
+                console.log(`[TopContributor] Found ${commitList.length} commits`);
+
+                if (commitList.length === 0) {
+                  console.log('[TopContributor] No commits found - returning null');
+                  return null;
+                }
+
+                // Fetch detailed commit info including stats in parallel
+                console.log('[TopContributor] Fetching commit details...');
+                const commitsWithStats = await Promise.all(
+                  commitList.map(async (commit) => {
+                    try {
+                      const { data: commitDetails } = await github.rest.repos.getCommit({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        ref: commit.sha,
+                      });
+
+                      // Extract stats for the specific file
+                      const fileStats = commitDetails.files?.find(file => file.filename === filePath);
+                      const stats = fileStats ? {
+                        additions: fileStats.additions || 0,
+                        deletions: fileStats.deletions || 0,
+                        total: fileStats.changes || 0,
+                      } : {
+                        additions: 0,
+                        deletions: 0,
+                        total: 0,
+                      };
+
+                      return {
+                        sha: commit.sha,
+                        message: commit.commit.message,
+                        author: {
+                          name: commit.commit.author.name,
+                          email: commit.commit.author.email,
+                          username: commit.author?.login,
+                          userId: commit.author?.id,
+                        },
+                        stats,
+                      };
+                    } catch (err) {
+                      console.error(`Failed to fetch stats for commit ${commit.sha}:`, err);
+                      return null;
+                    }
+                  })
+                );
+
+                const commits = commitsWithStats.filter(c => c !== null);
+
+                // Calculate contributor scores
+                console.log('[TopContributor] Calculating scores...');
+                const contributorScores = {};
+
+                // Get repository owner to exclude their commits
+                const { data: repoData } = await github.rest.repos.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo
+                });
+                const repoOwner = repoData.owner.login;
+
+                commits.forEach((commit) => {
+                  const username = commit.author.username;
+                  const userId = commit.author.userId;
+
+                  // Skip commits without GitHub user (local commits)
+                  if (!username || !userId) {
+                    console.log(`[TopContributor] Skipping commit without GitHub user: ${commit.sha.substring(0, 7)}`);
+                    return;
+                  }
+
+                  // Skip repository owner commits
+                  if (username === repoOwner) {
+                    console.log(`[TopContributor] Skipping repository owner commit: ${commit.sha.substring(0, 7)}`);
+                    return;
+                  }
+
+                  // Skip wiki bot
+                  if (username === BOT_USERNAME) {
+                    console.log(`[TopContributor] Skipping wiki bot commit: ${BOT_USERNAME} (${commit.sha.substring(0, 7)})`);
+                    return;
+                  }
+
+                  // Skip GitHub Actions bot
+                  if (username === GITHUB_ACTIONS_BOT) {
+                    console.log(`[TopContributor] Skipping GitHub Actions bot commit: ${commit.sha.substring(0, 7)}`);
+                    return;
+                  }
+
+                  const stats = commit.stats || { additions: 0, deletions: 0, total: 0 };
+
+                  // Calculate weighted score
+                  const score =
+                    (COMMIT_WEIGHT) +
+                    (stats.additions * ADDITION_WEIGHT) +
+                    (stats.deletions * DELETION_WEIGHT);
+
+                  // Initialize contributor if not exists
+                  if (!contributorScores[userId]) {
+                    contributorScores[userId] = {
+                      username,
+                      userId,
+                      score: 0,
+                      commits: 0,
+                      additions: 0,
+                      deletions: 0,
+                    };
+                  }
+
+                  // Update contributor stats
+                  contributorScores[userId].score += score;
+                  contributorScores[userId].commits += 1;
+                  contributorScores[userId].additions += stats.additions;
+                  contributorScores[userId].deletions += stats.deletions;
+                });
+
+                // Find top contributor
+                const contributors = Object.values(contributorScores);
+
+                if (contributors.length === 0) {
+                  console.log('[TopContributor] No community contributors found - returning null');
+                  return null;
+                }
+
+                contributors.sort((a, b) => b.score - a.score);
+                const topContributor = contributors[0];
+
+                console.log(`[TopContributor] Top contributor: ${topContributor.username} (ID: ${topContributor.userId}, score: ${topContributor.score.toFixed(2)})`);
+                console.log(`[TopContributor]   - Commits: ${topContributor.commits}`);
+                console.log(`[TopContributor]   - Additions: ${topContributor.additions}`);
+                console.log(`[TopContributor]   - Deletions: ${topContributor.deletions}`);
+
+                return {
+                  username: topContributor.username,
+                  userId: topContributor.userId,
+                  score: Math.round(topContributor.score * 100) / 100,
+                  updatedAt: new Date().toISOString(),
+                };
+              } catch (error) {
+                console.error('[TopContributor] Failed to calculate:', error);
+                throw error;
+              }
             }
 
-            echo "  ✓ Completed"
-          done
+            /**
+             * Update or create top contributor issue
+             */
+            async function updateTopContributorIssue(sectionId, pageId, contributorData) {
+              const issueTitle = `[Top Contributor] ${sectionId}/${pageId}`;
+              const issueLabel = 'top-contributor';
 
-          echo "✅ Top contributor updates completed"
+              try {
+                // Find existing issue
+                const { data: issues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  labels: issueLabel,
+                  per_page: 100
+                });
+
+                const existingIssue = issues.find(issue => issue.title === issueTitle);
+
+                const issueBody = JSON.stringify(contributorData, null, 2);
+
+                if (existingIssue) {
+                  // Update existing issue
+                  console.log(`[TopContributor] Updating existing issue #${existingIssue.number}`);
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: existingIssue.number,
+                    body: issueBody
+                  });
+                  return existingIssue.number;
+                } else {
+                  // Create new issue
+                  console.log('[TopContributor] Creating new issue');
+                  const { data: newIssue } = await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: [issueLabel, 'automated']
+                  });
+
+                  // Lock the issue to prevent comments
+                  try {
+                    await github.rest.issues.lock({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: newIssue.number,
+                      lock_reason: 'off-topic'
+                    });
+                    console.log(`[TopContributor] Locked issue #${newIssue.number}`);
+                  } catch (lockError) {
+                    console.warn('[TopContributor] Failed to lock issue:', lockError.message);
+                  }
+
+                  return newIssue.number;
+                }
+              } catch (error) {
+                console.error('[TopContributor] Failed to update issue:', error);
+                throw error;
+              }
+            }
+
+            // Parse changed files from previous step
+            const changedFilesOutput = `${{ steps.changed-files.outputs.files }}`;
+            const changedFiles = changedFilesOutput.split('\n').filter(f => f.trim());
+
+            console.log('==========================================');
+            console.log(`Processing ${changedFiles.length} changed file(s)`);
+            console.log('==========================================');
+            console.log('');
+
+            let succeeded = 0;
+            let failed = 0;
+
+            // Process each changed file
+            for (const file of changedFiles) {
+              if (!file || !file.trim()) continue;
+
+              // Extract section and page from path
+              const sectionMatch = file.match(/public\/content\/([^\/]+)\//);
+              const pageMatch = file.match(/public\/content\/[^\/]+\/(.+)\.md/);
+
+              if (!sectionMatch || !pageMatch) {
+                console.log(`Skipping invalid path: ${file}`);
+                failed++;
+                continue;
+              }
+
+              const section = sectionMatch[1];
+              const page = pageMatch[1];
+
+              console.log(`Processing: ${section}/${page}`);
+
+              try {
+                // Calculate top contributor
+                const topContributor = await calculateTopContributor(section, page);
+
+                if (!topContributor) {
+                  console.log(`  ℹ️  No top contributor to update (no commits or no valid contributors)`);
+                  succeeded++;
+                } else {
+                  // Update issue
+                  const issueNumber = await updateTopContributorIssue(section, page, topContributor);
+                  console.log(`  ✓ Success: Updated issue #${issueNumber}`);
+                  succeeded++;
+                }
+              } catch (error) {
+                console.error(`  ✗ Failed: ${error.message}`);
+                failed++;
+              }
+
+              console.log('');
+            }
+
+            console.log('==========================================');
+            console.log('✅ Top contributor updates completed');
+            console.log(`Succeeded: ${succeeded}`);
+            console.log(`Failed: ${failed}`);
+            console.log('==========================================');
+
+            // Don't fail the workflow if some files failed
+            // This allows other files to still be processed
 
       - name: Summary
         if: always()
