@@ -512,7 +512,7 @@
     "id": "getting-started/ui-guide",
     "title": "UI Guide",
     "description": "Complete guide to the user interface, menus, controls, and navigation in Slayer Legend",
-    "content": "UI Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "content": "UI Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page --> Test",
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "ui-guide",
