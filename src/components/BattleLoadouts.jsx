@@ -130,7 +130,6 @@ const BattleLoadouts = () => {
     if (shareChecksum) {
       const loadSharedBuild = async () => {
         try {
-          setLoading(true);
           logger.info('Loading shared build', { shareChecksum });
 
           // Get repo info from config
@@ -159,8 +158,6 @@ const BattleLoadouts = () => {
         } catch (error) {
           logger.error('Failed to load shared build', { error });
           alert(`Failed to load shared build: ${error.message}`);
-        } finally {
-          setLoading(false);
         }
       };
 
@@ -170,7 +167,6 @@ const BattleLoadouts = () => {
     else if (loadoutId && isAuthenticated && user) {
       const loadFromSavedLoadouts = async () => {
         try {
-          setLoading(true);
           logger.info('Loading saved loadout', { loadoutId });
 
           const response = await fetch(`${getLoadDataEndpoint()}?type=battle-loadouts&userId=${user.id}`);
@@ -182,22 +178,8 @@ const BattleLoadouts = () => {
 
           const savedLoadout = loadouts.find(l => l.id === loadoutId);
           if (savedLoadout) {
-            logger.info('LOAD: Found saved loadout', {
-              loadoutId,
-              loadoutName: savedLoadout.name,
-              hasSkillStoneBuild: !!savedLoadout.skillStoneBuild,
-              skillStoneBuild: savedLoadout.skillStoneBuild
-            });
-
             // Resolve the loadout (handles both build IDs and embedded builds)
             const resolvedLoadout = resolveLoadoutBuilds(savedLoadout);
-
-            logger.info('LOAD: Resolved loadout', {
-              hasSkillBuild: !!resolvedLoadout.skillBuild,
-              hasSpiritBuild: !!resolvedLoadout.spiritBuild,
-              hasSkillStoneBuild: !!resolvedLoadout.skillStoneBuild,
-              skillStoneBuild: resolvedLoadout.skillStoneBuild
-            });
 
             setCurrentLoadout(resolvedLoadout);
             setLoadoutName(resolvedLoadout.name || '');
@@ -214,8 +196,6 @@ const BattleLoadouts = () => {
         } catch (error) {
           logger.error('Failed to load saved loadout', { error });
           alert(`Failed to load loadout: ${error.message}`);
-        } finally {
-          setLoading(false);
         }
       };
       loadFromSavedLoadouts();
