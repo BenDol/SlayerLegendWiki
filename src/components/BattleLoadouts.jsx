@@ -41,6 +41,7 @@ const logger = createLogger('BattleLoadouts');
 const BattleLoadouts = () => {
   const { isAuthenticated, user } = useAuthStore();
   const loadoutNameInputRef = useRef(null);
+  const originalLoadedNameRef = useRef(null); // Track original name for Save As detection
   const [loadoutName, setLoadoutName] = useState('');
   const [currentLoadout, setCurrentLoadout] = useState(createEmptyLoadout(''));
   const [skills, setSkills] = useState([]);
@@ -200,6 +201,9 @@ const BattleLoadouts = () => {
 
             setCurrentLoadout(resolvedLoadout);
             setLoadoutName(resolvedLoadout.name || '');
+            const loadedName = resolvedLoadout.name || 'My Loadout';
+            setOriginalLoadedName(loadedName); // Track original name for Save As behavior
+            originalLoadedNameRef.current = loadedName; // Store in ref too
             setCurrentLoadedLoadoutId(loadoutId);
             setHasUnsavedChanges(false);
             logger.info('Saved loadout loaded successfully', { loadoutName: resolvedLoadout.name });
@@ -239,29 +243,22 @@ const BattleLoadouts = () => {
     // Load from localStorage if no URL params
     else {
       const draft = loadDraft();
-      if (draft) {
-        logger.debug('Loading draft', {
-          hasSkillBuildId: !!draft.currentLoadout.skillBuildId,
-          hasSpirBuildId: !!draft.currentLoadout.spiritBuildId,
-          hasSkillBuild: !!draft.currentLoadout.skillBuild,
-          hasSpiritBuild: !!draft.currentLoadout.spiritBuild,
-          skillBuildHasId: !!draft.currentLoadout.skillBuild?.id,
-          spiritBuildHasId: !!draft.currentLoadout.spiritBuild?.id
-        });
-
+      if (draft && draft.currentLoadout) {
         setLoadoutName(draft.loadoutName || '');
-
-        // Always use resolveLoadoutBuilds which handles both build IDs and embedded builds
         const resolvedLoadout = resolveLoadoutBuilds(draft.currentLoadout);
-
-        logger.debug('Draft resolved', {
-          hasSkillBuild: !!resolvedLoadout.skillBuild,
-          hasSpiritBuild: !!resolvedLoadout.spiritBuild,
-          skillBuildId: resolvedLoadout.skillBuild?.id,
-          spiritBuildId: resolvedLoadout.spiritBuild?.id
-        });
-
         setCurrentLoadout(resolvedLoadout);
+
+        if (resolvedLoadout.id) {
+          const originalName = draft.loadoutName || 'My Loadout';
+          setOriginalLoadedName(originalName);
+          originalLoadedNameRef.current = originalName;
+          setCurrentLoadedLoadoutId(resolvedLoadout.id);
+        } else {
+          setOriginalLoadedName(null);
+          originalLoadedNameRef.current = null;
+          setCurrentLoadedLoadoutId(null);
+        }
+
         setHasUnsavedChanges(true);
       }
     }
@@ -1020,7 +1017,9 @@ const BattleLoadouts = () => {
 
     setCurrentLoadout(resolvedLoadout);
     setLoadoutName(resolvedLoadout.name || 'My Loadout');
-    setOriginalLoadedName(resolvedLoadout.name || 'My Loadout'); // Track original name for Save As behavior
+    const loadedName = resolvedLoadout.name || 'My Loadout';
+    setOriginalLoadedName(loadedName); // Track original name for Save As behavior
+    originalLoadedNameRef.current = loadedName; // Store in ref too
     setHasUnsavedChanges(false); // Loaded from saved, no unsaved changes
     setCurrentLoadedLoadoutId(loadout.id); // Track which loadout is currently loaded
 
@@ -1160,31 +1159,36 @@ const BattleLoadouts = () => {
         }));
       }
 
-      // Step 3: Serialize loadout with build IDs
-      // Use dedicated serializer to optimize data (especially soul weapon builds)
+      // Step 3: Prepare loadout for serialization
+      // Check if name changed BEFORE serializing (so we can exclude ID if needed)
+      const effectiveOriginalName = originalLoadedNameRef.current || originalLoadedName;
+      const nameChanged = effectiveOriginalName && loadoutName !== effectiveOriginalName;
+
+      // Build the loadout object, conditionally including ID based on name change
       const loadoutToSave = {
         ...currentLoadout,
         name: loadoutName,
         skillBuild: currentLoadout.skillBuild ? { ...currentLoadout.skillBuild, id: skillBuildId } : null,
         spiritBuild: currentLoadout.spiritBuild ? { ...currentLoadout.spiritBuild, id: spiritBuildId } : null
       };
-      const loadoutData = serializeLoadoutForStorage(loadoutToSave);
 
-      // Save As behavior: If name changed from original, remove ID to create new entry
-      const nameChanged = originalLoadedName && loadoutName !== originalLoadedName;
-      if (nameChanged && loadoutData.id) {
-        logger.info('SAVE AS: Name changed from original, creating new loadout', {
-          originalName: originalLoadedName,
-          newName: loadoutName,
-          oldId: loadoutData.id
-        });
-        delete loadoutData.id;
-        delete loadoutData.createdAt;
-        delete loadoutData.updatedAt;
+      // Save As behavior: If name changed, remove ID BEFORE serializing to create new entry
+      if (nameChanged) {
+        delete loadoutToSave.id;
+        delete loadoutToSave.createdAt;
+        delete loadoutToSave.updatedAt;
+        logger.info('Save As: Name changed, creating new loadout', { originalName: effectiveOriginalName, newName: loadoutName });
       }
+
+      // Now serialize (ID already removed if name changed)
+      const loadoutData = serializeLoadoutForStorage(loadoutToSave);
 
       logger.info('SAVE: Preparing to save battle loadout', {
         loadoutName: loadoutData.name,
+        hasId: !!loadoutData.id,
+        id: loadoutData.id,
+        originalLoadedName,
+        currentLoadoutName: loadoutName,
         hasSkillStoneBuild: !!loadoutData.skillStoneBuild,
         hasSoulWeaponBuild: !!loadoutData.soulWeaponBuild,
         soulWeaponBuildSize: loadoutData.soulWeaponBuild ? JSON.stringify(loadoutData.soulWeaponBuild).length : 0
@@ -1221,6 +1225,16 @@ const BattleLoadouts = () => {
       if (savedLoadout) {
         setCurrentLoadedLoadoutId(savedLoadout.id);
         setOriginalLoadedName(loadoutName); // Update original name to current saved name
+        originalLoadedNameRef.current = loadoutName; // Update ref too
+
+        // CRITICAL: Update currentLoadout with the saved ID so future saves use correct ID
+        setCurrentLoadout(prev => ({
+          ...prev,
+          id: savedLoadout.id,
+          createdAt: savedLoadout.createdAt,
+          updatedAt: savedLoadout.updatedAt
+        }));
+
         logger.info('SAVE: Loadout saved successfully', {
           loadoutId: savedLoadout.id,
           loadoutName: savedLoadout.name,
@@ -1448,6 +1462,7 @@ const BattleLoadouts = () => {
     setCurrentLoadout(createEmptyLoadout(loadoutName));
     setCurrentLoadedLoadoutId(null); // Reset loaded ID
     setOriginalLoadedName(null); // Reset original name
+    originalLoadedNameRef.current = null; // Reset ref too
     clearDraft(); // Clear localStorage draft
   };
 

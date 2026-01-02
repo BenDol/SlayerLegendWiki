@@ -121,6 +121,11 @@ export const clearAllCaches = () => {
 
 /**
  * Merge cached data with GitHub data, prioritizing cache for recent updates
+ *
+ * Strategy:
+ * - Items in both: Use cached version if newer
+ * - Items only in cache: Only add if created recently (within cache duration)
+ * - Items only in GitHub: Always include (cache is missing them)
  */
 export const mergeCacheWithGitHub = (cachedItems, githubItems) => {
   if (!cachedItems || cachedItems.length === 0) {
@@ -137,7 +142,7 @@ export const mergeCacheWithGitHub = (cachedItems, githubItems) => {
   // Create a map of cached items by ID
   const cachedMap = new Map(cachedItems.map(item => [item.id, item]));
 
-  // Start with GitHub items
+  // Start with GitHub items as the source of truth
   const merged = [...githubItems];
 
   // Replace with cached versions if they're newer
@@ -145,7 +150,7 @@ export const mergeCacheWithGitHub = (cachedItems, githubItems) => {
     const githubItem = githubMap.get(cachedItem.id);
 
     if (githubItem) {
-      // Compare timestamps, use cached if it's newer
+      // Item exists in both - compare timestamps, use cached if it's newer
       const cachedTime = new Date(cachedItem.updatedAt).getTime();
       const githubTime = new Date(githubItem.updatedAt).getTime();
 
@@ -157,8 +162,22 @@ export const mergeCacheWithGitHub = (cachedItems, githubItems) => {
         }
       }
     } else {
-      // Item is in cache but not in GitHub (recently created)
-      merged.push(cachedItem);
+      // Item is in cache but not in GitHub
+      // Only add if it was created recently (within cache duration)
+      // This prevents deleted items from reappearing while still allowing new items
+      const itemAge = Date.now() - new Date(cachedItem.createdAt || cachedItem.updatedAt).getTime();
+      if (itemAge < CACHE_DURATION) {
+        logger.debug('Adding recently created item from cache', {
+          id: cachedItem.id,
+          age: Math.round(itemAge / 1000) + 's'
+        });
+        merged.push(cachedItem);
+      } else {
+        logger.debug('Skipping old cached item not in GitHub (likely deleted)', {
+          id: cachedItem.id,
+          age: Math.round(itemAge / 1000) + 's'
+        });
+      }
     }
   });
 

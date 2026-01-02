@@ -5,7 +5,7 @@ import { useWikiConfig } from '../../wiki-framework/src/hooks/useWikiConfig';
 import { useLoginFlow } from '../../wiki-framework/src/hooks/useLoginFlow';
 import LoginModal from '../../wiki-framework/src/components/auth/LoginModal';
 import { getUserLoadouts } from '../services/battleLoadouts';
-import { getCache, setCache, mergeCacheWithGitHub } from '../utils/buildCache';
+import { getCache, setCache, clearCache, mergeCacheWithGitHub } from '../utils/buildCache';
 import { getSaveDataEndpoint, getDeleteDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { getSkillGradeColor, getEquipmentRarityColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
@@ -301,8 +301,9 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
         onLoadoutsChange(sortedLoadouts);
       }
 
-      // Update cache after deletion
-      setCache('battle_loadouts', user.id, sortedLoadouts);
+      // Clear cache completely after deletion to force fresh fetch on next load
+      // This prevents deleted items from being merged back from stale cache
+      clearCache('battle_loadouts', user.id);
     } catch (err) {
       logger.error('Failed to delete loadout:', { error: err });
       setError(err.message || 'Failed to delete loadout');

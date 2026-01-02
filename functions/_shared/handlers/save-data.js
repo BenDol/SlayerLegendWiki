@@ -327,9 +327,15 @@ async function handleUserCentricSave(adapter, storage, config, type, username, u
     if (type === 'my-spirits' && spiritId) {
       // For my-spirits updates, find by spiritId
       itemIndex = items.findIndex(item => item.id === spiritId);
-    } else if (type !== 'my-spirits' && data.name) {
-      // For other types, find by name
-      itemIndex = items.findIndex(item => item.name === data.name);
+    } else if (type !== 'my-spirits') {
+      // For other types, match by ID only (not by name)
+      // This enables "Save As" behavior: when user changes name in UI, frontend
+      // removes the ID, causing backend to create a new entry instead of renaming
+      if (data.id) {
+        // ID provided → Update existing item
+        itemIndex = items.findIndex(item => item.id === data.id);
+      }
+      // No ID provided → Create new item (itemIndex stays -1)
     }
 
     let itemToSave;

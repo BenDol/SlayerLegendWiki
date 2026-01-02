@@ -217,7 +217,10 @@
       "Bash(if [ -d \"C:/Projects/slayerlegend/wiki/public/content\" ])",
       "Bash(then echo \"Directory exists\")",
       "Bash(else echo \"Directory does NOT exist\")",
-      "Bash(npm run prebuild:*)"
+      "Bash(npm run prebuild:*)",
+      "Bash(Select-String -Pattern \"scroll|Scroll|SCROLL\" -Context 2,2)",
+      "Bash(Get-Content \"wiki-framework/logs/debug.log\" -Tail 20)",
+      "Bash(tac:*)"
     ]
   }
 }
