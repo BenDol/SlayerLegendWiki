@@ -220,7 +220,8 @@
       "Bash(npm run prebuild:*)",
       "Bash(Select-String -Pattern \"scroll|Scroll|SCROLL\" -Context 2,2)",
       "Bash(Get-Content \"wiki-framework/logs/debug.log\" -Tail 20)",
-      "Bash(tac:*)"
+      "Bash(tac:*)",
+      "Bash(npm view:*)"
     ]
   }
 }
