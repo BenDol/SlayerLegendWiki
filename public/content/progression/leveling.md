@@ -15,4 +15,4 @@ order: 0
 
 {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->
 
-<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2025/12/64f84b65d55049a791cfe63323dd4432.png" alt="" width="720" height="720" />
+<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2025/12/64f84b65d55049a791cfe63323dd4432.png" alt="" width="80" height="80" />
