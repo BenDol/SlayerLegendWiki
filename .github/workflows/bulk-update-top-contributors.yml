@@ -1,0 +1,132 @@
+name: Bulk Update Top Contributors
+
+on:
+  workflow_dispatch: # Manual trigger
+    inputs:
+      dry_run:
+        description: 'Dry run (log only, no updates)'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # Run weekly on Sunday at 00:00 UTC to refresh all top contributors
+    - cron: '0 0 * * 0'
+
+jobs:
+  bulk-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for accurate commit analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install @octokit/rest
+
+      - name: Find all content pages
+        id: find-pages
+        run: |
+          # Find all markdown files in public/content/
+          FILES=$(find public/content -name "*.md" -type f | sort)
+
+          # Count total files
+          TOTAL=$(echo "$FILES" | wc -l)
+
+          echo "Found $TOTAL content pages to process"
+          echo "$FILES"
+
+          # Save to output
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+
+          # Save files list to temp file for next step
+          echo "$FILES" > /tmp/content-files.txt
+
+      - name: Process all pages
+        env:
+          WIKI_BOT_TOKEN: ${{ secrets.WIKI_BOT_TOKEN }}
+          BOT_SERVICE_URL: ${{ vars.BOT_SERVICE_URL }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          TOTAL=$(wc -l < /tmp/content-files.txt)
+          CURRENT=0
+          SUCCEEDED=0
+          FAILED=0
+
+          echo "=========================================="
+          echo "Processing $TOTAL content pages"
+          echo "Dry run: $DRY_RUN"
+          echo "=========================================="
+          echo ""
+
+          # Process each file
+          while IFS= read -r file; do
+            CURRENT=$((CURRENT + 1))
+
+            # Extract section and page from path
+            # Example: public/content/characters/stats.md -> section=characters, page=stats
+            SECTION=$(echo "$file" | sed 's|public/content/\([^/]*\)/.*|\1|')
+            PAGE=$(echo "$file" | sed 's|public/content/[^/]*/\(.*\)\.md|\1|')
+
+            echo "[$CURRENT/$TOTAL] Processing: $SECTION/$PAGE"
+
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "  [DRY RUN] Would calculate top contributor for $SECTION/$PAGE"
+              SUCCEEDED=$((SUCCEEDED + 1))
+            else
+              # Run the calculate-top-contributor script
+              if node scripts/calculate-top-contributor.js "$SECTION" "$PAGE"; then
+                echo "  ✓ Success: Updated top contributor for $SECTION/$PAGE"
+                SUCCEEDED=$((SUCCEEDED + 1))
+              else
+                echo "  ✗ Failed: Could not update top contributor for $SECTION/$PAGE"
+                FAILED=$((FAILED + 1))
+              fi
+            fi
+
+            # Brief delay to avoid rate limiting (GitHub API allows 5000 req/hr authenticated)
+            # With delay: ~720 pages/hr (well within limits)
+            sleep 5
+
+            echo ""
+          done < /tmp/content-files.txt
+
+          echo "=========================================="
+          echo "Processing complete!"
+          echo "Total pages: $TOTAL"
+          echo "Succeeded: $SUCCEEDED"
+          echo "Failed: $FAILED"
+          echo "=========================================="
+
+          # Exit with error if any failed (unless dry run)
+          if [ "$DRY_RUN" = "false" ] && [ $FAILED -gt 0 ]; then
+            exit 1
+          fi
+
+      - name: Create summary
+        if: always()
+        run: |
+          TOTAL=$(wc -l < /tmp/content-files.txt)
+
+          echo "## Bulk Top Contributor Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total pages processed:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "**Mode:** Dry run (no updates made)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Mode:** Live update" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Top contributor issues have been created/updated for all content pages." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "These issues are used by the StarContributor component to display the top contributor badge on each page." >> $GITHUB_STEP_SUMMARY

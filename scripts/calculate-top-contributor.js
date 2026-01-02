@@ -105,7 +105,6 @@ async function calculateTopContributor(owner, repo, sectionId, pageId, contentPa
     // Calculate contributor scores
     console.log('[TopContributor] Calculating scores...');
     const contributorScores = {};
-    const contributorStats = {};
 
     // Get repository owner to exclude their commits
     const { data: repoData } = await octokit.rest.repos.get({ owner, repo });
@@ -115,7 +114,7 @@ async function calculateTopContributor(owner, repo, sectionId, pageId, contentPa
       const username = commit.author.username;
       const userId = commit.author.userId;
 
-      // Skip repository owner commits
+      // Skip repository owner commits (owner contributions don't count)
       if (username === repoOwner) {
         console.log(`[TopContributor] Skipping repository owner commit: ${commit.sha.substring(0, 7)}`);
         return;
@@ -158,7 +157,7 @@ async function calculateTopContributor(owner, repo, sectionId, pageId, contentPa
     const contributors = Object.values(contributorScores);
 
     if (contributors.length === 0) {
-      console.log('[TopContributor] No valid contributors found - returning null');
+      console.log('[TopContributor] No community contributors found (only owner commits) - returning null');
       return null;
     }
 
@@ -174,6 +173,7 @@ async function calculateTopContributor(owner, repo, sectionId, pageId, contentPa
       username: topContributor.username,
       userId: topContributor.userId,
       score: Math.round(topContributor.score * 100) / 100, // Round to 2 decimal places
+      updatedAt: new Date().toISOString(),
     };
   } catch (error) {
     console.error('[TopContributor] Failed to calculate top contributor:', error);

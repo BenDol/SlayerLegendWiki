@@ -54,6 +54,7 @@ jobs:
 
             const CACHE_ISSUE_TITLE = '[Cache] Contributor Highscore';
             const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
+            const GITHUB_ACTIONS_BOT = 'github-actions[bot]';
 
             // Read wiki config to get the configured branch
             let configuredBranch = 'main'; // default
@@ -233,9 +234,14 @@ jobs:
               const anonymousMap = new Map(); // Anonymous contributors keyed by hashed email
 
               contributors.forEach(contributor => {
-                // Skip bot account - its contributions will be attributed to anonymous users
+                // Skip bot accounts - wiki bot's contributions will be attributed to anonymous users
                 if (contributor.login === BOT_USERNAME) {
                   console.log(`   ⏭️  Skipping bot account: ${BOT_USERNAME} (will process as anonymous)`);
+                  return;
+                }
+                // Skip GitHub Actions bot - automated commits shouldn't count in highscores
+                if (contributor.login === GITHUB_ACTIONS_BOT) {
+                  console.log(`   ⏭️  Skipping GitHub Actions bot: ${GITHUB_ACTIONS_BOT}`);
                   return;
                 }
 
@@ -363,6 +369,11 @@ jobs:
                     const stats = getContentFileStats(detailedCommit);
                     const additions = stats.additions;
                     const deletions = stats.deletions;
+
+                    // Skip GitHub Actions bot commits
+                    if (login === GITHUB_ACTIONS_BOT) {
+                      continue;
+                    }
 
                     // Check if this is a bot commit (anonymous contribution)
                     if (login === BOT_USERNAME) {
@@ -688,6 +699,11 @@ jobs:
                   const additions = stats.additions;
                   const deletions = stats.deletions;
 
+                  // Skip GitHub Actions bot commits
+                  if (login === GITHUB_ACTIONS_BOT) {
+                    continue;
+                  }
+
                   // Check if this is a bot commit (anonymous contribution)
                   if (login === BOT_USERNAME) {
                     // Skip if this commit is from a linked PR (already attributed to authenticated user)
@@ -961,6 +977,9 @@ jobs:
 
                 // Skip commits without a GitHub user (e.g., local git commits)
                 if (!login) continue;
+
+                // Skip bot accounts
+                if (login === BOT_USERNAME || login === GITHUB_ACTIONS_BOT) continue;
 
                 // Use user ID as key (permanent), fallback to login for local commits
                 const key = userId ? userId.toString() : `legacy:${login}`;
