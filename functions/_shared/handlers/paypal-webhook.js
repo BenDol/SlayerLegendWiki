@@ -401,6 +401,7 @@ export async function handlePayPalWebhook(adapter, configAdapter) {
 
     logger.info('Donator badge assigned successfully', {
       username: githubUsername,
+      userId,
       transactionId: resource.id,
     });
 

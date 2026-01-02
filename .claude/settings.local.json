@@ -217,15 +217,7 @@
       "Bash(if [ -d \"C:/Projects/slayerlegend/wiki/public/content\" ])",
       "Bash(then echo \"Directory exists\")",
       "Bash(else echo \"Directory does NOT exist\")",
-      "Bash(npm run prebuild:*)",
-      "Bash(Get-Content \"game-assets/images/image-index.json\")",
-      "Bash(Select-String -Pattern '\"\"path\"\":')",
-      "Bash(Select-String -Pattern \"DynamicPageLoader|Failed to load|404|Page not found\" -Context 2,2)",
-      "Bash(Select-String -Pattern \"SpiritSprite|sprite|image|error|Error|ERROR\" -Context 2,2)",
-      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\.wrangler\\\\server.log\" -Tail 100)",
-      "Bash(Select-String -Pattern \"sprite|image|error|Error|ERROR\" -Context 2,2)",
-      "Bash(Select-String -Pattern \"soul|gem|engraving|404\" -Context 1,1)",
-      "Bash(Select-String -Pattern \"soul|gem|engraving|SoulWeapon\" -Context 1,1)"
+      "Bash(npm run prebuild:*)"
     ]
   }
 }

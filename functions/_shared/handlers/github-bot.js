@@ -319,6 +319,8 @@ export async function handleGithubBot(adapter, configAdapter, cryptoAdapter) {
         return await handleCreateAdminIssue(adapter, octokit, body);
       case 'update-admin-issue':
         return await handleUpdateAdminIssue(adapter, octokit, body);
+      case 'update-top-contributor':
+        return await handleUpdateTopContributor(adapter, octokit, body);
       case 'create-issue-report':
         return await handleCreateIssueReport(adapter, octokit, body);
       case 'save-user-snapshot':
@@ -737,6 +739,68 @@ async function handleUpdateAdminIssue(octokit, { owner, repo, issueNumber, body,
       },
     }),
   };
+}
+
+/**
+ * Update top contributor for a page (called by GitHub Action)
+ * Required: owner, repo, sectionId, pageId, contributorData
+ */
+async function handleUpdateTopContributor(adapter, octokit, { owner, repo, sectionId, pageId, contributorData }) {
+  if (!owner || !repo || !sectionId || !pageId || !contributorData) {
+    return adapter.createJsonResponse(
+      { error: 'Missing required fields: owner, repo, sectionId, pageId, contributorData' },
+      { status: 400 }
+    );
+  }
+
+  if (!contributorData.username || !contributorData.userId || contributorData.score === undefined) {
+    return adapter.createJsonResponse(
+      { error: 'contributorData must contain username, userId, and score' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // Import admin service dynamically
+    const adminModule = await import('github-wiki-framework/src/services/github/admin.js');
+
+    // Load wiki config
+    const configModule = await import('github-wiki-framework/src/config/wikiConfig.js');
+    const config = configModule.default || configModule;
+
+    // Update top contributor via admin service
+    const result = await adminModule.updateTopContributor(
+      owner,
+      repo,
+      sectionId,
+      pageId,
+      contributorData,
+      config
+    );
+
+    logger.info('Updated top contributor', {
+      section: sectionId,
+      page: pageId,
+      username: contributorData.username,
+      score: contributorData.score
+    });
+
+    return adapter.createJsonResponse({
+      success: true,
+      topContributor: result,
+    });
+  } catch (error) {
+    logger.error('Failed to update top contributor', {
+      error: error.message,
+      section: sectionId,
+      page: pageId
+    });
+
+    return adapter.createJsonResponse(
+      { error: `Failed to update top contributor: ${error.message}` },
+      { status: 500 }
+    );
+  }
 }
 
 /**

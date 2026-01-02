@@ -166,7 +166,7 @@ const SkillSlot = ({
         {/* Skill Icon with Rarity Glow */}
         <div className={`absolute inset-0 rounded-lg overflow-hidden border-2 ${gradeColors.border} ${gradeColors.glow}`}>
           <img
-            src={skill.icon || resolveImagePath('skills/skill_deam.png')}
+            src={resolveImagePath(skill.icon || 'skills/skill_deam.png')}
             alt={skill.name}
             className="not-prose block w-full h-full object-contain m-0"
             onError={(e) => {
