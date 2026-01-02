@@ -21,6 +21,7 @@ import { serializeBuild, deserializeBuild, serializeBuildForSharing } from '../u
 import { serializeLoadoutForStorage, serializeLoadoutForSharing, deserializeSoulWeaponBuild } from '../utils/battleLoadoutSerializer';
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 import { createLogger } from '../utils/logger';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('BattleLoadouts');
 
@@ -2070,11 +2071,11 @@ const SoulWeaponSection = ({ soulWeaponBuild, onEdit, onClear, allWeapons }) => 
                 <div className="flex justify-center mb-2.5">
                   <div className="relative w-[72px] h-[72px] bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg border-2 border-purple-400/50 dark:border-purple-500/50 p-1 shadow-lg">
                     <img
-                      src={weapon.image}
+                      src={resolveImagePath(weapon.image)}
                       alt={weapon.name}
                       className="w-full h-full object-contain"
                       onError={(e) => {
-                        e.target.src = '/images/content/equipment/weapons/sword_201.png';
+                        e.target.src = resolveImagePath('equipment/weapons/sword_201.png');
                       }}
                     />
                     {/* Weapon Name Overlay */}

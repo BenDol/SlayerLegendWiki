@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, X, Settings, Move, Save } from 'lucide-react';
 import SpiritSprite from './SpiritSprite';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * SpiritSlot Component
@@ -66,12 +67,12 @@ const SpiritSlot = ({
 
   // Element icon mapping
   const elementIcons = {
-    Fire: '/images/content/icons/typeicon_fire_1.png',
-    Water: '/images/content/icons/typeicon_water_1.png',
-    Wind: '/images/content/icons/typeicon_wind_1.png',
-    Earth: '/images/content/icons/typeicon_earth s_1.png',
-    Light: '/images/content/icons/typeicon_random_1.png',
-    Dark: '/images/content/icons/typeicon_random_1.png',
+    Fire: resolveImagePath('icons/typeicon_fire_1.png'),
+    Water: resolveImagePath('icons/typeicon_water_1.png'),
+    Wind: resolveImagePath('icons/typeicon_wind_1.png'),
+    Earth: resolveImagePath('icons/typeicon_earth s_1.png'),
+    Light: resolveImagePath('icons/typeicon_random_1.png'),
+    Dark: resolveImagePath('icons/typeicon_random_1.png'),
   };
 
   // Calculate effective evolution level
@@ -320,7 +321,7 @@ const SpiritSlot = ({
                     {Array.from({ length: 5 }).map((_, index) => (
                       <img
                         key={index}
-                        src="/images/content/other/Star_1.png"
+                        src={resolveImagePath('other/Star_1.png')}
                         alt="star"
                         className={`w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 ${index < awakeningStars ? 'opacity-100' : 'opacity-20'}`}
                       />
@@ -330,7 +331,7 @@ const SpiritSlot = ({
 
                 {/* Element Icon Overlay */}
                 <img
-                  src={elementIcons[spirit.element] || '/images/content/icons/typeicon_random_1.png'}
+                  src={elementIcons[spirit.element] || resolveImagePath('icons/typeicon_random_1.png')}
                   alt={spirit.element}
                   className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 drop-shadow-lg z-10"
                   title={spirit.element}

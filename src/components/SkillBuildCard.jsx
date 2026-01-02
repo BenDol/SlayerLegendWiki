@@ -7,6 +7,7 @@ import { getLoadDataEndpoint } from '../utils/apiEndpoints';
 import { getSkillGradeColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
 import { getCache, setCache } from '../utils/buildCache';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('SkillBuildCard');
 
@@ -235,10 +236,10 @@ const SkillBuildCard = ({ identifier, mode = 'detailed', showActions = true }) =
   // Get element icon
   const getElementIcon = (element) => {
     const icons = {
-      Fire: '/images/content/icons/typeicon_fire_1.png',
-      Water: '/images/content/icons/typeicon_water_1.png',
-      Wind: '/images/content/icons/typeicon_wind_1.png',
-      Earth: '/images/content/icons/typeicon_earth s_1.png'
+      Fire: resolveImagePath('icons/typeicon_fire_1.png'),
+      Water: resolveImagePath('icons/typeicon_water_1.png'),
+      Wind: resolveImagePath('icons/typeicon_wind_1.png'),
+      Earth: resolveImagePath('icons/typeicon_earth s_1.png')
     };
     return icons[element];
   };
@@ -387,7 +388,7 @@ const SkillBuildCard = ({ identifier, mode = 'detailed', showActions = true }) =
               {Object.entries(getElementDistribution()).map(([element, count]) => (
                 <div key={element} className="flex items-center gap-1.5" title={element}>
                   <img
-                    src={getElementIcon(element)}
+                    src={resolveImagePath(getElementIcon(element))}
                     alt={element}
                     className="w-4 h-4"
                   />
@@ -413,7 +414,7 @@ const SkillBuildCard = ({ identifier, mode = 'detailed', showActions = true }) =
                 {Object.entries(getElementDistribution()).map(([element, count]) => (
                   <div key={element} className="flex items-center gap-1.5" title={element}>
                     <img
-                      src={getElementIcon(element)}
+                      src={resolveImagePath(getElementIcon(element))}
                       alt={element}
                       className="w-4 h-4"
                     />

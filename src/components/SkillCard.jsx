@@ -1,6 +1,7 @@
 import React from 'react';
 import { getSkillImage, getGenericSkillIcon, getElementIcon } from '../services/imageService';
 import { getGradeBackgroundColor } from '../config/rarityColors';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * SkillCard component - Displays skill information in a card format
@@ -91,7 +92,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
 
   const attributeGradient = attributeColors[skillData.attribute] || 'from-gray-500 to-gray-600';
   const gradeColor = getGradeBackgroundColor(skillData.grade);
-  const skillIcon = skillData.icon || getGenericSkillIcon();
+  const skillIcon = resolveImagePath(skillData.icon || getGenericSkillIcon());
 
   // Calculate damage at max level
   const maxLevelDamage = skillData.baseValue + (skillData.upgradeValue * (skillData.maxLevel - 1));
@@ -105,7 +106,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
           src={skillIcon}
           alt={skillData.name}
           className="w-8 h-8 rounded bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 p-0.5 m-0"
-          onError={(e) => { e.target.src = getGenericSkillIcon(); }}
+          onError={(e) => { e.target.src = resolveImagePath(getGenericSkillIcon()); }}
         />
 
         {/* Info */}
@@ -125,7 +126,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
 
         {/* Attribute Icon */}
         <img
-          src={getElementIcon(skillData.attribute)}
+          src={resolveImagePath(getElementIcon(skillData.attribute))}
           alt={skillData.attribute}
           title={skillData.attribute}
           className="w-5 h-5 flex-shrink-0"
@@ -145,7 +146,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
               src={skillIcon}
               alt={skillData.name}
               className="w-14 h-14 rounded-lg bg-white/10 backdrop-blur-sm p-1 border border-white/20"
-              onError={(e) => { e.target.src = getGenericSkillIcon(); }}
+              onError={(e) => { e.target.src = resolveImagePath(getGenericSkillIcon()); }}
             />
 
             {/* Skill Info */}
@@ -160,7 +161,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
                 {skillData.grade}
               </span>
               <img
-                src={getElementIcon(skillData.attribute)}
+                src={resolveImagePath(getElementIcon(skillData.attribute))}
                 alt={skillData.attribute}
                 title={skillData.attribute}
                 className="w-6 h-6"
@@ -266,7 +267,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
             src={skillIcon}
             alt={skillData.name}
             className="w-12 h-12 rounded-lg bg-white/10 backdrop-blur-sm p-1 border border-white/20"
-            onError={(e) => { e.target.src = getGenericSkillIcon(); }}
+            onError={(e) => { e.target.src = resolveImagePath(getGenericSkillIcon()); }}
           />
 
           {/* Skill Info */}
@@ -281,7 +282,7 @@ const SkillCard = ({ id, name, skill, mode = 'detailed' }) => {
               {skillData.grade}
             </span>
             <img
-              src={getElementIcon(skillData.attribute)}
+              src={resolveImagePath(getElementIcon(skillData.attribute))}
               alt={skillData.attribute}
               title={skillData.attribute}
               className="w-6 h-6"

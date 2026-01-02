@@ -11,6 +11,7 @@ const CACHE_TTL = 3600000; // 1 hour in milliseconds
 
 // Cache for wiki config
 let wikiConfig = null;
+let wikiConfigPromise = null;
 
 /**
  * Load and cache wiki-config.json
@@ -19,15 +20,24 @@ let wikiConfig = null;
 async function loadWikiConfig() {
   if (wikiConfig) return wikiConfig;
 
-  try {
-    const response = await fetch('/wiki-config.json');
-    if (!response.ok) throw new Error(`Failed to load wiki-config: ${response.status}`);
-    wikiConfig = await response.json();
-    return wikiConfig;
-  } catch (err) {
-    logger.error('Failed to load wiki-config', { error: err });
-    return null;
-  }
+  // If already loading, return the existing promise to avoid race conditions
+  if (wikiConfigPromise) return wikiConfigPromise;
+
+  // Start loading and cache the promise
+  wikiConfigPromise = (async () => {
+    try {
+      const response = await fetch('/wiki-config.json');
+      if (!response.ok) throw new Error(`Failed to load wiki-config: ${response.status}`);
+      wikiConfig = await response.json();
+      return wikiConfig;
+    } catch (err) {
+      logger.error('Failed to load wiki-config', { error: err });
+      wikiConfigPromise = null; // Clear promise on error so it can retry
+      return null;
+    }
+  })();
+
+  return wikiConfigPromise;
 }
 
 /**
@@ -141,19 +151,19 @@ async function loadImageIndex() {
 }
 
 /**
- * Get element type icon path
+ * Get element type icon path (relative path without /images/content/ prefix)
  * @param {string} element - Element name (Fire, Water, Wind, Earth)
- * @returns {string} Path to element icon
+ * @returns {string} Relative path to element icon
  */
 export function getElementIcon(element) {
   const elementMap = {
-    Fire: '/images/content/icons/typeicon_fire_1.png',
-    Water: '/images/content/icons/typeicon_water_1.png',
-    Wind: '/images/content/icons/typeicon_wind_1.png',
-    Earth: '/images/content/icons/typeicon_earth s_1.png',
+    Fire: 'icons/typeicon_fire_1.png',
+    Water: 'icons/typeicon_water_1.png',
+    Wind: 'icons/typeicon_wind_1.png',
+    Earth: 'icons/typeicon_earth s_1.png',
   };
 
-  return elementMap[element] || '/images/content/skills/Icon_skillCard.png';
+  return elementMap[element] || 'skills/Icon_skillCard.png';
 }
 
 /**
@@ -179,12 +189,12 @@ export async function getSkillImage(skillName, attribute) {
         const keywords = image.keywords.map(k => k.toLowerCase().replace(/\s+/g, ''));
 
         if (filename.includes(searchTerm) || keywords.some(k => k.includes(searchTerm))) {
-          // Convert CDN path to wiki path
+          // Convert CDN path to relative path (without /images/content/ prefix)
           // CDN: basePath + image.path (e.g., "/images" + "/icons/fire.png" = "/images/icons/fire.png")
-          // Wiki: /images/content/icons/fire.png (strip /images/, prepend /images/content/)
+          // Return relative path: icons/fire.png
           const cdnPath = basePath + image.path;
-          const relativePath = cdnPath.replace(/^\/images\//, '/');
-          return `/images/content${relativePath}`;
+          const relativePath = cdnPath.replace(/^\/images\//, '');
+          return relativePath;
         }
       }
     }
@@ -195,11 +205,11 @@ export async function getSkillImage(skillName, attribute) {
 }
 
 /**
- * Get skill card icon (generic)
- * @returns {string} Path to generic skill card icon
+ * Get skill card icon (generic) - relative path without /images/content/ prefix
+ * @returns {string} Relative path to generic skill card icon
  */
 export function getGenericSkillIcon() {
-  return '/images/content/skills/Icon_skillCard.png';
+  return 'skills/Icon_skillCard.png';
 }
 
 /**
@@ -214,57 +224,19 @@ export function preloadImages(imagePaths) {
 }
 
 /**
- * Get all element icons for preloading
- * @returns {Array<string>} Array of element icon paths
+ * Get all element icons for preloading (relative paths without /images/content/ prefix)
+ * @returns {Array<string>} Array of element icon relative paths
  */
 export function getAllElementIcons() {
   return [
-    '/images/content/icons/typeicon_fire_1.png',
-    '/images/content/icons/typeicon_water_1.png',
-    '/images/content/icons/typeicon_wind_1.png',
-    '/images/content/icons/typeicon_earth s_1.png',
-    '/images/content/skills/Icon_skillCard.png',
+    'icons/typeicon_fire_1.png',
+    'icons/typeicon_water_1.png',
+    'icons/typeicon_wind_1.png',
+    'icons/typeicon_earth s_1.png',
+    'skills/Icon_skillCard.png',
   ];
 }
 
-/**
- * Convert /images/content/* path to full CDN URL
- * @param {string} imagePath - Relative path starting with /images/content/
- * @returns {Promise<string>} Full CDN URL or original path if CDN not configured
- */
-export async function resolveImageUrl(imagePath) {
-  // Only process /images/content/* paths
-  if (!imagePath || !imagePath.startsWith('/images/content/')) {
-    return imagePath;
-  }
-
-  // Get CDN base URL from config
-  const cdnBaseUrl = await getCdnBaseUrl();
-
-  if (!cdnBaseUrl) {
-    // CDN not configured, return original path (for local dev fallback)
-    logger.debug('CDN not configured, using original path', { imagePath });
-    return imagePath;
-  }
-
-  // Extract path after /images/content/ (e.g., /images/content/icons/fire.png → icons/fire.png)
-  const relativePath = imagePath.replace('/images/content/', '');
-
-  // Construct full CDN URL with /images/ prefix
-  // CDN structure: <base>/game-assets/images/icons/fire.png
-  // Note: Don't manually encode - browser handles URL encoding automatically
-  const cdnUrl = `${cdnBaseUrl}/images/${relativePath}`;
-
-  logger.debug('Resolved image URL', { imagePath, cdnUrl });
-
-  return cdnUrl;
-}
-
-/**
- * Resolve multiple image URLs at once
- * @param {Array<string>} imagePaths - Array of image paths
- * @returns {Promise<Array<string>>} Array of resolved CDN URLs
- */
-export async function resolveImageUrls(imagePaths) {
-  return Promise.all(imagePaths.map(path => resolveImageUrl(path)));
-}
+// NOTE: resolveImageUrl() and resolveImageUrls() have been removed.
+// Use resolveImagePath() from src/utils/imageResolver.js instead.
+// The new resolver is synchronous and uses preloaded config for better performance.

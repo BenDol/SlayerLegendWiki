@@ -10,6 +10,7 @@ import { getUserLoadouts } from '../services/battleLoadouts';
 import { getSkillGradeColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
 import SkillStone from './SkillStone';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('SavedBuildsPanel');
 
@@ -691,7 +692,7 @@ const SavedBuildsPanel = ({
                               className={`w-6 h-6 rounded border ${gradeColors.border} ${gradeColors.glow} overflow-hidden`}
                             >
                               <img
-                                src={skill.icon}
+                                src={resolveImagePath(skill.icon)}
                                 alt={skill.name}
                                 className="w-full h-full object-contain"
                               />

@@ -433,11 +433,11 @@
       }
     },
     "maintenance": {
-      "enabled": true,
+      "enabled": false,
       "title": "Maintenance in Progress",
       "message": "We're currently performing scheduled maintenance to improve your experience.",
       "details": null,
-      "estimatedReturn": "2026-01-02T04:10:00.200Z",
+      "estimatedReturn": null,
       "contactEmail": null,
       "showContactInfo": false,
       "allowAdminBypass": true,

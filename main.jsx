@@ -499,14 +499,34 @@ const baseRoutes = [
 
 registerCustomRoutes(baseRoutes);
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <ErrorBoundary>
-        <AppWrapper>
-          <App />
-        </AppWrapper>
-      </ErrorBoundary>
-    </HelmetProvider>
-  </React.StrictMode>,
-);
+// Preload image config for synchronous image resolution
+import { preloadImageConfig } from './wiki-framework/src/utils/imageResolver.js';
+
+// Preload config before rendering app for synchronous image resolution
+preloadImageConfig().then(() => {
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <HelmetProvider>
+        <ErrorBoundary>
+          <AppWrapper>
+            <App />
+          </AppWrapper>
+        </ErrorBoundary>
+      </HelmetProvider>
+    </React.StrictMode>,
+  );
+}).catch(err => {
+  // Config failed to load - render anyway with local paths as fallback
+  console.error('Failed to preload image config, using local paths:', err);
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <HelmetProvider>
+        <ErrorBoundary>
+          <AppWrapper>
+            <App />
+          </AppWrapper>
+        </ErrorBoundary>
+      </HelmetProvider>
+    </React.StrictMode>,
+  );
+});

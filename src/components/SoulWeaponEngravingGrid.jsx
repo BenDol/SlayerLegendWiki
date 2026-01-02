@@ -1,5 +1,6 @@
 import React from 'react';
 import EngravingPiece from './EngravingPiece';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * SoulWeaponEngravingGrid Component
@@ -112,7 +113,7 @@ const SoulWeaponEngravingGrid = ({
           }}
         >
           <img
-            src={selectedWeapon.image}
+            src={resolveImagePath(selectedWeapon.image)}
             alt=""
             className="w-full h-full object-contain p-4"
             style={{

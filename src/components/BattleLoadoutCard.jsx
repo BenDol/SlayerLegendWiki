@@ -17,6 +17,7 @@ import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints'
 import { getSkillGradeColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
 import { getCache, setCache } from '../utils/buildCache';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('BattleLoadoutCard');
 
@@ -559,7 +560,7 @@ const CompactLoadout = ({ loadout, weapons, skillStonesData }) => {
                 <div key={idx} className="relative">
                   {slot.skill ? (
                     <div className={`w-full aspect-square rounded border ${getSkillGradeColor(slot.skill.grade).border} overflow-hidden`}>
-                      <img src={slot.skill.icon} alt={slot.skill.name} className="w-full h-full object-contain" title={slot.skill.name} />
+                      <img src={resolveImagePath(slot.skill.icon)} alt={slot.skill.name} className="w-full h-full object-contain" title={slot.skill.name} />
                     </div>
                   ) : (
                     <div className="w-full aspect-square bg-gray-100 dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600"></div>
@@ -607,11 +608,11 @@ const CompactLoadout = ({ loadout, weapons, skillStonesData }) => {
               <div className="flex-shrink-0">
                 <div className="relative w-10 h-10 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded border border-purple-400/50 dark:border-purple-500/50 p-0.5">
                   <img
-                    src={weapon.image}
+                    src={resolveImagePath(weapon.image)}
                     alt={weapon.name}
                     className="w-full h-full object-contain"
                     onError={(e) => {
-                      e.target.src = '/images/content/equipment/weapons/sword_201.png';
+                      e.target.src = resolveImagePath('equipment/weapons/sword_201.png');
                     }}
                   />
                   {/* Name Tag Overlay */}
@@ -745,11 +746,11 @@ const DetailedLoadout = ({ loadout, weapons, skillStonesData }) => {
                 <div className="flex justify-center">
                   <div className="relative w-14 h-14 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg border-2 border-purple-400/50 dark:border-purple-500/50 p-1">
                     <img
-                      src={weapon.image}
+                      src={resolveImagePath(weapon.image)}
                       alt={weapon.name}
                       className="w-full h-full object-contain"
                       onError={(e) => {
-                        e.target.src = '/images/content/equipment/weapons/sword_201.png';
+                        e.target.src = resolveImagePath('equipment/weapons/sword_201.png');
                       }}
                     />
                     {/* Name Tag Overlay */}
@@ -904,11 +905,11 @@ const AdvancedLoadout = ({ loadout, weapons, skillStonesData }) => {
                 <div className="flex justify-center">
                   <div className="relative w-[72px] h-[72px] bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg border-2 border-purple-400/50 dark:border-purple-500/50 p-1 shadow-lg">
                     <img
-                      src={weapon.image}
+                      src={resolveImagePath(weapon.image)}
                       alt={weapon.name}
                       className="w-full h-full object-contain"
                       onError={(e) => {
-                        e.target.src = '/images/content/equipment/weapons/sword_201.png';
+                        e.target.src = resolveImagePath('equipment/weapons/sword_201.png');
                       }}
                     />
                     {/* Name Tag Overlay */}

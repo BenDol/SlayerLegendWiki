@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * SkillInformation Modal Component
@@ -35,10 +36,10 @@ const SkillInformation = ({ skill, isOpen, onClose }) => {
   // Get element icon
   const getElementIcon = (element) => {
     const icons = {
-      Fire: '/images/content/icons/typeicon_fire_1.png',
-      Water: '/images/content/icons/typeicon_water_1.png',
-      Wind: '/images/content/icons/typeicon_wind_1.png',
-      Earth: '/images/content/icons/typeicon_earth s_1.png'
+      Fire: resolveImagePath('icons/typeicon_fire_1.png'),
+      Water: resolveImagePath('icons/typeicon_water_1.png'),
+      Wind: resolveImagePath('icons/typeicon_wind_1.png'),
+      Earth: resolveImagePath('icons/typeicon_earth s_1.png')
     };
     return icons[element];
   };
@@ -94,11 +95,11 @@ const SkillInformation = ({ skill, isOpen, onClose }) => {
             {skill.icon && (
               <div className="flex-shrink-0 aspect-square w-16 sm:w-20 rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 overflow-hidden">
                 <img
-                  src={skill.icon}
+                  src={resolveImagePath(skill.icon)}
                   alt={skill.name}
                   className="w-full h-full object-contain"
                   onError={(e) => {
-                    e.target.src = '/images/content/skills/skill_deam.png';
+                    e.target.src = resolveImagePath('skills/skill_deam.png');
                   }}
                 />
               </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * EngravingPiece Component
@@ -175,7 +176,7 @@ const EngravingPiece = ({
 
       {/* Draw gems at each filled cell */}
       {filledCells.map((filledCell) => {
-        const imageSrc = `/images/content/equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`;
+        const imageSrc = resolveImagePath(`equipment/soul-weapons/SoulGem_${rarityImageName}_Base.png`);
 
         return (
           <div

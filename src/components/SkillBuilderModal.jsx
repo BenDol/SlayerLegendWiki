@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { X, Check } from 'lucide-react';
 import SkillBuilder from './SkillBuilder';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * Modal wrapper for Skill Builder
@@ -84,7 +85,7 @@ const SkillBuilderModal = ({ isOpen, onClose, initialBuild = null, onSave }) => 
         {/* Fixed Header with title and close button */}
         <div className="flex-shrink-0 flex items-center justify-between p-4 bg-gray-900 md:rounded-t-lg border-b border-blue-900">
           <div className="flex items-center gap-3">
-            <img src="/images/content/skills/Icon_skillCard.png" alt="" className="w-6 h-6" />
+            <img src={resolveImagePath('skills/Icon_skillCard.png')} alt="" className="w-6 h-6" />
             <h2 className="text-xl font-bold text-white">Skill Builder</h2>
           </div>
           <button

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Search } from 'lucide-react';
 import SpiritSprite from './SpiritSprite';
 import { createLogger } from '../utils/logger';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('SpiritSelector');
 
@@ -24,12 +25,12 @@ const SpiritSelector = ({ isOpen, onClose, onSelectSpirit, currentBuild = null }
 
   // Element icon mapping
   const elementIcons = {
-    Fire: '/images/content/icons/typeicon_fire_1.png',
-    Water: '/images/content/icons/typeicon_water_1.png',
-    Wind: '/images/content/icons/typeicon_wind_1.png',
-    Earth: '/images/content/icons/typeicon_earth s_1.png',
-    Light: '/images/content/icons/typeicon_random_1.png',
-    Dark: '/images/content/icons/typeicon_random_1.png',
+    Fire: resolveImagePath('icons/typeicon_fire_1.png'),
+    Water: resolveImagePath('icons/typeicon_water_1.png'),
+    Wind: resolveImagePath('icons/typeicon_wind_1.png'),
+    Earth: resolveImagePath('icons/typeicon_earth s_1.png'),
+    Light: resolveImagePath('icons/typeicon_random_1.png'),
+    Dark: resolveImagePath('icons/typeicon_random_1.png'),
   };
 
   useEffect(() => {
@@ -176,7 +177,7 @@ const SpiritSelector = ({ isOpen, onClose, onSelectSpirit, currentBuild = null }
 
                         {/* Element Icon Overlay */}
                         <img
-                          src={elementIcons[spirit.element] || '/images/content/icons/typeicon_random_1.png'}
+                          src={elementIcons[spirit.element] || resolveImagePath('icons/typeicon_random_1.png')}
                           alt={spirit.element}
                           className="absolute -top-1 -right-1 w-6 h-6 drop-shadow-lg z-10"
                           title={spirit.element}

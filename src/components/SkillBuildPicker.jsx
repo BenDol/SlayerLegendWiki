@@ -5,6 +5,7 @@ import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { getLoadDataEndpoint } from '../utils/apiEndpoints';
 import { getSkillGradeColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('SkillBuildPicker');
 
@@ -395,7 +396,7 @@ const SkillBuildPicker = ({ isOpen, onClose, onSelect, renderPreview = null }) =
                                   title={skill.name}
                                 >
                                   <img
-                                    src={skill.icon}
+                                    src={resolveImagePath(skill.icon)}
                                     alt={skill.name}
                                     className="w-full h-full object-contain"
                                   />

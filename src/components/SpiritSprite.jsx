@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import spiritData from '../../public/data/spirit-characters.json';
 import { cacheName } from '../../wiki-framework/src/utils/storageManager';
 import { createLogger } from '../utils/logger';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('SpiritSprite');
 
@@ -256,6 +257,9 @@ const getCachedImage = (spiritId, level, frameNumber, framePath) => {
 
   // Not in cache or expired - fetch the image
   return new Promise((resolve) => {
+    // Resolve the CDN URL first
+    const resolvedUrl = resolveImagePath(framePath);
+
     const img = new Image();
     img.onload = () => {
       // Check cache size and cleanup if needed
@@ -279,7 +283,7 @@ const getCachedImage = (spiritId, level, frameNumber, framePath) => {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = framePath;
+    img.src = resolvedUrl;
 
     // Timeout fallback
     setTimeout(() => {
@@ -697,11 +701,11 @@ const SpiritSprite = ({
           {/* Show image only after frame detection completes and we have valid frames */}
           {framesDetected && validFrames.length > 0 && (
             <img
-              src={getCurrentFramePath()}
+              src={resolveImagePath(getCurrentFramePath())}
               alt={`${spirit.name} - Level ${level} - Frame ${currentFrame}`}
               className="w-full h-full object-contain object-center"
               onError={(e) => {
-                e.target.src = '/images/content/placeholder-spirit.png'; // Fallback image
+                e.target.src = resolveImagePath('placeholder-spirit.png'); // Fallback image
               }}
             />
           )}

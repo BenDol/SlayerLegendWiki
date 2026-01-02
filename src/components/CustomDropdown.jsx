@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Loader } from 'lucide-react';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * CustomDropdown Component
@@ -149,7 +150,7 @@ const CustomDropdown = ({
           {selectedOption?.image && (
             <div className="relative w-6 h-6 flex-shrink-0">
               <img
-                src={selectedOption.image}
+                src={resolveImagePath(selectedOption.image)}
                 alt=""
                 className="w-full h-full object-contain"
                 onLoad={() => handleImageLoad(selectedOption.image)}
@@ -210,7 +211,7 @@ const CustomDropdown = ({
                       </div>
                     )}
                     <img
-                      src={option.image}
+                      src={resolveImagePath(option.image)}
                       alt=""
                       className="w-full h-full object-contain"
                       onLoad={() => handleImageLoad(option.image)}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Search } from 'lucide-react';
 import { getSkillGradeColor } from '../config/rarityColors';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * SkillSelector Component
@@ -76,10 +77,10 @@ const SkillSelector = ({ isOpen, onClose, onSelectSkill, skills, currentBuild })
   // Get element icon
   const getElementIcon = (element) => {
     const icons = {
-      Fire: '/images/content/icons/typeicon_fire_1.png',
-      Water: '/images/content/icons/typeicon_water_1.png',
-      Wind: '/images/content/icons/typeicon_wind_1.png',
-      Earth: '/images/content/icons/typeicon_earth s_1.png'
+      Fire: resolveImagePath('icons/typeicon_fire_1.png'),
+      Water: resolveImagePath('icons/typeicon_water_1.png'),
+      Wind: resolveImagePath('icons/typeicon_wind_1.png'),
+      Earth: resolveImagePath('icons/typeicon_earth s_1.png')
     };
     return icons[element];
   };
@@ -136,7 +137,7 @@ const SkillSelector = ({ isOpen, onClose, onSelectSkill, skills, currentBuild })
         {/* Header */}
         <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
-            <img src="/images/content/skills/Icon_skillCard.png" alt="" className="w-7 h-7 sm:w-8 sm:h-8" />
+            <img src={resolveImagePath('skills/Icon_skillCard.png')} alt="" className="w-7 h-7 sm:w-8 sm:h-8" />
             <span>Select a Skill</span>
           </h2>
           <button
@@ -236,18 +237,18 @@ const SkillSelector = ({ isOpen, onClose, onSelectSkill, skills, currentBuild })
                     {/* Skill Icon */}
                     <div className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 ${gradeColors.border} ${gradeColors.glow}`}>
                       <img
-                        src={skill.icon}
+                        src={resolveImagePath(skill.icon)}
                         alt={skill.name}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.target.src = '/images/content/skills/skill_deam.png';
+                          e.target.src = resolveImagePath('skills/skill_deam.png');
                         }}
                       />
 
                       {/* Element Icon Overlay */}
                       {getElementIcon(skill.attribute) && (
                         <img
-                          src={getElementIcon(skill.attribute)}
+                          src={resolveImagePath(getElementIcon(skill.attribute))}
                           alt={skill.attribute}
                           className="absolute -top-1 -right-1 w-7 h-7 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                         />

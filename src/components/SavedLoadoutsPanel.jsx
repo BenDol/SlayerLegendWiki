@@ -13,6 +13,7 @@ import { validateBuildName } from '../utils/validation';
 import { deserializeSoulWeaponBuild, deserializeSkillBuild } from '../utils/battleLoadoutSerializer.js';
 import { deserializeBuild as deserializeSpiritBuild } from '../utils/spiritSerialization.js';
 import SkillStone from './SkillStone';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('SavedLoadoutsPanel');
 
@@ -706,7 +707,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
                             title={spirit.name}
                           >
                             <img
-                              src={spirit.thumbnail || spirit.image}
+                              src={resolveImagePath(spirit.thumbnail || spirit.image)}
                               alt={spirit.name}
                               className="w-full h-full object-cover"
                             />
@@ -724,7 +725,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
                         title={getLoadoutWeapon(loadout).name}
                       >
                         <img
-                          src={getLoadoutWeapon(loadout).image}
+                          src={resolveImagePath(getLoadoutWeapon(loadout).image)}
                           alt={getLoadoutWeapon(loadout).name}
                           className="w-full h-full object-contain"
                         />
@@ -744,7 +745,7 @@ const SavedLoadoutsPanel = ({ currentLoadout, onLoadLoadout, currentLoadedLoadou
                             title={skill.name}
                           >
                             <img
-                              src={skill.icon}
+                              src={resolveImagePath(skill.icon)}
                               alt={skill.name}
                               className="w-full h-full object-contain"
                             />

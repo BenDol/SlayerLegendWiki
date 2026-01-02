@@ -9,6 +9,7 @@ import { useSpiritsData } from '../hooks/useSpiritsData';
 import { deserializeBuild } from '../utils/spiritSerialization';
 import { createLogger } from '../utils/logger';
 import { validateBuildName } from '../utils/validation';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('SavedSpiritBuildsPanel');
 
@@ -444,7 +445,7 @@ const SavedSpiritBuildsPanel = ({
               {Array.from({ length: 5 }).map((_, index) => (
                 <img
                   key={index}
-                  src="/images/content/other/Star_1.png"
+                  src={resolveImagePath('other/Star_1.png')}
                   alt="star"
                   className={`w-2 h-2 ${index < awakeningStars ? 'opacity-100' : 'opacity-20'}`}
                 />

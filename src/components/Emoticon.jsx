@@ -22,6 +22,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { createLogger } from '../utils/logger';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('Emoticon');
 
@@ -83,7 +84,7 @@ const Emoticon = ({ id, name, size = 'large', alt, className = '', style = {} })
 
   // Get emoticon name for alt text
   const emoticonName = EMOTICON_MAP[emoticonId];
-  const imagePath = `/images/content/emoticons/Emoticon_${emoticonId}.png`;
+  const imagePath = resolveImagePath(`emoticons/Emoticon_${emoticonId}.png`);
   const altText = alt || emoticonName;
 
   // Determine size

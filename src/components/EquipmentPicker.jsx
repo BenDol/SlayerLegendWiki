@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 import { getEquipmentRarityColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('EquipmentPicker');
 
@@ -370,7 +371,7 @@ const EquipmentPicker = ({ isOpen, onClose, onSelect, renderPreview = null }) =>
                     <div className="aspect-square p-1.5 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center justify-center">
                       {item.image && (
                         <img
-                          src={item.image}
+                          src={resolveImagePath(item.image)}
                           alt={itemName}
                           className="w-8 h-8 object-contain mb-1"
                         />
@@ -501,7 +502,7 @@ const EquipmentPicker = ({ isOpen, onClose, onSelect, renderPreview = null }) =>
                     <div className="flex items-start gap-3">
                       {selectedEquipment.image && (
                         <img
-                          src={selectedEquipment.image}
+                          src={resolveImagePath(selectedEquipment.image)}
                           alt={selectedEquipment.name || selectedEquipment.rarity}
                           className="w-20 h-20 flex-shrink-0 object-contain bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-2"
                         />

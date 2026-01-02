@@ -1,5 +1,6 @@
 import React from 'react';
 import SpiritSprite from './SpiritSprite';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * SpiritComponent - Pure display component for spirits
@@ -97,15 +98,15 @@ const SpiritComponent = ({
 
   // Element icon mapping
   const elementIcons = {
-    Fire: '/images/content/icons/typeicon_fire_1.png',
-    Water: '/images/content/icons/typeicon_water_1.png',
-    Wind: '/images/content/icons/typeicon_wind_1.png',
-    Earth: '/images/content/icons/typeicon_earth s_1.png',
-    Light: '/images/content/icons/typeicon_random_1.png', // Fallback to random icon
-    Dark: '/images/content/icons/typeicon_random_1.png', // Fallback to random icon
+    Fire: resolveImagePath('icons/typeicon_fire_1.png'),
+    Water: resolveImagePath('icons/typeicon_water_1.png'),
+    Wind: resolveImagePath('icons/typeicon_wind_1.png'),
+    Earth: resolveImagePath('icons/typeicon_earth s_1.png'),
+    Light: resolveImagePath('icons/typeicon_random_1.png'), // Fallback to random icon
+    Dark: resolveImagePath('icons/typeicon_random_1.png'), // Fallback to random icon
   };
 
-  const elementIcon = elementIcons[spirit.element] || '/images/content/icons/typeicon_random_1.png';
+  const elementIcon = elementIcons[spirit.element] || resolveImagePath('icons/typeicon_random_1.png');
 
   return (
     <div
@@ -150,7 +151,7 @@ const SpiritComponent = ({
               {Array.from({ length: 5 }).map((_, index) => (
                 <img
                   key={index}
-                  src="/images/content/other/Star_1.png"
+                  src={resolveImagePath('other/Star_1.png')}
                   alt="star"
                   className={`${sizeConfig.star} ${index < awakeningStars ? 'opacity-100' : 'opacity-20'}`}
                 />

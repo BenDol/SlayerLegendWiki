@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Lock, Plus, Move } from 'lucide-react';
 import { getSkillGradeColor } from '../config/rarityColors';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * SkillSlot Component
@@ -50,10 +51,10 @@ const SkillSlot = ({
   // Get element icon
   const getElementIcon = (element) => {
     const icons = {
-      Fire: '/images/content/icons/typeicon_fire_1.png',
-      Water: '/images/content/icons/typeicon_water_1.png',
-      Wind: '/images/content/icons/typeicon_wind_1.png',
-      Earth: '/images/content/icons/typeicon_earth s_1.png'
+      Fire: resolveImagePath('icons/typeicon_fire_1.png'),
+      Water: resolveImagePath('icons/typeicon_water_1.png'),
+      Wind: resolveImagePath('icons/typeicon_wind_1.png'),
+      Earth: resolveImagePath('icons/typeicon_earth s_1.png')
     };
     return icons[element];
   };
@@ -93,7 +94,7 @@ const SkillSlot = ({
         {/* Slot Background */}
         <div className="relative w-16 h-16 sm:w-16 sm:h-16">
           <img
-            src="/images/content/skills/skill_baseSlot_Wide.png"
+            src={resolveImagePath('skills/skill_baseSlot_Wide.png')}
             alt="Locked Slot"
             className="not-prose w-full h-full object-contain opacity-50 m-0"
           />
@@ -165,11 +166,11 @@ const SkillSlot = ({
         {/* Skill Icon with Rarity Glow */}
         <div className={`absolute inset-0 rounded-lg overflow-hidden border-2 ${gradeColors.border} ${gradeColors.glow}`}>
           <img
-            src={skill.icon || '/images/content/skills/skill_deam.png'}
+            src={skill.icon || resolveImagePath('skills/skill_deam.png')}
             alt={skill.name}
             className="not-prose block w-full h-full object-contain m-0"
             onError={(e) => {
-              e.target.src = '/images/content/skills/skill_deam.png';
+              e.target.src = resolveImagePath('skills/skill_deam.png');
             }}
           />
         </div>
@@ -177,7 +178,7 @@ const SkillSlot = ({
         {/* Element Icon Overlay - positioned outside overflow-hidden container */}
         {getElementIcon(skill.attribute) && (
           <img
-            src={getElementIcon(skill.attribute)}
+            src={resolveImagePath(getElementIcon(skill.attribute))}
             alt={skill.attribute}
             className="not-prose block absolute -top-0.5 -left-0.5 w-5 h-5 sm:w-5 sm:h-5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] pointer-events-none m-0"
           />

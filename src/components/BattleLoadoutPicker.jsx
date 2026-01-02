@@ -6,6 +6,7 @@ import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { getLoadDataEndpoint } from '../utils/apiEndpoints';
 import { getSkillGradeColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('BattleLoadoutPicker');
 
@@ -339,7 +340,7 @@ const BattleLoadoutPicker = ({ isOpen, onClose, onSelect, renderPreview = null }
                                   title={spirit.name}
                                 >
                                   <img
-                                    src={spirit.thumbnail || spirit.image}
+                                    src={resolveImagePath(spirit.thumbnail || spirit.image)}
                                     alt={spirit.name}
                                     className="w-full h-full object-cover"
                                   />
@@ -360,7 +361,7 @@ const BattleLoadoutPicker = ({ isOpen, onClose, onSelect, renderPreview = null }
                                     title={skill.name}
                                   >
                                     <img
-                                      src={skill.icon}
+                                      src={resolveImagePath(skill.icon)}
                                       alt={skill.name}
                                       className="w-full h-full object-contain"
                                     />

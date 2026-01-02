@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, ArrowLeft } from 'lucide-react';
 import SkillStone from './SkillStone';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 /**
  * SkillStoneSelector Component
@@ -129,7 +130,7 @@ const SkillStoneSelector = ({
                         <div className="flex flex-col items-center gap-3">
                           <div className="relative">
                             <img
-                              src={getElementIcon(element)}
+                              src={resolveImagePath(getElementIcon(element))}
                               alt={elementData.name}
                               className="w-20 h-20 object-contain"
                             />
@@ -208,10 +209,10 @@ const SkillStoneSelector = ({
 // Helper function to get element icon path
 const getElementIcon = (element) => {
   const iconMap = {
-    fire: '/images/content/icons/typeicon_fire_1.png',
-    water: '/images/content/icons/typeicon_water_1.png',
-    wind: '/images/content/icons/typeicon_wind_1.png',
-    earth: '/images/content/icons/typeicon_earth s_1.png'
+    fire: resolveImagePath('icons/typeicon_fire_1.png'),
+    water: resolveImagePath('icons/typeicon_water_1.png'),
+    wind: resolveImagePath('icons/typeicon_wind_1.png'),
+    earth: resolveImagePath('icons/typeicon_earth s_1.png')
   };
   return iconMap[element];
 };

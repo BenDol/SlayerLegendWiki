@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getRarityBackgroundColor, getEquipmentRarityColor } from '../config/rarityColors';
 import { createLogger } from '../utils/logger';
+import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('EquipmentCard');
 
@@ -33,9 +34,9 @@ const EquipmentCard = ({ name, id, equipment, mode = 'detailed', type = 'soul-we
     // If equipment data provided directly, use it
     if (equipment) {
       setEquipmentData(equipment);
-      // Use image directly from data
+      // Resolve image path
       if (equipment.image) {
-        setImageUrl(equipment.image);
+        setImageUrl(resolveImagePath(equipment.image));
       }
       setLoading(false);
       return;
@@ -76,9 +77,9 @@ const EquipmentCard = ({ name, id, equipment, mode = 'detailed', type = 'soul-we
         }
 
         setEquipmentData(foundEquipment);
-        // Use image directly from data
+        // Resolve image path
         if (foundEquipment.image) {
-          setImageUrl(foundEquipment.image);
+          setImageUrl(resolveImagePath(foundEquipment.image));
         }
       } catch (err) {
         logger.error('Error loading equipment:', err);
