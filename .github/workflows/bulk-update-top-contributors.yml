@@ -51,8 +51,13 @@ jobs:
 
       - name: Process all pages
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WIKI_BOT_TOKEN: ${{ secrets.WIKI_BOT_TOKEN }}
-          BOT_SERVICE_URL: ${{ vars.BOT_SERVICE_URL }}
+          WIKI_BOT_USERNAME: slayer-wiki-bot
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          CONTENT_PATH: 'public/content'
+          BOT_SERVICE_URL: ${{ vars.BOT_SERVICE_URL || secrets.BOT_SERVICE_URL }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
           TOTAL=$(wc -l < /tmp/content-files.txt)

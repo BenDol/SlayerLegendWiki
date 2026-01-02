@@ -110,9 +110,19 @@ async function calculateTopContributor(owner, repo, sectionId, pageId, contentPa
     const { data: repoData } = await octokit.rest.repos.get({ owner, repo });
     const repoOwner = repoData.owner.login;
 
+    // Bot usernames to exclude (matching other workflows)
+    const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
+    const GITHUB_ACTIONS_BOT = 'github-actions[bot]';
+
     commits.forEach((commit) => {
       const username = commit.author.username;
       const userId = commit.author.userId;
+
+      // Skip commits without GitHub user (local commits)
+      if (!username || !userId) {
+        console.log(`[TopContributor] Skipping commit without GitHub user: ${commit.sha.substring(0, 7)}`);
+        return;
+      }
 
       // Skip repository owner commits (owner contributions don't count)
       if (username === repoOwner) {
@@ -120,9 +130,15 @@ async function calculateTopContributor(owner, repo, sectionId, pageId, contentPa
         return;
       }
 
-      // Skip commits without GitHub user (local commits)
-      if (!username || !userId) {
-        console.log(`[TopContributor] Skipping commit without GitHub user: ${commit.sha.substring(0, 7)}`);
+      // Skip wiki bot (anonymous contributions tracked separately)
+      if (username === BOT_USERNAME) {
+        console.log(`[TopContributor] Skipping wiki bot commit: ${BOT_USERNAME} (${commit.sha.substring(0, 7)})`);
+        return;
+      }
+
+      // Skip GitHub Actions bot
+      if (username === GITHUB_ACTIONS_BOT) {
+        console.log(`[TopContributor] Skipping GitHub Actions bot commit: ${commit.sha.substring(0, 7)}`);
         return;
       }
 

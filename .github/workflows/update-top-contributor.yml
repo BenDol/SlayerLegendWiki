@@ -51,6 +51,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WIKI_BOT_TOKEN: ${{ secrets.WIKI_BOT_TOKEN }}
+          WIKI_BOT_USERNAME: slayer-wiki-bot
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
           CONTENT_PATH: 'public/content'
