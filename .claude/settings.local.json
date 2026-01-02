@@ -221,7 +221,11 @@
       "Bash(Select-String -Pattern \"scroll|Scroll|SCROLL\" -Context 2,2)",
       "Bash(Get-Content \"wiki-framework/logs/debug.log\" -Tail 20)",
       "Bash(tac:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(Get-Content \"C:\\\\Users\\\\dolb9\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Projects-slayerlegend-wiki\\\\tasks\\\\b186135.output\")",
+      "Bash(Select-String -Pattern \"error|Error|ERROR|failed\" -Context 2,2)",
+      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\.wrangler\\\\server.log\" -Tail 50)",
+      "Bash(Select-String -Pattern \"error|Error|ERROR|warning|Warning|WARNING\")"
     ]
   }
 }
