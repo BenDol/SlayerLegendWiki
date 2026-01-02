@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import SkillCard from '../components/SkillCard';
 import EquipmentCard from '../components/EquipmentCard';
 import DataInjector from '../components/DataInjector';
@@ -10,7 +10,6 @@ import BattleLoadoutCard from '../components/BattleLoadoutCard';
 import SkillBuildCard from '../components/SkillBuildCard';
 import SpiritBuildCard from '../components/SpiritBuildCard';
 import { VideoGuideCard } from '../../wiki-framework/src/components/contentCreators';
-import { resolveImageUrl } from '../services/imageService';
 
 /**
  * Process game-specific syntax in markdown content
@@ -994,28 +993,6 @@ export const CustomTableHeaderCell = ({ node, children, ...props }) => {
 };
 
 /**
- * Custom image renderer that resolves /images/content/* paths to CDN URLs
- */
-export const CustomImage = ({ src, alt, ...props }) => {
-  const [resolvedSrc, setResolvedSrc] = useState(src);
-
-  useEffect(() => {
-    // Only resolve if the path starts with /images/content/
-    if (src && src.startsWith('/images/content/')) {
-      resolveImageUrl(src).then(cdnUrl => {
-        setResolvedSrc(cdnUrl);
-      }).catch(err => {
-        console.error('Failed to resolve image URL:', err);
-        // Keep original src as fallback
-        setResolvedSrc(src);
-      });
-    }
-  }, [src]);
-
-  return <img src={resolvedSrc} alt={alt} {...props} />;
-};
-
-/**
  * Get custom ReactMarkdown components for game content
  * Use this object with PageViewer's customComponents prop
  */
@@ -1024,5 +1001,4 @@ export const getGameComponents = () => ({
   li: CustomListItem,
   td: CustomTableCell,
   th: CustomTableHeaderCell,
-  img: CustomImage, // Resolve /images/content/* to CDN URLs
 });

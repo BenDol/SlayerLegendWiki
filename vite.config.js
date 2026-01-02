@@ -45,7 +45,7 @@ export default createWikiConfigSync({
     loggerPlugin(),
     githubProxyPlugin(),
     imageDbPlugin(),
-    localCdnPlugin(),
+    // localCdnPlugin(), // Disabled - use actual CDN for testing
   ],
 
   // You can override any Vite settings here

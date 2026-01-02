@@ -252,6 +252,7 @@ export async function resolveImageUrl(imagePath) {
 
   // Construct full CDN URL with /images/ prefix
   // CDN structure: <base>/game-assets/images/icons/fire.png
+  // Note: Don't manually encode - browser handles URL encoding automatically
   const cdnUrl = `${cdnBaseUrl}/images/${relativePath}`;
 
   logger.debug('Resolved image URL', { imagePath, cdnUrl });

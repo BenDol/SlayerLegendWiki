@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import DonationSystem from '../../wiki-framework/src/components/donation/DonationSystem';
 import DonationMascot from './DonationMascot';
 import useScrollDepthTrigger from '../hooks/useScrollDepthTrigger';
+import { useGlobalImageResolver } from '../hooks/useGlobalImageResolver';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('AppWrapper');
@@ -14,6 +15,9 @@ const logger = createLogger('AppWrapper');
  */
 const AppWrapper = ({ children }) => {
   const [currentPagePath, setCurrentPagePath] = useState(null);
+
+  // Initialize global image resolver to automatically handle /images/content/* paths
+  useGlobalImageResolver();
 
   // Track authentication state changes to trigger donation prompt on login
   useEffect(() => {

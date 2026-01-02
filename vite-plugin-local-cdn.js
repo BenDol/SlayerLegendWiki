@@ -39,7 +39,9 @@ export function localCdnPlugin() {
         // Intercept /images/content/* requests
         if (req.url.startsWith('/images/content/')) {
           const relativePath = req.url.replace('/images/content/', '');
-          localPath = path.join(LOCAL_CDN_PATH, 'game-assets', 'images', relativePath);
+          // Decode URL to handle spaces and special characters in filenames
+          const decodedPath = decodeURIComponent(relativePath);
+          localPath = path.join(LOCAL_CDN_PATH, 'game-assets', 'images', decodedPath);
 
           // Check if file exists in local CDN
           if (fs.existsSync(localPath)) {
