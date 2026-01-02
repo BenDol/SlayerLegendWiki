@@ -23,6 +23,7 @@ jobs:
     env:
       WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username
       GITHUB_ACTIONS_BOT: github-actions[bot]  # GitHub Actions bot username
+      VITE_RELEASE_DATE: ${{ vars.VITE_RELEASE_DATE }}  # Release date for filtering commits
 
     steps:
       - name: Checkout repository
@@ -65,6 +66,42 @@ jobs:
             const ADDITION_WEIGHT = 0.5;
             const DELETION_WEIGHT = 0.5;
 
+            // Read release date from environment variable
+            let releaseDate = null; // null = no filtering
+            const releaseDateStr = process.env.VITE_RELEASE_DATE;
+            if (releaseDateStr && releaseDateStr.trim() !== '') {
+              releaseDate = new Date(releaseDateStr);
+              if (isNaN(releaseDate.getTime())) {
+                console.warn('⚠️ Invalid VITE_RELEASE_DATE format:', releaseDateStr);
+                releaseDate = null;
+              } else {
+                console.log(`📅 Release date configured: ${releaseDate.toISOString()}`);
+                console.log(`   Only commits after this date will be counted`);
+              }
+            }
+
+            /**
+             * Filter commits by release date
+             * @param {Array} commits - Array of commits to filter
+             * @returns {Array} Filtered commits after release date
+             */
+            function filterByReleaseDate(commits) {
+              if (!releaseDate) return commits;
+
+              const beforeCount = commits.length;
+              const filtered = commits.filter(commit => {
+                const commitDate = new Date(commit.commit.author.date);
+                return commitDate >= releaseDate;
+              });
+
+              const filteredCount = beforeCount - filtered.length;
+              if (filteredCount > 0) {
+                console.log(`   📅 Filtered out ${filteredCount} commit(s) before release date`);
+              }
+
+              return filtered;
+            }
+
             /**
              * Calculate top contributor for a page
              */
@@ -85,15 +122,19 @@ jobs:
 
                 console.log(`[TopContributor] Found ${commitList.length} commits`);
 
-                if (commitList.length === 0) {
-                  console.log('[TopContributor] No commits found - returning null');
+                // Filter commits by release date
+                const filteredCommitList = filterByReleaseDate(commitList);
+                console.log(`[TopContributor] After release date filter: ${filteredCommitList.length} commits`);
+
+                if (filteredCommitList.length === 0) {
+                  console.log('[TopContributor] No commits found after filtering - returning null');
                   return null;
                 }
 
                 // Fetch detailed commit info including stats in parallel
                 console.log('[TopContributor] Fetching commit details...');
                 const commitsWithStats = await Promise.all(
-                  commitList.map(async (commit) => {
+                  filteredCommitList.map(async (commit) => {
                     try {
                       const { data: commitDetails } = await github.rest.repos.getCommit({
                         owner: context.repo.owner,
@@ -228,19 +269,40 @@ jobs:
             }
 
             /**
+             * Get the current branch from wiki-config.json
+             */
+            function getCurrentBranch() {
+              try {
+                const fs = require('fs');
+                const path = require('path');
+                const configPath = path.join(process.env.GITHUB_WORKSPACE, 'wiki-config.json');
+                const configContent = fs.readFileSync(configPath, 'utf8');
+                const config = JSON.parse(configContent);
+                return config?.wiki?.repository?.branch || 'main';
+              } catch (error) {
+                console.warn('[TopContributor] Failed to read wiki-config.json, using default branch: main');
+                return 'main';
+              }
+            }
+
+            /**
              * Update or create top contributor issue
              */
             async function updateTopContributorIssue(sectionId, pageId, contributorData) {
               const issueTitle = `[Top Contributor] ${sectionId}/${pageId}`;
               const issueLabel = 'top-contributor';
+              const branch = getCurrentBranch();
+              const branchLabel = `branch:${branch}`;
+
+              console.log(`[TopContributor] Using labels: "${issueLabel}", "${branchLabel}"`);
 
               try {
-                // Find existing issue
+                // Find existing issue (search by both labels)
                 const { data: issues } = await github.rest.issues.listForRepo({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   state: 'open',
-                  labels: issueLabel,
+                  labels: `${issueLabel},${branchLabel}`,
                   per_page: 100
                 });
 
@@ -266,7 +328,7 @@ jobs:
                     repo: context.repo.repo,
                     title: issueTitle,
                     body: issueBody,
-                    labels: [issueLabel, 'automated']
+                    labels: [issueLabel, branchLabel, 'automated']
                   });
 
                   // Lock the issue to prevent comments
