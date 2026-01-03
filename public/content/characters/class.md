@@ -37,7 +37,7 @@ This content is unlocked at Stage 120 and Level 250, granting additional bonuses
 |<div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/03a1af75f975429d999cd9a7fd926b71.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: -2px 0 0 0;" data-inline="true" /></div>|<div style="text-align: center;">Blast (Grade 20)</d>|<div style="text-align: center;">0%</div>|
 
 
-Legend: | <span class="text-gray-400 dark:text-gray-300">Common</span> | <span class="text-green-800 dark:text-green-600">Great</span> | <span class="text-orange-800 dark:text-orange-600">Rare</span> | <span class="text-purple-600 dark:text-purple-400">Epic</span> | <span class="text-red-600 dark:text-red-400">Legendary</span>
+**Legend: | <span class="text-gray-400 dark:text-gray-300">Common</span> | <span class="text-green-800 dark:text-green-600">Great</span> | <span class="text-orange-800 dark:text-orange-600">Rare</span> | <span class="text-purple-600 dark:text-purple-400">Epic</span> | <span class="text-red-600 dark:text-red-400">Legendary</span>**
 
 
 # <span class="text-gray-900 dark:text-gray-100">Class Awakening</span>
