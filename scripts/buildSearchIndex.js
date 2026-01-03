@@ -83,7 +83,7 @@ function buildSearchIndex() {
       const pageId = fileName.replace('.md', '');
 
       // Generate URL
-      const url = `/#/${section}/${pageId}`;
+      const url = `/${section}/${pageId}`;
 
       // Extract searchable text
       const textContent = extractTextContent(content);

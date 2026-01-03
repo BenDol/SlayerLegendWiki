@@ -1,0 +1,450 @@
+name: Bulk Update Top Contributors
+
+on:
+  workflow_dispatch: # Manual trigger
+    inputs:
+      dry_run:
+        description: 'Dry run (log only, no updates)'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # Run weekly on Sunday at 00:00 UTC to refresh all top contributors
+    - cron: '0 0 * * 0'
+
+jobs:
+  bulk-update:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write  # Need write permission to create/update top contributor issues
+
+    env:
+      WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username
+      GITHUB_ACTIONS_BOT: github-actions[bot]  # GitHub Actions bot username
+      VITE_RELEASE_DATE: ${{ vars.VITE_RELEASE_DATE }}  # Release date for filtering commits
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for accurate commit analysis
+
+      - name: Find all content pages
+        id: find-pages
+        run: |
+          # Find all markdown files in public/content/
+          FILES=$(find public/content -name "*.md" -type f | sort)
+
+          # Count total files
+          TOTAL=$(echo "$FILES" | wc -l)
+
+          echo "Found $TOTAL content pages to process"
+          echo "$FILES"
+
+          # Save to output
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+
+          # Save files list to temp file for next step
+          echo "$FILES" > /tmp/content-files.txt
+
+      - name: Process all pages
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+
+            const DRY_RUN = '${{ inputs.dry_run }}' === 'true';
+            const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
+            const GITHUB_ACTIONS_BOT = process.env.GITHUB_ACTIONS_BOT || 'github-actions[bot]';
+            const CONTENT_PATH = 'public/content';
+
+            // Scoring weights (must match StarContributor.jsx)
+            const COMMIT_WEIGHT = 10;
+            const ADDITION_WEIGHT = 0.5;
+            const DELETION_WEIGHT = 0.5;
+
+            // Read release date from environment variable
+            let releaseDate = null; // null = no filtering
+            const releaseDateStr = process.env.VITE_RELEASE_DATE;
+            if (releaseDateStr && releaseDateStr.trim() !== '') {
+              releaseDate = new Date(releaseDateStr);
+              if (isNaN(releaseDate.getTime())) {
+                console.warn('⚠️ Invalid VITE_RELEASE_DATE format:', releaseDateStr);
+                releaseDate = null;
+              } else {
+                console.log(`📅 Release date configured: ${releaseDate.toISOString()}`);
+                console.log(`   Only commits after this date will be counted`);
+              }
+            }
+
+            /**
+             * Filter commits by release date
+             * @param {Array} commits - Array of commits to filter
+             * @returns {Array} Filtered commits after release date
+             */
+            function filterByReleaseDate(commits) {
+              if (!releaseDate) return commits;
+
+              const beforeCount = commits.length;
+              const filtered = commits.filter(commit => {
+                const commitDate = new Date(commit.commit.author.date);
+                return commitDate >= releaseDate;
+              });
+
+              const filteredCount = beforeCount - filtered.length;
+              if (filteredCount > 0) {
+                console.log(`   📅 Filtered out ${filteredCount} commit(s) before release date`);
+              }
+
+              return filtered;
+            }
+
+            /**
+             * Calculate top contributor for a page
+             */
+            async function calculateTopContributor(sectionId, pageId) {
+              console.log(`[TopContributor] Calculating top contributor for ${sectionId}/${pageId}...`);
+
+              const filePath = `${CONTENT_PATH}/${sectionId}/${pageId}.md`;
+
+              try {
+                // Fetch ALL commits for the file (up to 100)
+                console.log(`[TopContributor] Fetching commits for ${filePath}...`);
+                const { data: commitList } = await github.rest.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: filePath,
+                  per_page: 100,
+                });
+
+                console.log(`[TopContributor] Found ${commitList.length} commits`);
+
+                // Filter commits by release date
+                const filteredCommitList = filterByReleaseDate(commitList);
+                console.log(`[TopContributor] After release date filter: ${filteredCommitList.length} commits`);
+
+                if (filteredCommitList.length === 0) {
+                  console.log('[TopContributor] No commits found after filtering - returning null');
+                  return null;
+                }
+
+                // Fetch detailed commit info including stats in parallel
+                console.log('[TopContributor] Fetching commit details...');
+                const commitsWithStats = await Promise.all(
+                  filteredCommitList.map(async (commit) => {
+                    try {
+                      const { data: commitDetails } = await github.rest.repos.getCommit({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        ref: commit.sha,
+                      });
+
+                      // Extract stats for the specific file
+                      const fileStats = commitDetails.files?.find(file => file.filename === filePath);
+                      const stats = fileStats ? {
+                        additions: fileStats.additions || 0,
+                        deletions: fileStats.deletions || 0,
+                        total: fileStats.changes || 0,
+                      } : {
+                        additions: 0,
+                        deletions: 0,
+                        total: 0,
+                      };
+
+                      return {
+                        sha: commit.sha,
+                        message: commit.commit.message,
+                        author: {
+                          name: commit.commit.author.name,
+                          email: commit.commit.author.email,
+                          username: commit.author?.login,
+                          userId: commit.author?.id,
+                        },
+                        stats,
+                      };
+                    } catch (err) {
+                      console.error(`Failed to fetch stats for commit ${commit.sha}:`, err);
+                      return null;
+                    }
+                  })
+                );
+
+                const commits = commitsWithStats.filter(c => c !== null);
+
+                // Calculate contributor scores
+                console.log('[TopContributor] Calculating scores...');
+                const contributorScores = {};
+
+                // Get repository owner to exclude their commits
+                const { data: repoData } = await github.rest.repos.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo
+                });
+                const repoOwner = repoData.owner.login;
+
+                commits.forEach((commit) => {
+                  const username = commit.author.username;
+                  const userId = commit.author.userId;
+
+                  // Skip commits without GitHub user (local commits)
+                  if (!username || !userId) {
+                    console.log(`[TopContributor] Skipping commit without GitHub user: ${commit.sha.substring(0, 7)}`);
+                    return;
+                  }
+
+                  // Skip repository owner commits
+                  if (username === repoOwner) {
+                    console.log(`[TopContributor] Skipping repository owner commit: ${commit.sha.substring(0, 7)}`);
+                    return;
+                  }
+
+                  // Skip wiki bot
+                  if (username === BOT_USERNAME) {
+                    console.log(`[TopContributor] Skipping wiki bot commit: ${BOT_USERNAME} (${commit.sha.substring(0, 7)})`);
+                    return;
+                  }
+
+                  // Skip GitHub Actions bot
+                  if (username === GITHUB_ACTIONS_BOT) {
+                    console.log(`[TopContributor] Skipping GitHub Actions bot commit: ${commit.sha.substring(0, 7)}`);
+                    return;
+                  }
+
+                  const stats = commit.stats || { additions: 0, deletions: 0, total: 0 };
+
+                  // Calculate weighted score
+                  const score =
+                    (COMMIT_WEIGHT) +
+                    (stats.additions * ADDITION_WEIGHT) +
+                    (stats.deletions * DELETION_WEIGHT);
+
+                  // Initialize contributor if not exists
+                  if (!contributorScores[userId]) {
+                    contributorScores[userId] = {
+                      username,
+                      userId,
+                      score: 0,
+                      commits: 0,
+                      additions: 0,
+                      deletions: 0,
+                    };
+                  }
+
+                  // Update contributor stats
+                  contributorScores[userId].score += score;
+                  contributorScores[userId].commits += 1;
+                  contributorScores[userId].additions += stats.additions;
+                  contributorScores[userId].deletions += stats.deletions;
+                });
+
+                // Find top contributor
+                const contributors = Object.values(contributorScores);
+
+                if (contributors.length === 0) {
+                  console.log('[TopContributor] No community contributors found - returning null');
+                  return null;
+                }
+
+                contributors.sort((a, b) => b.score - a.score);
+                const topContributor = contributors[0];
+
+                console.log(`[TopContributor] Top contributor: ${topContributor.username} (ID: ${topContributor.userId}, score: ${topContributor.score.toFixed(2)})`);
+                console.log(`[TopContributor]   - Commits: ${topContributor.commits}`);
+                console.log(`[TopContributor]   - Additions: ${topContributor.additions}`);
+                console.log(`[TopContributor]   - Deletions: ${topContributor.deletions}`);
+
+                return {
+                  username: topContributor.username,
+                  userId: topContributor.userId,
+                  score: Math.round(topContributor.score * 100) / 100,
+                  updatedAt: new Date().toISOString(),
+                };
+              } catch (error) {
+                console.error('[TopContributor] Failed to calculate:', error);
+                throw error;
+              }
+            }
+
+            /**
+             * Get the current branch from wiki-config.json
+             */
+            function getCurrentBranch() {
+              try {
+                const fs = require('fs');
+                const path = require('path');
+                const configPath = path.join(process.env.GITHUB_WORKSPACE, 'wiki-config.json');
+                const configContent = fs.readFileSync(configPath, 'utf8');
+                const config = JSON.parse(configContent);
+                return config?.wiki?.repository?.branch || 'main';
+              } catch (error) {
+                console.warn('[TopContributor] Failed to read wiki-config.json, using default branch: main');
+                return 'main';
+              }
+            }
+
+            /**
+             * Update or create top contributor issue
+             */
+            async function updateTopContributorIssue(sectionId, pageId, contributorData) {
+              const issueTitle = `[Top Contributor] ${sectionId}/${pageId}`;
+              const issueLabel = 'top-contributor';
+              const branch = getCurrentBranch();
+              const branchLabel = `branch:${branch}`;
+
+              console.log(`[TopContributor] Using labels: "${issueLabel}", "${branchLabel}"`);
+
+              try {
+                // Find existing issue (search by both labels)
+                const { data: issues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  labels: `${issueLabel},${branchLabel}`,
+                  per_page: 100
+                });
+
+                const existingIssue = issues.find(issue => issue.title === issueTitle);
+
+                const issueBody = JSON.stringify(contributorData, null, 2);
+
+                if (existingIssue) {
+                  // Update existing issue
+                  console.log(`[TopContributor] Updating existing issue #${existingIssue.number}`);
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: existingIssue.number,
+                    body: issueBody
+                  });
+                  return existingIssue.number;
+                } else {
+                  // Create new issue
+                  console.log('[TopContributor] Creating new issue');
+                  const { data: newIssue } = await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: [issueLabel, branchLabel, 'automated']
+                  });
+
+                  // Lock the issue to prevent comments
+                  try {
+                    await github.rest.issues.lock({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: newIssue.number,
+                      lock_reason: 'off-topic'
+                    });
+                    console.log(`[TopContributor] Locked issue #${newIssue.number}`);
+                  } catch (lockError) {
+                    console.warn('[TopContributor] Failed to lock issue:', lockError.message);
+                  }
+
+                  return newIssue.number;
+                }
+              } catch (error) {
+                console.error('[TopContributor] Failed to update issue:', error);
+                throw error;
+              }
+            }
+
+            // Read files list
+            const filesContent = fs.readFileSync('/tmp/content-files.txt', 'utf8');
+            const files = filesContent.trim().split('\n').filter(f => f);
+
+            let succeeded = 0;
+            let failed = 0;
+
+            console.log('==========================================');
+            console.log(`Processing ${files.length} content pages`);
+            console.log(`Dry run: ${DRY_RUN}`);
+            console.log('==========================================');
+            console.log('');
+
+            // Process each file
+            for (let i = 0; i < files.length; i++) {
+              const file = files[i];
+              const current = i + 1;
+
+              // Extract section and page from path
+              const sectionMatch = file.match(/public\/content\/([^\/]+)\//);
+              const pageMatch = file.match(/public\/content\/[^\/]+\/(.+)\.md/);
+
+              if (!sectionMatch || !pageMatch) {
+                console.log(`[${current}/${files.length}] Skipping invalid path: ${file}`);
+                failed++;
+                continue;
+              }
+
+              const section = sectionMatch[1];
+              const page = pageMatch[1];
+
+              console.log(`[${current}/${files.length}] Processing: ${section}/${page}`);
+
+              if (DRY_RUN) {
+                console.log(`  [DRY RUN] Would calculate top contributor for ${section}/${page}`);
+                succeeded++;
+              } else {
+                try {
+                  // Calculate top contributor
+                  const topContributor = await calculateTopContributor(section, page);
+
+                  if (!topContributor) {
+                    console.log(`  ℹ️  No top contributor to update (no commits or no valid contributors)`);
+                    succeeded++;
+                  } else {
+                    // Update issue
+                    const issueNumber = await updateTopContributorIssue(section, page, topContributor);
+                    console.log(`  ✓ Success: Updated issue #${issueNumber} for ${section}/${page}`);
+                    succeeded++;
+                  }
+                } catch (error) {
+                  console.error(`  ✗ Failed: ${error.message}`);
+                  failed++;
+                }
+              }
+
+              // Brief delay to avoid rate limiting
+              if (i < files.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 5000));
+              }
+
+              console.log('');
+            }
+
+            console.log('==========================================');
+            console.log('Processing complete!');
+            console.log(`Total pages: ${files.length}`);
+            console.log(`Succeeded: ${succeeded}`);
+            console.log(`Failed: ${failed}`);
+            console.log('==========================================');
+
+            // Exit with error if any failed (unless dry run)
+            if (!DRY_RUN && failed > 0) {
+              throw new Error(`${failed} page(s) failed to process`);
+            }
+
+      - name: Create summary
+        if: always()
+        run: |
+          TOTAL=$(wc -l < /tmp/content-files.txt)
+
+          echo "## Bulk Top Contributor Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total pages processed:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "**Mode:** Dry run (no updates made)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Mode:** Live update" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Top contributor issues have been created/updated for all content pages." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "These issues are used by the StarContributor component to display the top contributor badge on each page." >> $GITHUB_STEP_SUMMARY

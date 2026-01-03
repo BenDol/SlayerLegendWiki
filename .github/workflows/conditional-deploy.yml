@@ -1,0 +1,107 @@
+name: Conditional Cloudflare Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need at least 2 commits to compare
+
+      - name: Check if deploy is needed
+        id: check
+        run: |
+          echo "=== Conditional Deploy Check ==="
+
+          # Get commit message
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+
+          # Check for explicit deploy control keywords
+          if echo "$COMMIT_MSG" | grep -qiE '\[(deploy-required|force-deploy)\]'; then
+            echo "deploy=true" >> $GITHUB_OUTPUT
+            echo "✅ [deploy-required] keyword found - forcing deploy"
+            exit 0
+          fi
+
+          if echo "$COMMIT_MSG" | grep -qiE '\[(skip-deploy|no-deploy)\]'; then
+            echo "deploy=false" >> $GITHUB_OUTPUT
+            echo "⏭️ [skip-deploy] keyword found - skipping deploy"
+            exit 0
+          fi
+
+          # Check if dynamic page loading is enabled in config
+          if [ -f "wiki-config.json" ]; then
+            DYNAMIC_ENABLED=$(node -pe "try { JSON.parse(require('fs').readFileSync('wiki-config.json', 'utf8')).features.dynamicPageLoading.enabled } catch(e) { false }")
+            echo "Dynamic page loading enabled: $DYNAMIC_ENABLED"
+          else
+            DYNAMIC_ENABLED="false"
+            echo "⚠️ wiki-config.json not found, assuming dynamic loading disabled"
+          fi
+
+          # Get changed files in last commit
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+          echo ""
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          echo ""
+
+          # Check if ANY non-content files changed
+          # This includes: code, config, submodules, assets, etc.
+          # Only markdown files in public/content/ are considered "content-only"
+          NON_CONTENT_CHANGED=false
+          if echo "$CHANGED_FILES" | grep -v '^public/content/.*\.md$' | grep -q .; then
+            NON_CONTENT_CHANGED=true
+
+            # Log what triggered the deploy (for debugging)
+            if echo "$CHANGED_FILES" | grep -q '^wiki-framework$'; then
+              echo "📦 Submodule change detected (wiki-framework)"
+            fi
+          fi
+
+          echo "Non-content files changed: $NON_CONTENT_CHANGED"
+
+          # Decision logic based on dynamic loading setting
+          if [ "$DYNAMIC_ENABLED" = "true" ]; then
+            echo ""
+            echo "🔄 Dynamic page loading is ENABLED"
+            if [ "$NON_CONTENT_CHANGED" = "true" ]; then
+              echo "deploy=true" >> $GITHUB_OUTPUT
+              echo "✅ Non-content files changed - deploy needed"
+            else
+              echo "deploy=false" >> $GITHUB_OUTPUT
+              echo "⏭️ Only content files changed - skipping deploy (pages load from GitHub)"
+            fi
+          else
+            echo ""
+            echo "📦 Dynamic page loading is DISABLED"
+            echo "deploy=true" >> $GITHUB_OUTPUT
+            echo "✅ All changes require deploy - deploying"
+          fi
+
+      - name: Trigger Cloudflare Deploy
+        if: steps.check.outputs.deploy == 'true'
+        run: |
+          echo "🚀 Triggering Cloudflare Pages deploy..."
+          RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}")
+          echo "Response: $RESPONSE"
+
+          # Check if deploy was triggered successfully (flexible grep for JSON formatting)
+          if echo "$RESPONSE" | grep -q '"success"[[:space:]]*:[[:space:]]*true'; then
+            echo "✅ Deploy triggered successfully"
+          else
+            echo "❌ Deploy trigger failed"
+            echo "Expected success:true in response"
+            exit 1
+          fi
+
+      - name: Skip Deploy (No-op)
+        if: steps.check.outputs.deploy == 'false'
+        run: |
+          echo "⏭️ Deploy skipped - no action needed"
+          echo "Pages will load fresh content from GitHub via dynamic page loading"

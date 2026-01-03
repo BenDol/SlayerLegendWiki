@@ -1,8 +1,16 @@
 ---
-title: skill-mastery
-tags: [skills]
+id: skill-mastery
+title: Skill Mastery
+description: Guide to skill mastery system, leveling skills, and unlocking advanced skill features
+tags:
+  - skills
+  - mastery
+  - progression
 category: Skills
-date: 2025-12-13
+date: 2025-12-21
 ---
-# skill-mastery
-Skills guide
+
+# Skill Mastery
+
+{{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->
+

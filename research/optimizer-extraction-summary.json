@@ -1,0 +1,40 @@
+{
+  "spreadsheetId": "150nRJmTnvTlobYfMeLkdckoCFB42vaKzraw9wTMBDTc",
+  "spreadsheetName": "Master Optimizer",
+  "sheetsExtracted": 3,
+  "totalRows": 236,
+  "sheets": {
+    "COMPANIONS": {
+      "rows": 35,
+      "columns": [
+        "",
+        "INFO ",
+        "COMPANIONS ",
+        "FULL RESET OF ALL COMPANIONS ",
+        "HOME "
+      ]
+    },
+    "EQUIPMENT": {
+      "rows": 90,
+      "columns": [
+        "",
+        "WEAPON ",
+        "AWAKENED ORR",
+        "Equipment ",
+        "WEAPON ENHANCEMENTS",
+        "SOUL WEAPON ENGRAVING",
+        "HOME "
+      ]
+    },
+    "SKILLS": {
+      "rows": 111,
+      "columns": [
+        "",
+        "SKILLS ",
+        "Basic Data / Stats",
+        "Extra Data / Stats",
+        "SKILL PROFICIENCY"
+      ]
+    }
+  }
+}

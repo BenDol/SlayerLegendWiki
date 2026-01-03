@@ -1,0 +1,56 @@
+# Cloudflare Pages Local Development Environment Variables
+# Copy this file to .dev.vars and fill in your actual values
+# .dev.vars is gitignored and will not be committed
+
+# GitHub Bot Token (required for bot operations)
+WIKI_BOT_USERNAME=slayer-wiki-bot
+WIKI_BOT_TOKEN=ghp_your_bot_token_here
+
+# Repository Configuration (required)
+WIKI_REPO_OWNER=your_github_username
+WIKI_REPO_NAME=SlayerLegendWiki
+
+# GitHub OAuth Client ID (required for user authentication)
+VITE_GITHUB_CLIENT_ID=your_github_oauth_client_id
+
+# Optional: Override repository configuration for Vite (if different from above)
+VITE_WIKI_REPO_OWNER=your_github_username
+VITE_WIKI_REPO_NAME=SlayerLegendWiki
+
+# Platform Detection (automatically set, but can override)
+VITE_PLATFORM=cloudflare
+VITE_CF_PAGES=1
+
+# Anonymous Editing Configuration
+# Required for anonymous wiki edits with email verification and bot-submitted PRs
+
+# SendGrid API Key (for sending verification emails)
+SENDGRID_API_KEY=your_sendgrid_api_key_here
+
+# SendGrid Sender Email (must be verified in SendGrid)
+SENDGRID_FROM_EMAIL=noreply@slayerlegend.wiki
+
+# Google reCAPTCHA v3 Secret Key (for bot detection)
+RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key_here
+
+# Google reCAPTCHA v3 Site Key (public, exposed to client)
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
+
+# Email Validation API Key (optional)
+EMAIL_VALIDATION_API_KEY=your_email_validation_api_key_here
+
+# Secret key for signing verification tokens
+EMAIL_VERIFICATION_SECRET=your_random_secret_key_here
+
+# OpenAI API Key (optional - for content moderation)
+# Purpose: AI-powered detection of inappropriate content in:
+#   - Display names (anonymous edits)
+#   - Edit summaries (anonymous edits + optional for authenticated)
+#   - Page content (anonymous edits + optional for authenticated)
+# Fallback: If not configured, uses leo-profanity package (simple word list)
+#
+# Get started: https://platform.openai.com/api-keys
+# FREE unlimited moderation requests (moderation endpoint has no cost)
+# Rate Limits: 10,000 requests/min with payment method, 3/min without
+# Configuration: See wiki-config.json > features > editRequestCreator > contentModeration
+OPENAI_API_KEY=your_openai_api_key_here

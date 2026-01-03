@@ -1,56 +1,2007 @@
-{
-  "companions": [
-    {
-      "id": "ellie",
-      "name": "Ellie",
-      "element": "wind",
-      "unlockStage": 1,
-      "bonuses": [
-        "Increases Accuracy",
-        "Increases Attack",
-        "Reduces Enemy HP",
-        "Wind Damage bonus from leveling"
-      ],
-      "attributeStone": "Green (Wind)"
-    },
-    {
-      "id": "zeke",
-      "name": "Zeke",
-      "element": "earth",
-      "unlockStage": 10,
-      "bonuses": [
-        "Increases HP",
-        "Increases Critical Damage",
-        "Increases Attack Sum",
-        "Earth Damage bonus from leveling"
-      ],
-      "attributeStone": "Yellow (Earth)"
-    },
-    {
-      "id": "miho",
-      "name": "Miho",
-      "element": "fire",
-      "unlockStage": 25,
-      "bonuses": [
-        "Increases Damage Resist",
-        "Increases Dodge",
-        "Increases Total Gold Earned",
-        "Fire Damage bonus from leveling"
-      ],
-      "attributeStone": "Red (Fire)"
-    },
-    {
-      "id": "luna",
-      "name": "Luna",
-      "element": "water",
-      "unlockStage": 50,
-      "bonuses": [
-        "Increases Mana Recovery",
-        "Increases Extra Mana",
-        "Increases Skill Damage",
-        "Water Damage bonus from leveling"
-      ],
-      "attributeStone": "Blue (Water)"
-    }
-  ]
-}
+[
+  {
+    "level": 0,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 1,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 2,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 3,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 4,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 5,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 6,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 7,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 8,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 9,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 10,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 11,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 12,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 13,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 14,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 15,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 16,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 17,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 18,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 19,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 20,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 21,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 22,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 23,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 24,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 25,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 26,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 27,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 28,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 29,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 30,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 31,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 32,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 33,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 34,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 35,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 36,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 37,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 38,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 39,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 40,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 41,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 42,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 43,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 44,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 45,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 46,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 47,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 48,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 49,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 50,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 51,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 52,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 53,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 54,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 55,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 56,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 57,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 58,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 59,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 60,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 61,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 62,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 63,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 64,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 65,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 66,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 67,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 68,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 69,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 70,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 71,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 72,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 73,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 74,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 75,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 76,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 77,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 78,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 79,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 80,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 81,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 82,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 83,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 84,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 85,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 86,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 87,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 88,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 89,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 90,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 91,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 92,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 93,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 94,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 95,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 96,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 97,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 98,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 99,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 100,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 101,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 102,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 103,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 104,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 105,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 106,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 107,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 108,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 109,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 110,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 111,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 112,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 113,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 114,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 115,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 116,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 117,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 118,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 119,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 120,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 121,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 122,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 123,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 124,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 125,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 126,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 127,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 128,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 129,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 130,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 131,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 132,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 133,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 134,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 135,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 136,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 137,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 138,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 139,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 140,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 141,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 142,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 143,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 144,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 145,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 146,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 147,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 148,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 149,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 150,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 151,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 152,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 153,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 154,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 155,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 156,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 157,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 158,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 159,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 160,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 161,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 162,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 163,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 164,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 165,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 166,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 167,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 168,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 169,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 170,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 171,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 172,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 173,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 174,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 175,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 176,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 177,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 178,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 179,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 180,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 181,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 182,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 183,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 184,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 185,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 186,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 187,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 188,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 189,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 190,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 191,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 192,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 193,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 194,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 195,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 196,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 197,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 198,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 199,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 200,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 201,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 202,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 203,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 204,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 205,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 206,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 207,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 208,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 209,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 210,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 211,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 212,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 213,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 214,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 215,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 216,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 217,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 218,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 219,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 220,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 221,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 222,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 223,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 224,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 225,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 226,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 227,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 228,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 229,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 230,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 231,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 232,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 233,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 234,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 235,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 236,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 237,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 238,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 239,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 240,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 241,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 242,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 243,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 244,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 245,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 246,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 247,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 248,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 249,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 250,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 251,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 252,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 253,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 254,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 255,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 256,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 257,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 258,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 259,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 260,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 261,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 262,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 263,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 264,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 265,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 266,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 267,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 268,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 269,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 270,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 271,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 272,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 273,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 274,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 275,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 276,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 277,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 278,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 279,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 280,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 281,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 282,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 283,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 284,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 285,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 286,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 287,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 288,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 289,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 290,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 291,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 292,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 293,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 294,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 295,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 296,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 297,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 298,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 299,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 300,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 301,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 302,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 303,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 304,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 305,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 306,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 307,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 308,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 309,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 310,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 311,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 312,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 313,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 314,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 315,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 316,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 317,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 318,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 319,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 320,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 321,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 322,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 323,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 324,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 325,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 326,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 327,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 328,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 329,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 330,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 331,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 332,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 333,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 334,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 335,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 336,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 337,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 338,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 339,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 340,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 341,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 342,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 343,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 344,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 345,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 346,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 347,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 348,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 349,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 350,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 351,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 352,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 353,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 354,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 355,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 356,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 357,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 358,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 359,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 360,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 361,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 362,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 363,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 364,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 365,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 366,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 367,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 368,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 369,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 370,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 371,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 372,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 373,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 374,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 375,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 376,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 377,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 378,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 379,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 380,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 381,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 382,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 383,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 384,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 385,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 386,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 387,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 388,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 389,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 390,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 391,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 392,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 393,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 394,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 395,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 396,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 397,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 398,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 399,
+    "cost": 0,
+    "capacity": 0
+  },
+  {
+    "level": 400,
+    "cost": 0,
+    "capacity": 0
+  }
+]

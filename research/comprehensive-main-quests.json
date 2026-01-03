@@ -1,0 +1,1007 @@
+{
+  "spreadsheet": "1ZbNMPd40pPKwX5MmXzhWNfZzvrUm1bjrEKQ20IsHSGY",
+  "sheet": "QUESTS",
+  "totalRows": 141,
+  "maxColumns": 5,
+  "analysis": {
+    "totalRows": 141,
+    "maxColumns": 5,
+    "firstRow": [
+      "GEM QUESTS ID",
+      "TYPE",
+      "DESCRIPTION",
+      "NEED",
+      "REWARD"
+    ],
+    "columnsUsed": 5
+  },
+  "allRows": [
+    [
+      "GEM QUESTS ID",
+      "TYPE",
+      "DESCRIPTION",
+      "NEED",
+      "REWARD"
+    ],
+    [
+      "0",
+      "14",
+      "Kill Monster",
+      "1",
+      "50"
+    ],
+    [
+      "1",
+      "0",
+      "Increase Attack Power",
+      "5",
+      "100"
+    ],
+    [
+      "2",
+      "11",
+      "Growth -> Character level up",
+      "2",
+      "150"
+    ],
+    [
+      "3",
+      "17",
+      "Character STR Enhancement",
+      "1",
+      "200"
+    ],
+    [
+      "4",
+      "8",
+      "Stage Clear",
+      "1",
+      "250"
+    ],
+    [
+      "5",
+      "7",
+      "Summon Weapons from the Shop",
+      "3",
+      "300"
+    ],
+    [
+      "6",
+      "12",
+      "Equip Weapon",
+      "1",
+      "350"
+    ],
+    [
+      "7",
+      "8",
+      "Stage Clear",
+      "3",
+      "400"
+    ],
+    [
+      "8",
+      "11",
+      "Level Up",
+      "10",
+      "450"
+    ],
+    [
+      "9",
+      "6",
+      "Learn Skills",
+      "1",
+      "500"
+    ],
+    [
+      "10",
+      "15",
+      "Equip Skill",
+      "1",
+      "550"
+    ],
+    [
+      "11",
+      "16",
+      "Use Skill",
+      "1",
+      "600"
+    ],
+    [
+      "12",
+      "0",
+      "Increase Attack Power",
+      "20",
+      "650"
+    ],
+    [
+      "13",
+      "1",
+      "Physical Strength",
+      "20",
+      "700"
+    ],
+    [
+      "14",
+      "8",
+      "Stage Clear",
+      "6",
+      "750"
+    ],
+    [
+      "15",
+      "11",
+      "Growth -> Character level up",
+      "15",
+      "800"
+    ],
+    [
+      "16",
+      "6",
+      "Learn Skills",
+      "2",
+      "850"
+    ],
+    [
+      "17",
+      "15",
+      "Equip Skill",
+      "2",
+      "900"
+    ],
+    [
+      "18",
+      "8",
+      "Stage Clear",
+      "10",
+      "950"
+    ],
+    [
+      "19",
+      "18",
+      "Summon Accessory From The Shop",
+      "3",
+      "1000"
+    ],
+    [
+      "20",
+      "19",
+      "Equip Accessory",
+      "1",
+      "1050"
+    ],
+    [
+      "21",
+      "5",
+      "Adventure Clear",
+      "1",
+      "1100"
+    ],
+    [
+      "22",
+      "0",
+      "Increase Attack Power",
+      "50",
+      "1150"
+    ],
+    [
+      "23",
+      "1",
+      "Physical Strength",
+      "50",
+      "1200"
+    ],
+    [
+      "24",
+      "8",
+      "Stage Clear",
+      "20",
+      "1250"
+    ],
+    [
+      "25",
+      "5",
+      "Adventure Clear",
+      "5",
+      "1300"
+    ],
+    [
+      "26",
+      "13",
+      "Promotion Challenge",
+      "1",
+      "1350"
+    ],
+    [
+      "27",
+      "0",
+      "Increase Attack Power",
+      "100",
+      "1400"
+    ],
+    [
+      "28",
+      "1",
+      "Physical Strength",
+      "100",
+      "1450"
+    ],
+    [
+      "29",
+      "2",
+      "Increase Stamina Recovery",
+      "100",
+      "1500"
+    ],
+    [
+      "30",
+      "8",
+      "Stage Clear",
+      "30",
+      "1550"
+    ],
+    [
+      "31",
+      "3",
+      "Increase Critical Attack Power",
+      "100",
+      "1600"
+    ],
+    [
+      "32",
+      "4",
+      "Increase Critical Hit Chance",
+      "100",
+      "1650"
+    ],
+    [
+      "33",
+      "5",
+      "Adventure Clear",
+      "10",
+      "1700"
+    ],
+    [
+      "34",
+      "10",
+      "Watch Ads",
+      "1",
+      "1750"
+    ],
+    [
+      "35",
+      "0",
+      "Increase Attack Power",
+      "300",
+      "1800"
+    ],
+    [
+      "36",
+      "1",
+      "Physical Strength",
+      "300",
+      "1850"
+    ],
+    [
+      "37",
+      "2",
+      "Increase Stamina Recovery",
+      "300",
+      "1900"
+    ],
+    [
+      "38",
+      "8",
+      "Stage Clear",
+      "40",
+      "1950"
+    ],
+    [
+      "39",
+      "5",
+      "Adventure Clear",
+      "20",
+      "2000"
+    ],
+    [
+      "40",
+      "10",
+      "Watch Ads",
+      "1",
+      "2050"
+    ],
+    [
+      "41",
+      "3",
+      "Increase Critical Attack Power",
+      "300",
+      "2100"
+    ],
+    [
+      "42",
+      "4",
+      "Increase Critical Hit Chance",
+      "300",
+      "2150"
+    ],
+    [
+      "43",
+      "5",
+      "Adventure Clear",
+      "30",
+      "2200"
+    ],
+    [
+      "44",
+      "10",
+      "Watch Ads",
+      "2",
+      "2250"
+    ],
+    [
+      "45",
+      "8",
+      "Stage Clear",
+      "50",
+      "2300"
+    ],
+    [
+      "46",
+      "3",
+      "Increase Critical Attack Power",
+      "500",
+      "2350"
+    ],
+    [
+      "47",
+      "4",
+      "Increase Critical Hit Chance",
+      "500",
+      "2400"
+    ],
+    [
+      "48",
+      "8",
+      "Stage Clear",
+      "60",
+      "2450"
+    ],
+    [
+      "49",
+      "10",
+      "Watch Ads",
+      "2",
+      "2500"
+    ],
+    [
+      "50",
+      "0",
+      "Increase Attack Power",
+      "1000",
+      "2300"
+    ],
+    [
+      "51",
+      "1",
+      "Physical Strength",
+      "1000",
+      "2350"
+    ],
+    [
+      "52",
+      "2",
+      "Increase Stamina Recovery",
+      "1000",
+      "2400"
+    ],
+    [
+      "53",
+      "5",
+      "Adventure Clear",
+      "40",
+      "2450"
+    ],
+    [
+      "54",
+      "10",
+      "Watch Ads",
+      "3",
+      "2500"
+    ],
+    [
+      "55",
+      "8",
+      "Stage Clear",
+      "70",
+      "2550"
+    ],
+    [
+      "56",
+      "3",
+      "Increase Critical Attack Power",
+      "800",
+      "2600"
+    ],
+    [
+      "57",
+      "4",
+      "Increase Critical Hit Chance",
+      "800",
+      "2650"
+    ],
+    [
+      "58",
+      "8",
+      "Stage Clear",
+      "80",
+      "2700"
+    ],
+    [
+      "59",
+      "10",
+      "Watch Ads",
+      "3",
+      "2750"
+    ],
+    [
+      "60",
+      "0",
+      "Increase Attack Power",
+      "3500",
+      "2800"
+    ],
+    [
+      "61",
+      "1",
+      "Physical Strength",
+      "3500",
+      "2850"
+    ],
+    [
+      "62",
+      "2",
+      "Increase Stamina Recovery",
+      "3500",
+      "2900"
+    ],
+    [
+      "63",
+      "5",
+      "Adventure Clear",
+      "50",
+      "2950"
+    ],
+    [
+      "64",
+      "10",
+      "Watch Ads",
+      "4",
+      "3000"
+    ],
+    [
+      "65",
+      "8",
+      "Stage Clear",
+      "90",
+      "3050"
+    ],
+    [
+      "66",
+      "3",
+      "Increase Critical Attack Power",
+      "1000",
+      "3100"
+    ],
+    [
+      "67",
+      "4",
+      "Increase Critical Hit Chance",
+      "1000",
+      "3150"
+    ],
+    [
+      "68",
+      "8",
+      "Stage Clear",
+      "100",
+      "3200"
+    ],
+    [
+      "69",
+      "10",
+      "Watch Ads",
+      "4",
+      "3250"
+    ],
+    [
+      "70",
+      "0",
+      "Increase Attack Power",
+      "6000",
+      "3300"
+    ],
+    [
+      "71",
+      "1",
+      "Physical Strength",
+      "6000",
+      "3350"
+    ],
+    [
+      "72",
+      "2",
+      "Increase Stamina Recovery",
+      "6000",
+      "3400"
+    ],
+    [
+      "73",
+      "5",
+      "Adventure Clear",
+      "60",
+      "3450"
+    ],
+    [
+      "74",
+      "10",
+      "Watch Ads",
+      "4",
+      "3500"
+    ],
+    [
+      "75",
+      "0",
+      "Increase Attack Power",
+      "10000",
+      "3550"
+    ],
+    [
+      "76",
+      "1",
+      "Physical Strength",
+      "10000",
+      "3600"
+    ],
+    [
+      "77",
+      "2",
+      "Increase Stamina Recovery",
+      "10000",
+      "3650"
+    ],
+    [
+      "78",
+      "8",
+      "Stage Clear",
+      "110",
+      "3700"
+    ],
+    [
+      "79",
+      "10",
+      "Watch Ads",
+      "4",
+      "3750"
+    ],
+    [
+      "80",
+      "0",
+      "Increase Attack Power",
+      "15000",
+      "3800"
+    ],
+    [
+      "81",
+      "1",
+      "Physical Strength",
+      "15000",
+      "3850"
+    ],
+    [
+      "82",
+      "2",
+      "Increase Stamina Recovery",
+      "15000",
+      "3900"
+    ],
+    [
+      "83",
+      "5",
+      "Adventure Clear",
+      "65",
+      "3950"
+    ],
+    [
+      "84",
+      "10",
+      "Watch Ads",
+      "4",
+      "4000"
+    ],
+    [
+      "85",
+      "0",
+      "Increase Attack Power",
+      "20000",
+      "4050"
+    ],
+    [
+      "86",
+      "1",
+      "Physical Strength",
+      "20000",
+      "4100"
+    ],
+    [
+      "87",
+      "2",
+      "Increase Stamina Recovery",
+      "20000",
+      "4150"
+    ],
+    [
+      "88",
+      "8",
+      "Stage Clear",
+      "125",
+      "4200"
+    ],
+    [
+      "89",
+      "10",
+      "Watch Ads",
+      "4",
+      "4250"
+    ],
+    [
+      "90",
+      "0",
+      "Increase Attack Power",
+      "25000",
+      "4300"
+    ],
+    [
+      "91",
+      "1",
+      "Physical Strength",
+      "25000",
+      "4350"
+    ],
+    [
+      "92",
+      "2",
+      "Increase Stamina Recovery",
+      "25000",
+      "4400"
+    ],
+    [
+      "93",
+      "5",
+      "Adventure Clear",
+      "70",
+      "4450"
+    ],
+    [
+      "94",
+      "10",
+      "Watch Ads",
+      "4",
+      "4500"
+    ],
+    [
+      "95",
+      "0",
+      "Increase Attack Power",
+      "30000",
+      "4550"
+    ],
+    [
+      "96",
+      "1",
+      "Physical Strength",
+      "30000",
+      "4600"
+    ],
+    [
+      "97",
+      "2",
+      "Increase Stamina Recovery",
+      "30000",
+      "4650"
+    ],
+    [
+      "98",
+      "8",
+      "Stage Clear",
+      "140",
+      "4700"
+    ],
+    [
+      "99",
+      "10",
+      "Watch Ads",
+      "4",
+      "4750"
+    ],
+    [
+      "100",
+      "0",
+      "Increase Attack Power",
+      "35000",
+      "4800"
+    ],
+    [
+      "101",
+      "1",
+      "Physical Strength",
+      "35000",
+      "4850"
+    ],
+    [
+      "102",
+      "2",
+      "Increase Stamina Recovery",
+      "35000",
+      "4900"
+    ],
+    [
+      "103",
+      "5",
+      "Adventure Clear",
+      "75",
+      "4950"
+    ],
+    [
+      "104",
+      "10",
+      "Watch Ads",
+      "4",
+      "5000"
+    ],
+    [
+      "105",
+      "0",
+      "Increase Attack Power",
+      "40000",
+      "5050"
+    ],
+    [
+      "106",
+      "1",
+      "Physical Strength",
+      "40000",
+      "5100"
+    ],
+    [
+      "107",
+      "2",
+      "Increase Stamina Recovery",
+      "40000",
+      "5150"
+    ],
+    [
+      "108",
+      "8",
+      "Stage Clear",
+      "155",
+      "5200"
+    ],
+    [
+      "109",
+      "10",
+      "Watch Ads",
+      "4",
+      "5250"
+    ],
+    [
+      "110",
+      "0",
+      "Increase Attack Power",
+      "50000",
+      "5300"
+    ],
+    [
+      "111",
+      "1",
+      "Physical Strength",
+      "50000",
+      "5350"
+    ],
+    [
+      "112",
+      "2",
+      "Increase Stamina Recovery",
+      "50000",
+      "5400"
+    ],
+    [
+      "113",
+      "8",
+      "Stage Clear",
+      "170",
+      "5450"
+    ],
+    [
+      "114",
+      "10",
+      "Watch Ads",
+      "4",
+      "5500"
+    ],
+    [
+      "115",
+      "0",
+      "Increase Attack Power",
+      "60000",
+      "5550"
+    ],
+    [
+      "116",
+      "1",
+      "Physical Strength",
+      "60000",
+      "5600"
+    ],
+    [
+      "117",
+      "2",
+      "Increase Stamina Recovery",
+      "60000",
+      "5650"
+    ],
+    [
+      "118",
+      "8",
+      "Stage Clear",
+      "190",
+      "5700"
+    ],
+    [
+      "119",
+      "10",
+      "Watch Ads",
+      "4",
+      "5750"
+    ],
+    [
+      "120",
+      "0",
+      "Increase Attack Power",
+      "70000",
+      "5800"
+    ],
+    [
+      "121",
+      "1",
+      "Physical Strength",
+      "70000",
+      "5850"
+    ],
+    [
+      "122",
+      "2",
+      "Increase Stamina Recovery",
+      "70000",
+      "5900"
+    ],
+    [
+      "123",
+      "8",
+      "Stage Clear",
+      "220",
+      "5950"
+    ],
+    [
+      "124",
+      "10",
+      "Watch Ads",
+      "4",
+      "6000"
+    ],
+    [
+      "125",
+      "0",
+      "Increase Attack Power",
+      "80000",
+      "6050"
+    ],
+    [
+      "126",
+      "1",
+      "Physical Strength",
+      "80000",
+      "6100"
+    ],
+    [
+      "127",
+      "2",
+      "Increase Stamina Recovery",
+      "80000",
+      "6150"
+    ],
+    [
+      "128",
+      "8",
+      "Stage Clear",
+      "250",
+      "6200"
+    ],
+    [
+      "129",
+      "10",
+      "Watch Ads",
+      "4",
+      "6250"
+    ],
+    [
+      "130",
+      "0",
+      "Increase Attack Power",
+      "90000",
+      "6300"
+    ],
+    [
+      "131",
+      "1",
+      "Physical Strength",
+      "90000",
+      "6350"
+    ],
+    [
+      "132",
+      "2",
+      "Increase Stamina Recovery",
+      "90000",
+      "6400"
+    ],
+    [
+      "133",
+      "8",
+      "Stage Clear",
+      "280",
+      "6450"
+    ],
+    [
+      "134",
+      "10",
+      "Watch Ads",
+      "4",
+      "6500"
+    ],
+    [
+      "135",
+      "0",
+      "Increase Attack Power",
+      "100000",
+      "6550"
+    ],
+    [
+      "136",
+      "1",
+      "Physical Strength",
+      "100000",
+      "6600"
+    ],
+    [
+      "137",
+      "2",
+      "Increase Stamina Recovery",
+      "100000",
+      "6650"
+    ],
+    [
+      "138",
+      "8",
+      "Stage Clear",
+      "310",
+      "6700"
+    ],
+    [
+      "139",
+      "10",
+      "Watch Ads",
+      "4",
+      "6750"
+    ]
+  ]
+}

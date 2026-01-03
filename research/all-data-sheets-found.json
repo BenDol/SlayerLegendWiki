@@ -1,0 +1,53 @@
+{
+  "totalChecked": 64,
+  "dataSheets": [
+    {
+      "sheet": "COMPANIONS",
+      "rows": 36,
+      "firstRow": [
+        "",
+        "INFO ",
+        "",
+        "COMPANIONS ",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "sheet": "APPEARANCE",
+      "rows": 62,
+      "firstRow": [
+        "",
+        "APPEARANCE ",
+        "OWN",
+        "APPEARANCE CLOTHING",
+        "",
+        "BONUS TYPE",
+        "EFFECT",
+        "BONUS",
+        "",
+        "TOTAL OWNED EFFECT"
+      ]
+    },
+    {
+      "sheet": "CHARACTER",
+      "rows": 66,
+      "firstRow": [
+        "",
+        "ENHANCE ",
+        "",
+        "CHARACTER ",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    }
+  ]
+}

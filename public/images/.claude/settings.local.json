@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(python extract_skill_icons.py:*)",
+      "Bash(python extract_all_atlas_icons.py:*)",
+      "Bash(python:*)",
+      "Bash(done)",
+      "Bash(sort:*)",
+      "Bash(find:*)",
+      "WebSearch",
+      "WebFetch(domain:sites.google.com)",
+      "WebFetch(domain:docs.google.com)",
+      "Bash(cat:*)",
+      "Bash(node -e:*)",
+      "Bash(grep:*)",
+      "Bash(curl:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(node -c:*)",
+      "Bash(node --check:*)",
+      "Bash(gh issue list:*)"
+    ]
+  }
+}

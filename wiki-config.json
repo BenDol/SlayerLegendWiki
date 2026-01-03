@@ -2,13 +2,55 @@
   "wiki": {
     "title": "Slayer Legend Wiki",
     "description": "Complete guide for Slayer Legend: Idle RPG (슬레이어 키우기)",
+    "url": "https://slayerlegend.wiki",
     "logo": "/images/logo.png",
+    "favicon": "/icon/favicon.ico",
+    "manifest": "/site.webmanifest",
+    "themeColor": "#3b82f6",
+    "socialPreview": {
+      "defaultImage": "/images/og-default.svg",
+      "twitterCard": "summary_large_image"
+    },
+    "social": {
+      "discord": "https://discord.gg/slayerlegendsna2"
+    },
     "repository": {
       "owner": "BenDol",
       "repo": "SlayerLegendWiki",
       "branch": "main",
-      "contentPath": "public/content"
-    }
+      "contentPath": "public/content",
+      "namespaces": {
+        "enabled": true,
+        "allowedBranches": ["main", "dev"],
+        "defaultBranch": "main"
+      }
+    },
+    "tools": [
+      {
+        "title": "Battle Loadouts",
+        "path": "/battle-loadouts",
+        "icon": "📖",
+        "description": "Configure and save complete battle loadouts"
+      },
+      {
+        "title": "Skill Builder",
+        "path": "/skill-builder",
+        "icon": "⚔️",
+        "description": "Create and share skill builds"
+      },
+      {
+        "title": "Spirit Builder",
+        "path": "/spirit-builder",
+        "icon": "🔮",
+        "description": "Build and share spirit configurations"
+      },
+      {
+        "title": "Soul Weapon",
+        "path": "/soul-weapon-engraving",
+        "icon": "🗡️",
+        "description": "Plan and visualize soul weapon engraving layouts"
+      }
+    ]
   },
   "categories": [
     {
@@ -17,22 +59,38 @@
       "icon": "⚔️",
       "order": 1,
       "expandedByDefault": true,
-      "sections": ["getting-started", "characters", "equipment", "companions", "skills"]
+      "sections": ["getting-started", "progression"]
+    },
+    {
+      "id": "tools",
+      "title": "Tools",
+      "icon": "🛠️",
+      "order": 2,
+      "expandedByDefault": true,
+      "sections": ["tools"]
     },
     {
       "id": "content",
       "title": "Content",
       "icon": "🗺️",
-      "order": 2,
-      "expandedByDefault": true,
-      "sections": ["content", "progression", "resources"]
+      "order": 3,
+      "expandedByDefault": false,
+      "sections": ["characters", "equipment", "companions", "skills", "stages", "spirits", "resources"]
     },
     {
       "id": "guides",
-      "title": "Guides & Tools",
+      "title": "Guides",
       "icon": "📚",
-      "order": 3,
-      "sections": ["guides", "database", "tools"]
+      "order": 4,
+      "sections": ["guides", "database", "andy"]
+    },
+    {
+      "id": "community",
+      "title": "Community",
+      "icon": "👥",
+      "order": 5,
+      "expandedByDefault": false,
+      "sections": ["community"]
     }
   ],
   "sidebar": {
@@ -43,14 +101,30 @@
         "icon": "🏠"
       },
       {
-        "title": "Contributing",
-        "path": "/meta/contributing",
-        "icon": "✍️"
+        "title": "Highscore",
+        "path": "/highscore",
+        "icon": "🏆"
       },
       {
         "title": "Guidelines",
         "path": "/meta/guidelines",
-        "icon": "📋"
+        "icon": "📋",
+        "showInHeader": false,
+        "position": "bottom"
+      },
+      {
+        "title": "Contributing",
+        "path": "/meta/contributing",
+        "icon": "✍️",
+        "showInHeader": false,
+        "position": "bottom"
+      },
+      {
+        "title": "Donate",
+        "path": "/donate",
+        "icon": "💝",
+        "showInHeader": false,
+        "position": "bottom"
       }
     ]
   },
@@ -96,12 +170,20 @@
       "order": 5
     },
     {
-      "id": "content",
-      "title": "Content",
-      "path": "content",
+      "id": "stages",
+      "title": "Stages",
+      "path": "stages",
       "icon": "🗺️",
       "allowContributions": true,
       "order": 6
+    },
+    {
+      "id": "spirits",
+      "title": "Spirits",
+      "path": "spirits",
+      "icon": "👻",
+      "allowContributions": true,
+      "order": 6.5
     },
     {
       "id": "progression",
@@ -125,6 +207,7 @@
       "path": "guides",
       "icon": "📚",
       "allowContributions": true,
+      "hideTitleInSidebar": true,
       "order": 9
     },
     {
@@ -137,12 +220,60 @@
       "order": 10
     },
     {
+      "id": "andy",
+      "title": "Andy",
+      "path": "andy",
+      "icon": "📖",
+      "showInHeader": false,
+      "allowContributions": true,
+      "order": 10.1
+    },
+    {
+      "id": "community",
+      "title": "Community",
+      "path": "community",
+      "icon": "👥",
+      "allowContributions": false,
+      "hideTitleInSidebar": true,
+      "order": 10.5,
+      "pages": [
+        {
+          "title": "Content Creators",
+          "path": "/creators",
+          "icon": "🎥"
+        }
+      ]
+    },
+    {
       "id": "tools",
       "title": "Tools",
       "path": "tools",
       "icon": "🛠️",
       "allowContributions": false,
-      "order": 11
+      "hideTitleInSidebar": true,
+      "order": 11,
+      "pages": [
+        {
+          "title": "Battle Loadouts",
+          "path": "/battle-loadouts",
+          "icon": "📖"
+        },
+        {
+          "title": "Skill Builder",
+          "path": "/skill-builder",
+          "icon": "⚔️"
+        },
+        {
+          "title": "Spirit Builder",
+          "path": "/spirit-builder",
+          "icon": "🔮"
+        },
+        {
+          "title": "Soul Weapon",
+          "path": "/soul-weapon-engraving",
+          "icon": "🗡️"
+        }
+      ]
     },
     {
       "id": "meta",
@@ -153,6 +284,21 @@
       "order": 12
     }
   ],
+  "storage": {
+    "backend": "github",
+    "version": "v1",
+    "migration": {
+      "enabled": false
+    },
+    "github": {
+      "owner": "BenDol",
+      "repo": "SlayerLegendWiki"
+    },
+    "cloudflare": {
+      "keyPrefix": "slayerwiki",
+      "namespaceName": "SLAYER_WIKI_DATA"
+    }
+  },
   "features": {
     "search": true,
     "tableOfContents": true,
@@ -164,6 +310,36 @@
     "calculators": true,
     "progressTracking": true,
     "autoFormatPageTitles": true,
+    "purgeClientCacheOnUpdate": false,
+    "preserveDraftsOnUpdate": true,
+    "forceRelogOnUpdate": false,
+    "enableRemoteLoggingInDev": true,
+    "dynamicPageLoading": {
+      "enabled": true,
+      "cacheTTL": 120000,
+      "fallbackToStatic": true,
+      "allowStaleOnRateLimit": true
+    },
+    "gameAssets": {
+      "enabled": true,
+      "cdn": {
+        "provider": "github",
+        "github": {
+          "owner": "BenDol",
+          "repo": "SlayerLegendCDN",
+          "basePath": "game-assets",
+          "servingMode": "jsdelivr",
+          "branch": "main"
+        }
+      }
+    },
+    "branchIndicator": {
+      "enabled": false
+    },
+    "developmentBanner": {
+      "enabled": true,
+      "expiryMinutes": 60
+    },
     "customHomePage": {
       "enabled": false,
       "path": "home.md"
@@ -189,16 +365,233 @@
         "keepForkUpdated": true
       },
       "anonymous": {
-        "enabled": false,
+        "enabled": true,
         "mode": "server",
+        "requireEmailVerification": true,
         "serverEndpoint": "",
-        "attributionFormat": "Contributed anonymously via wiki editor"
+        "attributionFormat": "Contributed anonymously via wiki editor",
+        "reCaptcha": {
+          "enabled": true,
+          "siteKey": "",
+          "minimumScore": 0.5
+        },
+        "rateLimit": {
+          "enabled": true,
+          "maxEditsPerHour": 5,
+          "windowMinutes": 60
+        },
+        "emailVerification": {
+          "codeExpiryMinutes": 10,
+          "tokenExpiryHours": 24,
+          "codeLength": 6
+        },
+        "emailService": {
+          "provider": "sendgrid",
+          "fromEmail": "noreply@slayerlegend.wiki",
+          "fromName": "Slayer Legend Wiki"
+        },
+        "storage": {
+          "provider": "github-issues",
+          "verificationLabel": "email-verification",
+          "cleanupDays": 1
+        },
+        "labels": ["anonymous-edit", "needs-review"]
+      },
+      "contentModeration": {
+        "enabled": true,
+        "checkAnonymousEdits": true,
+        "checkAuthenticatedEdits": false,
+        "checkDisplayName": true,
+        "checkEditSummary": true,
+        "checkPageContent": true,
+        "maxContentLength": 5000
       },
       "permissions": {
-        "requireAuth": true,
+        "requireAuth": false,
         "fallbackToFork": true,
         "allowDirectCommit": true,
         "allowDirectCommitDelete": false
+      }
+    },
+    "contributorHighscore": {
+      "enabled": true,
+      "cacheMinutes": 30,
+      "displayLimit": 100,
+      "ignoreRepositoryOwner": true,
+      "ignoreMainContributors": false
+    },
+    "achievements": {
+      "enabled": true,
+      "checking": {
+        "checkOnLogin": true,
+        "checkOnBuildSave": true,
+        "checkOnLoadoutSave": true,
+        "checkOnSnapshotUpdate": true
+      },
+      "limits": {
+        "maxChecksPerHour": 10
+      }
+    },
+    "maintenance": {
+      "enabled": false,
+      "title": "Maintenance in Progress",
+      "message": "We're currently performing scheduled maintenance to improve your experience.",
+      "details": null,
+      "estimatedReturn": null,
+      "contactEmail": null,
+      "showContactInfo": false,
+      "allowAdminBypass": true,
+      "customHtml": null
+    },
+    "donation": {
+      "enabled": true,
+      "minAmount": 5,
+      "prompt": {
+        "minTimeOnSite": 60,
+        "minPagesViewed": 3,
+        "daysUntilNextPrompt": 2
+      },
+      "badge": {
+        "enabled": true,
+        "badge": "💎",
+        "color": "#ffd700",
+        "title": "Donator"
+      },
+      "paypal": {
+        "enabled": true,
+        "clientId": "",
+        "webhookUrl": "/api/paypal-webhook"
+      },
+      "methods": {
+        "stripe": {
+          "enabled": false,
+          "url": ""
+        },
+        "paypal": {
+          "enabled": true,
+          "fallbackUrl": "https://paypal.me/bendolus",
+          "disablePayLater": true
+        },
+        "kofi": {
+          "enabled": false,
+          "username": "bendol",
+          "url": "https://ko-fi.com/bendol"
+        }
+      }
+    },
+    "contentCreators": {
+      "enabled": true,
+      "streamers": {
+        "enabled": true,
+        "allowSubmissions": true,
+        "requireApproval": true,
+        "platforms": ["twitch", "youtube"],
+        "rateLimit": {
+          "maxSubmissionsPerHour": 5
+        },
+        "showOnHomePage": true,
+        "homePageLimit": 3
+      },
+      "videoGuides": {
+        "enabled": true,
+        "allowSubmissions": true,
+        "allowRawUpload": true,
+        "requireAuthentication": false,
+        "requireApproval": true,
+        "dataFile": "public/data/video-guides.json",
+        "categories": ["beginner", "intermediate", "advanced", "farming", "promotion"],
+        "difficulties": ["beginner", "intermediate", "advanced", "expert"],
+        "tags": ["tutorial", "guide", "tips", "strategy", "build", "farming", "pve", "promotion"],
+        "showOnHomePage": true,
+        "homePageLimit": 6,
+        "cdn": {
+          "provider": "github",
+          "github": {
+            "owner": "BenDol",
+            "repo": "SlayerLegendCDN",
+            "servingMode": "jsdelivr",
+            "maxFileSizeMB": 500,
+            "allowedFormats": ["mp4", "webm", "mov", "avi"],
+            "lfs": {
+              "enabled": false,
+              "useByDefault": false,
+              "thresholdMB": 10,
+              "batchAPI": "https://github.com/{owner}/{repo}.git/info/lfs/objects/batch"
+            }
+          }
+        }
+      },
+      "showInSidebar": true,
+      "sidebarPosition": "top"
+    },
+    "profilePictures": {
+      "enabled": true,
+      "maxFileSizeMB": 3,
+      "allowedFormats": ["jpg", "jpeg", "png", "webp", "gif"],
+      "outputFormat": "webp",
+      "outputQuality": 85,
+      "outputDimensions": { "width": 512, "height": 512 },
+      "moderation": {
+        "enabled": true,
+        "provider": "openai-vision"
+      },
+      "cdn": {
+        "provider": "github",
+        "github": {
+          "owner": "BenDol",
+          "repo": "SlayerLegendCDN",
+          "path": "avatars",
+          "servingMode": "jsdelivr"
+        }
+      }
+    },
+    "imageUploads": {
+      "enabled": true,
+      "maxFileSizeMB": 10,
+      "allowedFormats": ["jpg", "jpeg", "png", "webp", "gif"],
+      "categories": [
+        "characters",
+        "equipment",
+        "stages",
+        "companions",
+        "skills",
+        "resources",
+        "bosses",
+        "guides",
+        "other"
+      ],
+      "requireAuthentication": false,
+      "moderation": {
+        "enabled": true,
+        "provider": "openai-vision",
+        "checkAnonymous": true,
+        "checkAuthenticated": true
+      },
+      "rateLimit": {
+        "enabled": true,
+        "maxUploadsPerDay": 10,
+        "windowHours": 24,
+        "anonymousOnly": true
+      },
+      "processing": {
+        "generateWebP": true,
+        "webpQuality": 85,
+        "maxDimensions": {
+          "width": 2048,
+          "height": 2048
+        },
+        "autoResize": true,
+        "preserveOriginal": true
+      },
+      "cdn": {
+        "provider": "github",
+        "github": {
+          "owner": "BenDol",
+          "repo": "SlayerLegendCDN",
+          "basePath": "user-content/images",
+          "servingMode": "jsdelivr",
+          "indexUrl": "https://cdn.jsdelivr.net/gh/BenDol/SlayerLegendCDN@main/user-content/images/image-index.json"
+        }
       }
     }
   },
