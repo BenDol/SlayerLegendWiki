@@ -4,7 +4,7 @@
   "description": "My custom wiki built with GitHub Wiki Framework",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/killDevServer.js && node scripts/injectVersion.js",
+    "predev": "node scripts/killDevServer.js && node scripts/copyConfig.js && node scripts/injectVersion.js",
     "dev": "concurrently --kill-others --names \"CONFIG,VITE,WRANGLER\" --prefix-colors \"cyan,blue,yellow\" \"npm:dev:watch\" \"npm:dev:vite-cf\" \"npm:dev:wrangler\"",
     "dev:watch": "node scripts/watchConfig.js",
     "dev:vite-cf": "cross-env VITE_DEV_PLATFORM=cloudflare vite",

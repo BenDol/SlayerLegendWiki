@@ -301,6 +301,31 @@ Parent Project (this repo)       Framework Submodule
 2. If framework change needed, update framework repo separately
 3. Pull framework updates: `cd wiki-framework && git pull`
 
+### Configuring Features
+Many framework features can be toggled in `wiki-config.json` under `features`:
+
+```json
+{
+  "features": {
+    "editor": {
+      "previewHighlight": {
+        "enabled": true  // Highlights word/element at cursor in live preview
+      }
+    },
+    "dynamicPageLoading": {
+      "enabled": true,  // Load pages from GitHub instead of bundled files
+      "cacheTTL": 120000
+    }
+  }
+}
+```
+
+**Available feature flags:**
+- `editor.previewHighlight` - Real-time preview highlighting while editing ([docs](wiki-framework/docs/editor-cursor-highlight.md))
+- `dynamicPageLoading` - Load pages from GitHub instead of bundled files
+- `sidebarTreeLines` - Visual tree lines in sidebar navigation
+- See `wiki-config.json` for full list
+
 ## Important Constraints
 
 1. **Never modify `wiki-framework/` files** - Framework is generic, reusable

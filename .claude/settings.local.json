@@ -225,7 +225,14 @@
       "Bash(Get-Content \"C:\\\\Users\\\\dolb9\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Projects-slayerlegend-wiki\\\\tasks\\\\b186135.output\")",
       "Bash(Select-String -Pattern \"error|Error|ERROR|failed\" -Context 2,2)",
       "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\.wrangler\\\\server.log\" -Tail 50)",
-      "Bash(Select-String -Pattern \"error|Error|ERROR|warning|Warning|WARNING\")"
+      "Bash(Select-String -Pattern \"error|Error|ERROR|warning|Warning|WARNING\")",
+      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\wiki-framework\\\\logs\\\\debug.log\" -Tail 30)",
+      "Bash(Start-Sleep -Seconds 3)",
+      "Bash(Get-Content \"C:\\\\Users\\\\dolb9\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Projects-slayerlegend-wiki\\\\tasks\\\\bcf7ca6.output\" -Tail 30)",
+      "Bash(Get-Content \"C:\\\\Users\\\\dolb9\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Projects-slayerlegend-wiki\\\\tasks\\\\bbb84a3.output\" -Tail 50)",
+      "Bash(Get-Content public/wiki-config.json)",
+      "Bash(Select-String -Pattern \"editor|network\" -Context 1,1)",
+      "Bash(Get-Content functions/_shared/wiki-config.json)"
     ]
   }
 }

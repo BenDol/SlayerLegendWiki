@@ -349,6 +349,12 @@
       "width": 1,
       "style": "solid"
     },
+    "editor": {
+      "previewHighlight": {
+        "enabled": true,
+        "description": "Highlights the word/element at cursor position in the live preview while editing"
+      }
+    },
     "starContributor": {
       "enabled": true,
       "icon": "⭐"
