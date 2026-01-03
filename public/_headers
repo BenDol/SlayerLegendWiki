@@ -1,0 +1,14 @@
+# Cloudflare Pages Custom Headers
+# See: https://developers.cloudflare.com/pages/configuration/headers/
+
+# Search index - cache for 1 hour (rebuilds trigger new deployment)
+/search-index.json
+  Cache-Control: public, max-age=3600, s-maxage=3600
+
+# Static game data - cache for 1 hour (only changes with deployment)
+/data/*.json
+  Cache-Control: public, max-age=3600, s-maxage=3600
+
+# Wiki config - NO CACHE (contains feature flags that may need immediate updates)
+/wiki-config.json
+  Cache-Control: no-cache, no-store, must-revalidate

@@ -1,0 +1,32 @@
+[
+{
+"spiritId": 1,
+"level": 1,
+"awakeningLevel": 5,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0,
+"id": "my-spirits-1766217975811-qyabuxno2",
+"createdAt": "2025-12-20T08:06:15.811Z",
+"updatedAt": "2025-12-20T08:06:32.145Z"
+},
+{
+"spiritId": 7,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0,
+"id": "my-spirits-1766220640322-2pe4mcit8",
+"createdAt": "2025-12-20T08:50:40.322Z",
+"updatedAt": "2025-12-20T08:50:40.477Z"
+},
+{
+"spiritId": 10,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0,
+"id": "my-spirits-1766235065135-zssgrjb1x",
+"createdAt": "2025-12-20T12:51:05.135Z",
+"updatedAt": "2025-12-20T12:51:05.363Z"
+}
+]

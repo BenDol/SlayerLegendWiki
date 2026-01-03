@@ -1,0 +1,982 @@
+[
+  {
+    "id": "0",
+    "type": "14",
+    "description": "Kill Monster",
+    "need": "1",
+    "reward": "50"
+  },
+  {
+    "id": "1",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "5",
+    "reward": "100"
+  },
+  {
+    "id": "2",
+    "type": "11",
+    "description": "Growth -> Character level up",
+    "need": "2",
+    "reward": "150"
+  },
+  {
+    "id": "3",
+    "type": "17",
+    "description": "Character STR Enhancement",
+    "need": "1",
+    "reward": "200"
+  },
+  {
+    "id": "4",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "1",
+    "reward": "250"
+  },
+  {
+    "id": "5",
+    "type": "7",
+    "description": "Summon Weapons from the Shop",
+    "need": "3",
+    "reward": "300"
+  },
+  {
+    "id": "6",
+    "type": "12",
+    "description": "Equip Weapon",
+    "need": "1",
+    "reward": "350"
+  },
+  {
+    "id": "7",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "3",
+    "reward": "400"
+  },
+  {
+    "id": "8",
+    "type": "11",
+    "description": "Level Up",
+    "need": "10",
+    "reward": "450"
+  },
+  {
+    "id": "9",
+    "type": "6",
+    "description": "Learn Skills",
+    "need": "1",
+    "reward": "500"
+  },
+  {
+    "id": "10",
+    "type": "15",
+    "description": "Equip Skill",
+    "need": "1",
+    "reward": "550"
+  },
+  {
+    "id": "11",
+    "type": "16",
+    "description": "Use Skill",
+    "need": "1",
+    "reward": "600"
+  },
+  {
+    "id": "12",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "20",
+    "reward": "650"
+  },
+  {
+    "id": "13",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "20",
+    "reward": "700"
+  },
+  {
+    "id": "14",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "6",
+    "reward": "750"
+  },
+  {
+    "id": "15",
+    "type": "11",
+    "description": "Growth -> Character level up",
+    "need": "15",
+    "reward": "800"
+  },
+  {
+    "id": "16",
+    "type": "6",
+    "description": "Learn Skills",
+    "need": "2",
+    "reward": "850"
+  },
+  {
+    "id": "17",
+    "type": "15",
+    "description": "Equip Skill",
+    "need": "2",
+    "reward": "900"
+  },
+  {
+    "id": "18",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "10",
+    "reward": "950"
+  },
+  {
+    "id": "19",
+    "type": "18",
+    "description": "Summon Accessory From The Shop",
+    "need": "3",
+    "reward": "1000"
+  },
+  {
+    "id": "20",
+    "type": "19",
+    "description": "Equip Accessory",
+    "need": "1",
+    "reward": "1050"
+  },
+  {
+    "id": "21",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "1",
+    "reward": "1100"
+  },
+  {
+    "id": "22",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "50",
+    "reward": "1150"
+  },
+  {
+    "id": "23",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "50",
+    "reward": "1200"
+  },
+  {
+    "id": "24",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "20",
+    "reward": "1250"
+  },
+  {
+    "id": "25",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "5",
+    "reward": "1300"
+  },
+  {
+    "id": "26",
+    "type": "13",
+    "description": "Promotion Challenge",
+    "need": "1",
+    "reward": "1350"
+  },
+  {
+    "id": "27",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "100",
+    "reward": "1400"
+  },
+  {
+    "id": "28",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "100",
+    "reward": "1450"
+  },
+  {
+    "id": "29",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "100",
+    "reward": "1500"
+  },
+  {
+    "id": "30",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "30",
+    "reward": "1550"
+  },
+  {
+    "id": "31",
+    "type": "3",
+    "description": "Increase Critical Attack Power",
+    "need": "100",
+    "reward": "1600"
+  },
+  {
+    "id": "32",
+    "type": "4",
+    "description": "Increase Critical Hit Chance",
+    "need": "100",
+    "reward": "1650"
+  },
+  {
+    "id": "33",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "10",
+    "reward": "1700"
+  },
+  {
+    "id": "34",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "1",
+    "reward": "1750"
+  },
+  {
+    "id": "35",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "300",
+    "reward": "1800"
+  },
+  {
+    "id": "36",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "300",
+    "reward": "1850"
+  },
+  {
+    "id": "37",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "300",
+    "reward": "1900"
+  },
+  {
+    "id": "38",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "40",
+    "reward": "1950"
+  },
+  {
+    "id": "39",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "20",
+    "reward": "2000"
+  },
+  {
+    "id": "40",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "1",
+    "reward": "2050"
+  },
+  {
+    "id": "41",
+    "type": "3",
+    "description": "Increase Critical Attack Power",
+    "need": "300",
+    "reward": "2100"
+  },
+  {
+    "id": "42",
+    "type": "4",
+    "description": "Increase Critical Hit Chance",
+    "need": "300",
+    "reward": "2150"
+  },
+  {
+    "id": "43",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "30",
+    "reward": "2200"
+  },
+  {
+    "id": "44",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "2",
+    "reward": "2250"
+  },
+  {
+    "id": "45",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "50",
+    "reward": "2300"
+  },
+  {
+    "id": "46",
+    "type": "3",
+    "description": "Increase Critical Attack Power",
+    "need": "500",
+    "reward": "2350"
+  },
+  {
+    "id": "47",
+    "type": "4",
+    "description": "Increase Critical Hit Chance",
+    "need": "500",
+    "reward": "2400"
+  },
+  {
+    "id": "48",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "60",
+    "reward": "2450"
+  },
+  {
+    "id": "49",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "2",
+    "reward": "2500"
+  },
+  {
+    "id": "50",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "1000",
+    "reward": "2300"
+  },
+  {
+    "id": "51",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "1000",
+    "reward": "2350"
+  },
+  {
+    "id": "52",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "1000",
+    "reward": "2400"
+  },
+  {
+    "id": "53",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "40",
+    "reward": "2450"
+  },
+  {
+    "id": "54",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "3",
+    "reward": "2500"
+  },
+  {
+    "id": "55",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "70",
+    "reward": "2550"
+  },
+  {
+    "id": "56",
+    "type": "3",
+    "description": "Increase Critical Attack Power",
+    "need": "800",
+    "reward": "2600"
+  },
+  {
+    "id": "57",
+    "type": "4",
+    "description": "Increase Critical Hit Chance",
+    "need": "800",
+    "reward": "2650"
+  },
+  {
+    "id": "58",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "80",
+    "reward": "2700"
+  },
+  {
+    "id": "59",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "3",
+    "reward": "2750"
+  },
+  {
+    "id": "60",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "3500",
+    "reward": "2800"
+  },
+  {
+    "id": "61",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "3500",
+    "reward": "2850"
+  },
+  {
+    "id": "62",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "3500",
+    "reward": "2900"
+  },
+  {
+    "id": "63",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "50",
+    "reward": "2950"
+  },
+  {
+    "id": "64",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "3000"
+  },
+  {
+    "id": "65",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "90",
+    "reward": "3050"
+  },
+  {
+    "id": "66",
+    "type": "3",
+    "description": "Increase Critical Attack Power",
+    "need": "1000",
+    "reward": "3100"
+  },
+  {
+    "id": "67",
+    "type": "4",
+    "description": "Increase Critical Hit Chance",
+    "need": "1000",
+    "reward": "3150"
+  },
+  {
+    "id": "68",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "100",
+    "reward": "3200"
+  },
+  {
+    "id": "69",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "3250"
+  },
+  {
+    "id": "70",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "6000",
+    "reward": "3300"
+  },
+  {
+    "id": "71",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "6000",
+    "reward": "3350"
+  },
+  {
+    "id": "72",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "6000",
+    "reward": "3400"
+  },
+  {
+    "id": "73",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "60",
+    "reward": "3450"
+  },
+  {
+    "id": "74",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "3500"
+  },
+  {
+    "id": "75",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "10000",
+    "reward": "3550"
+  },
+  {
+    "id": "76",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "10000",
+    "reward": "3600"
+  },
+  {
+    "id": "77",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "10000",
+    "reward": "3650"
+  },
+  {
+    "id": "78",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "110",
+    "reward": "3700"
+  },
+  {
+    "id": "79",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "3750"
+  },
+  {
+    "id": "80",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "15000",
+    "reward": "3800"
+  },
+  {
+    "id": "81",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "15000",
+    "reward": "3850"
+  },
+  {
+    "id": "82",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "15000",
+    "reward": "3900"
+  },
+  {
+    "id": "83",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "65",
+    "reward": "3950"
+  },
+  {
+    "id": "84",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "4000"
+  },
+  {
+    "id": "85",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "20000",
+    "reward": "4050"
+  },
+  {
+    "id": "86",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "20000",
+    "reward": "4100"
+  },
+  {
+    "id": "87",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "20000",
+    "reward": "4150"
+  },
+  {
+    "id": "88",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "125",
+    "reward": "4200"
+  },
+  {
+    "id": "89",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "4250"
+  },
+  {
+    "id": "90",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "25000",
+    "reward": "4300"
+  },
+  {
+    "id": "91",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "25000",
+    "reward": "4350"
+  },
+  {
+    "id": "92",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "25000",
+    "reward": "4400"
+  },
+  {
+    "id": "93",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "70",
+    "reward": "4450"
+  },
+  {
+    "id": "94",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "4500"
+  },
+  {
+    "id": "95",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "30000",
+    "reward": "4550"
+  },
+  {
+    "id": "96",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "30000",
+    "reward": "4600"
+  },
+  {
+    "id": "97",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "30000",
+    "reward": "4650"
+  },
+  {
+    "id": "98",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "140",
+    "reward": "4700"
+  },
+  {
+    "id": "99",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "4750"
+  },
+  {
+    "id": "100",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "35000",
+    "reward": "4800"
+  },
+  {
+    "id": "101",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "35000",
+    "reward": "4850"
+  },
+  {
+    "id": "102",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "35000",
+    "reward": "4900"
+  },
+  {
+    "id": "103",
+    "type": "5",
+    "description": "Adventure Clear",
+    "need": "75",
+    "reward": "4950"
+  },
+  {
+    "id": "104",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "5000"
+  },
+  {
+    "id": "105",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "40000",
+    "reward": "5050"
+  },
+  {
+    "id": "106",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "40000",
+    "reward": "5100"
+  },
+  {
+    "id": "107",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "40000",
+    "reward": "5150"
+  },
+  {
+    "id": "108",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "155",
+    "reward": "5200"
+  },
+  {
+    "id": "109",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "5250"
+  },
+  {
+    "id": "110",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "50000",
+    "reward": "5300"
+  },
+  {
+    "id": "111",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "50000",
+    "reward": "5350"
+  },
+  {
+    "id": "112",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "50000",
+    "reward": "5400"
+  },
+  {
+    "id": "113",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "170",
+    "reward": "5450"
+  },
+  {
+    "id": "114",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "5500"
+  },
+  {
+    "id": "115",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "60000",
+    "reward": "5550"
+  },
+  {
+    "id": "116",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "60000",
+    "reward": "5600"
+  },
+  {
+    "id": "117",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "60000",
+    "reward": "5650"
+  },
+  {
+    "id": "118",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "190",
+    "reward": "5700"
+  },
+  {
+    "id": "119",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "5750"
+  },
+  {
+    "id": "120",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "70000",
+    "reward": "5800"
+  },
+  {
+    "id": "121",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "70000",
+    "reward": "5850"
+  },
+  {
+    "id": "122",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "70000",
+    "reward": "5900"
+  },
+  {
+    "id": "123",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "220",
+    "reward": "5950"
+  },
+  {
+    "id": "124",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "6000"
+  },
+  {
+    "id": "125",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "80000",
+    "reward": "6050"
+  },
+  {
+    "id": "126",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "80000",
+    "reward": "6100"
+  },
+  {
+    "id": "127",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "80000",
+    "reward": "6150"
+  },
+  {
+    "id": "128",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "250",
+    "reward": "6200"
+  },
+  {
+    "id": "129",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "6250"
+  },
+  {
+    "id": "130",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "90000",
+    "reward": "6300"
+  },
+  {
+    "id": "131",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "90000",
+    "reward": "6350"
+  },
+  {
+    "id": "132",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "90000",
+    "reward": "6400"
+  },
+  {
+    "id": "133",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "280",
+    "reward": "6450"
+  },
+  {
+    "id": "134",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "6500"
+  },
+  {
+    "id": "135",
+    "type": "0",
+    "description": "Increase Attack Power",
+    "need": "100000",
+    "reward": "6550"
+  },
+  {
+    "id": "136",
+    "type": "1",
+    "description": "Physical Strength",
+    "need": "100000",
+    "reward": "6600"
+  },
+  {
+    "id": "137",
+    "type": "2",
+    "description": "Increase Stamina Recovery",
+    "need": "100000",
+    "reward": "6650"
+  },
+  {
+    "id": "138",
+    "type": "8",
+    "description": "Stage Clear",
+    "need": "310",
+    "reward": "6700"
+  },
+  {
+    "id": "139",
+    "type": "10",
+    "description": "Watch Ads",
+    "need": "4",
+    "reward": "6750"
+  }
+]

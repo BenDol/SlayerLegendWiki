@@ -1,0 +1,142 @@
+name: HTML Security Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'public/content/**/*.md'
+      - 'src/**/*.jsx'
+      - 'src/**/*.js'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  validate-html:
+    runs-on: ubuntu-latest
+    name: Validate HTML Security
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for git diff
+
+      - name: Checkout base branch
+        run: |
+          git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run HTML security validation
+        id: validate
+        continue-on-error: true
+        run: node wiki-framework/scripts/validateHtml.js
+        env:
+          GITHUB_BASE_REF: origin/${{ github.base_ref }}
+          GITHUB_SHA: ${{ github.sha }}
+
+      - name: Read validation report
+        id: report
+        if: always()
+        run: |
+          if [ -f validation-report.md ]; then
+            echo "report_exists=true" >> $GITHUB_OUTPUT
+            # Read report content (handle multiline)
+            {
+              echo 'report<<EOF'
+              cat validation-report.md
+              echo EOF
+            } >> $GITHUB_OUTPUT
+          else
+            echo "report_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on PR with validation results
+        if: steps.report.outputs.report_exists == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const report = `${{ steps.report.outputs.report }}`;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('HTML Security Validation')
+            );
+
+            // Create or update comment
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: report
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: report
+              });
+            }
+
+      - name: Add security warning label
+        if: steps.validate.outputs.has_critical == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['security:warning']
+            });
+
+      - name: Remove security warning label
+        if: steps.validate.outputs.has_issues == 'false'
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'security:warning'
+              });
+            } catch (error) {
+              // Label might not exist, ignore
+              console.log('Label not found or already removed');
+            }
+
+      - name: Fail if critical issues found
+        if: steps.validate.outputs.has_critical == 'true'
+        run: |
+          echo "❌ Critical security issues detected. Review required before merge."
+          exit 1
+
+      - name: Success
+        if: steps.validate.outputs.has_issues == 'false'
+        run: |
+          echo "✅ HTML security validation passed!"

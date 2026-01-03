@@ -1,0 +1,247 @@
+[
+{
+"name": "Test",
+"maxSlots": 10,
+"slots": [
+{
+"skillId": 7,
+"level": 130
+},
+{
+"skillId": 9,
+"level": 130
+},
+{
+"skillId": 10,
+"level": 130
+},
+{
+"skillId": 4,
+"level": 130
+},
+{
+"skillId": 12,
+"level": 130
+},
+{
+"skillId": 2,
+"level": 130
+},
+{
+"skillId": 11,
+"level": 20
+},
+{
+"skillId": null,
+"level": 1
+},
+{
+"skillId": 15,
+"level": 130
+},
+{
+"skillId": 18,
+"level": 20
+}
+],
+"id": "skill-builds-1766218568747-n2iiggwi7",
+"createdAt": "2025-12-20T08:16:08.747Z",
+"updatedAt": "2025-12-20T08:16:09.114Z"
+},
+{
+"name": "Test22",
+"maxSlots": 10,
+"slots": [
+{
+"skillId": 7,
+"level": 130
+},
+{
+"skillId": 9,
+"level": 130
+},
+{
+"skillId": 10,
+"level": 130
+},
+{
+"skillId": 4,
+"level": 130
+},
+{
+"skillId": 12,
+"level": 130
+},
+{
+"skillId": 2,
+"level": 130
+},
+{
+"skillId": 11,
+"level": 20
+},
+{
+"skillId": null,
+"level": 1
+},
+{
+"skillId": 15,
+"level": 130
+},
+{
+"skillId": 18,
+"level": 20
+}
+],
+"id": "skill-builds-1766220431638-okml96akn",
+"createdAt": "2025-12-20T08:47:11.638Z",
+"updatedAt": "2025-12-20T08:47:11.865Z"
+},
+{
+"name": "Test223",
+"maxSlots": 10,
+"slots": [
+{
+"skillId": 7,
+"level": 130
+},
+{
+"skillId": 9,
+"level": 130
+},
+{
+"skillId": 10,
+"level": 130
+},
+{
+"skillId": 4,
+"level": 130
+},
+{
+"skillId": 12,
+"level": 130
+},
+{
+"skillId": 2,
+"level": 130
+},
+{
+"skillId": 11,
+"level": 20
+},
+{
+"skillId": null,
+"level": 1
+},
+{
+"skillId": 15,
+"level": 130
+},
+{
+"skillId": 18,
+"level": 20
+}
+],
+"id": "skill-builds-1766233893226-2l92u9rvo",
+"createdAt": "2025-12-20T12:31:33.226Z",
+"updatedAt": "2025-12-20T12:31:33.388Z"
+},
+{
+"name": "Test22377",
+"maxSlots": 10,
+"slots": [
+{
+"skillId": 7,
+"level": 130
+},
+{
+"skillId": 9,
+"level": 130
+},
+{
+"skillId": 10,
+"level": 130
+},
+{
+"skillId": 4,
+"level": 130
+},
+{
+"skillId": 12,
+"level": 130
+},
+{
+"skillId": 2,
+"level": 130
+},
+{
+"skillId": 11,
+"level": 20
+},
+{
+"skillId": null,
+"level": 1
+},
+{
+"skillId": 15,
+"level": 130
+},
+{
+"skillId": 18,
+"level": 20
+}
+],
+"id": "skill-builds-1766234185091-l2p9rjouf",
+"createdAt": "2025-12-20T12:36:25.091Z",
+"updatedAt": "2025-12-20T12:36:25.295Z"
+},
+{
+"name": "Test222",
+"maxSlots": 10,
+"slots": [
+{
+"skillId": 7,
+"level": 130
+},
+{
+"skillId": 9,
+"level": 130
+},
+{
+"skillId": 10,
+"level": 130
+},
+{
+"skillId": 4,
+"level": 130
+},
+{
+"skillId": 12,
+"level": 130
+},
+{
+"skillId": 2,
+"level": 130
+},
+{
+"skillId": 11,
+"level": 20
+},
+{
+"skillId": 13,
+"level": 1
+},
+{
+"skillId": 15,
+"level": 130
+},
+{
+"skillId": 18,
+"level": 20
+}
+],
+"id": "skill-builds-1766277102218-kooi765zz",
+"createdAt": "2025-12-21T00:31:42.218Z",
+"updatedAt": "2025-12-21T02:24:21.751Z"
+}
+]

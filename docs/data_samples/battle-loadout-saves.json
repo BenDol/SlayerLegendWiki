@@ -1,0 +1,166 @@
+[
+{
+"name": "Test2",
+"skillBuild": {
+"name": "Test22",
+"maxSlots": 10,
+"slots": [
+{
+"skillId": 7,
+"level": 130
+},
+{
+"skillId": 9,
+"level": 130
+},
+{
+"skillId": 10,
+"level": 130
+},
+{
+"skillId": 4,
+"level": 130
+},
+{
+"skillId": 12,
+"level": 130
+},
+{
+"skillId": 2,
+"level": 130
+},
+{
+"skillId": 11,
+"level": 20
+},
+{
+"skillId": null,
+"level": 1
+},
+{
+"skillId": 15,
+"level": 130
+},
+{
+"skillId": 18,
+"level": 20
+}
+]
+},
+"spiritBuild": {
+"name": "Test",
+"slots": [
+{
+"spiritId": 2,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 9,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 1,
+"level": 1,
+"awakeningLevel": 5,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+}
+]
+},
+"spirit": null,
+"skillStone": null,
+"promotionAbility": null,
+"familiar": null,
+"id": "battle-loadouts-1766219113794-b10ogqio9",
+"createdAt": "2025-12-20T08:25:13.794Z",
+"updatedAt": "2025-12-20T12:50:06.912Z"
+},
+{
+"name": "Test245645645646456456456456",
+"skillBuild": {
+"name": "Test22",
+"maxSlots": 10,
+"slots": [
+{
+"skillId": 7,
+"level": 130
+},
+{
+"skillId": 9,
+"level": 130
+},
+{
+"skillId": 10,
+"level": 130
+},
+{
+"skillId": 4,
+"level": 130
+},
+{
+"skillId": 12,
+"level": 130
+},
+{
+"skillId": 2,
+"level": 130
+},
+{
+"skillId": 11,
+"level": 20
+},
+{
+"skillId": null,
+"level": 1
+},
+{
+"skillId": 15,
+"level": 130
+},
+{
+"skillId": 18,
+"level": 20
+}
+]
+},
+"spiritBuild": {
+"name": "Test",
+"slots": [
+{
+"spiritId": 2,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 9,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 1,
+"level": 1,
+"awakeningLevel": 5,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+}
+]
+},
+"spirit": null,
+"skillStone": null,
+"promotionAbility": null,
+"familiar": null,
+"id": "battle-loadouts-1766284889171-vrci04rzp",
+"createdAt": "2025-12-21T02:41:29.171Z",
+"updatedAt": "2025-12-21T02:41:29.417Z"
+}
+]

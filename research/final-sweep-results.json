@@ -1,0 +1,27 @@
+{
+  "totalChecked": 175,
+  "totalFound": 9,
+  "foundSheets": {
+    "SKILLS": 46,
+    "SOULSWEAPONS": 57,
+    "RELICS": 12,
+    "QUESTS": 140,
+    "SPIRITS": 401,
+    "PROMOTIONS": 21,
+    "STAGES": 2000,
+    "CAMPAIGN": 148,
+    "ADVENTURE": 100
+  },
+  "alreadyExtracted": [
+    "SKILLS",
+    "SOULSWEAPONS",
+    "RELICS",
+    "QUESTS",
+    "SPIRITS",
+    "PROMOTIONS",
+    "STAGES",
+    "CAMPAIGN",
+    "ADVENTURE"
+  ],
+  "newSheets": []
+}

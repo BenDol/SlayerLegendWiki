@@ -1,0 +1,53 @@
+name: Update Achievement Statistics
+
+# This workflow calculates and updates achievement statistics (% of users with each achievement)
+# whenever a user snapshot is updated. Statistics are stored in a cache issue for fast retrieval.
+#
+# The workflow:
+# 1. Fetches all user snapshots to count total users
+# 2. Fetches all achievement issues to count unlocks per achievement
+# 3. Calculates percentage for each achievement
+# 4. Stores results in a cache issue labeled "achievement-stats"
+#
+# Triggers:
+# - When achievement issues are created/updated (labeled 'achievements')
+# - Manually via GitHub UI (Actions tab)
+on:
+  issues:
+    types: [opened, edited, closed, reopened]
+  workflow_dispatch:
+
+jobs:
+  update-achievement-stats:
+    runs-on: ubuntu-latest
+    # Only run if:
+    # - Issue has 'achievements' label
+    # - Manually triggered
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.issue.labels.*.name, 'achievements')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Calculate achievement statistics
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: node scripts/calculateAchievementStats.js
+
+      - name: Summary
+        run: |
+          echo "✅ Achievement statistics updated successfully"
+          echo "📊 Statistics are available in the achievement-stats cache issue"

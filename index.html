@@ -2,9 +2,78 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Wiki</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/icon/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon/android-chrome-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon/android-chrome-512x512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Shortcut icon for older browsers -->
+    <link rel="shortcut icon" href="/icon/favicon.ico" />
+
+    <!-- Base Meta Tags (will be overridden by react-helmet-async) -->
+    <title>Slayer Legend Wiki</title>
+    <meta name="description" content="Complete guide for Slayer Legend: Idle RPG (슬레이어 키우기)" />
+    <meta name="keywords" content="Slayer Legend, 슬레이어 키우기, Idle RPG, guide, wiki, tips, builds, characters, equipment" />
+
+    <!-- Open Graph Meta Tags (Facebook, Discord, LinkedIn, Signal) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Slayer Legend Wiki" />
+    <meta property="og:title" content="Slayer Legend Wiki" />
+    <meta property="og:description" content="Complete guide for Slayer Legend: Idle RPG (슬레이어 키우기)" />
+    <meta property="og:image" content="https://slayerlegend.wiki/images/logo.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:url" content="https://slayerlegend.wiki" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Slayer Legend Wiki" />
+    <meta name="twitter:description" content="Complete guide for Slayer Legend: Idle RPG (슬레이어 키우기)" />
+    <meta name="twitter:image" content="https://slayerlegend.wiki/images/logo.png" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#3b82f6" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://slayerlegend.wiki/" />
+
+    <!-- Structured Data (JSON-LD) for better SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Slayer Legend Wiki",
+      "alternateName": "Slayer Wiki",
+      "url": "https://slayerlegend.wiki/",
+      "description": "Complete guide for Slayer Legend: Idle RPG (슬레이어 키우기)",
+      "image": "https://slayerlegend.wiki/images/logo.png",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Slayer Legend Wiki",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://slayerlegend.wiki/images/logo.png",
+          "width": 512,
+          "height": 512
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://slayerlegend.wiki/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
