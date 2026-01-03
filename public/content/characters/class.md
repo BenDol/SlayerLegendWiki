@@ -25,10 +25,10 @@ order: 0
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Ranger (Grade 8)</d>|
 |<div style="text-align: center;"><img src="/images/content/characters/skin_costume_008_0.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: -2px 0 0 0;" data-inline="true" /></div>|<div style="text-align: center;">Paladin (Grade 9)</d>|
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Gladiator (Grade 10)</d>|
-|<div style="text-align: center;">s</div>|<div style="text-align: center;">Red Gladiator (Grade 11)</d>|
+|<div style="text-align: center;"><img src="/images/content/characters/skin_costume_001_0.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: -2px 0 0 0;" data-inline="true" /></div>|<div style="text-align: center;">Red Gladiator (Grade 11)</d>|
 |<div style="text-align: center;"><img src="/images/content/characters/skin_costume_011_0.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: -2px 0 0 0;" data-inline="true" /></div>|<div style="text-align: center;">Crusader (Grade 12)</d>|
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Weapon Master (Grade 13)</d>|
-|<div style="text-align: center;">s</div>|<div style="text-align: center;">Shadow Hunter (Grade 14)</d>|
+|<div style="text-align: center;"><img src="/images/content/characters/skin_costume_013_0.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: -2px 0 0 0;" data-inline="true" /></div>|<div style="text-align: center;">Shadow Hunter (Grade 14)</d>|
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Champion (Grade 15)</d>|
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Guardian (Grade 16)</d>|
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Dark Knight (Grade 17)</d>|
