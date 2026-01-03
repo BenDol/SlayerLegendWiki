@@ -1,0 +1,790 @@
+{
+  "sheet": "SKILLS",
+  "rows": 111,
+  "columns": [
+    "",
+    "SKILLS ",
+    "Basic Data / Stats",
+    "Extra Data / Stats",
+    "SKILL PROFICIENCY"
+  ],
+  "data": [
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "Elemental Damage",
+      "Extra Data / Stats": "Stat",
+      "SKILL PROFICIENCY": "Proficiency Level :"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "Element",
+      "Extra Data / Stats": "Noah",
+      "SKILL PROFICIENCY": "All Attribute DMG :"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Loar/Mum",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "STAGE BOSS SIZE CHECK",
+      "SKILL PROFICIENCY": "MANTRA BONUS"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "STAGE NUMBER :",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "BOSS SIZE :",
+      "SKILL PROFICIENCY": "Bonus ATK/HP :"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "Use Auto Values",
+      "Extra Data / Stats": "BOSS ATK :",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "BOSS HP :",
+      "SKILL PROFICIENCY": "Elemental Weakness / Advantage"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "ACTIVE BUFFS AND VALUES AT MAX STACKS",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": "Enemy Attribute"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "BUFF SKILL",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Lightning Stroke",
+      "SKILL PROFICIENCY": "Locked"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "20",
+      "SKILL PROFICIENCY": "20"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "1",
+      "SKILL PROFICIENCY": "1"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "TOTAL ATK BONUS :",
+      "Extra Data / Stats": "1.14%",
+      "SKILL PROFICIENCY": "0.00%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "TOTAL AS BONUS :",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "232.00%",
+      "SKILL PROFICIENCY": "0.00%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "3.02E+06",
+      "SKILL PROFICIENCY": "0.00E+00"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "1%",
+      "SKILL PROFICIENCY": "0%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "220",
+      "SKILL PROFICIENCY": "Locked"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "80.00%",
+      "SKILL PROFICIENCY": "0.00%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "8.00%",
+      "SKILL PROFICIENCY": "0.00%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "3",
+      "SKILL PROFICIENCY": "5"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": " - "
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "WIND",
+      "SKILL PROFICIENCY": "None"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "15",
+      "SKILL PROFICIENCY": "Locked"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "4",
+      "SKILL PROFICIENCY": "Locked"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "7",
+      "SKILL PROFICIENCY": "Locked"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "TRUE",
+      "SKILL PROFICIENCY": "FALSE"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "30",
+      "SKILL PROFICIENCY": "Locked"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "928%",
+      "SKILL PROFICIENCY": "0%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "100.00%",
+      "SKILL PROFICIENCY": "0.00%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "100.00%",
+      "SKILL PROFICIENCY": "100.00%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "100.00%",
+      "SKILL PROFICIENCY": "100.00%"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "3.02E+06",
+      "SKILL PROFICIENCY": "0.00E+00"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "FAMMILIARS",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "FAMMILIAR",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": "PREFERED FAMMILIAR"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "NAME",
+      "SKILL PROFICIENCY": "NAME"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "KU"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "PE"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "PO"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "A"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "RU"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "NA"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "JE"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "MUS"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "HI"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "TI"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "SHA"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "None",
+      "SKILL PROFICIENCY": "RION"
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "YOUR FAMMILIAR SETUP",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "NA",
+      "Basic Data / Stats": "NAME",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "IMAGE",
+      "Extra Data / Stats": "100%",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "SYMBOL",
+      "Extra Data / Stats": "10",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "EFFECT",
+      "Extra Data / Stats": "10,000",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "damage",
+      "Basic Data / Stats": "Attacks  times at range of  with 0% of",
+      "Extra Data / Stats": "330,000,000,000",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "0",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "#DIV/0!",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Lightning Slash",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Refinement Effect",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Owned Effects",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Character ATK",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Lightning Stroke",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Refinement Effect",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Owned Effects",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "CRIT Dmg",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Thunder Slash",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Refinement Effect",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Owned Effects",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Character ATK",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Fulgurous",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Refinement Effect",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Owned Effects",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Accuracy",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Thunderbolt Slash",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Refinement Effect",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Owned Effects",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Character ATK",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Red Lightning",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Refinement Effect",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Owned Effects",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "CRIT Dmg",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Supersonic",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Refinement Effect",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Owned Effects",
+      "SKILL PROFICIENCY": ""
+    },
+    {
+      "": "",
+      "SKILLS ": "",
+      "Basic Data / Stats": "",
+      "Extra Data / Stats": "Accuracy",
+      "SKILL PROFICIENCY": ""
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# This directory stores monthly GitHub issue backups
+# Daily backups are stored as GitHub Actions artifacts (90-day retention)
+# Monthly backups (1st of month) are committed to this directory

@@ -24,7 +24,7 @@ Add your logo and reference it in `wiki-config.json`:
 ### Images in Markdown
 Place images in `public/images/` and reference them in your content:
 ```markdown
-![Screenshot](/images/my-screenshot.png)
+![Screenshot](/images/content/my-screenshot.png)
 ```
 
 ### Favicon

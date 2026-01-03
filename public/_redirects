@@ -1,0 +1,10 @@
+# Game assets are proxied to CDN via Cloudflare Function
+# /images/content/* requests are handled by functions/images/content/[[path]].js
+# which proxies to https://cdn.jsdelivr.net/gh/BenDol/SlayerLegendCDN@main/game-assets/images/
+# In dev, Vite proxy handles this (see vite.config.js)
+
+# Cloudflare Pages SPA routing fallback
+# Serve index.html for all routes that don't match static files
+# This allows React Router to handle client-side routing
+
+/*    /index.html   200

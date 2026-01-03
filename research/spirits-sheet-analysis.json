@@ -1,0 +1,58 @@
+{
+  "totalRows": 401,
+  "totalColumns": 7,
+  "columns": [
+    "LEVEL",
+    "ENHANCE CUBES",
+    "MANA CRYSTAL",
+    "GOLD EXP FACTOR",
+    "",
+    "ATTACK HP FACTORS",
+    "SPIRIT INVENTORY"
+  ],
+  "nonEmptyColumns": [
+    {
+      "name": "LEVEL",
+      "count": 401
+    },
+    {
+      "name": "ENHANCE CUBES",
+      "count": 401
+    },
+    {
+      "name": "MANA CRYSTAL",
+      "count": 401
+    },
+    {
+      "name": "GOLD EXP FACTOR",
+      "count": 401
+    },
+    {
+      "name": "ATTACK HP FACTORS",
+      "count": 401
+    },
+    {
+      "name": "SPIRIT INVENTORY",
+      "count": 21
+    }
+  ],
+  "companionReferences": [],
+  "firstRow": {
+    "LEVEL": "0",
+    "ENHANCE CUBES": "30",
+    "MANA CRYSTAL": "300",
+    "GOLD EXP FACTOR": "1",
+    "": "",
+    "ATTACK HP FACTORS": "3.33",
+    "SPIRIT INVENTORY": ""
+  },
+  "lastRow": {
+    "LEVEL": "400",
+    "ENHANCE CUBES": "1,934,436,030",
+    "MANA CRYSTAL": "171,478,964,922",
+    "GOLD EXP FACTOR": "42.65",
+    "": "",
+    "ATTACK HP FACTORS": "145.69",
+    "SPIRIT INVENTORY": ""
+  }
+}

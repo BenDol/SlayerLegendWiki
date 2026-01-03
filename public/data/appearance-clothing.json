@@ -1,0 +1,490 @@
+[
+  {
+    "id": 1,
+    "name": "Pac-Man T-shirt",
+    "bonusType": "Dodge",
+    "effect": "3",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 2,
+    "name": "Summer Shirt",
+    "bonusType": "Dodge",
+    "effect": "3",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 3,
+    "name": "Prison Garb (Striped)",
+    "bonusType": "Extra EXP",
+    "effect": "5%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 4,
+    "name": "Military Uniform",
+    "bonusType": "Extra EXP",
+    "effect": "3%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 5,
+    "name": "Kindergarten",
+    "bonusType": "Monster Gold",
+    "effect": "3%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 6,
+    "name": "Swagger",
+    "bonusType": "Accuracy",
+    "effect": "3",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 7,
+    "name": "Sailor",
+    "bonusType": "Extra EXP",
+    "effect": "5%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 8,
+    "name": "Rainbow Shirt",
+    "bonusType": "Extra EXP",
+    "effect": "3%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 9,
+    "name": "Tuxedo",
+    "bonusType": "Dodge",
+    "effect": "6",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 10,
+    "name": "Denim Jacket",
+    "bonusType": "Monster Gold",
+    "effect": "10%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 11,
+    "name": "Sweatsuit (Sky)",
+    "bonusType": "Dodge",
+    "effect": "6",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 12,
+    "name": "Suit",
+    "bonusType": "Accuracy",
+    "effect": "6",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 13,
+    "name": "Sweatsuit (Purple)",
+    "bonusType": "Extra EXP",
+    "effect": "6%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 14,
+    "name": "Martial Arts Uniform",
+    "bonusType": "Dodge",
+    "effect": "6",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 15,
+    "name": "Taekwondo Uniform",
+    "bonusType": "Extra EXP",
+    "effect": "10%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 16,
+    "name": "80's Vibe",
+    "bonusType": "Accuracy",
+    "effect": "6",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 17,
+    "name": "Smith",
+    "bonusType": "Extra EXP",
+    "effect": "9%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 18,
+    "name": "Chef",
+    "bonusType": "Monster Gold",
+    "effect": "9%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 19,
+    "name": "Yellow Raincoat",
+    "bonusType": "Accuracy",
+    "effect": "15",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 20,
+    "name": "Techwear",
+    "bonusType": "Dodge",
+    "effect": "9",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 21,
+    "name": "Police Uniform",
+    "bonusType": "Accuracy",
+    "effect": "9",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 22,
+    "name": "Sleeveless",
+    "bonusType": "Dodge",
+    "effect": "9",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 23,
+    "name": "Zip-Up Hoodie",
+    "bonusType": "Monster Gold",
+    "effect": "15%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 24,
+    "name": "Rash Guard",
+    "bonusType": "Monster Gold",
+    "effect": "9%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 25,
+    "name": "Leopard",
+    "bonusType": "Monster Gold",
+    "effect": "12%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 26,
+    "name": "Sweatsuit (Orange)",
+    "bonusType": "Monster Gold",
+    "effect": "12%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 27,
+    "name": "Naughty Skeleton T-Shirt",
+    "bonusType": "Accuracy",
+    "effect": "20",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 28,
+    "name": "Pajamas",
+    "bonusType": "Dodge",
+    "effect": "9",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 29,
+    "name": "Basketball Uniform",
+    "bonusType": "Accuracy",
+    "effect": "12",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 30,
+    "name": "Prison Garb (Orange)",
+    "bonusType": "Monster Gold",
+    "effect": "12%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 31,
+    "name": "City Hunter",
+    "bonusType": "Dodge",
+    "effect": "12",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 32,
+    "name": "Ninja Suit",
+    "bonusType": "Monster Gold",
+    "effect": "20%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 33,
+    "name": "Baseball Uniform",
+    "bonusType": "Monster Gold",
+    "effect": "12%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 34,
+    "name": "Blue Robe",
+    "bonusType": "Monster Gold",
+    "effect": "18%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 35,
+    "name": "Plumber Work Clothes",
+    "bonusType": "Dodge",
+    "effect": "15",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 36,
+    "name": "Hawaiian Shirt",
+    "bonusType": "Monster Gold",
+    "effect": "25%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 37,
+    "name": "Solver",
+    "bonusType": "Accuracy",
+    "effect": "15",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 38,
+    "name": "Bartender",
+    "bonusType": "Extra EXP",
+    "effect": "21%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 39,
+    "name": "Captain's Clothes",
+    "bonusType": "Extra EXP",
+    "effect": "18%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 40,
+    "name": "Sweatsuit (Red)",
+    "bonusType": "Accuracy",
+    "effect": "30",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 41,
+    "name": "Fitness Freak",
+    "bonusType": "Accuracy",
+    "effect": "18",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 42,
+    "name": "Blue Suit",
+    "bonusType": "Accuracy",
+    "effect": "24",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 43,
+    "name": "Red Suit",
+    "bonusType": "Extra EXP",
+    "effect": "24%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 44,
+    "name": "Life Jacket",
+    "bonusType": "Dodge",
+    "effect": "40",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 45,
+    "name": "Training Uniform",
+    "bonusType": "Accuracy",
+    "effect": "24",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 46,
+    "name": "Black Robe",
+    "bonusType": "Extra EXP",
+    "effect": "24%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 47,
+    "name": "Sweatsuit (Blue)",
+    "bonusType": "Extra EXP",
+    "effect": "24%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 48,
+    "name": "Sweatsuit (Black)",
+    "bonusType": "Monster Gold",
+    "effect": "50%",
+    "bonus": "0",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 49,
+    "name": "Sweatsuit (Green)",
+    "bonusType": "Extra EXP",
+    "effect": "50%",
+    "bonus": "0%",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 50,
+    "name": "Sweatsuit (Yellow)",
+    "bonusType": "Monster Gold",
+    "effect": "100%",
+    "bonus": "0%",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 51,
+    "name": "Sweatsuit (Crimson)",
+    "bonusType": "Extra EXP",
+    "effect": "80%",
+    "bonus": "0%",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 52,
+    "name": "Sweatsuit (White)",
+    "bonusType": "Monster Gold",
+    "effect": "200%",
+    "bonus": "0%",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 53,
+    "name": "Sweatsuit (Dark Purple)",
+    "bonusType": "Extra EXP",
+    "effect": "150%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 54,
+    "name": "Sweatsuit (Royal Blue)",
+    "bonusType": "Monster Gold",
+    "effect": "300%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 55,
+    "name": "Sweatsuit (Black&Pink)",
+    "bonusType": "Extra EXP",
+    "effect": "200%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 56,
+    "name": "Sweatsuit (Mint)",
+    "bonusType": "Monster Gold",
+    "effect": "400%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 57,
+    "name": "Sweatsuit (Scarlet)",
+    "bonusType": "Extra EXP",
+    "effect": "250%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 58,
+    "name": "Sweatsuit (Cream)",
+    "bonusType": "Monster Gold",
+    "effect": "500%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 59,
+    "name": "Sweatsuit (Dark Green)",
+    "bonusType": "Extra EXP",
+    "effect": "300%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 60,
+    "name": "Sweatsuit (Silver Blue)",
+    "bonusType": "Monster Gold",
+    "effect": "600%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  },
+  {
+    "id": 61,
+    "name": "Sweatsuit (Lime)",
+    "bonusType": "Extra EXP",
+    "effect": "350%",
+    "bonus": "",
+    "dataSource": "Player-contributed (Master Optimizer)"
+  }
+]

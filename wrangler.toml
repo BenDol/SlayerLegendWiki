@@ -1,0 +1,53 @@
+# Cloudflare Pages Configuration
+# Used for local development with Wrangler
+
+name = "slayer-legend-wiki"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages configuration
+pages_build_output_dir = "dist"
+
+# Functions configuration (for Pages Functions specifically)
+[functions]
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Local development configuration
+[dev]
+port = 8788
+ip = "localhost"
+local_protocol = "http"
+# Watch framework submodule for changes
+watch_paths = ["functions", "wiki-framework/src"]
+
+# Note: Cloudflare Workers have a 100MB request body limit
+# This affects video uploads - files larger than 100MB cannot be uploaded
+# through Cloudflare Pages. For larger files, deploy to Netlify instead,
+# or implement client-side direct upload to R2/LFS.
+
+# Environment variables for local development
+# IMPORTANT: Never commit actual secrets! Use .dev.vars for local secrets
+[vars]
+VITE_PLATFORM = "cloudflare"
+VITE_CF_PAGES = "1"
+
+# Local development configuration
+# Create a .dev.vars file (gitignored) with your secrets:
+# WIKI_BOT_TOKEN=your_bot_token_here
+# WIKI_REPO_OWNER=your_github_username
+# WIKI_REPO_NAME=your_repo_name
+# VITE_GITHUB_CLIENT_ID=your_github_client_id
+# VITE_WIKI_REPO_OWNER=your_github_username
+# VITE_WIKI_REPO_NAME=your_repo_name
+
+# Cloudflare KV Storage (optional - for faster storage backend)
+# Uncomment the section below to enable Cloudflare KV storage
+# 1. Create KV namespace: wrangler kv:namespace create "SLAYER_WIKI_DATA"
+# 2. Copy the namespace ID from the output
+# 3. Uncomment and update the id field below
+# 4. Update wiki-config.json storage.backend to "cloudflare-kv"
+#
+# [[kv_namespaces]]
+# binding = "SLAYER_WIKI_DATA"
+# id = "your-kv-namespace-id-here"

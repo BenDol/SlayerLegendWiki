@@ -2,679 +2,519 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Quick Links
+
+### Core Documentation
+- **[Repository Permissions](.claude/repository-permissions.md)** - Branch protection, bot setup, security configuration
+- **[Cloudflare Pages Deployment](.claude/cloudflare-pages-deployment.md)** - Build configuration, test execution, environment variables
+- **[Deployment Platforms](.claude/deployment-platforms.md)** - Netlify vs Cloudflare comparison, video upload limits
+- **[Security Audit Report](.claude/security-audit-report.md)** - HTML injection protections, XSS prevention, security layers
+
+### Additional Resources
+- **[PayPal Webhook Setup](.claude/paypal-webhook-setup.md)** - PayPal integration for donations
+- **[Serverless Caching Audit](.claude/serverless-caching-audit.md)** - Caching strategies and implementation
+- **[HTML Security Validation](.claude/memory/HTML-SECURITY-VALIDATION-WORKFLOW.md)** - Automated security testing workflow
+
 ## Project Overview
 
 This is a **parent wiki project** built using the [GitHub Wiki Framework](https://github.com/BenDol/GithubWiki) as a git submodule. The framework handles all React components, routing, and core functionality, while this repository contains only content, configuration, and customization.
 
-## Architecture: Framework as Submodule
+### Critical Concepts
 
-**Critical concept:** The `wiki-framework/` directory is a **git submodule** containing the entire React application. Never edit files inside `wiki-framework/` - all customizations belong in the parent project.
+**🚨 FRAMEWORK RULE:** The `wiki-framework/` directory is a **git submodule**. Never edit files inside `wiki-framework/` - all customizations belong in the parent project. The framework must NEVER import from the parent project.
+
+**🎯 REGISTRY PATTERN:** All game-specific functionality is added via registries in `main.jsx`:
+- Content renderers for custom markdown syntax
+- Custom routes for tools/builders
+- Data files for Data Browser
+- Pickers for page editor
+
+## Logging System
+
+The project has TWO logging systems that should be monitored during development:
+
+### 1. Client-Side Logs (Browser/Frontend)
+**Location:** `wiki-framework/logs/debug.log`
+
+- These are remote logs written by the client-side JavaScript
+- **Requirement:** Check `public/wiki-config.json` to confirm `enableRemoteLoggingInDev: true`
+- **When to check:** For frontend issues (React components, UI interactions, client-side logic)
+
+**How to monitor client logs:**
+
+1. **Stream logs in background** (Recommended for debugging):
+   ```bash
+   tail -f wiki-framework/logs/debug.log    # Run with run_in_background: true
+   ```
+   - Use `run_in_background: true` to keep monitoring while working
+   - Check output periodically with TaskOutput tool
+   - Kill the background task with KillShell when done
+   - **Auto-cancellation:** If no activity for 3+ minutes, stop monitoring (user is AFK)
+
+2. **Read recent logs directly**:
+   ```bash
+   tail -50 wiki-framework/logs/debug.log   # Last 50 lines
+   tail -100 wiki-framework/logs/debug.log  # Last 100 lines
+   ```
+
+3. **Search for specific errors**:
+   ```bash
+   grep -i "error\|failed" wiki-framework/logs/debug.log | tail -20
+   ```
+
+### 2. Server-Side Logs (Wrangler/Cloudflare Functions)
+**Location:** `.wrangler/server.log`
+
+- All Wrangler output (stdout/stderr) is captured to this file in real-time
+- These logs include:
+  - `[WRANGLER]` - Cloudflare Worker/Function logs
+  - `[VITE]` - Vite dev server logs (from the WRANGLER process output)
+  - `[ERROR]` - Critical errors in serverless functions
+  - `[WARNING]` - Non-critical warnings
+  - `[INFO]` - Informational messages
+  - Stack traces with file paths and line numbers
+- **When to check:** For backend/API issues (serverless functions, database operations, authentication)
+
+**How to monitor server logs:**
+
+1. **Stream logs in background** (Recommended for debugging):
+   ```bash
+   tail -f .wrangler/server.log    # Run with run_in_background: true
+   ```
+   - Use `run_in_background: true` to keep monitoring while working
+   - Check output periodically with TaskOutput tool
+   - Kill the background task with KillShell when done
+
+2. **Read recent logs directly**:
+   ```bash
+   tail -50 .wrangler/server.log   # Last 50 lines
+   tail -100 .wrangler/server.log  # Last 100 lines
+   ```
+
+3. **Search for specific errors**:
+   ```bash
+   grep -i "error\|warning\|failed" .wrangler/server.log | tail -20
+   ```
+
+**Example Wrangler error format:**
+```
+[WRANGLER] ✘ [ERROR] [HandlerName] Error message {
+[WRANGLER]     error: 'Detailed error description',
+[WRANGLER]     stack: 'TypeError: ...\n' +
+[WRANGLER]       '    at functionName (file:///path/to/file.js:123:45)\n' +
+[WRANGLER]       ...
+[WRANGLER]   }
+[WRANGLER] [wrangler:info] POST /api/endpoint 500 Internal Server Error (7ms)
+```
+
+### Best Practice Workflow
+
+**For backend/API debugging:**
+1. ✅ Read `.wrangler/server.log` directly using `tail -50 .wrangler/server.log`
+2. ✅ Look for `[ERROR]`, `[WARNING]`, or `[DEBUG]` messages
+3. ✅ Read error messages and stack traces
+4. ✅ Identify the file and line number from stack trace
+5. ✅ Fix the issue
+6. ✅ Monitor logs in real-time with `tail -f .wrangler/server.log` (run in background with `run_in_background: true`)
+7. ✅ Ask user to test and verify fix
+
+**For frontend debugging:**
+1. ✅ Read `wiki-framework/logs/debug.log` for client-side errors
+2. ✅ Use `tail -f` to monitor in real-time
+3. ✅ Look for logger.error() and logger.warn() messages
+
+**CRITICAL:** Always check server logs when API endpoints return 500, 403, 401, or other error status codes!
+
+## Quick Start
+
+```bash
+# Development (Cloudflare Pages Functions - DEFAULT)
+npm run dev              # Start Wrangler + Vite + config watcher (http://localhost:8788)
+
+# Alternative: Netlify Functions (fallback)
+npm run dev:netlify      # Start Netlify dev + config watcher (http://localhost:8888)
+
+# Direct Vite (no serverless functions)
+npm run dev:vite         # Start Vite only + config watcher (http://localhost:5173)
+
+# Production build
+npm run build:cloudflare # Build for Cloudflare Pages (use this in CF dashboard)
+npm run build            # Build for Cloudflare Pages (shorthand)
+npm run build:netlify    # Build for Netlify (fallback)
+npm run build:search     # Rebuild search index after content changes
+
+# Framework updates
+cd wiki-framework && git pull origin main && cd ..
+git add wiki-framework && git commit -m "Update framework"
+
+# Tests & Deployment
+# Tests run automatically on production (main branch) Cloudflare deploys
+# Tests are skipped on preview deploys (other branches) for speed
+# To skip tests on main branch, use commit message markers:
+# [skip tests], [skip-tests], [no tests], [tests skip]
+git commit -m "Fix typo [skip tests]"
+
+# See .claude/cloudflare-pages-deployment.md for full deployment guide
+```
+
+## Dynamic Page Loading & Conditional Deployments
+
+The wiki supports **dynamic page loading** which fetches markdown content from GitHub instead of bundled static files. This eliminates the need for full rebuilds when only content changes.
+
+### Configuration
+
+Enable in `wiki-config.json`:
+```json
+{
+  "features": {
+    "dynamicPageLoading": {
+      "enabled": true,          // Master toggle
+      "cacheTTL": 300000,       // 5 minutes (in milliseconds)
+      "fallbackToStatic": true, // Fall back to bundled files if GitHub unavailable
+      "allowStaleOnRateLimit": true  // Use expired cache when rate limited
+    }
+  }
+}
+```
+
+### Conditional Deployments (GitHub Actions)
+
+When `dynamicPageLoading.enabled = true`, content-only commits automatically skip Cloudflare deployments to conserve build quota. This is handled by `.github/workflows/conditional-deploy.yml`.
+
+**Behavior:**
+- ✅ **Content-only commits** (`public/content/*.md` only) → No deploy (pages load from GitHub)
+- ✅ **Code/config commits** → Full deploy triggered
+- ✅ **Submodule updates** (`wiki-framework` changes) → Full deploy triggered
+- ✅ **Dynamic loading disabled** → All commits deploy (backward compatible)
+
+**Commit Message Overrides:**
+```bash
+# Force deploy even if only content changed
+git commit -m "Update content [deploy-required]"
+
+# Skip deploy even if code changed (manual override)
+git commit -m "Refactor [skip-deploy]"
+```
+
+**Keywords:**
+- `[deploy-required]` or `[force-deploy]` - Force full deploy
+- `[skip-deploy]` or `[no-deploy]` - Skip deploy
+
+**Setup Required:**
+1. Disable automatic Cloudflare deploys (Settings → Builds & deployments)
+2. Create deploy hook in Cloudflare Pages dashboard
+3. Add `CLOUDFLARE_DEPLOY_HOOK` secret to GitHub repo
+
+### How It Works
+
+**With Dynamic Loading Enabled:**
+1. User edits markdown page via wiki editor
+2. Commit pushed to GitHub (no Cloudflare deploy triggered)
+3. Next page load fetches fresh content from GitHub API
+4. Content cached locally for 5 minutes
+5. Cache invalidated automatically on next edit
+
+**Cost Savings:**
+- Before: Every edit = 1 build (20 edits/day = 600 builds/month)
+- After: Only code changes = builds (typically 30-50/month)
+- Stays within Cloudflare Pages free tier (500 builds/month)
+
+### Cache Behavior
+
+- **Fresh cache**: Content served from localStorage (< 5 minutes old)
+- **Cache miss**: Fetches from GitHub, caches locally
+- **Rate limited**: Uses stale cache (< 24 hours old), shows warning banner
+- **GitHub down**: Falls back to bundled static files, shows warning banner
+- **After edit**: Cache purged immediately, fresh fetch on next load
+
+## Video Upload System
+
+### Hybrid Upload Strategy (Client-side LFS for Large Files)
+
+The video upload system uses a **hybrid approach** to support files up to 500MB on both Netlify and Cloudflare:
+
+| File Size | Upload Method | Local Dev | Netlify Prod | Cloudflare Prod |
+|-----------|---------------|-----------|--------------|-----------------|
+| **< 6MB** | Server-side | ✅ Works | ✅ Works | ✅ Works |
+| **6-100MB** | Client-side LFS (local) / Server-side (prod) | ✅ Auto LFS | ✅ Server | ✅ Server |
+| **100-500MB** | Client-side LFS | ✅ Auto LFS | ✅ Auto LFS | ✅ Auto LFS |
+
+**How it works:**
+
+1. **Small files (< threshold):** Upload through serverless function on form submit
+2. **Large files (≥ threshold):** Immediate upload to GitHub LFS while user fills form, then instant submit
+   - **Local dev threshold:** 6MB (bypasses Netlify CLI limit)
+   - **Production threshold:** 100MB (bypasses Cloudflare Worker limit)
+
+**Benefits:**
+
+- ✅ **Works seamlessly in local dev** - files > 6MB automatically use LFS
+- ✅ **Supports 500MB on both Netlify and Cloudflare**
+- ✅ **Better UX** - large files upload while user fills form
+- ✅ **Minimizes orphaned uploads** - small files use simpler server-side flow
+
+**Implementation:**
+
+- **Small files:** FormData upload to `/api/video-upload`
+- **Large files:** Client → `/api/request-lfs-upload` → Direct to GitHub LFS → `/api/finalize-lfs-upload`
+
+**Orphaned Uploads:**
+
+If a user uploads a large file but abandons the form, the file sits in GitHub LFS unreferenced for ~7 days before automatic garbage collection. This is acceptable because most users complete submissions.
+
+## Project Structure
 
 ```
 Parent Project (this repo)       Framework Submodule
 ├── public/content/              wiki-framework/
-├── wiki-config.json            ├── src/           # React app
-├── vite.config.js              ├── scripts/       # Build tools
-├── main.jsx                    └── vite.config.base.js
-└── package.json
+│   ├── getting-started/         ├── src/           # React app
+│   ├── characters/              ├── scripts/       # Build tools
+│   └── ...                      └── vite.config.base.js
+├── public/data/
+│   └── wiki-config.json         # Auto-copied (DON'T EDIT!)
+├── src/components/              # Game-specific only
+├── wiki-config.json             # ⭐ SOURCE OF TRUTH - EDIT THIS!
+├── main.jsx                     # App entry + registrations
+└── vite.config.js
 ```
 
-### What Lives Where
-
-**Parent project (edit these):**
-- `public/content/` - All markdown content (11 sections, 100+ pages)
-- `public/` - Static assets (images, logos, favicons, etc.)
-- `public/data/` - JSON data files for data-driven pages
-- `src/components/calculators/` - **Game-specific calculator components**
-- `wiki-config.json` - **SOURCE OF TRUTH** for config (auto-copied to public/)
-- `vite.config.js` - Base URL, content path, custom plugins, Node.js polyfills
-- `main.jsx` - Entry point that imports framework App
-- `scripts/` - Build scripts (copyConfig.js, buildSearchIndex.js)
-- `.env.local` - GitHub OAuth credentials
-- `tailwind.config.js` - Theme customization
-
-**Auto-generated files (DO NOT EDIT):**
-- `public/wiki-config.json` - Auto-copied from root (gitignored)
-- `public/search-index.json` - Auto-generated search index (gitignored)
-
-**Framework submodule (GENERIC components only):**
-- `wiki-framework/src/components/` - React components
-  - `wiki/DataDrivenPage.jsx` - Data-driven page system (loads JSON)
-  - `wiki/BuildEncoder.jsx` - Generic data sharing via URL
-  - `wiki/TierList.jsx` + `TierCard.jsx` - S/A/B/C/D tier ranking
-  - `wiki/SortableTable.jsx` - Sortable/filterable tables
-  - `wiki/ProgressTracker.jsx` - Checkbox progress tracking
-  - `wiki/PageViewer.jsx` - Markdown page renderer
-  - `common/` - Generic UI components (Button, Modal, etc.)
-- `wiki-framework/src/pages/` - Page components
-- `wiki-framework/src/store/` - State management
-- `wiki-framework/src/hooks/` - React hooks
-- `wiki-framework/scripts/` - Build scripts
-- `wiki-framework/vite.config.base.js` - Base Vite configuration
-
-## Common Development Commands
-
-```bash
-# Development
-npm run dev              # Start dev server + config watcher (http://localhost:5173)
-npm run dev:server       # Start ONLY dev server (no config watching)
-npm run dev:watch        # Start ONLY config watcher (no dev server)
-npm run build            # Build for production (auto-copies config + builds search)
-npm run preview          # Preview production build
-npm run build:search     # Build search index after content changes
-
-# Manual operations
-node scripts/copyConfig.js      # Manually copy wiki-config.json to public/
-node scripts/buildSearchIndex.js # Manually rebuild search index
-
-# Framework updates
-cd wiki-framework
-git pull origin main
-cd ..
-git add wiki-framework
-git commit -m "Update wiki framework"
-```
-
-## Development Workflow
-
-**Standard workflow (recommended):**
-```bash
-npm run dev
-```
-This automatically runs BOTH:
-- Config watcher (auto-copies wiki-config.json changes to public/)
-- Vite dev server
-
-Now you can edit `wiki-config.json` and just refresh your browser (Ctrl+Shift+R)!
-
-## Static Assets (Images, Logos, etc.)
-
-All static assets should be placed in the `public/` directory at the root of your parent wiki project.
-
-### Directory Structure
-```
-public/
-├── logo.svg           # Wiki logo
-├── favicon.ico        # Browser favicon
-├── images/            # Content images
-│   ├── screenshot1.png
-│   └── diagram.svg
-└── assets/            # Other static files
-```
-
-### Using Static Assets
-
-**In wiki-config.json:**
-```json
-{
-  "wiki": {
-    "logo": "/logo.svg"    // Served from public/logo.svg
-  }
-}
-```
-
-**In markdown content:**
-```markdown
-![Alt text](/images/screenshot1.png)
-![Diagram](/images/diagram.svg)
-```
-
-**In HTML (index.html):**
-```html
-<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-```
-
-### Important Notes
-- Files in `public/` are served at the root path (`/`)
-- Images are copied as-is to the build output (no processing)
-- Use absolute paths starting with `/` to reference public assets
-- For GitHub Pages, assets work the same way (base URL is handled by Vite)
-
-## Content Management
-
-### Creating New Pages
-
-1. Create markdown file: `public/content/{section}/page-name.md`
-2. Add frontmatter:
-```markdown
----
-title: Page Title
-description: Brief description
-tags: [tag1, tag2]
-category: Documentation
-date: 2025-12-12
----
-
-# Page Content
-```
-3. Rebuild search index: `npm run build:search`
-4. Page accessible at `/#/{section}/page-name`
-
-### Adding New Sections
-
-1. Edit `wiki-config.json` to add section:
-```json
-{
-  "sections": [
-    {
-      "id": "tutorials",
-      "title": "Tutorials",
-      "path": "tutorials",
-      "icon": "📚",
-      "showInHeader": true,
-      "allowContributions": true,
-      "order": 4
-    }
-  ]
-}
-```
-2. Create directory: `mkdir public/content/tutorials`
-3. Add index page: `public/content/tutorials/index.md`
-
-## Configuration Files
-
-### wiki-config.json (ROOT - Source of Truth)
-**IMPORTANT:** The root `wiki-config.json` is the single source of truth. It's automatically copied to `public/` when running `npm run dev` or `npm run build`.
-
-**Never edit `public/wiki-config.json` directly** - it's auto-generated and gitignored.
-
-#### Navigation Structure
-
-The wiki uses a hierarchical navigation system:
-
-**Categories** → **Sections** → **Pages**
-
-- **Categories**: Top-level groups in the header with dropdown menus (e.g., "Gameplay", "Content")
-- **Sections**: Content areas within categories (e.g., "Characters", "Equipment")
-- **Pages**: Individual markdown pages within sections (e.g., "promotions.md")
-
-**Sidebar Configuration:**
-The sidebar is separate from the category/section hierarchy and shows important meta pages:
-- Home link
-- Contributing guide
-- Editing guidelines
-
-Example structure:
-```json
-{
-  "categories": [
-    {
-      "id": "gameplay",
-      "title": "Gameplay",
-      "icon": "⚔️",
-      "order": 1,
-      "sections": ["getting-started", "characters", "equipment"]
-    }
-  ],
-  "sections": [
-    {
-      "id": "characters",
-      "title": "Characters",
-      "path": "characters",
-      "icon": "⚔️",
-      "allowContributions": true,
-      "order": 2
-    }
-  ],
-  "sidebar": {
-    "pages": [
-      { "title": "Home", "path": "/", "icon": "🏠" },
-      { "title": "Contributing", "path": "/meta/contributing", "icon": "✍️" }
-    ]
-  }
-}
-```
-
-Must update when deploying:
-- `wiki.title` - Wiki name
-- `wiki.description` - Wiki description
-- `wiki.logo` - Path to logo (e.g., "/logo.svg")
-- `wiki.repository.owner` - GitHub username
-- `wiki.repository.repo` - Repository name
-- `sections[]` - Navigation sections
-- `features.autoFormatPageTitles` - Auto-format page titles (see below)
-
-After editing, restart dev server or run `node scripts/copyConfig.js`
-
-**Auto-Format Page Titles Feature:**
-When `features.autoFormatPageTitles` is enabled, page filenames are automatically formatted for display:
-- Replaces hyphens with spaces: `getting-started` → `Getting Started`
-- Capitalizes first letter of each word: `early-game-roadmap` → `Early Game Roadmap`
-- Only applies when no explicit `title` is set in frontmatter
-- Affects breadcrumbs and section page listings
-
-Example:
-```json
-{
-  "features": {
-    "autoFormatPageTitles": true
-  }
-}
-```
-
-**Custom Home Page Feature:**
-When `features.customHomePage.enabled` is true, the home page displays a custom markdown file instead of the default sections grid:
-- Set `enabled: true` to activate custom home page
-- Set `path` to the markdown file location relative to `public/content/` (default: "home.md")
-- Create the markdown file at `public/content/[path]` with frontmatter
-- Falls back to error page if file not found
-- Disabled by default (shows default home page with sections grid)
-
-Example:
-```json
-{
-  "features": {
-    "customHomePage": {
-      "enabled": true,
-      "path": "home.md"
-    }
-  }
-}
-```
-
-Then create `public/content/home.md`:
-```markdown
----
-title: Welcome to Our Wiki
-description: Custom home page content
----
-
-# Welcome!
-
-Your custom home page content here...
-```
-
-**Direct Commit Feature:**
-When `features.editRequestCreator.permissions.allowDirectCommit` is enabled, users with write access to the repository can commit directly to the main branch, bypassing the pull request workflow:
-
-- **Default: `false`** - All edits create pull requests (safer, allows review)
-- **When `true`** - Contributors with write access commit directly to main branch
-- Only affects authenticated users with write/admin permissions
-- Users without write access still use the fork/PR workflow
-- Works for creating/editing pages
-
-**Delete operations** have a separate control (`allowDirectCommitDelete`):
-- **Default: `false`** - Deletes always create PRs, even when `allowDirectCommit` is true
-- **When `true`** - Contributors can delete pages directly from main branch
-- Requires **both** `allowDirectCommit` AND `allowDirectCommitDelete` to be true
-- Recommended to keep `false` for safety (deletes are permanent)
-
-**When to enable:**
-- Small teams with trusted contributors
-- Internal wikis where review is not needed
-- Faster workflow for experienced contributors
-
-**When to keep disabled (recommended):**
-- Public wikis with many contributors
-- When you want to review all changes
-- To maintain audit trail through PRs
-- To prevent accidental changes
-- **Always for deletes** - extra safety for destructive operations
-
-Example:
-```json
-{
-  "features": {
-    "editRequestCreator": {
-      "permissions": {
-        "requireAuth": true,
-        "fallbackToFork": true,
-        "allowDirectCommit": false,
-        "allowDirectCommitDelete": false
-      }
-    }
-  }
-}
-```
-
-**Behavior:**
-- **allowDirectCommit: false** → All operations create PRs
-- **allowDirectCommit: true, allowDirectCommitDelete: false** (recommended) → Edits commit directly, deletes create PRs
-- **allowDirectCommit: true, allowDirectCommitDelete: true** → Both edits and deletes commit directly
-- Confirmation dialogs update to indicate immediate vs. PR-based changes
-
-### vite.config.js
-Must update `base` to match repository name:
-```javascript
-export default createWikiConfigSync({
-  base: '/your-repo-name/',  // Must match GitHub repo for GitHub Pages
-  contentPath: './public/content',
-});
-```
-
-### .env.local
-Required for GitHub OAuth features:
-```env
-VITE_GITHUB_CLIENT_ID=your_client_id_here
-VITE_WIKI_REPO_OWNER=yourusername
-VITE_WIKI_REPO_NAME=repo-name
-```
-
-## GitHub Pages Deployment
-
-1. **Configure repository settings:**
-   - Update `base` in `vite.config.js` to match repo name
-   - Update repository info in `wiki-config.json`
-
-2. **Set up GitHub OAuth (optional):**
-   - Create OAuth App at github.com/settings/developers
-   - Add `GITHUB_CLIENT_ID` to repository secrets
-   - Add credentials to `.env.local` for local dev
-
-3. **Enable GitHub Pages:**
-   - Repository Settings → Pages
-   - Source: "GitHub Actions"
-
-4. **Deploy:**
-   - Push to `main` branch triggers automatic deployment via GitHub Actions
-
-The wiki will be live at: `https://username.github.io/repo-name/`
-
-## Framework Updates
-
-To update the framework version:
-
-```bash
-cd wiki-framework
-git pull origin main          # Get latest framework
-cd ..
-git add wiki-framework
-git commit -m "Update wiki framework to latest"
-git push
-```
-
-**Pinning to specific version (recommended for production):**
-```bash
-cd wiki-framework
-git checkout v1.0.0           # Or specific commit hash
-cd ..
-git add wiki-framework
-git commit -m "Pin framework to v1.0.0"
-```
-
-## Debugging
-
-### Developer Tools Panel
-Press `Ctrl+Shift+D` to open the Developer Tools panel for:
-- Live error tracking
-- Console logs capture
-- Filter by log type (Error, Warning, Info)
-- Export logs
-
-### Log Files
-All logs are written to: `wiki-framework/logs/debug.log`
-
-**IMPORTANT: The log file updates in real-time as the application runs.**
-- Claude can read the logs directly using: `cat wiki-framework/logs/debug.log | tail -50`
-- Logs include console.log, console.error, console.warn from the browser
-- Use `tail -50` to see recent logs, or search for specific patterns
-
-**When debugging issues:**
-1. **Check `wiki-framework/logs/debug.log` for detailed error traces** (updates live!)
-2. Use Dev Panel (`Ctrl+Shift+D`) for real-time monitoring in the browser
-3. Clear browser cache if changes not appearing
-4. Rebuild search index after content changes
-5. For component debugging, add `console.log()` and check the debug.log file
-
-### Prestige System
-The prestige badge system is fully documented in `PRESTIGE.md`. Key points:
-- Enable/disable via `public/wiki-config.json`: `prestige.enabled`
-- Badges appear on all user avatars throughout the app
-- Currently only shows for authenticated user
-- Architecture ready for multi-user support
-- Debug logs available in browser console (search for "PrestigeAvatar")
-
-### Keyboard Shortcuts
-- `Ctrl+K` - Open search modal
-- `Ctrl+Shift+D` - Toggle Developer Tools panel
-
-### Error Handling
-The framework includes two types of error boundaries for better error recovery:
-
-**1. RouteErrorBoundary** (`wiki-framework/src/components/common/RouteErrorBoundary.jsx`)
-- Catches errors in route components using React Router's `errorElement`
-- Handles 404, 403, 500, and generic errors
-- Provides user-friendly error UI with navigation options
-- Automatically logs errors to debug system
-
-**2. ErrorBoundary** (`wiki-framework/src/components/common/ErrorBoundary.jsx`)
-- Class-based boundary for component-level errors
-- Catches rendering errors in component tree
-- Shows error details in development mode
-- Logs errors to debug system
-
-**Error Recovery Options:**
-- **Go Back** - Return to previous page
-- **Go Home** - Navigate to homepage
-- **Reload Page** - Refresh the application
-- **Developer Tools** - Open debug panel (Ctrl+Shift+D)
-
-All errors are automatically logged to `logs/debug.log` for analysis.
-
-## Submodule Management
-
-### Initial Clone
-Always use `--recursive` to include framework:
-```bash
-git clone --recursive <repo-url>
-```
-
-### If Submodule Missing
-```bash
-git submodule update --init --recursive
-```
-
-### Viewing Submodule Status
-```bash
-git submodule status
-```
-
-## New Framework Features
-
-### Data-Driven Pages
-Load content from JSON files for easy updates:
-```javascript
-import DataDrivenPage from './wiki-framework/src/components/wiki/DataDrivenPage';
-
-<DataDrivenPage
-  dataFile="equipment.json"
-  renderData={(data) => <EquipmentList items={data.weapons} />}
-/>
-```
-
-Data files location: `public/data/`
-- `equipment.json` - Weapons and accessories
-- `skills.json` - All skills by element
-- `companions.json` - Companion data
-- `classes.json` - Class information
-- `relics.json` - Relic data
-- `drop-tables.json` - Drop rates
-- `formulas.json` - Game formulas
-- `promotions.json` - Promotion tiers
-
-### Build Sharing System
-Share character builds via URL:
-```javascript
-import BuildEncoder, { encodeBuild, generateBuildURL } from './components/wiki/BuildEncoder';
-
-const build = {
-  name: "Fire DPS Build",
-  skills: [...],
-  stats: {...},
-  equipment: {...}
-};
-
-const url = generateBuildURL(build); // Returns shareable URL
-```
-
-Builds are encoded in URL hash: `/#/build?data=encodedString`
-
-### Game-Specific Calculators
-Four calculator components for Slayer Legend mechanics (located in `src/components/calculators/`):
-1. **DamageCalculator** - Calculate damage output with Attack, Crit, Elemental stats
-2. **EnhancementCalculator** - Calculate gold costs for equipment enhancement
-3. **FusionCalculator** - Plan equipment fusion with 5:1 ratio
-4. **StatCalculator** - Calculate stat changes after promotion
-
-**Note:** These are game-specific and live in the parent project, NOT the framework.
-
-Usage in markdown pages:
-```markdown
----
-title: Damage Calculator
----
-
-# Damage Calculator
-
-<DamageCalculator />
-```
-
-The markdown processor automatically resolves components from `src/components/calculators/`.
-
-### Tier Lists
-Visual tier list component:
-```javascript
-import TierList from './components/wiki/TierList';
-
-const items = [
-  { name: "Fireball", tier: "S", category: "Fire Skills", image: "/images/skills/fireball.png" },
-  { name: "Water Shield", tier: "A", category: "Water Skills" }
-];
-
-<TierList items={items} onItemClick={(item) => console.log(item)} />
-```
-
-Tiers: S, A, B, C, D with color coding
-
-### Sortable Tables
-Data tables with sort, filter, pagination:
-```javascript
-import SortableTable from './components/wiki/SortableTable';
-
-const data = [
-  { name: "Common Sword", attack: 50, grade: "Common" },
-  { name: "Rare Sword", attack: 400, grade: "Rare" }
-];
-
-const columns = [
-  { key: "name", label: "Name" },
-  { key: "attack", label: "Attack" },
-  { key: "grade", label: "Grade" }
-];
-
-<SortableTable data={data} columns={columns} pageSize={20} />
-```
-
-### Progress Tracker
-Track player progression with localStorage persistence:
-```javascript
-import ProgressTracker from './components/wiki/ProgressTracker';
-
-const items = [
-  "Clear Stage 100",
-  "Unlock all companions",
-  "Reach Bronze promotion"
-];
-
-<ProgressTracker category="Early Game" items={items} />
-```
-
-Features:
-- Checkbox progress tracking
-- Progress percentage
-- Export/import progress
-- Persistent across sessions
-
-## Wiki Content Structure
-
-### Sections (11 total)
-1. **Getting Started** (🎮) - New player guides
-2. **Characters** (⚔️) - Stats, promotions, enhancement
-3. **Equipment** (🛡️) - Weapons, accessories, soul weapons
-4. **Companions** (🤝) - Ellie, Zeke, Miho, Luna
-5. **Skills** (✨) - Fire/Water/Earth/Wind skills
-6. **Content** (🗺️) - Stages, dungeons, events
-7. **Progression** (📈) - Memory Tree, classes, familiars
-8. **Resources** (💎) - Gold, diamonds, materials
-9. **Guides** (📚) - Strategy guides, tier lists
-10. **Database** (📖) - Data tables (hidden from header)
-11. **Tools** (🛠️) - Calculators and planners
-
-### Page Count
-- Getting Started: 5 pages
-- Characters: 7 pages
-- Equipment: 8 pages
-- Companions: 7 pages
-- Skills: 10 pages
-- Content: 10 pages
-- Progression: 8 pages
-- Resources: 12 pages
-- Guides: 11 pages
-- Database: 7 pages
-- Tools: 6 pages
-
-**Total: 91 content pages**
+**Parent project:** Content, config, game-specific components
+**Framework submodule:** Generic React app, routing, UI components
+
+**IMPORTANT:** Always edit the **root** `wiki-config.json`, never `public/wiki-config.json`
+
+## Common Tasks
+
+### Adding New Content
+1. Create markdown file in `public/content/{section}/`
+2. Add frontmatter (title, description, tags)
+3. Rebuild search: `npm run build:search`
+
+### Adding Game-Specific Component
+1. Create component in `src/components/`
+2. Register in `main.jsx` if needed for markdown rendering
+3. Use Content Renderer Registry pattern (see `main.jsx` for examples)
+
+### Modifying Framework
+**DO NOT** edit `wiki-framework/` directly. Instead:
+1. Check if registries can solve your need
+2. If framework change needed, update framework repo separately
+3. Pull framework updates: `cd wiki-framework && git pull`
 
 ## Important Constraints
 
-1. **Never modify `wiki-framework/` files** - The framework is a submodule containing generic wiki functionality only
-2. **Game-specific components belong in `src/components/`** - Keep the framework generic and reusable
-3. **Always rebuild search index** after adding/editing content: `npm run build:search`
-4. **Base URL must match repo name** for GitHub Pages deployment
-5. **Restart dev server** after configuration changes
+1. **Never modify `wiki-framework/` files** - Framework is generic, reusable
+2. **Game-specific components belong in `src/components/`** - Keep framework clean
+3. **Always edit root `wiki-config.json`** - NEVER edit `public/wiki-config.json` (it's auto-generated/copied from root)
+4. **Always rebuild search index** after content changes: `npm run build:search`
+5. **Restart dev server** after configuration changes (config watcher should pick up changes automatically)
 6. **Use frontmatter** on all markdown files for proper indexing
-7. **Data files must be valid JSON** in `public/data/` directory
+7. **Never bypass HTML sanitization** - Don't use `dangerouslySetInnerHTML`
 
-## Component Rendering Order (CRITICAL)
+## Security
 
-**ALWAYS check loading states BEFORE any other conditional renders** to prevent flickering.
+The wiki has **comprehensive, multi-layer protection** against HTML injection and XSS attacks:
 
-### Correct Pattern:
+### Client-Side Protection
+- ✅ **`rehype-sanitize`** - Strips dangerous HTML on every render
+- ✅ **Whitelist-based** - Only explicitly allowed elements/attributes
+- ✅ **Protocol filtering** - Blocks `javascript:`, `data:`, `blob:` URLs
+- **Location**: `wiki-framework/src/components/wiki/PageViewer.jsx:74-107`
+
+### Server-Side Validation
+- ✅ **Automated PR checks** - Scans for 14 dangerous patterns
+- ✅ **Blocks merges** - Critical issues prevent PR approval
+- ✅ **Security labels** - Adds `security:warning` label
+- **Workflow**: `.github/workflows/html-security-validation.yml`
+
+### What's Blocked
+- `<script>` tags, event handlers (`onclick`, etc.)
+- `javascript:` URLs, data URIs with HTML
+- `<iframe>`, `<object>`, `<embed>`, `<form>` tags
+- Inline styles with JavaScript
+- Suspicious class names (non-Tailwind)
+
+### What's Allowed
+- `<span class="text-*">` for Tailwind text colors
+- `<img src="...">` with safe protocols only
+- `<div align="...">` for text alignment
+- Headings with `id` for anchor links
+- Standard markdown elements
+
+**See**: [Security Audit Report](.claude/security-audit-report.md) for complete analysis.
+
+**Documentation**: `wiki-framework/SECURITY.md`
+
+## Coding Standards
+
+### Logging Standards
+
+**CRITICAL: Use centralized logger instead of console for all logging.**
+
+The project uses a centralized logging utility (`src/utils/logger.js`) that provides environment-aware filtering and structured prefixes.
+
+#### Basic Usage
+
 ```javascript
-// ✅ CORRECT - Loading check FIRST
-if (loading) {
-  return <LoadingSpinner />;
-}
+import { createLogger } from '../utils/logger';
+const logger = createLogger('ComponentName');
 
-if (!isAuthenticated) {
-  return <AuthRequired />;
-}
+// Critical user actions
+logger.info('User saved build', { buildName, userId });
 
-if (error) {
-  return <ErrorMessage />;
-}
+// Development debugging
+logger.debug('Cache hit', { key, value });
 
+// Verbose lifecycle
+logger.trace('Effect running', { deps });
+
+// Errors and warnings
+logger.error('Failed to load data', { error });
+logger.warn('Using fallback value', { key });
+```
+
+#### Log Levels
+
+| Level | Production | Development | Use Cases |
+|-------|-----------|-------------|-----------|
+| **ERROR** | ✅ Visible | ✅ Visible | API failures, exceptions, data corruption |
+| **WARN** | ✅ Visible | ✅ Visible | Fallbacks, deprecations, missing optional data |
+| **INFO** | ⚠️ Critical Only | ✅ All | User actions + lifecycle events |
+| **DEBUG** | ❌ Hidden | ✅ Visible | Cache ops, validations, internal state |
+| **TRACE** | ❌ Hidden | ✅ Visible | Lifecycle, polling, verbose tracking |
+
+#### Critical Actions (INFO Logged in Production)
+
+These keywords in INFO messages trigger production logging:
+- **Authentication**: `login`, `logout`, `authenticate`
+- **Data operations**: `save`, `delete`, `create`, `update`
+- **Sharing**: `share`, `export`, `import`, `copy`
+- **Monetization**: `donate`, `payment`
+
+#### Child Loggers
+
+Use child loggers for nested contexts:
+
+```javascript
+const logger = createLogger('SoulWeapon');
+const cacheLogger = logger.child('Cache');
+const bestWeaponLogger = logger.child('BestWeapon');
+
+cacheLogger.debug('Cached 5 submissions'); // Outputs: [SoulWeapon:Cache] Cached 5 submissions
+```
+
+#### Best Practices
+
+1. **Never use `console.log/warn/error` directly** - Always use logger
+2. **Choose appropriate log levels** - Don't use INFO for internal debugging
+3. **Include context data** - Pass objects as second parameter
+4. **Use consistent prefixes** - Typically component or module name
+5. **Keep messages concise** - Logs should be scannable
+6. **Production = clean** - Only errors, warnings, and critical actions visible
+
+#### Migration Pattern
+
+**Before:**
+```javascript
+console.log('[Component] Doing something:', value);
+console.error('[Component] Failed:', error);
+```
+
+**After:**
+```javascript
+const logger = createLogger('Component');
+logger.debug('Doing something', { value });
+logger.error('Failed', { error });
+```
+
+### Use Constants for Configuration Values
+
+**CRITICAL: Extract repetitive magic numbers and strings into named constants.**
+
+```javascript
+// ❌ BAD - Magic numbers everywhere
+const [gridScale, setGridScale] = useState(1.5);
+<input min="0.5" max="2.4" step="0.1" />
+const newInventory = Array(8).fill(null);
+
+// ✅ GOOD - Named constants
+const GRID_SCALE_DEFAULT = 1.5;
+const GRID_SCALE_MIN = 0.5;
+const GRID_SCALE_MAX = 2.4;
+const INVENTORY_SIZE = 8;
+
+const [gridScale, setGridScale] = useState(GRID_SCALE_DEFAULT);
+<input min={GRID_SCALE_MIN} max={GRID_SCALE_MAX} />
+const newInventory = Array(INVENTORY_SIZE).fill(null);
+```
+
+See example in `src/components/SoulWeaponEngravingBuilder.jsx` (lines 25-46).
+
+### Component Rendering Order
+
+**ALWAYS check loading states FIRST** to prevent flickering:
+
+```javascript
+// ✅ CORRECT
+if (loading) return <LoadingSpinner />;
+if (!isAuthenticated) return <AuthRequired />;
+if (error) return <ErrorMessage />;
 return <Content />;
-```
 
-### Incorrect Pattern:
-```javascript
 // ❌ WRONG - Auth check before loading causes flicker
-if (!isAuthenticated) {
-  return <AuthRequired />;  // Flickers briefly!
-}
-
-if (loading) {
-  return <LoadingSpinner />;
-}
+if (!isAuthenticated) return <AuthRequired />;
+if (loading) return <LoadingSpinner />;
 ```
 
-### Why This Matters:
-- When a component mounts, initial state often has `loading = true` and `data = null/[]`
-- Checking data/auth before loading will briefly show error states
-- Users see a flash of "Not Authenticated" or "No Data" before the spinner appears
-- Always render loading spinner FIRST, then check other conditions after data loads
+## Git Workflow
 
-## Adding New Components
+**IMPORTANT: Claude should NEVER handle git commits or pushes.**
 
-### When to add to parent project (`src/components/`):
-- Game-specific mechanics or formulas
-- Slayer Legend-specific data structures
-- Components that won't work for other wikis
+**🚨 PROHIBITED GIT COMMANDS:**
+- **NEVER** use `git add` - User stages changes manually
+- **NEVER** use `git commit` - User creates commits manually
+- **NEVER** use `git push` - User pushes changes manually
 
-### When to add to framework (requires submodule update):
-- Generic wiki utilities
-- Reusable across ANY wiki topic
-- No assumptions about content domain
+**Allowed behavior:**
+- Claude makes code changes only (using Read, Edit, Write tools)
+- User handles ALL git operations manually
+- User reviews and commits with their own messages
 
-**See `COMPONENTS-MOVED.md` for detailed guidelines.**
+**Framework submodule:**
+- Often in detached HEAD state (normal)
+- **DO NOT** use ANY git commands in `wiki-framework/` directory
+- User handles all submodule operations
+
+## Repository Permissions & Security
+
+**IMPORTANT: GitHub Actions workflow permissions are READ-ONLY.**
+
+- **Workflow Permissions:** "Read repository contents and packages permissions"
+- This is the **correct and secure** configuration
+- Workflows use **bot tokens from secrets** for write operations
+- DO NOT suggest changing to "Read and write permissions"
+
+**Bot Token Architecture:**
+- `WIKI_BOT_TOKEN` - Used by serverless functions for creating PRs, commits
+- `CDN_REPO_TOKEN` - Used for CDN repository video uploads (same as WIKI_BOT_TOKEN or separate)
+- Stored in GitHub Secrets and deployment platform environment variables
+- Never stored in workflow GITHUB_TOKEN
+
+**Branch Protection (main branch):**
+- Require 1 PR approval before merging
+- Require status checks: build, test, search-index
+- Require conversation resolution
+- Include administrators
+- No force pushes, no deletions
+
+See **[Repository Permissions](.claude/repository-permissions.md)** for complete details.
+
+## Documentation
+
+For detailed information on specific topics, see the **Quick Links** section at the top of this file.
+
+## Getting Help
+
+- `/help` - Get help with Claude Code
+- [GitHub Issues](https://github.com/anthropics/claude-code/issues) - Report issues with Claude Code
+- [Framework Docs](https://github.com/BenDol/GithubWiki) - Wiki framework documentation

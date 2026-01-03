@@ -1,0 +1,1277 @@
+name: Update Contributor Highscore Cache
+
+# This workflow automatically updates the contributor highscore cache
+# by fetching fresh contributor statistics and storing them in a GitHub issue.
+# This prevents every user from hitting the GitHub API for the same data.
+#
+# The cache is stored in a GitHub issue with the label "highscore-cache"
+# and is read by the wiki's highscore page for all users.
+#
+# Cache Structure:
+# - All Time: Total contributions from repos.listContributors()
+# - This Month: Commits from the last 30 days
+# - This Week: Commits from the last 7 days
+#
+# All contributor data includes userId for username-change immunity
+#
+# Schedule: Runs daily at 2 AM UTC
+# Manual: Can be triggered manually via GitHub UI (Actions tab)
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:  # Allow manual trigger from Actions tab
+
+# Prevent race conditions: Only one workflow run at a time
+# If a new run is triggered while one is running, cancel the old one
+concurrency:
+  group: update-highscore-cache
+  cancel-in-progress: false  # Let running job finish, queue new one
+
+jobs:
+  update-cache:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write  # Need write permission to update cache issue
+
+    env:
+      WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username (anonymous contributions)
+      VITE_RELEASE_DATE: ${{ vars.VITE_RELEASE_DATE }}  # Release date for filtering commits (optional)
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update highscore cache
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const crypto = require('crypto');
+
+            const CACHE_ISSUE_TITLE = '[Cache] Contributor Highscore';
+            const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
+            const GITHUB_ACTIONS_BOT = 'github-actions[bot]';
+
+            // Read wiki config to get the configured branch
+            let configuredBranch = 'main'; // default
+            try {
+              const configPath = path.join(process.env.GITHUB_WORKSPACE, 'wiki-config.json');
+              const configContent = fs.readFileSync(configPath, 'utf8');
+              const config = JSON.parse(configContent);
+              configuredBranch = config?.wiki?.repository?.branch || 'main';
+              console.log(`📋 Using configured branch from wiki-config.json: ${configuredBranch}`);
+            } catch (error) {
+              console.warn('⚠️ Failed to read wiki-config.json, using default branch: main');
+            }
+
+            // Read release date from environment variable
+            let releaseDate = null; // null = no filtering
+            const releaseDateStr = process.env.VITE_RELEASE_DATE;
+            if (releaseDateStr && releaseDateStr.trim() !== '') {
+              releaseDate = new Date(releaseDateStr);
+              if (isNaN(releaseDate.getTime())) {
+                console.warn('⚠️ Invalid VITE_RELEASE_DATE format:', releaseDateStr);
+                releaseDate = null;
+              } else {
+                console.log(`📅 Release date configured: ${releaseDate.toISOString()}`);
+                console.log(`   Only activity after this date will be counted`);
+              }
+            }
+
+            /**
+             * Filter commits by release date
+             * @param {Array} commits - Array of commits to filter
+             * @returns {Array} Filtered commits after release date
+             */
+            function filterByReleaseDate(commits) {
+              if (!releaseDate) return commits;
+
+              const beforeCount = commits.length;
+              const filtered = commits.filter(commit => {
+                const commitDate = new Date(commit.commit.author.date);
+                return commitDate >= releaseDate;
+              });
+
+              const filteredCount = beforeCount - filtered.length;
+              if (filteredCount > 0) {
+                console.log(`   📅 Filtered out ${filteredCount} commit(s) before release date`);
+              }
+
+              return filtered;
+            }
+
+            console.log('🔍 Fetching contributor statistics for all time periods...');
+
+            /**
+             * Calculate a fair contributor score that prevents gaming
+             * Formula: (contributions * 100) + (quality_bonus * 2)
+             *
+             * - Base score from contributions (heavily weighted at 100x)
+             * - Quality bonus from average lines per contribution (2x weight)
+             * - This rewards both volume AND quality, preventing spam contributions
+             */
+            function calculateContributorScore(contributor) {
+              const contributions = contributor.contributions || 0;
+              const additions = contributor.additions || 0;
+              const deletions = contributor.deletions || 0;
+
+              // Base score: contributions heavily weighted
+              const baseScore = contributions * 100;
+
+              // Quality bonus: average lines changed per contribution
+              // High value = meaningful contributions, Low value = spam
+              const totalLines = additions + deletions;
+              const averageLinesPerContribution = contributions > 0 ? totalLines / contributions : 0;
+              const qualityBonus = averageLinesPerContribution * 2;
+
+              // Final score
+              const score = baseScore + qualityBonus;
+
+              return Math.round(score);
+            }
+
+            /**
+             * Hash email for privacy (consistent hashing for aggregation)
+             */
+            function hashEmail(email) {
+              return crypto.createHash('sha256').update(email.toLowerCase().trim()).digest('hex');
+            }
+
+            /**
+             * Filter commit stats to only count changes to content files
+             * Only counts additions/deletions for files inside public/content/**
+             * @param {Object} detailedCommit - Full commit data from repos.getCommit()
+             * @returns {Object} Filtered stats { additions, deletions }
+             */
+            function getContentFileStats(detailedCommit) {
+              if (!detailedCommit.files || detailedCommit.files.length === 0) {
+                return { additions: 0, deletions: 0 };
+              }
+
+              let additions = 0;
+              let deletions = 0;
+
+              for (const file of detailedCommit.files) {
+                // Only count files inside public/content/
+                if (file.filename && file.filename.startsWith('public/content/')) {
+                  additions += file.additions || 0;
+                  deletions += file.deletions || 0;
+                }
+              }
+
+              return { additions, deletions };
+            }
+
+            /**
+             * Parse anonymous contribution from bot commit message
+             * Returns { name, emailHash, verified } or null if not anonymous/verified
+             *
+             * NEW FORMAT (with Email-Hash line):
+             *   Anonymous contribution by: Display Name
+             *   Email: m****d@example.com (verified ✓)
+             *   Email-Hash: abc123def456...
+             *
+             * OLD FORMAT (without Email-Hash, must re-hash):
+             *   Anonymous contribution by: Display Name
+             *   Email: m****d@example.com (verified ✓)
+             */
+            function parseAnonymousContribution(commitMessage) {
+              // Check for verified anonymous contribution
+              const nameMatch = commitMessage.match(/Anonymous contribution by:\s*(.+)/);
+              const emailHashMatch = commitMessage.match(/Email-Hash:\s*([a-f0-9]+)/);
+
+              if (nameMatch) {
+                // NEW FORMAT: Use email hash directly from commit message
+                if (emailHashMatch) {
+                  return {
+                    name: nameMatch[1].trim(),
+                    emailHash: emailHashMatch[1].trim(),
+                    verified: true
+                  };
+                }
+
+                // OLD FORMAT: Extract masked email and hash it
+                // This is a fallback for old commits before Email-Hash was added
+                const emailMatch = commitMessage.match(/Email:\s*(.+?)\s*\(verified\s*✓\)/);
+                if (emailMatch) {
+                  // Hash the masked email (this will cause separate entries for same email
+                  // due to random masking, but we can't do better for old commits)
+                  const maskedEmail = emailMatch[1].trim();
+                  return {
+                    name: nameMatch[1].trim(),
+                    // Will be hashed by caller using hashEmail()
+                    email: maskedEmail,
+                    verified: true
+                  };
+                }
+              }
+
+              return null;
+            }
+
+            /**
+             * Fetch all-time contributor stats
+             * Enhanced with PR data for additions/deletions
+             */
+            async function fetchAllTimeContributors() {
+              console.log('📊 Fetching all-time contributors...');
+
+              // Get base contributor counts
+              const { data: contributors } = await github.rest.repos.listContributors({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              });
+
+              console.log(`✅ Found ${contributors.length} all-time contributors`);
+
+              // Create map with base stats (exclude bot)
+              const contributorMap = new Map();
+              const anonymousMap = new Map(); // Anonymous contributors keyed by hashed email
+
+              contributors.forEach(contributor => {
+                // Skip bot accounts - wiki bot's contributions will be attributed to anonymous users
+                if (contributor.login === BOT_USERNAME) {
+                  console.log(`   ⏭️  Skipping bot account: ${BOT_USERNAME} (will process as anonymous)`);
+                  return;
+                }
+                // Skip GitHub Actions bot - automated commits shouldn't count in highscores
+                if (contributor.login === GITHUB_ACTIONS_BOT) {
+                  console.log(`   ⏭️  Skipping GitHub Actions bot: ${GITHUB_ACTIONS_BOT}`);
+                  return;
+                }
+
+                contributorMap.set(contributor.id, {
+                  userId: contributor.id,
+                  login: contributor.login,
+                  avatarUrl: contributor.avatar_url,
+                  contributions: 0,  // Will be counted from filtered commits
+                  additions: 0,
+                  deletions: 0,
+                  profileUrl: contributor.html_url,
+                  prestige: 0,
+                  type: contributor.type
+                });
+              });
+
+              // First, fetch linked anonymous PRs to build a set of commit SHAs to exclude
+              console.log('🔍 Pre-fetching linked anonymous PRs to avoid double-counting...');
+              if (releaseDate) {
+                console.log(`   📅 Filtering PRs merged after: ${releaseDate.toISOString()}`);
+              }
+              const linkedPRCommitSHAs = new Set();
+              let prPage = 1;
+              const prPerPage = 100;
+              let hasMorePRs = true;
+
+              while (hasMorePRs) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: prPerPage,
+                  page: prPage,
+                });
+
+                if (prs.length === 0) break;
+
+                // Find PRs with user-id labels (linked anonymous edits)
+                for (const pr of prs) {
+                  // Skip if not merged
+                  if (!pr.merged_at) continue;
+
+                  // Filter by release date
+                  if (releaseDate) {
+                    const mergeDate = new Date(pr.merged_at);
+                    if (mergeDate < releaseDate) continue;
+                  }
+
+                  // Check for user-id label
+                  const userIdLabel = pr.labels.find(label => {
+                    const labelName = typeof label === 'string' ? label : label.name;
+                    return labelName && labelName.startsWith('user-id:');
+                  });
+
+                  if (userIdLabel) {
+                    // Fetch all commits from this linked PR
+                    try {
+                      const { data: prCommits } = await github.rest.pulls.listCommits({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: pr.number,
+                        per_page: 100,
+                      });
+
+                      // Add all commit SHAs from this linked PR to exclusion set
+                      for (const commit of prCommits) {
+                        linkedPRCommitSHAs.add(commit.sha);
+                      }
+                    } catch (error) {
+                      console.warn(`⚠️ Failed to fetch commits for linked PR #${pr.number}:`, error.message);
+                    }
+                  }
+                }
+
+                hasMorePRs = prs.length === prPerPage;
+                prPage++;
+
+                // Safety limit
+                if (prPage > 50) {
+                  console.warn('⚠️ Reached page limit (50) for PR pre-fetching');
+                  break;
+                }
+              }
+
+              console.log(`✅ Found ${linkedPRCommitSHAs.size} commit(s) from linked anonymous PRs (will exclude from anonymous map)`);
+
+              // Enhance with commit data to get additions/deletions
+              console.log('📊 Fetching all commits for additions/deletions data...');
+
+              let page = 1;
+              const perPage = 100;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: commits } = await github.rest.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  sha: configuredBranch,
+                  per_page: perPage,
+                  page: page,
+                });
+
+                if (commits.length === 0) break;
+
+                // Filter by release date
+                const filteredCommits = filterByReleaseDate(commits);
+
+                console.log(`   Page ${page}: Processing ${filteredCommits.length} commits...`);
+
+                // Fetch detailed commit data to get additions/deletions
+                for (const commit of filteredCommits) {
+                  const author = commit.author || commit.commit.author;
+                  const userId = author?.id;
+                  const login = author?.login;
+
+                  try {
+                    // repos.listCommits() doesn't include additions/deletions, need repos.getCommit()
+                    const { data: detailedCommit } = await github.rest.repos.getCommit({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      ref: commit.sha,
+                    });
+
+                    // Only count additions/deletions for files in public/content/
+                    const stats = getContentFileStats(detailedCommit);
+                    const additions = stats.additions;
+                    const deletions = stats.deletions;
+
+                    // Skip GitHub Actions bot commits
+                    if (login === GITHUB_ACTIONS_BOT) {
+                      continue;
+                    }
+
+                    // Check if this is a bot commit (anonymous contribution)
+                    if (login === BOT_USERNAME) {
+                      // Skip if this commit is from a linked PR (already attributed to authenticated user)
+                      if (linkedPRCommitSHAs.has(commit.sha)) {
+                        // This commit belongs to a linked PR, skip it to avoid double-counting
+                        continue;
+                      }
+
+                      const anonData = parseAnonymousContribution(detailedCommit.commit.message);
+                      if (anonData && anonData.verified) {
+                        // Use emailHash directly if available (new format), otherwise hash the email (old format)
+                        const emailHash = anonData.emailHash || hashEmail(anonData.email);
+
+                        if (anonymousMap.has(emailHash)) {
+                          const anon = anonymousMap.get(emailHash);
+                          anon.contributions++;
+                          anon.additions += additions;
+                          anon.deletions += deletions;
+                        } else {
+                          anonymousMap.set(emailHash, {
+                            userId: null,
+                            login: anonData.name, // Display name from contribution
+                            avatarUrl: null,
+                            contributions: 1,
+                            additions,
+                            deletions,
+                            profileUrl: null,
+                            prestige: 0,
+                            type: 'Anonymous',
+                            isAnonymous: true,
+                            emailHash: emailHash
+                          });
+                        }
+                      }
+                    } else if (userId && contributorMap.has(userId)) {
+                      // Regular contributor
+                      const contributor = contributorMap.get(userId);
+                      contributor.contributions++;  // Count this commit
+                      contributor.additions += additions;
+                      contributor.deletions += deletions;
+                    }
+                  } catch (error) {
+                    console.warn(`   ⚠️ Failed to fetch details for commit ${commit.sha.substring(0, 7)}:`, error.message);
+                  }
+                }
+
+                hasMore = commits.length === perPage;
+                page++;
+
+                // Safety limit to prevent excessive API calls
+                if (page > 50) {
+                  console.warn('⚠️ Reached page limit (50) for commit fetching');
+                  break;
+                }
+              }
+
+              // Fetch linked anonymous PRs (PRs with user-id labels)
+              console.log('🔍 Fetching linked anonymous PRs...');
+              if (releaseDate) {
+                console.log(`   📅 Filtering PRs merged after: ${releaseDate.toISOString()}`);
+              }
+              let linkedPRCount = 0;
+              prPage = 1;  // Reset page counter (already declared above)
+              // prPerPage already declared above, reusing same value (100)
+              hasMorePRs = true;  // Reset flag (already declared above)
+
+              while (hasMorePRs) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: prPerPage,
+                  page: prPage,
+                });
+
+                if (prs.length === 0) break;
+
+                // Find PRs with user-id labels (linked anonymous edits)
+                for (const pr of prs) {
+                  // Skip if not merged
+                  if (!pr.merged_at) continue;
+
+                  // Filter by release date
+                  if (releaseDate) {
+                    const mergeDate = new Date(pr.merged_at);
+                    if (mergeDate < releaseDate) continue;
+                  }
+
+                  // Check for user-id label
+                  const userIdLabel = pr.labels.find(label => {
+                    const labelName = typeof label === 'string' ? label : label.name;
+                    return labelName && labelName.startsWith('user-id:');
+                  });
+
+                  if (userIdLabel) {
+                    const labelName = typeof userIdLabel === 'string' ? userIdLabel : userIdLabel.name;
+                    const userId = parseInt(labelName.replace('user-id:', ''));
+
+                    // Get detailed PR data for additions/deletions
+                    try {
+                      const { data: detailedPR } = await github.rest.pulls.get({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: pr.number,
+                      });
+
+                      // Count only additions/deletions for files in public/content/
+                      let additions = 0;
+                      let deletions = 0;
+
+                      // Fetch PR files to get content-specific stats
+                      try {
+                        const { data: prFiles } = await github.rest.pulls.listFiles({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          pull_number: pr.number,
+                          per_page: 100,
+                        });
+
+                        for (const file of prFiles) {
+                          if (file.filename && file.filename.startsWith('public/content/')) {
+                            additions += file.additions || 0;
+                            deletions += file.deletions || 0;
+                          }
+                        }
+                      } catch (fileError) {
+                        console.warn(`⚠️ Failed to fetch files for PR #${pr.number}:`, fileError.message);
+                      }
+
+                      // Add to contributor stats (1 contribution per PR, not per commit)
+                      if (contributorMap.has(userId)) {
+                        const contributor = contributorMap.get(userId);
+                        contributor.contributions++;  // 1 per PR to avoid gaming the system
+                        contributor.additions += additions;
+                        contributor.deletions += deletions;
+                        linkedPRCount++;
+                      } else {
+                        console.warn(`⚠️ Found linked PR #${pr.number} for unknown user ID: ${userId}`);
+                      }
+                    } catch (error) {
+                      console.warn(`⚠️ Failed to fetch details for linked PR #${pr.number}:`, error.message);
+                    }
+                  }
+                }
+
+                hasMorePRs = prs.length === prPerPage;
+                prPage++;
+
+                // Safety limit
+                if (prPage > 50) {
+                  console.warn('⚠️ Reached page limit (50) for PR fetching');
+                  break;
+                }
+              }
+
+              if (linkedPRCount > 0) {
+                console.log(`✅ Processed ${linkedPRCount} linked anonymous PR(s)`);
+              }
+
+              // Merge regular contributors and anonymous contributors
+              const allContributors = [
+                ...Array.from(contributorMap.values()),
+                ...Array.from(anonymousMap.values())
+              ];
+
+              // Calculate scores for all contributors
+              const formatted = allContributors.map(contributor => {
+                contributor.score = calculateContributorScore(contributor);
+                return contributor;
+              });
+
+              // Filter out contributors with zero contributions (unmerged PRs, etc.)
+              const activeContributors = formatted.filter(contributor => contributor.contributions > 0);
+
+              // Sort by score (descending), fallback to contributions if equal
+              activeContributors.sort((a, b) => {
+                if (b.score !== a.score) {
+                  return b.score - a.score;
+                }
+                return b.contributions - a.contributions;
+              });
+
+              const filteredCount = formatted.length - activeContributors.length;
+              if (filteredCount > 0) {
+                console.log(`   🧹 Filtered out ${filteredCount} contributor(s) with zero contributions`);
+              }
+
+              console.log(`✅ Enhanced ${contributorMap.size} registered + ${anonymousMap.size} anonymous contributors`);
+              console.log(`   Total: ${activeContributors.length} active contributors`);
+
+              return activeContributors;
+            }
+
+            /**
+             * Fetch commits within a date range with detailed additions/deletions by author
+             * This gives credit to all contributions, whether through PRs or direct commits
+             */
+            async function fetchCommitsWithStatsInDateRange(since, until, branch = 'main') {
+              console.log(`📊 Fetching commits from ${since} to ${until} on branch '${branch}'...`);
+
+              // First, fetch linked anonymous PRs to build a set of commit SHAs to exclude
+              console.log('🔍 Pre-fetching linked anonymous PRs in date range to avoid double-counting...');
+              const linkedPRCommitSHAs = new Set();
+              let prPrePage = 1;
+              const prPrePerPage = 100;
+              let hasMorePrePRs = true;
+
+              while (hasMorePrePRs) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: prPrePerPage,
+                  page: prPrePage,
+                });
+
+                if (prs.length === 0) break;
+
+                // Find PRs with user-id labels (linked anonymous edits) within date range
+                for (const pr of prs) {
+                  // Skip if not merged
+                  if (!pr.merged_at) continue;
+
+                  // Check if PR is within date range
+                  const prDate = new Date(pr.created_at);
+                  const sinceDate = new Date(since);
+                  const untilDate = new Date(until);
+                  if (prDate < sinceDate || prDate > untilDate) continue;
+
+                  // Check for user-id label
+                  const userIdLabel = pr.labels.find(label => {
+                    const labelName = typeof label === 'string' ? label : label.name;
+                    return labelName && labelName.startsWith('user-id:');
+                  });
+
+                  if (userIdLabel) {
+                    // Fetch all commits from this linked PR
+                    try {
+                      const { data: prCommits } = await github.rest.pulls.listCommits({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: pr.number,
+                        per_page: 100,
+                      });
+
+                      // Add all commit SHAs from this linked PR to exclusion set
+                      for (const commit of prCommits) {
+                        linkedPRCommitSHAs.add(commit.sha);
+                      }
+                    } catch (error) {
+                      console.warn(`⚠️ Failed to fetch commits for linked PR #${pr.number}:`, error.message);
+                    }
+                  }
+                }
+
+                hasMorePrePRs = prs.length === prPrePerPage;
+                prPrePage++;
+
+                // Safety limit
+                if (prPrePage > 50) {
+                  console.warn('⚠️ Reached page limit (50) for PR pre-fetching');
+                  break;
+                }
+              }
+
+              console.log(`✅ Found ${linkedPRCommitSHAs.size} commit(s) from linked anonymous PRs in date range (will exclude from anonymous map)`);
+
+              const commits = [];
+              let page = 1;
+              const perPage = 100;
+
+              // Fetch all commits in date range
+              while (true) {
+                const { data } = await github.rest.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  sha: branch, // Explicitly specify branch
+                  since,
+                  until,
+                  per_page: perPage,
+                  page: page,
+                });
+
+                if (data.length === 0) break;
+                commits.push(...data);
+
+                // If we got fewer than perPage, we've reached the end
+                if (data.length < perPage) break;
+                page++;
+              }
+
+              console.log(`✅ Found ${commits.length} commits in date range`);
+
+              // Filter by release date
+              const filteredCommits = filterByReleaseDate(commits);
+              console.log(`   After release date filter: ${filteredCommits.length} commits`);
+
+              // Aggregate commits by author (use user ID as key for permanent identification)
+              const contributorMap = new Map();
+              const anonymousMap = new Map(); // Anonymous contributors keyed by hashed email
+
+              // Fetch detailed commit data to get additions/deletions
+              console.log(`   Fetching detailed stats for ${filteredCommits.length} commits...`);
+              for (const commit of filteredCommits) {
+                const author = commit.author || commit.commit.author;
+                const login = author?.login;
+                const userId = author?.id;
+
+                // Skip commits without a GitHub user (e.g., local git commits)
+                if (!login) continue;
+
+                try {
+                  // repos.listCommits() doesn't include additions/deletions, need repos.getCommit()
+                  const { data: detailedCommit } = await github.rest.repos.getCommit({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: commit.sha,
+                  });
+
+                  // Only count additions/deletions for files in public/content/
+                  const stats = getContentFileStats(detailedCommit);
+                  const additions = stats.additions;
+                  const deletions = stats.deletions;
+
+                  // Skip GitHub Actions bot commits
+                  if (login === GITHUB_ACTIONS_BOT) {
+                    continue;
+                  }
+
+                  // Check if this is a bot commit (anonymous contribution)
+                  if (login === BOT_USERNAME) {
+                    // Skip if this commit is from a linked PR (already attributed to authenticated user)
+                    if (linkedPRCommitSHAs.has(commit.sha)) {
+                      // This commit belongs to a linked PR, skip it to avoid double-counting
+                      continue;
+                    }
+
+                    const anonData = parseAnonymousContribution(detailedCommit.commit.message);
+                    if (anonData && anonData.verified) {
+                      // Use emailHash directly if available (new format), otherwise hash the email (old format)
+                      const emailHash = anonData.emailHash || hashEmail(anonData.email);
+
+                      if (anonymousMap.has(emailHash)) {
+                        const anon = anonymousMap.get(emailHash);
+                        anon.contributions++;
+                        anon.additions += additions;
+                        anon.deletions += deletions;
+                      } else {
+                        anonymousMap.set(emailHash, {
+                          userId: null,
+                          login: anonData.name, // Display name from contribution
+                          avatarUrl: null,
+                          contributions: 1,
+                          additions,
+                          deletions,
+                          profileUrl: null,
+                          prestige: 0,
+                          type: 'Anonymous',
+                          isAnonymous: true,
+                          emailHash: emailHash
+                        });
+                      }
+                    }
+                    // CRITICAL: Always skip bot commits - don't add bot as regular contributor
+                    continue;
+                  }
+
+                  // Regular contributor (not bot)
+                  // Use user ID as key (permanent), fallback to login
+                  const key = userId ? userId.toString() : `legacy:${login}`;
+
+                  if (contributorMap.has(key)) {
+                    const existing = contributorMap.get(key);
+                    existing.contributions++;
+                    existing.additions += additions;
+                    existing.deletions += deletions;
+                    // Update login in case username changed
+                    existing.login = login;
+                  } else {
+                    contributorMap.set(key, {
+                      userId: userId || null,
+                      login: login,
+                      avatarUrl: author.avatar_url,
+                      contributions: 1,
+                      additions,
+                      deletions,
+                      profileUrl: author.html_url,
+                      prestige: 0,
+                      type: author.type || 'User',
+                    });
+                  }
+                } catch (error) {
+                  console.warn(`⚠️ Failed to fetch details for commit ${commit.sha.substring(0, 7)}:`, error.message);
+                }
+              }
+
+              // Fetch linked anonymous PRs within date range (PRs with user-id labels)
+              console.log('🔍 Fetching linked anonymous PRs within date range...');
+              if (releaseDate) {
+                console.log(`   📅 Filtering PRs merged after: ${releaseDate.toISOString()}`);
+              }
+              let linkedPRCount = 0;
+              let prPage = 1;
+              const prPerPage = 100;
+              let hasMorePRs = true;
+
+              while (hasMorePRs) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: prPerPage,
+                  page: prPage,
+                });
+
+                if (prs.length === 0) break;
+
+                // Find PRs with user-id labels (linked anonymous edits)
+                for (const pr of prs) {
+                  // Skip if not merged
+                  if (!pr.merged_at) continue;
+
+                  // Check if PR merge date is within date range (use merged_at, not created_at)
+                  const prDate = new Date(pr.merged_at);
+                  const sinceDate = new Date(since);
+                  const untilDate = new Date(until);
+                  if (prDate < sinceDate || prDate > untilDate) continue;
+
+                  // Filter by release date
+                  if (releaseDate) {
+                    if (prDate < releaseDate) continue;
+                  }
+
+                  // Check for user-id label
+                  const userIdLabel = pr.labels.find(label => {
+                    const labelName = typeof label === 'string' ? label : label.name;
+                    return labelName && labelName.startsWith('user-id:');
+                  });
+
+                  if (userIdLabel) {
+                    const labelName = typeof userIdLabel === 'string' ? userIdLabel : userIdLabel.name;
+                    const userId = parseInt(labelName.replace('user-id:', ''));
+                    const userKey = userId.toString();
+
+                    // Get detailed PR data for additions/deletions
+                    try {
+                      const { data: detailedPR } = await github.rest.pulls.get({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: pr.number,
+                      });
+
+                      // Count only additions/deletions for files in public/content/
+                      let additions = 0;
+                      let deletions = 0;
+
+                      // Fetch PR files to get content-specific stats
+                      try {
+                        const { data: prFiles } = await github.rest.pulls.listFiles({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          pull_number: pr.number,
+                          per_page: 100,
+                        });
+
+                        for (const file of prFiles) {
+                          if (file.filename && file.filename.startsWith('public/content/')) {
+                            additions += file.additions || 0;
+                            deletions += file.deletions || 0;
+                          }
+                        }
+                      } catch (fileError) {
+                        console.warn(`⚠️ Failed to fetch files for PR #${pr.number}:`, fileError.message);
+                      }
+
+                      // Add to contributor stats (1 contribution per PR, not per commit)
+                      if (contributorMap.has(userKey)) {
+                        const contributor = contributorMap.get(userKey);
+                        contributor.contributions++;  // 1 per PR to avoid gaming the system
+                        contributor.additions += additions;
+                        contributor.deletions += deletions;
+                        linkedPRCount++;
+                      } else {
+                        // User not in map yet, try to fetch their info
+                        try {
+                          const { data: userData } = await github.rest.users.getByUsername({
+                            username: pr.user.login // This might be the bot, but we'll try
+                          });
+
+                          contributorMap.set(userKey, {
+                            userId: userId,
+                            login: userData.login,
+                            avatarUrl: userData.avatar_url,
+                            contributions: 1,  // 1 per PR to avoid gaming the system
+                            additions,
+                            deletions,
+                            profileUrl: userData.html_url,
+                            prestige: 0,
+                            type: userData.type || 'User',
+                          });
+                          linkedPRCount++;
+                        } catch (error) {
+                          console.warn(`⚠️ Found linked PR #${pr.number} for unknown user ID ${userId}, failed to fetch user data`);
+                        }
+                      }
+                    } catch (error) {
+                      console.warn(`⚠️ Failed to fetch details for linked PR #${pr.number}:`, error.message);
+                    }
+                  }
+                }
+
+                hasMorePRs = prs.length === prPerPage;
+                prPage++;
+
+                // Safety limit
+                if (prPage > 50) {
+                  console.warn('⚠️ Reached page limit (50) for PR fetching');
+                  break;
+                }
+              }
+
+              if (linkedPRCount > 0) {
+                console.log(`✅ Processed ${linkedPRCount} linked anonymous PR(s) in date range`);
+              }
+
+              // Merge regular contributors and anonymous contributors
+              const allContributors = [
+                ...Array.from(contributorMap.values()),
+                ...Array.from(anonymousMap.values())
+              ];
+
+              // Calculate scores for all contributors
+              const contributors = allContributors.map(contributor => {
+                contributor.score = calculateContributorScore(contributor);
+                return contributor;
+              });
+
+              // Filter out contributors with zero contributions (unmerged PRs, etc.)
+              const activeContributors = contributors.filter(contributor => contributor.contributions > 0);
+
+              // Sort by score (descending), fallback to contributions if equal
+              activeContributors.sort((a, b) => {
+                if (b.score !== a.score) {
+                  return b.score - a.score;
+                }
+                return b.contributions - a.contributions;
+              });
+
+              const filteredCount = contributors.length - activeContributors.length;
+              if (filteredCount > 0) {
+                console.log(`   🧹 Filtered out ${filteredCount} contributor(s) with zero contributions`);
+              }
+
+              console.log(`✅ Found ${contributorMap.size} registered + ${anonymousMap.size} anonymous contributors`);
+              console.log(`   Total: ${activeContributors.length} active contributors`);
+              return activeContributors;
+            }
+
+            /**
+             * Fetch commits within a date range and aggregate by author
+             * @deprecated Use fetchCommitsWithStatsInDateRange for accurate additions/deletions
+             */
+            async function fetchCommitsInDateRange(since, until, branch = 'main') {
+              console.log(`📊 Fetching commits from ${since} to ${until} on branch '${branch}'...`);
+
+              const commits = [];
+              let page = 1;
+              const perPage = 100;
+
+              // Fetch all commits in date range (with pagination)
+              // Use sha parameter to explicitly specify the branch
+              while (true) {
+                const { data } = await github.rest.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  sha: branch, // Explicitly specify branch to only count main branch commits
+                  since,
+                  until,
+                  per_page: perPage,
+                  page: page,
+                });
+
+                if (data.length === 0) break;
+                commits.push(...data);
+
+                // If we got fewer than perPage, we've reached the end
+                if (data.length < perPage) break;
+                page++;
+              }
+
+              console.log(`✅ Found ${commits.length} commits in date range`);
+
+              // Aggregate commits by author (use user ID as key for permanent identification)
+              const contributorMap = new Map();
+
+              for (const commit of commits) {
+                const author = commit.author || commit.commit.author;
+                const login = author?.login;
+                const userId = author?.id;
+
+                // Skip commits without a GitHub user (e.g., local git commits)
+                if (!login) continue;
+
+                // Skip bot accounts
+                if (login === BOT_USERNAME || login === GITHUB_ACTIONS_BOT) continue;
+
+                // Use user ID as key (permanent), fallback to login for local commits
+                const key = userId ? userId.toString() : `legacy:${login}`;
+
+                if (contributorMap.has(key)) {
+                  contributorMap.get(key).contributions++;
+                  // Update login in case username changed
+                  contributorMap.get(key).login = login;
+                } else {
+                  contributorMap.set(key, {
+                    userId: userId || null,
+                    login: login,
+                    avatarUrl: author.avatar_url,
+                    contributions: 1,
+                    additions: 0, // Note: commit data doesn't include line changes
+                    deletions: 0, // Note: commit data doesn't include line changes
+                    profileUrl: author.html_url,
+                    prestige: 0,
+                    type: author.type || 'User',
+                  });
+                }
+              }
+
+              // Convert map to array and calculate scores
+              const contributors = Array.from(contributorMap.values()).map(contributor => ({
+                ...contributor,
+                score: calculateContributorScore(contributor),
+              }));
+
+              // Filter out contributors with zero contributions (unmerged PRs, etc.)
+              const activeContributors = contributors.filter(contributor => contributor.contributions > 0);
+
+              // Sort by score (descending), fallback to contributions if equal
+              activeContributors.sort((a, b) => {
+                if (b.score !== a.score) {
+                  return b.score - a.score;
+                }
+                return b.contributions - a.contributions;
+              });
+
+              const filteredCount = contributors.length - activeContributors.length;
+              if (filteredCount > 0) {
+                console.log(`   🧹 Filtered out ${filteredCount} contributor(s) with zero contributions`);
+              }
+
+              console.log(`✅ Found ${activeContributors.length} unique active contributors in date range`);
+              return activeContributors;
+            }
+
+            // Calculate date ranges
+            const now = new Date();
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+            /**
+             * Fetch display names from registry issue
+             * Returns a map of userId => displayName
+             */
+            async function fetchDisplayNames() {
+              console.log('👤 Fetching display names registry...');
+
+              try {
+                // Find display names registry issue
+                const { data: issues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  labels: 'display-names',
+                  per_page: 100
+                });
+
+                const registryIssue = issues.find(issue => issue.title === '[Display Names Registry]');
+
+                if (!registryIssue) {
+                  console.log('   ℹ️  No display names registry found');
+                  return new Map();
+                }
+
+                console.log(`   Found registry issue #${registryIssue.number}`);
+
+                // Parse index map from issue body
+                const indexMap = new Map();
+                if (registryIssue.body) {
+                  const regex = /\[(\d+)\]=(\d+)/g;
+                  let match;
+                  while ((match = regex.exec(registryIssue.body)) !== null) {
+                    const userId = parseInt(match[1], 10);
+                    const commentId = parseInt(match[2], 10);
+                    indexMap.set(userId, commentId);
+                  }
+                }
+
+                console.log(`   Found ${indexMap.size} display name(s) in registry`);
+
+                // Fetch display name data from comments
+                const displayNames = new Map();
+                for (const [userId, commentId] of indexMap.entries()) {
+                  try {
+                    const { data: comment } = await github.rest.issues.getComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: commentId
+                    });
+
+                    const data = JSON.parse(comment.body);
+                    if (data.displayName) {
+                      displayNames.set(userId, data.displayName);
+                    }
+                  } catch (error) {
+                    console.warn(`   ⚠️  Failed to load display name for user ${userId}:`, error.message);
+                  }
+                }
+
+                console.log(`   ✅ Loaded ${displayNames.size} display name(s)`);
+                return displayNames;
+              } catch (error) {
+                console.error('   ❌ Failed to fetch display names:', error.message);
+                return new Map();
+              }
+            }
+
+            // Fetch all three categories in parallel (using commit data for accurate stats)
+            console.log(`🔄 Fetching contributor data from branch: ${configuredBranch}`);
+            const [allTimeContributors, thisMonthContributors, thisWeekContributors, displayNamesMap] = await Promise.all([
+              fetchAllTimeContributors(),
+              fetchCommitsWithStatsInDateRange(oneMonthAgo.toISOString(), now.toISOString(), configuredBranch),
+              fetchCommitsWithStatsInDateRange(oneWeekAgo.toISOString(), now.toISOString(), configuredBranch),
+              fetchDisplayNames(),
+            ]);
+
+            // Merge display names into contributor data
+            console.log('👤 Merging display names into contributor data...');
+            function mergeDisplayNames(contributors) {
+              return contributors.map(contributor => {
+                if (contributor.userId && displayNamesMap.has(contributor.userId)) {
+                  return {
+                    ...contributor,
+                    displayName: displayNamesMap.get(contributor.userId)
+                  };
+                }
+                return contributor;
+              });
+            }
+
+            const allTimeWithNames = mergeDisplayNames(allTimeContributors);
+            const thisMonthWithNames = mergeDisplayNames(thisMonthContributors);
+            const thisWeekWithNames = mergeDisplayNames(thisWeekContributors);
+
+            // Create cache data with all categories (using display name merged data)
+            const cacheData = {
+              lastUpdated: now.toISOString(),
+              categories: {
+                allTime: {
+                  contributors: allTimeWithNames,
+                },
+                thisMonth: {
+                  startDate: oneMonthAgo.toISOString(),
+                  endDate: now.toISOString(),
+                  contributors: thisMonthWithNames,
+                },
+                thisWeek: {
+                  startDate: oneWeekAgo.toISOString(),
+                  endDate: now.toISOString(),
+                  contributors: thisWeekWithNames,
+                },
+              },
+            };
+
+            console.log('🔍 Looking for cache issue...');
+
+            // Find existing cache issue
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'highscore-cache',
+              per_page: 100
+            });
+
+            // Find issue with exact title match
+            const existingIssue = issues.find(issue => issue.title === CACHE_ISSUE_TITLE);
+
+            let issueNumber;
+
+            if (existingIssue) {
+              // Update existing issue
+              issueNumber = existingIssue.number;
+              console.log(`📝 Updating existing cache issue #${issueNumber}...`);
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: JSON.stringify(cacheData, null, 2)
+              });
+            } else {
+              // Create new issue
+              console.log('📝 Creating new cache issue...');
+
+              const { data: newIssue } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: CACHE_ISSUE_TITLE,
+                body: JSON.stringify(cacheData, null, 2),
+                labels: ['highscore-cache', 'automated']
+              });
+
+              issueNumber = newIssue.number;
+
+              // CRITICAL: Check for duplicate issues created by race condition
+              console.log('🔍 Verifying no duplicate issues...');
+              const { data: verifyIssues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'highscore-cache',
+                per_page: 100
+              });
+
+              const duplicates = verifyIssues.filter(issue => issue.title === CACHE_ISSUE_TITLE);
+
+              if (duplicates.length > 1) {
+                console.warn('⚠️ Multiple cache issues detected! Closing newer duplicates...');
+                console.log('   Found issues:', duplicates.map(i => `#${i.number}`).join(', '));
+
+                // Sort by issue number (oldest first)
+                duplicates.sort((a, b) => a.number - b.number);
+                const primaryIssue = duplicates[0];
+                const duplicatesToClose = duplicates.slice(1);
+
+                console.log(`   Primary issue: #${primaryIssue.number}`);
+                console.log(`   Duplicates to close: ${duplicatesToClose.map(i => `#${i.number}`).join(', ')}`);
+
+                // Close duplicate issues
+                for (const duplicate of duplicatesToClose) {
+                  try {
+                    await github.rest.issues.update({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: duplicate.number,
+                      state: 'closed',
+                      state_reason: 'not_planned'
+                    });
+
+                    // Add comment explaining why it was closed
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: duplicate.number,
+                      body: '🤖 This issue was automatically closed because it is a duplicate. The primary cache issue is #' + primaryIssue.number + '.\n\nThis can happen when multiple workflow runs execute simultaneously.'
+                    });
+
+                    console.log(`   ✓ Closed duplicate issue #${duplicate.number}`);
+                  } catch (closeError) {
+                    console.error(`   ✗ Failed to close duplicate issue #${duplicate.number}:`, closeError.message);
+                  }
+                }
+
+                // Use the primary (oldest) issue
+                issueNumber = primaryIssue.number;
+                console.log(`✅ Using primary issue #${issueNumber}`);
+              } else {
+                console.log('✓ No duplicates found');
+              }
+
+              // Lock the issue to prevent unwanted comments
+              try {
+                await github.rest.issues.lock({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  lock_reason: 'off-topic'
+                });
+                console.log('🔒 Locked cache issue to collaborators only');
+              } catch (lockError) {
+                console.warn('⚠️ Failed to lock issue:', lockError.message);
+              }
+            }
+
+            console.log(`✅ Cache updated successfully!`);
+            console.log(`   Issue: #${issueNumber}`);
+            console.log(`   Last Updated: ${cacheData.lastUpdated}`);
+            console.log('');
+            console.log('📊 Category Statistics:');
+            console.log(`   All Time: ${allTimeContributors.length} contributors`);
+            console.log(`   This Month: ${thisMonthContributors.length} contributors`);
+            console.log(`   This Week: ${thisWeekContributors.length} contributors`);
+            console.log('');
+            console.log(`🏆 Top 3 All Time: ${allTimeContributors.slice(0, 3).map(c => `${c.login} (${c.contributions})`).join(', ')}`);
+            if (thisMonthContributors.length > 0) {
+              console.log(`🔥 Top 3 This Month: ${thisMonthContributors.slice(0, 3).map(c => `${c.login} (${c.contributions})`).join(', ')}`);
+            }
+            if (thisWeekContributors.length > 0) {
+              console.log(`⚡ Top 3 This Week: ${thisWeekContributors.slice(0, 3).map(c => `${c.login} (${c.contributions})`).join(', ')}`);
+            }

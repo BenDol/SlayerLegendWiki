@@ -1,0 +1,318 @@
+{
+  "totalImages": 39402,
+  "categories": {
+    "backgrounds": {
+      "count": 34,
+      "path": "public/images/backgrounds",
+      "sampleFiles": [
+        "Background.png",
+        "Background_1.png",
+        "BlackOrbGacha_Light 1.png",
+        "BlackOrbGacha_Light 2.png",
+        "DragonValleyCookBg.png",
+        "DragonValleyCookBg_1.png",
+        "Event_package_bg_Name.png",
+        "Event_package_bg_Name_1.png",
+        "ImmortalTree_bg_00.png",
+        "ImmortalTree_bg_00_5.png"
+      ]
+    },
+    "characters": {
+      "count": 24,
+      "path": "public/images/characters",
+      "sampleFiles": [
+        "09_SlayerImapact 2.png",
+        "Goods_SummonSlayerClass.png",
+        "Goods_SummonSlayerClass_1.png",
+        "GuildMiniGame_Character.png",
+        "GuildMiniGame_Character_1.png",
+        "PackageBundle_SlayerCloak_Motion.png",
+        "PackageBundle_SlayerCloak_Motion_0.png",
+        "PackageBundle_SlayerCloak_Motion_1.png",
+        "PackageBundle_SlayerCloak_Motion_2.png",
+        "PackageBundle_SlayerCloak_Motion_3.png"
+      ]
+    },
+    "companions": {
+      "count": 1909,
+      "path": "public/images/companions",
+      "sampleFiles": [
+        "Minigame_Mole_Friend1Water_Basic.png",
+        "Minigame_Mole_Friend1Water_Hit.png",
+        "Minigame_Mole_Friend1_Basic.png",
+        "Minigame_Mole_Friend1_Hit.png",
+        "Minigame_Mole_Friend2Water_Basic.png",
+        "Minigame_Mole_Friend2Water_Hit.png",
+        "Minigame_Mole_Friend2_Basic.png",
+        "Minigame_Mole_Friend2_Hit.png",
+        "Minigame_Mole_Friend3Water_Basic.png",
+        "Minigame_Mole_Friend3Water_Hit.png"
+      ]
+    },
+    "dungeons": {
+      "count": 2,
+      "path": "public/images/dungeons",
+      "sampleFiles": [
+        "MenuIcon_DungeonPreset.png",
+        "MenuIcon_DungeonPreset_1.png"
+      ]
+    },
+    "emoticons": {
+      "count": 25,
+      "path": "public/images/emoticons",
+      "sampleFiles": [
+        "EmoticonBalloon.png",
+        "EmoticonBalloon_1.png",
+        "Emoticon_1.png",
+        "Emoticon_1001.png",
+        "Emoticon_1002.png",
+        "Emoticon_1003.png",
+        "Emoticon_1004.png",
+        "Emoticon_1005.png",
+        "Emoticon_1006.png",
+        "Emoticon_1007.png"
+      ]
+    },
+    "equipment/soul-weapons": {
+      "count": 95,
+      "path": "public/images/equipment/soul-weapons",
+      "sampleFiles": [
+        "DragonSoul.png",
+        "DragonSoul_1.png",
+        "Goods_ChaosSoul.png",
+        "Goods_ChaosSoul_1.png",
+        "Goods_DemonSoulOrb.png",
+        "Goods_DemonSoulOrb_1.png",
+        "Goods_SoulBlue.png",
+        "Goods_SoulBlue_1.png",
+        "Goods_SoulGreen.png",
+        "Goods_SoulGreen_1.png"
+      ]
+    },
+    "equipment/weapons": {
+      "count": 868,
+      "path": "public/images/equipment/weapons",
+      "sampleFiles": [
+        "07_BurningWeapon_1.png",
+        "07_StormBlade.png",
+        "08_BurningWeapon_2.png",
+        "08_HasteBlade.png",
+        "11_CycloneBlade.png",
+        "12_BurningWeapon_3.png",
+        "13_BurningWeapon_4.png",
+        "13_WindyBlade.png",
+        "14_SonicWeapon.png",
+        "44_IceSword.png"
+      ]
+    },
+    "general": {
+      "count": 1,
+      "path": "public/images/general",
+      "sampleFiles": [
+        "app-icon.png"
+      ]
+    },
+    "icons": {
+      "count": 329,
+      "path": "public/images/icons",
+      "sampleFiles": [
+        "EventPass_icon.png",
+        "EventPass_icon_1.png",
+        "Event_package_bg_Nameicon.png",
+        "Event_package_bg_Nameicon_1.png",
+        "GuildUI_CountIcon.png",
+        "GuildUI_CountIcon_1.png",
+        "GuildUI_Icon_BeastBlessing.png",
+        "GuildUI_Icon_BeastBlessing_1.png",
+        "GuildUI_Icon_GuildInfo.png",
+        "GuildUI_Icon_GuildInfo_1.png"
+      ]
+    },
+    "items": {
+      "count": 83,
+      "path": "public/images/items",
+      "sampleFiles": [
+        "DragonValleyLobbyItem_Earth.png",
+        "DragonValleyLobbyItem_Earth_0.png",
+        "DragonValleyLobbyItem_Earth_1.png",
+        "DragonValleyLobbyItem_Fire.png",
+        "DragonValleyLobbyItem_Fire_0.png",
+        "DragonValleyLobbyItem_Fire_1.png",
+        "DragonValleyLobbyItem_Water.png",
+        "DragonValleyLobbyItem_Water_0.png",
+        "DragonValleyLobbyItem_Water_1.png",
+        "DragonValleyLobbyItem_Wind.png"
+      ]
+    },
+    "maps": {
+      "count": 14,
+      "path": "public/images/maps",
+      "sampleFiles": [
+        "CampaignMap_8.png",
+        "CampaignMap_8_1.png",
+        "DragonValleyMap 1.png",
+        "DragonValleyMap 1_1.png",
+        "DragonValleyMap_Winter.png",
+        "DragonValleyMap_Winter_1.png",
+        "MapScroll.png",
+        "MapScroll_1.png",
+        "Map_Arrow.png",
+        "Map_Arrow_1.png"
+      ]
+    },
+    "monsters": {
+      "count": 33,
+      "path": "public/images/monsters",
+      "sampleFiles": [
+        "ManaCrystalMonster.png",
+        "ManaCrystalMonster_0.png",
+        "ManaCrystalMonster_10.png",
+        "ManaCrystalMonster_11.png",
+        "ManaCrystalMonster_12.png",
+        "ManaCrystalMonster_4.png",
+        "ManaCrystalMonster_8.png",
+        "ManaCrystalMonster_9.png",
+        "Minigame_Mole_Enemy1Water_Attack.png",
+        "Minigame_Mole_Enemy1Water_Basic.png"
+      ]
+    },
+    "monsters/bosses": {
+      "count": 14,
+      "path": "public/images/monsters/bosses",
+      "sampleFiles": [
+        "Ranking Boss Layer 01.png",
+        "Ranking Boss Layer 02.png",
+        "Ranking Boss Layer 03.png",
+        "Ranking Boss Layer 05.png",
+        "Ranking Boss Layer 06.png",
+        "Ranking Boss Layer 08.png",
+        "Ranking Boss Layer 09.png",
+        "Ranking Boss Layer 10.png",
+        "Ranking Boss Layer 11.png",
+        "RankingBoss.png"
+      ]
+    },
+    "other": {
+      "count": 35188,
+      "path": "public/images/other",
+      "sampleFiles": [
+        "001.png",
+        "001_0.png",
+        "001_1.png",
+        "001_10.png",
+        "001_11.png",
+        "001_12.png",
+        "001_13.png",
+        "001_14.png",
+        "001_15.png",
+        "001_2.png"
+      ]
+    },
+    "promos": {
+      "count": 23,
+      "path": "public/images/promos",
+      "sampleFiles": [
+        "1.png",
+        "10.png",
+        "11.png",
+        "12.png",
+        "13.png",
+        "14.png",
+        "15.png",
+        "16.png",
+        "17.png",
+        "18.png"
+      ]
+    },
+    "root": {
+      "count": 1,
+      "path": "public/images/root",
+      "sampleFiles": [
+        "logo.png"
+      ]
+    },
+    "skills": {
+      "count": 149,
+      "path": "public/images/skills",
+      "sampleFiles": [
+        "1003_SeasonSkill.png",
+        "1003_SeasonSkill_1.png",
+        "Goods_SeasonSkillGoldenPen.png",
+        "Goods_SeasonSkillGoldenPen_1.png",
+        "Goods_SeasonSkillPen.png",
+        "Goods_SeasonSkillPen_1.png",
+        "Goods_SeasonSkillPoint.png",
+        "Goods_SeasonSkillPoint_1.png",
+        "Icon_SeasonSkill.png",
+        "Icon_SeasonSkillPackage.png"
+      ]
+    },
+    "tier-lists": {
+      "count": 8,
+      "path": "public/images/tier-lists",
+      "sampleFiles": [
+        "blizzard.png",
+        "c-tier-skills.png",
+        "d-tier-skills.png",
+        "lightning-body.png",
+        "pillar-of-fire.png",
+        "rage.png",
+        "rave-skill.png",
+        "tier-list-overview.png"
+      ]
+    },
+    "ui": {
+      "count": 543,
+      "path": "public/images/ui",
+      "sampleFiles": [
+        "Ancient Ruins Layer 01.png",
+        "Ancient Ruins Layer 02.png",
+        "Ancient Ruins Layer 05.png",
+        "Ancient Ruins Layer 06.png",
+        "Ancient Ruins Layer 08.png",
+        "Ancient Ruins Layer 09.png",
+        "Ancient Ruins Layer 10.png",
+        "Ancient Ruins Layer 11.png",
+        "Ancient Ruins.png",
+        "Ancient Ruins_1.png"
+      ]
+    },
+    "ui/buttons": {
+      "count": 39,
+      "path": "public/images/ui/buttons",
+      "sampleFiles": [
+        "Button_mount.png",
+        "Button_mount_1.png",
+        "Button_unmount.png",
+        "Button_unmount_1.png",
+        "baseButton.png",
+        "baseButton2.png",
+        "baseButton2_1.png",
+        "baseButtonBoss.png",
+        "baseButtonBoss_1.png",
+        "baseButtonWhite.png"
+      ]
+    },
+    "ui/panels": {
+      "count": 20,
+      "path": "public/images/ui/panels",
+      "sampleFiles": [
+        "KongInfoPanel00.png",
+        "KongInfoPanel00_1.png",
+        "basePanel 1.png",
+        "basePanel 1_1.png",
+        "basePanel.png",
+        "basePanel_1.png",
+        "basePanel_Popup 1.png",
+        "basePanel_Popup 1_1.png",
+        "basePanel_Popup Event.png",
+        "basePanel_Popup Event_1.png"
+      ]
+    }
+  },
+  "summary": {
+    "extractedFrom": "Unity Asset Bundles (hero, monster, contents, popup, skin, emoticon, map assetpacks)",
+    "format": "PNG",
+    "organized": true
+  }
+}

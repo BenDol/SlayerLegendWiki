@@ -1,0 +1,118 @@
+[
+{
+"name": "Test",
+"slots": [
+{
+"spiritId": 2,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 7,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 1,
+"level": 1,
+"awakeningLevel": 5,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+}
+],
+"id": "spirit-builds-1766217547293-9ffg2dtjv",
+"createdAt": "2025-12-20T07:59:07.293Z",
+"updatedAt": "2025-12-20T22:24:52.509Z"
+},
+{
+"name": "sdfsdf",
+"slots": [
+{
+"spiritId": 8,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 1,
+"level": 1,
+"awakeningLevel": 5,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 10,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+}
+],
+"id": "spirit-builds-1766218396412-lh0hxkog5",
+"createdAt": "2025-12-20T08:13:16.412Z",
+"updatedAt": "2025-12-20T12:49:39.316Z"
+},
+{
+"name": "Test5345345345345345",
+"slots": [
+{
+"spiritId": 2,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 9,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": 1,
+"level": 1,
+"awakeningLevel": 5,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+}
+],
+"id": "spirit-builds-1766220254995-k6h5i2blw",
+"createdAt": "2025-12-20T08:44:14.995Z",
+"updatedAt": "2025-12-20T08:44:15.141Z"
+},
+{
+"name": "123123",
+"slots": [
+{
+"spiritId": null,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": null,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+},
+{
+"spiritId": null,
+"level": 1,
+"awakeningLevel": 0,
+"evolutionLevel": 4,
+"skillEnhancementLevel": 0
+}
+],
+"id": "spirit-builds-1766234964946-8xyfcbxks",
+"createdAt": "2025-12-20T12:49:24.946Z",
+"updatedAt": "2025-12-20T12:49:25.079Z"
+}
+]
