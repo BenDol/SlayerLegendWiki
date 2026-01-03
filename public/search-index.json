@@ -19,7 +19,7 @@
     "id": "characters/class",
     "title": "Class",
     "description": "A brief overview of the class system.",
-    "content": "Page Title This page provides an overview and detailed information about the topic. Introduction Add your introduction here. Explain what this page covers and why it's important. Main Content Add the main content sections here. You can include: - Key concepts and definitions - Step-by-step guides or instructions - Important tips and best practices - Examples and use cases Additional Information Include any supplementary details, notes, or related information.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Class Overview</span> Insert text here. <span class=\"text-gray-900 dark:text-gray-100\">Class Awakening</span> Insert text here. <span class=\"text-gray-900 dark:text-gray-100\">Memory Tree</span> Insert text here. <span class=\"text-gray-900 dark:text-gray-100\">Constellations</span>",
     "section": "characters",
     "sectionTitle": "Characters",
     "pageId": "class",
