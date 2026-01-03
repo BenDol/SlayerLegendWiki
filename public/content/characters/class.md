@@ -10,7 +10,7 @@ date: '2026-01-03'
 order: 0
 ---
 # <span class="text-gray-900 dark:text-gray-100">Class Overview</span>
-**This content is unlocked at Stage 120 and Level 250, granting additional bonuses to ATK and HP. There are 20 available classes, with additional secret classes unlocked through awakenings.** 
+**This content is unlocked at Stage 120 and Level 250, granting additional bonuses to ATK and HP. There are 20 available classes, with additional secret classes unlocked through awakenings. Classes can be obtained through summoning using 3,000 currency or class tickets.** 
 
 
 | <div style="text-align: center;">Class</div> | <div style="text-align: center;">Title</div> |
