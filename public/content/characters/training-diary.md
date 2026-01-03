@@ -1,5 +1,5 @@
 ---
-id: training-log
+id: training-diary
 title: Training Diary
 description: A brief overview of the training diary system.
 tags:
