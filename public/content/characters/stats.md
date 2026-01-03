@@ -38,7 +38,7 @@ order: 0
 # <span class="text-gray-900 dark:text-gray-100">Growth Points</span>
 **As you level up and use the Training Diary, you will unlock more stat points to allocate to your stats. These additional stats are divided into two categories: combat stats and miscellaneous stats. You can reset growth points for<img src="/images/content/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />3,000.** 
 - **The combat stats refer to your ATK, HP, HP Recovery, and Critical Damage as explained above.**
-- The **<span class="text-purple-600 dark:text-purple-400">miscellaneous stats</span> are supplementary and provide support both in and out of combat.**
+- **The <span class="text-purple-600 dark:text-purple-400">miscellaneous stats</span> are supplementary and provide support both in and out of combat.**
 
 
 ## <span class="text-purple-600 dark:text-purple-400">Miscellaneous Stats</span>
