@@ -15,9 +15,9 @@ order: 0
 
 | <div style="text-align: center;">Class</div> | <div style="text-align: center;">Title</div> |
 |----------|----------|
-|<div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/a26fefa2630d45fb87d9e1fa63d4ce7b.webp" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: 0 0.25em;" data-inline="true" /></div>|<div style="text-align: center;">Trainee (Grade 1)</div>|
-|<div style="text-align: center;">s</div>|<div style="text-align: center;">Adventurer (Grade 2)</d>|
-|<div style="text-align: center;">s</div>|<div style="text-align: center;">Swordsman (Grade 3)</d>|
+|<div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/a26fefa2630d45fb87d9e1fa63d4ce7b.webp" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: -2px 0 0 0;" data-inline="true" /></div>|<div style="text-align: center;">Trainee (Grade 1)</div>|
+|<div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/9762d3021bec43eebdc6fc0d48e47577.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: -2px 0 0 0;" data-inline="true" /></div>|<div style="text-align: center;">Adventurer (Grade 2)</d>|
+|<div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/1d550260c0fa4ce997ffbf532a4f1c4f.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 50px; height: 50px; margin: -2px 0 0 0;" data-inline="true" /></div>|<div style="text-align: center;">Swordsman (Grade 3)</d>|
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Warrior (Grade 4)</d>|
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Defender (Grade 5)</d>|
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Lancer (Grade 6)</d>|
