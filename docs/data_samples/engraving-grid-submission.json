@@ -1,0 +1,84 @@
+{
+"weaponId": "56",
+"weaponName": "Wanderer",
+"gridType": "5x5",
+"completionEffect": {
+"atk": 58.8,
+"hp": 253.2
+},
+"activeSlots": [
+{
+"row": 0,
+"col": 1
+},
+{
+"row": 0,
+"col": 2
+},
+{
+"row": 0,
+"col": 3
+},
+{
+"row": 1,
+"col": 1
+},
+{
+"row": 1,
+"col": 2
+},
+{
+"row": 1,
+"col": 3
+},
+{
+"row": 2,
+"col": 1
+},
+{
+"row": 2,
+"col": 2
+},
+{
+"row": 2,
+"col": 3
+},
+{
+"row": 3,
+"col": 1
+},
+{
+"row": 3,
+"col": 2
+},
+{
+"row": 3,
+"col": 3
+},
+{
+"row": 4,
+"col": 0
+},
+{
+"row": 4,
+"col": 1
+},
+{
+"row": 4,
+"col": 3
+},
+{
+"row": 4,
+"col": 4
+}
+],
+"totalActiveSlots": 16,
+"id": "grid-1766275282242-eex2kyb9p",
+"createdAt": "2025-12-21T00:01:22.627Z",
+"submittedBy": "BenDol",
+"submittedAt": "2025-12-21T00:05:21.297Z",
+"username": "BenDol",
+"userId": 0,
+"entityId": "56",
+"updatedAt": "2025-12-21T00:05:21.643Z"
+}

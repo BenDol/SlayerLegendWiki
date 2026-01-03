@@ -1,0 +1,277 @@
+{
+  "source": "Master Optimizer Spreadsheet",
+  "spreadsheetId": "150nRJmTnvTlobYfMeLkdckoCFB42vaKzraw9wTMBDTc",
+  "companionsFound": 1,
+  "companions": {
+    "Ellie": {
+      "name": "Ellie",
+      "skills": [
+        {
+          "name": "Intensive Fire",
+          "maxLevel": "100",
+          "effect": "Dmg Resist",
+          "value": "+0%"
+        },
+        {
+          "name": "Blessing of Forest",
+          "maxLevel": "100",
+          "effect": "Dodge",
+          "value": "+0%"
+        },
+        {
+          "name": "Song of Elf",
+          "maxLevel": "100",
+          "effect": "Total Gold",
+          "value": "+0%"
+        }
+      ],
+      "rawData": [
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Ellie",
+          "FULL RESET OF ALL COMPANIONS ": "Lv.0",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "Looter 000",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "Fire",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": "0 / 5"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Wind Dmg  +0%",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "PASSIVES SKILLS",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "EFFECTS",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Intensive Fire\nMax Lv.100",
+          "FULL RESET OF ALL COMPANIONS ": "Dmg Resist",
+          "HOME ": "+0%"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Blessing of Forest\nMax Lv.100",
+          "FULL RESET OF ALL COMPANIONS ": "Dodge",
+          "HOME ": "+0%"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Song of Elf\nMax Lv.100",
+          "FULL RESET OF ALL COMPANIONS ": "Total Gold",
+          "HOME ": "+0%"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "EFFECTS",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Locked",
+          "FULL RESET OF ALL COMPANIONS ": "Locked",
+          "HOME ": " "
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Locked",
+          "FULL RESET OF ALL COMPANIONS ": "Locked",
+          "HOME ": " "
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Locked",
+          "FULL RESET OF ALL COMPANIONS ": "Locked",
+          "HOME ": " "
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "EFFECTS",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Locked",
+          "FULL RESET OF ALL COMPANIONS ": "Red Soul Weapon Completion Effect",
+          "HOME ": "+0%"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Locked",
+          "FULL RESET OF ALL COMPANIONS ": "Devournist DMG",
+          "HOME ": "+0%"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Locked",
+          "FULL RESET OF ALL COMPANIONS ": "Fire Spirit Stats",
+          "HOME ": "+0%"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "PASSIVE COST CALCULATOR",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Wind's Understanding",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "From :",
+          "FULL RESET OF ALL COMPANIONS ": "0",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "To :",
+          "FULL RESET OF ALL COMPANIONS ": "1500",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Stone Cost:",
+          "FULL RESET OF ALL COMPANIONS ": "11,796,000",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Emerald Cost :",
+          "FULL RESET OF ALL COMPANIONS ": "1,990,575",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "PROMOTION OPTIONS",
+          "COMPANIONS ": "",
+          "FULL RESET OF ALL COMPANIONS ": "",
+          "HOME ": ""
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Extra ATK",
+          "FULL RESET OF ALL COMPANIONS ": "20%",
+          "HOME ": "(x 1.0)"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Extra ATK",
+          "FULL RESET OF ALL COMPANIONS ": "20%",
+          "HOME ": "Locked"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Extra ATK",
+          "FULL RESET OF ALL COMPANIONS ": "20%",
+          "HOME ": "Locked"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Extra ATK",
+          "FULL RESET OF ALL COMPANIONS ": "20%",
+          "HOME ": "Locked"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Extra ATK",
+          "FULL RESET OF ALL COMPANIONS ": "20%",
+          "HOME ": "Locked"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Extra ATK",
+          "FULL RESET OF ALL COMPANIONS ": "20%",
+          "HOME ": "Locked"
+        },
+        {
+          "": "",
+          "INFO ": "",
+          "COMPANIONS ": "Extra ATK",
+          "FULL RESET OF ALL COMPANIONS ": "20%",
+          "HOME ": "Locked"
+        }
+      ]
+    }
+  }
+}

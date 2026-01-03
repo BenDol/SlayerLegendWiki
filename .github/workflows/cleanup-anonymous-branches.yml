@@ -1,0 +1,72 @@
+name: Cleanup Anonymous Edit Branches
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to delete branches
+      pull-requests: read # Required to check for open PRs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all branches
+
+      - name: Delete closed anonymous edit branches
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+
+          REPO="${{ github.repository }}"
+          echo "🔍 Searching for anonymous-edit branches in $REPO..."
+
+          # Get all branches starting with anon-edit/
+          BRANCHES=$(gh api repos/$REPO/branches --paginate --jq '.[] | select(.name | startswith("anon-edit/")) | .name')
+
+          if [ -z "$BRANCHES" ]; then
+            echo "✅ No anonymous-edit branches found. Nothing to clean up."
+            exit 0
+          fi
+
+          BRANCH_COUNT=$(echo "$BRANCHES" | wc -l)
+          echo "📋 Found $BRANCH_COUNT anonymous-edit branch(es)"
+
+          DELETED_COUNT=0
+          SKIPPED_COUNT=0
+
+          # Check each branch for open PRs
+          while IFS= read -r BRANCH; do
+            echo ""
+            echo "🔎 Checking branch: $BRANCH"
+
+            # Check if branch has an open PR
+            OPEN_PRS=$(gh pr list --repo $REPO --head "$BRANCH" --state open --json number --jq 'length')
+
+            if [ "$OPEN_PRS" -gt 0 ]; then
+              echo "  ⏭️  Skipping - has $OPEN_PRS open PR(s)"
+              SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+            else
+              echo "  🗑️  Deleting branch (no open PRs)..."
+              gh api repos/$REPO/git/refs/heads/$BRANCH -X DELETE || {
+                echo "  ⚠️  Failed to delete branch"
+                continue
+              }
+              echo "  ✅ Deleted successfully"
+              DELETED_COUNT=$((DELETED_COUNT + 1))
+            fi
+          done <<< "$BRANCHES"
+
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 Cleanup Summary:"
+          echo "   • Branches found: $BRANCH_COUNT"
+          echo "   • Branches deleted: $DELETED_COUNT"
+          echo "   • Branches skipped: $SKIPPED_COUNT"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

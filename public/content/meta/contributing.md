@@ -1,4 +1,5 @@
 ---
+id: contributing
 title: Contributing
 description: Learn how to contribute to the Slayer Legend Wiki
 tags: [meta, contributing]
@@ -57,11 +58,11 @@ The wiki supports GitHub-flavored Markdown:
 **Bold text**
 *Italic text*
 [Links](https://example.com)
-![Images](/images/example.png)
+![Images](/images/content/example.png)
 ```
 
 ## Getting Help
 
-Need assistance? Check out our [Editing Guidelines](/meta/guidelines) or reach out through GitHub issues.
+Need assistance? Check out our [Editing Guidelines](/#/meta/guidelines) or reach out through GitHub issues.
 
 Thank you for contributing to the Slayer Legend community!

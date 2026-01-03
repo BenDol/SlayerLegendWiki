@@ -1,0 +1,250 @@
+```javascript
+import { registerContentProcessor, registerCustomComponents } from './wiki-framework/src/utils/contentRendererRegistry.js';
+import { processGameSyntax, getGameComponents } from './src/utils/gameContentRenderer.js';
+
+registerContentProcessor(processGameSyntax);
+registerCustomComponents(getGameComponents());
+```
+
+**Step 3:** Use in markdown:
+```markdown
+# Fire Skills
+
+<!-- skill:Fire Slash -->
+
+This skill does fire damage.
+```
+
+The framework's PageViewer and PageEditor automatically use registered renderers without knowing about SkillCard.
+
+### Files Involved
+- **Framework (generic):**
+  - `wiki-framework/src/utils/contentRendererRegistry.js` - Registry
+  - `wiki-framework/src/components/wiki/PageViewer.jsx` - Uses registry
+  - `wiki-framework/src/components/wiki/PageEditor.jsx` - Passes to PageViewer
+  - `wiki-framework/src/pages/PageEditorPage.jsx` - Passes to PageEditor
+- **Parent (game-specific):**
+  - `src/utils/gameContentRenderer.js` - Custom renderers
+  - `src/components/SkillCard.jsx` - Game component
+  - `main.jsx` - Registration
+
+**IMPORTANT:** Never import parent components in framework files. Always use the registry pattern.
+
+### Route Registry
+
+**How to Add Game-Specific Routes**
+
+The framework provides a route registry system for adding custom routes (tools, simulators, etc.) without modifying the framework router.
+
+#### Architecture
+1. **Framework** provides `routeRegistry.js` with `registerCustomRoutes()` function
+2. **Parent project** creates game-specific page components in `src/pages/`
+3. **Parent's main.jsx** registers the routes on app startup
+
+#### Example: Skill Build Simulator
+
+**Step 1:** Create page component in parent project (`src/pages/SkillBuildSimulatorPage.jsx`):
+```javascript
+import SkillBuildSimulator from '../components/SkillBuildSimulator';
+
+const SkillBuildSimulatorPage = () => {
+  return <SkillBuildSimulator />;
+};
+
+export default SkillBuildSimulatorPage;
+```
+
+**Step 2:** Register in `main.jsx`:
+```javascript
+import { registerCustomRoutes } from './wiki-framework/src/utils/routeRegistry.js';
+import SkillBuildSimulatorPage from './src/pages/SkillBuildSimulatorPage.jsx';
+
+registerCustomRoutes([
+  {
+    path: 'skill-builder',
+    component: <SkillBuildSimulatorPage />,
+    suspense: true  // Optional, defaults to true
+  }
+]);
+```
+
+**Step 3:** Access at: `/#/skill-builder`
+
+The framework router automatically includes all registered custom routes at runtime.
+
+#### Files Involved
+- **Framework (generic):**
+  - `wiki-framework/src/utils/routeRegistry.js` - Registry system
+  - `wiki-framework/src/router.jsx` - Uses `getCustomRoutes()`
+- **Parent (game-specific):**
+  - `src/pages/SkillBuildSimulatorPage.jsx` - Custom page
+  - `src/components/SkillBuildSimulator.jsx` - Custom component
+  - `main.jsx` - Registration
+
+**IMPORTANT:** Never import parent routes/pages in framework router. Always use the route registry pattern.
+
+## Framework React Hooks
+
+The framework provides reusable React hooks that are generic and can be used by any wiki project. These hooks live in `wiki-framework/src/hooks/` and should be imported from there.
+
+### useDraftStorage Hook
+
+**Location:** `wiki-framework/src/hooks/useDraftStorage.js`
+
+A generic hook for localStorage-based draft auto-save functionality. Perfect for builders, forms, or any component that needs to preserve user input across sessions.
+
+**Features:**
+- Debounced auto-save (configurable delay, default 1 second)
+- User-specific storage keys (supports anonymous users)
+- Modal mode (disable auto-save/load when in modal)
+- Auto-load on mount
+- Manual clear functionality
+
+**Usage Example:**
+```javascript
+import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
+import { useAuthStore } from '../../wiki-framework/src/store/authStore';
+
+const MyBuilder = ({ isModal = false }) => {
+  const { user } = useAuthStore();
+  const [buildName, setBuildName] = useState('');
+  const [buildData, setBuildData] = useState({});
+
+  // Initialize draft storage
+  const { loadDraft, clearDraft, isDraftAvailable } = useDraftStorage(
+    'myBuilder',           // Storage key prefix
+    user,                  // User object (or null for anonymous)
+    isModal,              // Disable in modal mode
+    { buildName, buildData }, // Data to auto-save
+    1000                  // Debounce delay (ms)
+  );
+
+  // Load draft on mount
+  useEffect(() => {
+    const draft = loadDraft();
+    if (draft) {
+      setBuildName(draft.buildName || '');
+      setBuildData(draft.buildData || {});
+    }
+  }, []);
+
+  // Clear draft after successful save
+  const handleSave = async () => {
+    await saveToBackend();
+    clearDraft(); // Remove draft from localStorage
+  };
+
+  // Clear draft on reset
+  const handleClear = () => {
+    setBuildName('');
+    setBuildData({});
+    clearDraft();
+  };
+};
+```
+
+**Parameters:**
+- `storageKey` (string) - Base key for localStorage (e.g., 'skillBuilder', 'spiritBuilder')
+- `user` (object|null) - User object with `id` property, or null for anonymous
+- `isModal` (boolean) - If true, disables auto-save/load (for modal mode)
+- `draftData` (object) - Data to save to localStorage (auto-saved on change)
+- `debounceMs` (number) - Debounce delay in milliseconds (default: 1000)
+
+**Returns:**
+- `loadDraft()` - Function to load draft from localStorage
+- `clearDraft()` - Function to clear draft from localStorage
+- `isDraftAvailable()` - Function to check if draft exists
+
+**Storage Key Format:**
+`{storageKey}_draft_{userId}` (e.g., `skillBuilder_draft_123456` or `skillBuilder_draft_anonymous`)
+
+**When to Use:**
+- Form builders (skill, spirit, loadout builders)
+- Multi-step wizards
+- Content editors
+- Any component where losing user input would be frustrating
+
+**Important Notes:**
+- This hook was moved from parent project to framework to avoid code duplication
+- Used by SkillBuilder, SpiritBuilder, and BattleLoadouts in the parent project
+- Modal mode disables auto-save to prevent conflicts with parent page state
+- Always clear draft after successful backend save to avoid stale data
+
+### Data Browser Registry
+
+**Location:** `wiki-framework/src/utils/dataBrowserRegistry.js`
+
+A registry for parent projects to register their data files for the Data Browser modal (Ctrl+Shift+B).
+
+**Purpose:**
+The framework provides the Data Browser UI, but the parent project provides the list of data files to browse. This keeps the framework generic and prevents hardcoding game-specific file names.
+
+**Features:**
+- Register data files from parent project's `main.jsx`
+- Supports simple filenames or full path objects
+- Auto-prefixes filenames with `/data/` by default
+- Verifies files exist before displaying
+
+**Usage Example:**
+```javascript
+// In main.jsx (parent project)
+import { registerDataFiles } from './wiki-framework/src/utils/dataBrowserRegistry.js';
+
+registerDataFiles([
+  // Simple filenames (auto-prefixed with /data/)
+  'skills.json',
+  'companions.json',
+  'equipment.json',
+  'promotions.json',
+
+  // Or full paths for custom locations
+  { name: 'config.json', path: '/config.json' },
+]);
+```
+
+**Priority Order:**
+1. **Registered data files** (recommended) - Set via `registerDataFiles()`
+2. **data-files-index.json** - If no registry, tries `/data/data-files-index.json`
+3. **Empty list** - If neither exist, shows empty state
+
+**Important:**
+- Always register data files in parent project's `main.jsx`
+- Framework should NEVER hardcode specific file names
+- Each wiki project registers its own data files
+
+## Common Development Commands
+
+```bash
+# Manual operations
+node scripts/copyConfig.js      # Manually copy wiki-config.json to public/
+node scripts/buildSearchIndex.js # Manually rebuild search index
+
+## Git Workflow
+
+**IMPORTANT: Claude should NEVER handle git commits or pushes.**
+
+- User will handle all git commits and pushes manually
+- Claude should make code changes and edits as requested
+- Claude should NOT use `git add`, `git commit`, or `git push` commands
+- User prefers to review changes and commit them manually with their own messages
+
+**CRITICAL: Do NOT perform git operations in the wiki-framework/ submodule:**
+- The submodule is often in detached HEAD state - this is normal
+- Do NOT use `git checkout`, `git add`, `git commit` in the submodule directory
+- Do NOT attempt to fix detached HEAD state
+- wiki-framework submodule project should NEVER reference code from the parent project
+- User will handle all submodule git operations manually
+
+## Dev Server Management
+
+**IMPORTANT: Claude should NEVER start the dev server.**
+
+- User will start and stop the dev server manually
+- Claude should make code changes and edits as requested
+- Claude should NOT use `npm run dev`, `npm run dev:server`, or `npm run dev:vite` commands
+- User prefers to control when the server runs
+- After making changes, inform the user they may need to restart the server if it's running
+
+## Development Workflow
+
+**Standard workflow (recommended):**

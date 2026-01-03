@@ -1,0 +1,50 @@
+{
+  "dataSources": {
+    "APK": "Extracted from game APK (highest priority)",
+    "GoogleSheets": "Slayer Legend Master Document (official)",
+    "PlayerOptimizer": "Master Optimizer (player-contributed)"
+  },
+  "companions": {
+    "existing": {
+      "file": "companions.json",
+      "type": "SPIRITS progression",
+      "records": 401,
+      "source": "GoogleSheets"
+    },
+    "optimizer": {
+      "companionsFound": 1,
+      "names": [
+        "Ellie"
+      ],
+      "skillsPerCompanion": 6,
+      "source": "PlayerOptimizer"
+    },
+    "unity": {
+      "confirmed": 4,
+      "names": [
+        "Ellie",
+        "Zeke",
+        "Miho",
+        "Luna"
+      ],
+      "status": "Server-side only"
+    }
+  },
+  "skills": {
+    "existing": 46,
+    "optimizer": 111,
+    "source": "GoogleSheets + PlayerOptimizer"
+  },
+  "equipment": {
+    "existing": 57,
+    "optimizer": 90,
+    "source": "GoogleSheets + PlayerOptimizer"
+  },
+  "gaps": [
+    "Companion characters (Zeke, Miho, Luna)",
+    "Memory Tree / Immortal Tree",
+    "Skill Mastery",
+    "Black Orb system",
+    "Dragon Emblem system"
+  ]
+}

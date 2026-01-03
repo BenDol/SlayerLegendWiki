@@ -1,0 +1,825 @@
+{
+  "sheet": "EQUIPMENT",
+  "rows": 90,
+  "columns": [
+    "",
+    "WEAPON ",
+    "AWAKENED ORR",
+    "Equipment ",
+    "WEAPON ENHANCEMENTS",
+    "SOUL WEAPON ENGRAVING",
+    "HOME "
+  ],
+  "data": [
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "0",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Completion Effects",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Completed:",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "SOUL WEAPON :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "ATK:",
+      "HOME ": "1.00%"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "HP:",
+      "HOME ": "1.00%"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Engraving Effect Total",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "ATK / HP BONUS :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Soul Weapon ATK:",
+      "HOME ": "0.00%"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Additional Options Total",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "TOTAL WEAPON BONUS",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "ATK:",
+      "HOME ": "0.00%"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Equipped Effect :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "CRIT Dmg:",
+      "HOME ": "0.00%"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Owned Effect :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "HP:",
+      "HOME ": "0.00%"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Critical Bonus :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "HP Recovery:",
+      "HOME ": "0.00%"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Gold Bonus :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Extra Gold:",
+      "HOME ": "0.00%"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Accuracy:",
+      "HOME ": "0"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "CHARACTER STATS",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Dodge:",
+      "HOME ": "0"
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Unbuffed Attack :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Crit DMG % :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Extra Gold :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "WEAPON COST CALCULATOR",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Use Current LVL :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "From Lv: ",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "To Lv:",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Grade:",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Total Cost :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "ATK INCREASE :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "CRIT INCREASE :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "TOTAL DMG INCREASE :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "ACCESSORIES",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "AWAKENED ORB",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "0",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "TOTAL ACCESSORY BONUS",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Equipped Effect :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Owned Effect :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Mana Regen Bonus :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Max Mana Bonus :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "EXP Bonus :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "SLAYER TOTALS FROM ACCESSORIES",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Unbuffed HP :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "HP Regen :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Max Mana :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Mana Recovery :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Extra EXP :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "ACCESSORY COST CALCULATOR",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Use Current LVL :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "From Lv:",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "To Lv:",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Grade:",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "Total Cost :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "HP INCREASE :",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "Relics",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "RELICS",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "ICON",
+      "Equipment ": "RELIC",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Strength Gloves\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Hunter's Eye\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "0%",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "HP Ring\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "0%",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Recovery Totem\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Bracelet of Speed\nMax Level 50",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Lucky Pendant\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Focus Ring\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Invisible Cloak\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Silence Flame\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Abyss's Water Drop\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Emperor Ring\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Eye of Typoon\nMax Level 100",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "Spirits",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "SPIRITS",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "ICON",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Slot 3",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "Mum",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "EXP",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "0.00%",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "Slot 3",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "",
+      "WEAPON ENHANCEMENTS": "39,930",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "Fountain of Circulation Awakening",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "Sala",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "1st Companion Effect",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "2nd Companion Effect",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "EXP",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "3rd Companion Effect",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "0.00%",
+      "HOME ": ""
+    },
+    {
+      "": "",
+      "WEAPON ": "",
+      "AWAKENED ORR": "",
+      "Equipment ": "4th Companion Effect",
+      "WEAPON ENHANCEMENTS": "",
+      "SOUL WEAPON ENGRAVING": "",
+      "HOME ": ""
+    }
+  ]
+}

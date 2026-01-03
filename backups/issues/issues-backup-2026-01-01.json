@@ -1,0 +1,2097 @@
+{
+  "metadata": {
+    "backupDate": "2026-01-01T05:06:25.467Z",
+    "repository": "BenDol/SlayerLegendWiki",
+    "totalIssues": 53,
+    "totalComments": 36,
+    "issueState": "open",
+    "version": "1.0.0"
+  },
+  "issues": [
+    {
+      "number": 328,
+      "title": "[My Spirits] bonfyrenz",
+      "body": "[\n  {\n    \"spiritId\": 3,\n    \"level\": 1,\n    \"awakeningLevel\": 15,\n    \"evolutionLevel\": 4,\n    \"skillEnhancementLevel\": 0,\n    \"id\": \"my-spirits-1767230976664-le59nhtil\",\n    \"createdAt\": \"2026-01-01T01:29:36.664Z\",\n    \"updatedAt\": \"2026-01-01T01:29:36.994Z\"\n  }\n]",
+      "state": "open",
+      "labels": [
+        {
+          "name": "user-id:249419067",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "my-spirits",
+          "color": "9f1ddb",
+          "description": "User spirit collection storage (managed by bot)"
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2026-01-01T01:29:37Z",
+      "updated_at": "2026-01-01T01:29:37Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/328",
+      "comments": []
+    },
+    {
+      "number": 327,
+      "title": "[Comments] Zeke",
+      "body": "💬 **Comments for:** Zeke\n📄 **Page ID:** `companions/zeke`\n🔗 **Page URL:** https://slayerlegend.wiki#/companions/zeke\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:companions/zeke",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T19:00:07Z",
+      "updated_at": "2025-12-31T19:00:08Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/327",
+      "comments": [
+        {
+          "id": 3702722020,
+          "body": "Zeke is built like a brick..",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T19:00:08Z",
+          "updated_at": "2025-12-31T19:00:08Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/327#issuecomment-3702722020"
+        }
+      ]
+    },
+    {
+      "number": 326,
+      "title": "[Comments] Promotion Option",
+      "body": "💬 **Comments for:** Promotion Option\n📄 **Page ID:** `companions/promotion-option`\n🔗 **Page URL:** https://slayerlegend.wiki#/companions/promotion-option\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:companions/promotion-option",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:59:51Z",
+      "updated_at": "2025-12-31T18:59:51Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/326",
+      "comments": [
+        {
+          "id": 3702721413,
+          "body": "Useful",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:59:51Z",
+          "updated_at": "2025-12-31T18:59:51Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/326#issuecomment-3702721413"
+        }
+      ]
+    },
+    {
+      "number": 325,
+      "title": "[Comments] Miho",
+      "body": "💬 **Comments for:** Miho\n📄 **Page ID:** `companions/miho`\n🔗 **Page URL:** https://slayerlegend.wiki#/companions/miho\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:companions/miho",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:59:33Z",
+      "updated_at": "2025-12-31T18:59:34Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/325",
+      "comments": [
+        {
+          "id": 3702721125,
+          "body": "More like finding Nemo! How do I kill this guy!?",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:59:34Z",
+          "updated_at": "2025-12-31T18:59:34Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/325#issuecomment-3702721125"
+        }
+      ]
+    },
+    {
+      "number": 324,
+      "title": "[Comments] Luna",
+      "body": "💬 **Comments for:** Luna\n📄 **Page ID:** `companions/luna`\n🔗 **Page URL:** https://slayerlegend.wiki#/companions/luna\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:companions/luna",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:59:12Z",
+      "updated_at": "2025-12-31T18:59:13Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/324",
+      "comments": [
+        {
+          "id": 3702720507,
+          "body": "What builds?",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:59:13Z",
+          "updated_at": "2025-12-31T18:59:13Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/324#issuecomment-3702720507"
+        }
+      ]
+    },
+    {
+      "number": 323,
+      "title": "[Comments] Ellie",
+      "body": "💬 **Comments for:** Ellie\n📄 **Page ID:** `companions/ellie`\n🔗 **Page URL:** https://slayerlegend.wiki#/companions/ellie\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:companions/ellie",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:58:56Z",
+      "updated_at": "2025-12-31T18:58:57Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/323",
+      "comments": [
+        {
+          "id": 3702720231,
+          "body": "Would be nice to know how to kill her pages 1-5",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:58:57Z",
+          "updated_at": "2025-12-31T18:58:57Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/323#issuecomment-3702720231"
+        }
+      ]
+    },
+    {
+      "number": 322,
+      "title": "[Comments] Companion Enhancement",
+      "body": "💬 **Comments for:** Companion Enhancement\n📄 **Page ID:** `companions/enhancement`\n🔗 **Page URL:** https://slayerlegend.wiki#/companions/enhancement\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:companions/enhancement",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:58:34Z",
+      "updated_at": "2025-12-31T18:58:35Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/322",
+      "comments": [
+        {
+          "id": 3702719613,
+          "body": "Almost feel like some of these sections may be useful to be condensed. Still not sure on how to level my skills properly.. tehehe",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:58:35Z",
+          "updated_at": "2025-12-31T18:58:35Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/322#issuecomment-3702719613"
+        }
+      ]
+    },
+    {
+      "number": 321,
+      "title": "[Comments] Companion Builds",
+      "body": "💬 **Comments for:** Companion Builds\n📄 **Page ID:** `companions/companion-builds`\n🔗 **Page URL:** https://slayerlegend.wiki#/companions/companion-builds\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:companions/companion-builds",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:57:45Z",
+      "updated_at": "2025-12-31T18:57:46Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/321",
+      "comments": [
+        {
+          "id": 3702718328,
+          "body": "What should I focus on first companion skill wise?",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:57:46Z",
+          "updated_at": "2025-12-31T18:57:46Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/321#issuecomment-3702718328"
+        }
+      ]
+    },
+    {
+      "number": 320,
+      "title": "[Comments] Your First Steps",
+      "body": "💬 **Comments for:** Your First Steps\n📄 **Page ID:** `getting-started/first-steps`\n🔗 **Page URL:** https://slayerlegend.wiki#/getting-started/first-steps\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:getting-started/first-steps",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:55:00Z",
+      "updated_at": "2025-12-31T18:55:01Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/320",
+      "comments": [
+        {
+          "id": 3702714255,
+          "body": "The most critical steps are within these first few hours I'd reckon. Building out a foundation is everything to understanding our priorities.",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:55:01Z",
+          "updated_at": "2025-12-31T18:55:01Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/320#issuecomment-3702714255"
+        }
+      ]
+    },
+    {
+      "number": 319,
+      "title": "[Comments] Ui Guide",
+      "body": "💬 **Comments for:** Ui Guide\n📄 **Page ID:** `getting-started/ui-guide`\n🔗 **Page URL:** https://slayerlegend.wiki#/getting-started/ui-guide\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:getting-started/ui-guide",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:54:17Z",
+      "updated_at": "2025-12-31T18:54:18Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/319",
+      "comments": [
+        {
+          "id": 3702713149,
+          "body": "Where are appearances located? :)",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:54:18Z",
+          "updated_at": "2025-12-31T18:54:18Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/319#issuecomment-3702713149"
+        }
+      ]
+    },
+    {
+      "number": 318,
+      "title": "[Comments] Installation",
+      "body": "💬 **Comments for:** Installation\n📄 **Page ID:** `getting-started/installation`\n🔗 **Page URL:** https://slayerlegend.wiki#/getting-started/installation\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:getting-started/installation",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:53:57Z",
+      "updated_at": "2025-12-31T18:53:58Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/318",
+      "comments": [
+        {
+          "id": 3702712600,
+          "body": "Downloaded. EASY!",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:53:57Z",
+          "updated_at": "2025-12-31T18:53:57Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/318#issuecomment-3702712600"
+        }
+      ]
+    },
+    {
+      "number": 317,
+      "title": "[Comments] Early Game Roadmap",
+      "body": "💬 **Comments for:** Early Game Roadmap\n📄 **Page ID:** `getting-started/early-game-roadmap`\n🔗 **Page URL:** https://slayerlegend.wiki#/getting-started/early-game-roadmap\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:getting-started/early-game-roadmap",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:53:41Z",
+      "updated_at": "2025-12-31T18:53:41Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/317",
+      "comments": [
+        {
+          "id": 3702712041,
+          "body": "Excited to see this thoroughly developed!",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:53:41Z",
+          "updated_at": "2025-12-31T18:53:41Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/317#issuecomment-3702712041"
+        }
+      ]
+    },
+    {
+      "number": 316,
+      "title": "[Comments] Core Mechanics",
+      "body": "💬 **Comments for:** Core Mechanics\n📄 **Page ID:** `getting-started/core-mechanics`\n🔗 **Page URL:** https://slayerlegend.wiki#/getting-started/core-mechanics\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:getting-started/core-mechanics",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:53:12Z",
+      "updated_at": "2025-12-31T18:53:13Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/316",
+      "comments": [
+        {
+          "id": 3702711236,
+          "body": "Understand things like Salamander early on to help maximize dmg windows for builds including DH etc is really important. Aside understanding rave & wog..",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:53:13Z",
+          "updated_at": "2025-12-31T18:53:13Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/316#issuecomment-3702711236"
+        }
+      ]
+    },
+    {
+      "number": 315,
+      "title": "[Comments] Training Log",
+      "body": "💬 **Comments for:** Training Log\n📄 **Page ID:** `characters/training-log`\n🔗 **Page URL:** https://slayerlegend.wiki#/characters/training-log\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:characters/training-log",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:52:02Z",
+      "updated_at": "2025-12-31T18:52:02Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/315",
+      "comments": [
+        {
+          "id": 3702709288,
+          "body": "This seems like not a lot of exp but overall each 100 levels it seems to account for about 10 levels-ish per before obtaining more op points if we miss zero days throughout progression. This changes of course based on total progression?",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:52:02Z",
+          "updated_at": "2025-12-31T18:52:02Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/315#issuecomment-3702709288"
+        }
+      ]
+    },
+    {
+      "number": 314,
+      "title": "[Comments] Latent Power",
+      "body": "💬 **Comments for:** Latent Power\n📄 **Page ID:** `characters/latent-power`\n🔗 **Page URL:** https://slayerlegend.wiki#/characters/latent-power\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:characters/latent-power",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:50:40Z",
+      "updated_at": "2025-12-31T18:50:40Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/314",
+      "comments": [
+        {
+          "id": 3702706915,
+          "body": "When to stop focusing on dragon power vs dragon spark. At some point we will switch back and +10 str crit luk right? ",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:50:40Z",
+          "updated_at": "2025-12-31T18:50:40Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/314#issuecomment-3702706915"
+        }
+      ]
+    },
+    {
+      "number": 313,
+      "title": "[User Snapshot] brobbenlive-creator",
+      "body": "{\n  \"userId\": 252371557,\n  \"username\": \"brobbenlive-creator\",\n  \"lastUpdated\": \"2025-12-31T18:49:33.617Z\",\n  \"stats\": {\n    \"totalPRs\": 0,\n    \"openPRs\": 0,\n    \"mergedPRs\": 0,\n    \"closedPRs\": 0,\n    \"totalAdditions\": 0,\n    \"totalDeletions\": 0,\n    \"totalFiles\": 0,\n    \"mostRecentEdit\": null\n  },\n  \"pullRequests\": [],\n  \"pullRequestsCount\": 0,\n  \"pullRequestsStored\": 0,\n  \"pullRequestsTruncated\": false,\n  \"user\": {\n    \"id\": 252371557,\n    \"login\": \"brobbenlive-creator\",\n    \"name\": null,\n    \"avatar_url\": \"https://avatars.githubusercontent.com/u/252371557?v=4\",\n    \"bio\": null\n  }\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "user-snapshot",
+          "color": "5319e7",
+          "description": "User profile snapshot data (managed by bot)"
+        },
+        {
+          "name": "user-id:252371557",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:49:33Z",
+      "updated_at": "2025-12-31T18:49:34Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/313",
+      "comments": []
+    },
+    {
+      "number": 312,
+      "title": "[Comments] Character Stats",
+      "body": "💬 **Comments for:** Character Stats\n📄 **Page ID:** `characters/stats`\n🔗 **Page URL:** https://slayerlegend.wiki#/characters/stats\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:characters/stats",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:48:42Z",
+      "updated_at": "2025-12-31T18:48:42Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/312",
+      "comments": [
+        {
+          "id": 3702703174,
+          "body": "Nice. 1.75mill, good to know!",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:48:42Z",
+          "updated_at": "2025-12-31T18:48:42Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/312#issuecomment-3702703174"
+        }
+      ]
+    },
+    {
+      "number": 311,
+      "title": "[Comments] Character Enhancement",
+      "body": "💬 **Comments for:** Character Enhancement\n📄 **Page ID:** `characters/enhancement`\n🔗 **Page URL:** https://slayerlegend.wiki#/characters/enhancement\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:characters/enhancement",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:47:50Z",
+      "updated_at": "2025-12-31T19:46:11Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/311",
+      "comments": [
+        {
+          "id": 3702701704,
+          "body": "I guess this page would be for a short description on stats manipulated by gold and various resources. How best to optimize expenditures perhaps?",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:47:51Z",
+          "updated_at": "2025-12-31T18:47:51Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/311#issuecomment-3702701704"
+        },
+        {
+          "id": 3702763418,
+          "body": "> [@brobbenlive-creator](#comment-3702701704) said:\n> I guess this page would be for a short description on stats manipulated by gold and various resources. How best to optimize expenditures perhaps?\n\nYeah that would be good to include!",
+          "user": {
+            "login": "BenDol",
+            "id": 1935706
+          },
+          "created_at": "2025-12-31T19:33:20Z",
+          "updated_at": "2025-12-31T19:46:11Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/311#issuecomment-3702763418"
+        }
+      ]
+    },
+    {
+      "number": 310,
+      "title": "[Comments] Character Promotions",
+      "body": "💬 **Comments for:** Character Promotions\n📄 **Page ID:** `characters/promotions`\n🔗 **Page URL:** https://slayerlegend.wiki#/characters/promotions\n🔀 **Branch:** main\n\n---\n\nThis issue is used to collect comments for the wiki page. Feel free to leave your thoughts, questions, or feedback below!\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "wiki-comments",
+          "color": "0075ca",
+          "description": "Issue used for collecting page comments"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "page:characters/promotions",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:46:15Z",
+      "updated_at": "2025-12-31T18:46:16Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/310",
+      "comments": [
+        {
+          "id": 3702699165,
+          "body": "I would love to see at what recommend stages, possibly even stat checks to these promotions alongside recommend builds at somepoint. Not clear if this page is for that or not, although I would say it is redundant information nearly all available in game. So I hope this page becomes short and sweet to the point!",
+          "user": {
+            "login": "brobbenlive-creator",
+            "id": 252371557
+          },
+          "created_at": "2025-12-31T18:46:16Z",
+          "updated_at": "2025-12-31T18:46:16Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/310#issuecomment-3702699165"
+        }
+      ]
+    },
+    {
+      "number": 309,
+      "title": "[Achievements] brobbenlive-creator",
+      "body": "{\n  \"userId\": 252371557,\n  \"username\": \"brobbenlive-creator\",\n  \"lastUpdated\": \"2025-12-31T18:42:23.499Z\",\n  \"achievements\": [\n    {\n      \"id\": \"first-login\",\n      \"unlockedAt\": \"2025-12-31T18:42:21.173Z\",\n      \"progress\": 100\n    }\n  ],\n  \"version\": \"1.0\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "achievements",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "user-id:252371557",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T18:42:23Z",
+      "updated_at": "2025-12-31T18:42:24Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/309",
+      "comments": []
+    },
+    {
+      "number": 303,
+      "title": "[User Snapshot] andyluc",
+      "body": "{\n  \"userId\": 251925542,\n  \"username\": \"andyluc\",\n  \"lastUpdated\": \"2026-01-01T02:01:03.994Z\",\n  \"stats\": {\n    \"totalPRs\": 10,\n    \"openPRs\": 0,\n    \"mergedPRs\": 8,\n    \"closedPRs\": 2,\n    \"totalAdditions\": 289,\n    \"totalDeletions\": 118,\n    \"totalFiles\": 8,\n    \"mostRecentEdit\": \"2026-01-01T01:55:59.000Z\"\n  },\n  \"pullRequests\": [\n    {\n      \"number\": 329,\n      \"title\": \"[Edit] Delete Character Enhancement\",\n      \"state\": \"closed\",\n      \"created_at\": \"2026-01-01T01:55:59Z\",\n      \"updated_at\": \"2026-01-01T01:57:49Z\",\n      \"merged_at\": null,\n      \"closed_at\": \"2026-01-01T01:57:49Z\",\n      \"additions\": 0,\n      \"deletions\": 20,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/329\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": [\n        {\n          \"name\": \"documentation\",\n          \"color\": \"0075ca\"\n        },\n        {\n          \"name\": \"wiki-edit\",\n          \"color\": \"7057ff\"\n        }\n      ]\n    },\n    {\n      \"number\": 308,\n      \"title\": \"Character Promotions\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-31T18:18:18Z\",\n      \"updated_at\": \"2025-12-31T20:08:29Z\",\n      \"merged_at\": \"2025-12-31T20:08:28Z\",\n      \"closed_at\": \"2025-12-31T20:08:28Z\",\n      \"additions\": 27,\n      \"deletions\": 72,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/308\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    },\n    {\n      \"number\": 307,\n      \"title\": \"Character Stats\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-31T17:29:58Z\",\n      \"updated_at\": \"2025-12-31T20:07:28Z\",\n      \"merged_at\": \"2025-12-31T20:07:28Z\",\n      \"closed_at\": \"2025-12-31T20:07:28Z\",\n      \"additions\": 33,\n      \"deletions\": 14,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/307\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    },\n    {\n      \"number\": 306,\n      \"title\": \"Character Stats\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-31T00:56:49Z\",\n      \"updated_at\": \"2025-12-31T04:54:23Z\",\n      \"merged_at\": \"2025-12-31T04:54:23Z\",\n      \"closed_at\": \"2025-12-31T04:54:23Z\",\n      \"additions\": 22,\n      \"deletions\": 4,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/306\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    },\n    {\n      \"number\": 305,\n      \"title\": \"Character Promotions\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-31T00:22:25Z\",\n      \"updated_at\": \"2025-12-31T00:24:23Z\",\n      \"merged_at\": \"2025-12-31T00:24:23Z\",\n      \"closed_at\": \"2025-12-31T00:24:23Z\",\n      \"additions\": 75,\n      \"deletions\": 4,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/305\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    },\n    {\n      \"number\": 304,\n      \"title\": \"Overview & Introduction\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-31T00:06:10Z\",\n      \"updated_at\": \"2025-12-31T00:24:47Z\",\n      \"merged_at\": \"2025-12-31T00:24:47Z\",\n      \"closed_at\": \"2025-12-31T00:24:47Z\",\n      \"additions\": 0,\n      \"deletions\": 21,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/304\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    },\n    {\n      \"number\": 299,\n      \"title\": \"Character Promotions\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-30T20:01:50Z\",\n      \"updated_at\": \"2025-12-31T00:11:09Z\",\n      \"merged_at\": \"2025-12-31T00:11:08Z\",\n      \"closed_at\": \"2025-12-31T00:11:08Z\",\n      \"additions\": 74,\n      \"deletions\": 3,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/299\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    },\n    {\n      \"number\": 292,\n      \"title\": \"Overview & Introduction\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-30T00:44:06Z\",\n      \"updated_at\": \"2025-12-30T18:16:00Z\",\n      \"merged_at\": \"2025-12-30T18:16:00Z\",\n      \"closed_at\": \"2025-12-30T18:16:00Z\",\n      \"additions\": 27,\n      \"deletions\": 0,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/292\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    },\n    {\n      \"number\": 289,\n      \"title\": \"test\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-29T21:53:46Z\",\n      \"updated_at\": \"2025-12-29T21:54:57Z\",\n      \"merged_at\": null,\n      \"closed_at\": \"2025-12-29T21:54:57Z\",\n      \"additions\": 29,\n      \"deletions\": 0,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/289\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    },\n    {\n      \"number\": 283,\n      \"title\": \"Overview & Introduction\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-29T18:16:19Z\",\n      \"updated_at\": \"2025-12-29T19:42:44Z\",\n      \"merged_at\": \"2025-12-29T19:42:44Z\",\n      \"closed_at\": \"2025-12-29T19:42:44Z\",\n      \"additions\": 31,\n      \"deletions\": 0,\n      \"changed_files\": 1,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/283\",\n      \"user\": {\n        \"login\": \"andyluc\",\n        \"id\": 251925542,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n        \"html_url\": \"https://github.com/andyluc\"\n      },\n      \"labels\": []\n    }\n  ],\n  \"pullRequestsCount\": 10,\n  \"pullRequestsStored\": 10,\n  \"pullRequestsTruncated\": false,\n  \"user\": {\n    \"id\": 251925542,\n    \"login\": \"andyluc\",\n    \"name\": \"Andy\",\n    \"avatar_url\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n    \"bio\": null\n  }\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "user-snapshot",
+          "color": "5319e7",
+          "description": "User profile snapshot data (managed by bot)"
+        },
+        {
+          "name": "user-id:251925542",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-31T00:00:50Z",
+      "updated_at": "2026-01-01T02:01:04Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/303",
+      "comments": []
+    },
+    {
+      "number": 302,
+      "title": "[Donator] bonfyrenz",
+      "body": "{\n  \"userId\": 249419067,\n  \"username\": \"bonfyrenz\",\n  \"lastUpdated\": \"2025-12-30T23:17:56.659Z\",\n  \"isDonator\": true,\n  \"donatedAt\": \"2025-12-30T23:17:56.486Z\",\n  \"badge\": \"💎\",\n  \"color\": \"#ffd700\",\n  \"assignedBy\": \"admin:BenDol\",\n  \"amount\": 100,\n  \"reason\": \"Cheers!\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "user-id:249419067",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "donator",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-30T23:17:56Z",
+      "updated_at": "2025-12-30T23:17:56Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/302",
+      "comments": []
+    },
+    {
+      "number": 300,
+      "title": "[Profile Pictures Registry]",
+      "body": "# Profile Pictures Index\n\n<!-- userId -> commentId mapping -->\n[1935706]=3700575830\n[249419067]=3700748127\n[251925542]=3700948688\n[252371557]=3702694041",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "profile-pictures",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-30T21:11:49Z",
+      "updated_at": "2025-12-31T18:43:03Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/300",
+      "comments": [
+        {
+          "id": 3700575830,
+          "body": "{\n  \"userId\": 1935706,\n  \"username\": \"BenDol\",\n  \"customAvatarUrl\": \"https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/06ac4aaf58d9a1dbd775014831e12bd0bb739647/avatars/1935706.webp?v=1767132264002\",\n  \"fileSize\": 38806,\n  \"mimeType\": \"image/webp\",\n  \"dimensions\": {\n    \"width\": 512,\n    \"height\": 512\n  },\n  \"uploadDate\": \"2025-12-30T22:04:24.670Z\",\n  \"lastModified\": \"2025-12-30T22:04:24.670Z\",\n  \"changeCount\": 12\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-30T21:11:50Z",
+          "updated_at": "2025-12-30T22:04:23Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/300#issuecomment-3700575830"
+        },
+        {
+          "id": 3700748127,
+          "body": "{\n  \"userId\": 249419067,\n  \"username\": \"bonfyrenz\",\n  \"customAvatarUrl\": \"https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/73a1a006dad598f54621670dc050572d59128053/avatars/249419067.webp?v=1767135307151\",\n  \"fileSize\": 43836,\n  \"mimeType\": \"image/webp\",\n  \"dimensions\": {\n    \"width\": 512,\n    \"height\": 512\n  },\n  \"uploadDate\": \"2025-12-30T22:55:07.768Z\",\n  \"lastModified\": \"2025-12-30T22:55:07.768Z\",\n  \"changeCount\": 1\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-30T22:55:08Z",
+          "updated_at": "2025-12-30T22:55:08Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/300#issuecomment-3700748127"
+        },
+        {
+          "id": 3700948688,
+          "body": "{\n  \"userId\": 251925542,\n  \"username\": \"andyluc\",\n  \"customAvatarUrl\": \"https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/2219c572609a8f20a0f816bb58a078d42e7bc309/avatars/251925542.webp?v=1767142309754\",\n  \"fileSize\": 11662,\n  \"mimeType\": \"image/webp\",\n  \"dimensions\": {\n    \"width\": 512,\n    \"height\": 512\n  },\n  \"uploadDate\": \"2025-12-31T00:51:50.351Z\",\n  \"lastModified\": \"2025-12-31T00:51:50.351Z\",\n  \"changeCount\": 2\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-31T00:51:34Z",
+          "updated_at": "2025-12-31T00:51:50Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/300#issuecomment-3700948688"
+        },
+        {
+          "id": 3702694041,
+          "body": "{\n  \"userId\": 252371557,\n  \"username\": \"brobbenlive-creator\",\n  \"customAvatarUrl\": \"https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/48f65bb6f2b0ef16e0ed0d7b3300634c1b6235dd/avatars/252371557.webp?v=1767206582290\",\n  \"fileSize\": 40228,\n  \"mimeType\": \"image/webp\",\n  \"dimensions\": {\n    \"width\": 512,\n    \"height\": 512\n  },\n  \"uploadDate\": \"2025-12-31T18:43:03.107Z\",\n  \"lastModified\": \"2025-12-31T18:43:03.107Z\",\n  \"changeCount\": 1\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-31T18:43:03Z",
+          "updated_at": "2025-12-31T18:43:03Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/300#issuecomment-3702694041"
+        }
+      ]
+    },
+    {
+      "number": 298,
+      "title": "[Issue Report] BenDol - Test Issue",
+      "body": "**Category**: Bug Report\n**Submitted by**: BenDol\n**Email**: dolb90@gmail.com\n**Page URL**: http://localhost:5173/#/admin\n\n## Description\n\nTest Issue Test Issue Test Issue Test Issue\n\n---\n\n**System Information**\n- **Browser**: Chrome 143.0.0\n- **OS**: Windows 10\n- **Screen**: 2560x1440\n- **Timestamp**: 2025-12-30T11:22:59.085Z\n",
+      "state": "open",
+      "labels": [
+        {
+          "name": "user-report",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "bug-report",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "BenDol",
+        "id": 1935706,
+        "type": "User"
+      },
+      "created_at": "2025-12-30T11:22:58Z",
+      "updated_at": "2025-12-30T11:22:58Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/298",
+      "comments": []
+    },
+    {
+      "number": 294,
+      "title": "[Spirit Build] llamadolly73-cmd",
+      "body": "[\n  {\n    \"name\": \"Boss build\",\n    \"slots\": [\n      {\n        \"type\": \"base\",\n        \"spiritId\": 12,\n        \"level\": 55,\n        \"awakeningLevel\": 6,\n        \"evolutionLevel\": 4,\n        \"skillEnhancementLevel\": 0\n      },\n      {\n        \"type\": \"base\",\n        \"spiritId\": 1,\n        \"level\": 50,\n        \"awakeningLevel\": 5,\n        \"evolutionLevel\": 4,\n        \"skillEnhancementLevel\": 0\n      },\n      {\n        \"type\": \"base\",\n        \"spiritId\": 4,\n        \"level\": 50,\n        \"awakeningLevel\": 4,\n        \"evolutionLevel\": 4,\n        \"skillEnhancementLevel\": 2\n      }\n    ],\n    \"id\": \"spirit-builds-1767066178233-bzs5wc9r8\",\n    \"createdAt\": \"2025-12-30T03:42:58.233Z\",\n    \"updatedAt\": \"2025-12-30T03:42:58.625Z\"\n  }\n]",
+      "state": "open",
+      "labels": [
+        {
+          "name": "spirit-builds",
+          "color": "db1d7a",
+          "description": "User spirit build storage (managed by bot)"
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "user-id:252110456",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-30T03:42:59Z",
+      "updated_at": "2025-12-30T03:42:59Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/294",
+      "comments": []
+    },
+    {
+      "number": 293,
+      "title": "[Achievements] llamadolly73-cmd",
+      "body": "{\n  \"userId\": 252110456,\n  \"username\": \"llamadolly73-cmd\",\n  \"lastUpdated\": \"2025-12-30T03:29:33.718Z\",\n  \"achievements\": [\n    {\n      \"id\": \"first-login\",\n      \"unlockedAt\": \"2025-12-30T03:29:31.129Z\",\n      \"progress\": 100\n    }\n  ],\n  \"version\": \"1.0\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "achievements",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "user-id:252110456",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-30T03:29:34Z",
+      "updated_at": "2025-12-30T03:29:34Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/293",
+      "comments": []
+    },
+    {
+      "number": 291,
+      "title": "[Display Names Registry]",
+      "body": "[1935706]=3697710640\n[249419067]=3700717519\n[251925542]=3700951572\n",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "display-names",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-29T22:51:43Z",
+      "updated_at": "2025-12-31T00:53:13Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/291",
+      "comments": [
+        {
+          "id": 3697710640,
+          "body": "{\n  \"userId\": 1935706,\n  \"username\": \"BenDol\",\n  \"displayName\": \"Bonfyre\",\n  \"lastChanged\": \"2025-12-29T22:54:12.410Z\",\n  \"changeCount\": 1,\n  \"bannedNames\": []\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-29T22:54:14Z",
+          "updated_at": "2025-12-29T22:54:14Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/291#issuecomment-3697710640"
+        },
+        {
+          "id": 3700717519,
+          "body": "{\n  \"userId\": 249419067,\n  \"username\": \"bonfyrenz\",\n  \"displayName\": \"BonfyreAlt\",\n  \"lastChanged\": \"2025-12-30T22:41:58.232Z\",\n  \"changeCount\": 1,\n  \"bannedNames\": []\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-30T22:41:58Z",
+          "updated_at": "2025-12-30T22:41:58Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/291#issuecomment-3700717519"
+        },
+        {
+          "id": 3700951572,
+          "body": "{\n  \"userId\": 251925542,\n  \"username\": \"andyluc\",\n  \"displayName\": \"Andy\",\n  \"lastChanged\": \"2025-12-31T00:53:12.397Z\",\n  \"changeCount\": 1,\n  \"bannedNames\": [],\n  \"history\": []\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-31T00:53:12Z",
+          "updated_at": "2025-12-31T00:53:12Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/291#issuecomment-3700951572"
+        }
+      ]
+    },
+    {
+      "number": 287,
+      "title": "[User Snapshot] bonfyrenz",
+      "body": "{\n  \"userId\": 249419067,\n  \"username\": \"bonfyrenz\",\n  \"lastUpdated\": \"2025-12-29T21:30:55.295Z\",\n  \"stats\": {\n    \"totalPRs\": 0,\n    \"openPRs\": 0,\n    \"mergedPRs\": 0,\n    \"closedPRs\": 0,\n    \"totalAdditions\": 0,\n    \"totalDeletions\": 0,\n    \"totalFiles\": 0,\n    \"mostRecentEdit\": null\n  },\n  \"pullRequests\": [],\n  \"pullRequestsCount\": 0,\n  \"pullRequestsStored\": 0,\n  \"pullRequestsTruncated\": false,\n  \"user\": {\n    \"id\": 249419067,\n    \"login\": \"bonfyrenz\",\n    \"name\": null,\n    \"avatar_url\": \"https://avatars.githubusercontent.com/u/249419067?v=4\",\n    \"bio\": null\n  }\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "user-snapshot",
+          "color": "5319e7",
+          "description": "User profile snapshot data (managed by bot)"
+        },
+        {
+          "name": "user-id:249419067",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-29T21:30:57Z",
+      "updated_at": "2025-12-29T21:30:57Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/287",
+      "comments": []
+    },
+    {
+      "number": 286,
+      "title": "[Achievements] bonfyrenz",
+      "body": "{\n  \"userId\": 249419067,\n  \"username\": \"bonfyrenz\",\n  \"lastUpdated\": \"2025-12-29T21:30:52.647Z\",\n  \"achievements\": [\n    {\n      \"id\": \"first-login\",\n      \"unlockedAt\": \"2025-12-29T21:30:50.128Z\",\n      \"progress\": 100\n    }\n  ],\n  \"version\": \"1.0\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "user-id:249419067",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "achievements",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-29T21:30:54Z",
+      "updated_at": "2025-12-29T21:30:54Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/286",
+      "comments": []
+    },
+    {
+      "number": 284,
+      "title": "[Admin List]",
+      "body": "🔐 **Wiki Administrators**\n\nThis issue stores the list of wiki administrators who have permission to manage users and content.\n\n**Admin List:**\n```json\n[\n  {\n    \"username\": \"rozyiscozy\",\n    \"userId\": 111704674,\n    \"addedBy\": \"BenDol\",\n    \"addedAt\": \"2025-12-31T00:31:34.547Z\"\n  }\n]\n```\n\n---\n\n⚠️ **This issue is managed by the wiki bot.** Only the repository owner can modify the admin list via the Admin Panel.\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "wiki-admin-list",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-29T21:30:49Z",
+      "updated_at": "2025-12-31T00:31:34Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/284",
+      "comments": []
+    },
+    {
+      "number": 282,
+      "title": "[Achievements] soccersurfer253",
+      "body": "{\n  \"userId\": 251961996,\n  \"username\": \"soccersurfer253\",\n  \"lastUpdated\": \"2025-12-29T06:32:42.362Z\",\n  \"achievements\": [\n    {\n      \"id\": \"first-login\",\n      \"unlockedAt\": \"2025-12-29T06:32:39.712Z\",\n      \"progress\": 100\n    }\n  ],\n  \"version\": \"1.0\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "achievements",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "user-id:251961996",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-29T06:32:42Z",
+      "updated_at": "2025-12-29T06:32:43Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/282",
+      "comments": []
+    },
+    {
+      "number": 281,
+      "title": "[Achievements] andylucgame-glitch",
+      "body": "{\n  \"userId\": 251925542,\n  \"username\": \"andyluc\",\n  \"lastUpdated\": \"2025-12-31T21:00:36.492Z\",\n  \"achievements\": [\n    {\n      \"id\": \"first-login\",\n      \"unlockedAt\": \"2025-12-28T23:52:42.973Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-pr\",\n      \"unlockedAt\": \"2025-12-31T21:00:34.602Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-merge\",\n      \"unlockedAt\": \"2025-12-31T21:00:34.602Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-edit\",\n      \"unlockedAt\": \"2025-12-31T21:00:34.602Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"lines-apprentice\",\n      \"unlockedAt\": \"2025-12-31T21:00:34.602Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-pr-closed\",\n      \"unlockedAt\": \"2025-12-31T21:00:34.763Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"night-owl\",\n      \"unlockedAt\": \"2025-12-31T21:00:36.492Z\",\n      \"progress\": 100\n    }\n  ],\n  \"version\": \"1.0\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "achievements",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "user-id:251925542",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T23:52:45Z",
+      "updated_at": "2025-12-31T21:00:36Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/281",
+      "comments": []
+    },
+    {
+      "number": 279,
+      "title": "[Build Share Index]",
+      "body": "# Build Share Index\n\n[04c30c2c72cf]=3695092734\n[59a6eadc493a]=3695112064\n",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "build-share-index",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T21:39:47Z",
+      "updated_at": "2025-12-28T22:51:34Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/279",
+      "comments": [
+        {
+          "id": 3695092734,
+          "body": "{\n  \"type\": \"battle-loadouts\",\n  \"checksum\": \"04c30c2c72cf\",\n  \"fullChecksum\": \"04c30c2c72cfba05467da01f73a755f0190d02d84fa2d7bc97d74df73fafd895\",\n  \"data\": {\n    \"name\": \"Dimensional Rift\",\n    \"skillBuild\": {\n      \"id\": \"skill-builds-1766821946497-o0rgoqe45\",\n      \"name\": \"Test\",\n      \"maxSlots\": 10,\n      \"slots\": [\n        {\n          \"skillId\": 3,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 2,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 1,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 4,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 6,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 5,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 10,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 8,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 9,\n          \"level\": 1\n        },\n        {\n          \"skillId\": 13,\n          \"level\": 1\n        }\n      ]\n    },\n    \"spiritBuild\": {\n      \"name\": \"Test\",\n      \"slots\": [\n        {\n          \"type\": \"base\",\n          \"spiritId\": 3,\n          \"level\": 1,\n          \"awakeningLevel\": 0,\n          \"evolutionLevel\": 4,\n          \"skillEnhancementLevel\": 0\n        },\n        {\n          \"type\": \"base\",\n          \"spiritId\": 1,\n          \"level\": 1,\n          \"awakeningLevel\": 0,\n          \"evolutionLevel\": 4,\n          \"skillEnhancementLevel\": 0\n        },\n        {\n          \"type\": \"base\",\n          \"spiritId\": 4,\n          \"level\": 1,\n          \"awakeningLevel\": 0,\n          \"evolutionLevel\": 4,\n          \"skillEnhancementLevel\": 0\n        }\n      ],\n      \"id\": \"spirit-builds-1766823297154-7nqpu1eun\",\n      \"createdAt\": \"2025-12-27T19:54:21.580Z\",\n      \"updatedAt\": \"2025-12-27T19:54:21.763Z\"\n    },\n    \"soulWeaponBuild\": {\n      \"weaponId\": 36,\n      \"weaponName\": \"Vision\",\n      \"gridState\": [\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          }\n        ]\n      ],\n      \"inventory\": [\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        }\n      ]\n    },\n    \"skillStoneBuild\": {\n      \"name\": \"\",\n      \"slots\": [\n        {\n          \"type\": \"cooldown\",\n          \"element\": \"fire\",\n          \"tier\": \"A\"\n        },\n        {\n          \"type\": \"time\",\n          \"element\": \"wind\",\n          \"tier\": \"A\"\n        },\n        {\n          \"type\": \"heat\",\n          \"element\": \"earth\",\n          \"tier\": \"B\"\n        }\n      ]\n    },\n    \"spirit\": null,\n    \"skillStone\": null,\n    \"promotionAbility\": null,\n    \"familiar\": null\n  },\n  \"createdAt\": \"2025-12-28T22:16:02.183Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T22:16:03Z",
+          "updated_at": "2025-12-28T22:16:03Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/279#issuecomment-3695092734"
+        },
+        {
+          "id": 3695112064,
+          "body": "{\n  \"type\": \"skill-builds\",\n  \"checksum\": \"59a6eadc493a\",\n  \"fullChecksum\": \"59a6eadc493a636f0eaf3d697f38e3eef142ef58c1e1f43213924e3b761c228f\",\n  \"data\": {\n    \"name\": \"Test\",\n    \"maxSlots\": 10,\n    \"slots\": [\n      {\n        \"skillId\": 3,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 2,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 1,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 4,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 6,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 5,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 10,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 8,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 9,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 13,\n        \"level\": 1\n      }\n    ]\n  },\n  \"createdAt\": \"2025-12-28T22:51:32.982Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T22:51:33Z",
+          "updated_at": "2025-12-28T22:51:33Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/279#issuecomment-3695112064"
+        }
+      ]
+    },
+    {
+      "number": 278,
+      "title": "[Achievements] 3picfailure28",
+      "body": "{\n  \"userId\": 251910075,\n  \"username\": \"3picfailure28\",\n  \"lastUpdated\": \"2025-12-28T20:21:40.490Z\",\n  \"achievements\": [\n    {\n      \"id\": \"first-login\",\n      \"unlockedAt\": \"2025-12-28T20:21:38.275Z\",\n      \"progress\": 100\n    }\n  ],\n  \"version\": \"1.0\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "achievements",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "user-id:251910075",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T20:21:40Z",
+      "updated_at": "2025-12-28T20:21:41Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/278",
+      "comments": []
+    },
+    {
+      "number": 277,
+      "title": "[Soul Weapon Grid] soul-weapon-61",
+      "body": "Storage for soul-weapon grid submissions: 61",
+      "state": "open",
+      "labels": [
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "soul-weapon-grids",
+          "color": "db8c1d",
+          "description": "Soul weapon engraving grid submissions (managed by bot)"
+        },
+        {
+          "name": "weapon-id:61",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T19:36:47Z",
+      "updated_at": "2025-12-28T19:36:47Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/277",
+      "comments": [
+        {
+          "id": 3694985905,
+          "body": "{\n  \"weaponId\": \"61\",\n  \"weaponName\": \"Hometown\",\n  \"gridType\": \"5x5\",\n  \"completionEffect\": {\n    \"atk\": 54,\n    \"hp\": 239.3\n  },\n  \"activeSlots\": [\n    {\n      \"row\": 0,\n      \"col\": 0\n    },\n    {\n      \"row\": 0,\n      \"col\": 1\n    },\n    {\n      \"row\": 1,\n      \"col\": 1\n    },\n    {\n      \"row\": 1,\n      \"col\": 2\n    },\n    {\n      \"row\": 1,\n      \"col\": 3\n    },\n    {\n      \"row\": 1,\n      \"col\": 4\n    },\n    {\n      \"row\": 2,\n      \"col\": 1\n    },\n    {\n      \"row\": 2,\n      \"col\": 2\n    },\n    {\n      \"row\": 2,\n      \"col\": 3\n    },\n    {\n      \"row\": 2,\n      \"col\": 4\n    },\n    {\n      \"row\": 3,\n      \"col\": 2\n    },\n    {\n      \"row\": 3,\n      \"col\": 3\n    },\n    {\n      \"row\": 3,\n      \"col\": 4\n    },\n    {\n      \"row\": 4,\n      \"col\": 2\n    },\n    {\n      \"row\": 4,\n      \"col\": 3\n    },\n    {\n      \"row\": 4,\n      \"col\": 4\n    }\n  ],\n  \"totalActiveSlots\": 16,\n  \"id\": \"grid-1766950605666-7fl40a6bh\",\n  \"submittedBy\": \"BenDol\",\n  \"submittedAt\": \"2025-12-28T19:36:45.666Z\",\n  \"username\": \"BenDol\",\n  \"userId\": 0,\n  \"entityId\": \"61\",\n  \"createdAt\": \"2025-12-28T19:36:46.293Z\",\n  \"updatedAt\": \"2025-12-28T19:36:46.293Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T19:36:47Z",
+          "updated_at": "2025-12-28T19:36:47Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/277#issuecomment-3694985905"
+        }
+      ]
+    },
+    {
+      "number": 276,
+      "title": "[Soul Weapon Grid] soul-weapon-60",
+      "body": "Storage for soul-weapon grid submissions: 60",
+      "state": "open",
+      "labels": [
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "soul-weapon-grids",
+          "color": "db8c1d",
+          "description": "Soul weapon engraving grid submissions (managed by bot)"
+        },
+        {
+          "name": "weapon-id:60",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T19:35:49Z",
+      "updated_at": "2025-12-28T19:35:49Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/276",
+      "comments": [
+        {
+          "id": 3694985340,
+          "body": "{\n  \"weaponId\": \"60\",\n  \"weaponName\": \"Resolution\",\n  \"gridType\": \"5x5\",\n  \"completionEffect\": {\n    \"atk\": 51.3,\n    \"hp\": 227.1\n  },\n  \"activeSlots\": [\n    {\n      \"row\": 1,\n      \"col\": 0\n    },\n    {\n      \"row\": 1,\n      \"col\": 1\n    },\n    {\n      \"row\": 1,\n      \"col\": 2\n    },\n    {\n      \"row\": 1,\n      \"col\": 3\n    },\n    {\n      \"row\": 1,\n      \"col\": 4\n    },\n    {\n      \"row\": 2,\n      \"col\": 0\n    },\n    {\n      \"row\": 2,\n      \"col\": 1\n    },\n    {\n      \"row\": 2,\n      \"col\": 2\n    },\n    {\n      \"row\": 2,\n      \"col\": 3\n    },\n    {\n      \"row\": 2,\n      \"col\": 4\n    },\n    {\n      \"row\": 3,\n      \"col\": 1\n    },\n    {\n      \"row\": 3,\n      \"col\": 2\n    },\n    {\n      \"row\": 3,\n      \"col\": 3\n    },\n    {\n      \"row\": 4,\n      \"col\": 1\n    },\n    {\n      \"row\": 4,\n      \"col\": 2\n    },\n    {\n      \"row\": 4,\n      \"col\": 3\n    }\n  ],\n  \"totalActiveSlots\": 16,\n  \"id\": \"grid-1766950547894-87jltg8xu\",\n  \"submittedBy\": \"BenDol\",\n  \"submittedAt\": \"2025-12-28T19:35:47.894Z\",\n  \"username\": \"BenDol\",\n  \"userId\": 0,\n  \"entityId\": \"60\",\n  \"createdAt\": \"2025-12-28T19:35:48.476Z\",\n  \"updatedAt\": \"2025-12-28T19:35:48.476Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T19:35:49Z",
+          "updated_at": "2025-12-28T19:35:49Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/276#issuecomment-3694985340"
+        }
+      ]
+    },
+    {
+      "number": 275,
+      "title": "[Soul Weapon Grid] soul-weapon-59",
+      "body": "Storage for soul-weapon grid submissions: 59",
+      "state": "open",
+      "labels": [
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "soul-weapon-grids",
+          "color": "db8c1d",
+          "description": "Soul weapon engraving grid submissions (managed by bot)"
+        },
+        {
+          "name": "weapon-id:59",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T19:34:14Z",
+      "updated_at": "2025-12-28T19:34:15Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/275",
+      "comments": [
+        {
+          "id": 3694984415,
+          "body": "{\n  \"weaponId\": \"59\",\n  \"weaponName\": \"Sincerity\",\n  \"gridType\": \"5x5\",\n  \"completionEffect\": {\n    \"atk\": 50.9,\n    \"hp\": 224\n  },\n  \"activeSlots\": [\n    {\n      \"row\": 0,\n      \"col\": 2\n    },\n    {\n      \"row\": 0,\n      \"col\": 3\n    },\n    {\n      \"row\": 0,\n      \"col\": 4\n    },\n    {\n      \"row\": 1,\n      \"col\": 1\n    },\n    {\n      \"row\": 1,\n      \"col\": 2\n    },\n    {\n      \"row\": 1,\n      \"col\": 3\n    },\n    {\n      \"row\": 2,\n      \"col\": 0\n    },\n    {\n      \"row\": 2,\n      \"col\": 1\n    },\n    {\n      \"row\": 2,\n      \"col\": 2\n    },\n    {\n      \"row\": 2,\n      \"col\": 3\n    },\n    {\n      \"row\": 3,\n      \"col\": 1\n    },\n    {\n      \"row\": 3,\n      \"col\": 2\n    },\n    {\n      \"row\": 3,\n      \"col\": 3\n    },\n    {\n      \"row\": 4,\n      \"col\": 2\n    },\n    {\n      \"row\": 4,\n      \"col\": 3\n    },\n    {\n      \"row\": 4,\n      \"col\": 4\n    }\n  ],\n  \"totalActiveSlots\": 16,\n  \"id\": \"grid-1766950453571-pb80k9fgg\",\n  \"submittedBy\": \"BenDol\",\n  \"submittedAt\": \"2025-12-28T19:34:13.571Z\",\n  \"username\": \"BenDol\",\n  \"userId\": 0,\n  \"entityId\": \"59\",\n  \"createdAt\": \"2025-12-28T19:34:14.151Z\",\n  \"updatedAt\": \"2025-12-28T19:34:14.151Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T19:34:15Z",
+          "updated_at": "2025-12-28T19:34:15Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/275#issuecomment-3694984415"
+        }
+      ]
+    },
+    {
+      "number": 274,
+      "title": "[Soul Weapon Engraving] BenDol",
+      "body": "[\n  {\n    \"name\": \"Current\",\n    \"weaponId\": 46,\n    \"weaponName\": \"Blessing\",\n    \"gridState\": [\n      [\n        {\n          \"active\": false,\n          \"piece\": null\n        },\n        {\n          \"active\": false,\n          \"piece\": null\n        },\n        {\n          \"active\": false,\n          \"piece\": null\n        },\n        {\n          \"active\": false,\n          \"piece\": null\n        },\n        {\n          \"active\": false,\n          \"piece\": null\n        }\n      ],\n      [\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 0,\n            \"anchorRow\": 1,\n            \"anchorCol\": 0\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 90,\n            \"anchorRow\": 1,\n            \"anchorCol\": 1\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 90,\n            \"anchorRow\": 1,\n            \"anchorCol\": 1\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 90,\n            \"anchorRow\": 1,\n            \"anchorCol\": 1\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 270,\n            \"anchorRow\": 1,\n            \"anchorCol\": 2\n          }\n        }\n      ],\n      [\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 0,\n            \"anchorRow\": 1,\n            \"anchorCol\": 0\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 90,\n            \"anchorRow\": 1,\n            \"anchorCol\": 1\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 270,\n            \"anchorRow\": 1,\n            \"anchorCol\": 2\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 270,\n            \"anchorRow\": 1,\n            \"anchorCol\": 2\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 270,\n            \"anchorRow\": 1,\n            \"anchorCol\": 2\n          }\n        }\n      ],\n      [\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 0,\n            \"anchorRow\": 1,\n            \"anchorCol\": 0\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 0,\n            \"anchorRow\": 1,\n            \"anchorCol\": 0\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 90,\n            \"anchorRow\": 3,\n            \"anchorCol\": 2\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 90,\n            \"anchorRow\": 3,\n            \"anchorCol\": 2\n          }\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 90,\n            \"anchorRow\": 3,\n            \"anchorCol\": 2\n          }\n        }\n      ],\n      [\n        {\n          \"active\": false,\n          \"piece\": null\n        },\n        {\n          \"active\": false,\n          \"piece\": null\n        },\n        {\n          \"active\": true,\n          \"piece\": {\n            \"shapeId\": 1,\n            \"rarity\": 5,\n            \"level\": 50,\n            \"rotation\": 90,\n            \"anchorRow\": 3,\n            \"anchorCol\": 2\n          }\n        },\n        {\n          \"active\": false,\n          \"piece\": null\n        },\n        {\n          \"active\": false,\n          \"piece\": null\n        }\n      ]\n    ],\n    \"inventory\": [\n      {\n        \"shapeId\": 1,\n        \"rarity\": 5,\n        \"level\": 50\n      },\n      {\n        \"shapeId\": 1,\n        \"rarity\": 5,\n        \"level\": 50\n      },\n      {\n        \"shapeId\": 1,\n        \"rarity\": 5,\n        \"level\": 50\n      },\n      {\n        \"shapeId\": 1,\n        \"rarity\": 5,\n        \"level\": 50\n      },\n      {\n        \"shapeId\": 5,\n        \"rarity\": 5,\n        \"level\": 50\n      },\n      {\n        \"shapeId\": 5,\n        \"rarity\": 5,\n        \"level\": 50\n      },\n      {\n        \"shapeId\": 5,\n        \"rarity\": 5,\n        \"level\": 50\n      },\n      {\n        \"shapeId\": 5,\n        \"rarity\": 5,\n        \"level\": 50\n      }\n    ],\n    \"id\": \"engraving-builds-1766948309559-ygsvm02r5\",\n    \"createdAt\": \"2025-12-28T18:58:29.559Z\",\n    \"updatedAt\": \"2025-12-28T19:24:55.165Z\"\n  }\n]",
+      "state": "open",
+      "labels": [
+        {
+          "name": "user-id:1935706",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "engraving-builds",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T18:58:31Z",
+      "updated_at": "2025-12-28T19:24:56Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/274",
+      "comments": []
+    },
+    {
+      "number": 273,
+      "title": "[Soul Weapon Grid] soul-weapon-58",
+      "body": "Storage for soul-weapon grid submissions: 58",
+      "state": "open",
+      "labels": [
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "soul-weapon-grids",
+          "color": "db8c1d",
+          "description": "Soul weapon engraving grid submissions (managed by bot)"
+        },
+        {
+          "name": "weapon-id:58",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T18:18:38Z",
+      "updated_at": "2025-12-28T18:18:38Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/273",
+      "comments": [
+        {
+          "id": 3694937012,
+          "body": "{\n  \"weaponId\": \"58\",\n  \"weaponName\": \"Thirst\",\n  \"gridType\": \"5x5\",\n  \"completionEffect\": {\n    \"atk\": 50.6,\n    \"hp\": 221\n  },\n  \"activeSlots\": [\n    {\n      \"row\": 0,\n      \"col\": 0\n    },\n    {\n      \"row\": 0,\n      \"col\": 1\n    },\n    {\n      \"row\": 0,\n      \"col\": 2\n    },\n    {\n      \"row\": 0,\n      \"col\": 3\n    },\n    {\n      \"row\": 1,\n      \"col\": 0\n    },\n    {\n      \"row\": 1,\n      \"col\": 1\n    },\n    {\n      \"row\": 1,\n      \"col\": 2\n    },\n    {\n      \"row\": 1,\n      \"col\": 3\n    },\n    {\n      \"row\": 1,\n      \"col\": 4\n    },\n    {\n      \"row\": 2,\n      \"col\": 0\n    },\n    {\n      \"row\": 2,\n      \"col\": 1\n    },\n    {\n      \"row\": 2,\n      \"col\": 2\n    },\n    {\n      \"row\": 2,\n      \"col\": 3\n    },\n    {\n      \"row\": 2,\n      \"col\": 4\n    },\n    {\n      \"row\": 3,\n      \"col\": 2\n    },\n    {\n      \"row\": 4,\n      \"col\": 2\n    }\n  ],\n  \"totalActiveSlots\": 16,\n  \"id\": \"grid-1766945916998-bgnuuiwu6\",\n  \"submittedBy\": \"BenDol\",\n  \"submittedAt\": \"2025-12-28T18:18:36.998Z\",\n  \"username\": \"BenDol\",\n  \"userId\": 0,\n  \"entityId\": \"58\",\n  \"createdAt\": \"2025-12-28T18:18:37.576Z\",\n  \"updatedAt\": \"2025-12-28T18:18:37.576Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T18:18:38Z",
+          "updated_at": "2025-12-28T18:18:38Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/273#issuecomment-3694937012"
+        }
+      ]
+    },
+    {
+      "number": 272,
+      "title": "[Soul Weapon Grid] soul-weapon-56",
+      "body": "Storage for soul-weapon grid submissions: 56",
+      "state": "open",
+      "labels": [
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "weapon-id:56",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "soul-weapon-grids",
+          "color": "db8c1d",
+          "description": "Soul weapon engraving grid submissions (managed by bot)"
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T18:18:16Z",
+      "updated_at": "2025-12-28T18:18:16Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/272",
+      "comments": [
+        {
+          "id": 3694936810,
+          "body": "{\n  \"weaponId\": \"56\",\n  \"weaponName\": \"Wanderer\",\n  \"gridType\": \"5x5\",\n  \"completionEffect\": {\n    \"atk\": 47.4,\n    \"hp\": 204.2\n  },\n  \"activeSlots\": [\n    {\n      \"row\": 0,\n      \"col\": 1\n    },\n    {\n      \"row\": 0,\n      \"col\": 2\n    },\n    {\n      \"row\": 0,\n      \"col\": 3\n    },\n    {\n      \"row\": 1,\n      \"col\": 1\n    },\n    {\n      \"row\": 1,\n      \"col\": 2\n    },\n    {\n      \"row\": 1,\n      \"col\": 3\n    },\n    {\n      \"row\": 2,\n      \"col\": 1\n    },\n    {\n      \"row\": 2,\n      \"col\": 2\n    },\n    {\n      \"row\": 2,\n      \"col\": 3\n    },\n    {\n      \"row\": 3,\n      \"col\": 1\n    },\n    {\n      \"row\": 3,\n      \"col\": 2\n    },\n    {\n      \"row\": 3,\n      \"col\": 3\n    },\n    {\n      \"row\": 4,\n      \"col\": 0\n    },\n    {\n      \"row\": 4,\n      \"col\": 1\n    },\n    {\n      \"row\": 4,\n      \"col\": 3\n    },\n    {\n      \"row\": 4,\n      \"col\": 4\n    }\n  ],\n  \"totalActiveSlots\": 16,\n  \"id\": \"grid-1766945895011-wk59b1u4j\",\n  \"submittedBy\": \"BenDol\",\n  \"submittedAt\": \"2025-12-28T18:18:15.011Z\",\n  \"username\": \"BenDol\",\n  \"userId\": 0,\n  \"entityId\": \"56\",\n  \"createdAt\": \"2025-12-28T18:18:15.541Z\",\n  \"updatedAt\": \"2025-12-28T18:18:15.541Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T18:18:16Z",
+          "updated_at": "2025-12-28T18:18:16Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/272#issuecomment-3694936810"
+        }
+      ]
+    },
+    {
+      "number": 271,
+      "title": "[Soul Weapon Grid] soul-weapon-55",
+      "body": "Storage for soul-weapon grid submissions: 55",
+      "state": "open",
+      "labels": [
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "weapon-id:55",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "soul-weapon-grids",
+          "color": "db8c1d",
+          "description": "Soul weapon engraving grid submissions (managed by bot)"
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T18:17:56Z",
+      "updated_at": "2025-12-28T18:17:56Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/271",
+      "comments": [
+        {
+          "id": 3694936603,
+          "body": "{\n  \"weaponId\": \"55\",\n  \"weaponName\": \"Expectation\",\n  \"gridType\": \"5x5\",\n  \"completionEffect\": {\n    \"atk\": 47.1,\n    \"hp\": 201.2\n  },\n  \"activeSlots\": [\n    {\n      \"row\": 0,\n      \"col\": 0\n    },\n    {\n      \"row\": 0,\n      \"col\": 1\n    },\n    {\n      \"row\": 0,\n      \"col\": 2\n    },\n    {\n      \"row\": 0,\n      \"col\": 3\n    },\n    {\n      \"row\": 0,\n      \"col\": 4\n    },\n    {\n      \"row\": 1,\n      \"col\": 0\n    },\n    {\n      \"row\": 1,\n      \"col\": 4\n    },\n    {\n      \"row\": 2,\n      \"col\": 0\n    },\n    {\n      \"row\": 2,\n      \"col\": 1\n    },\n    {\n      \"row\": 2,\n      \"col\": 2\n    },\n    {\n      \"row\": 2,\n      \"col\": 3\n    },\n    {\n      \"row\": 2,\n      \"col\": 4\n    },\n    {\n      \"row\": 3,\n      \"col\": 1\n    },\n    {\n      \"row\": 3,\n      \"col\": 2\n    },\n    {\n      \"row\": 3,\n      \"col\": 3\n    },\n    {\n      \"row\": 4,\n      \"col\": 2\n    }\n  ],\n  \"totalActiveSlots\": 16,\n  \"id\": \"grid-1766945874695-8al38pk5y\",\n  \"submittedBy\": \"BenDol\",\n  \"submittedAt\": \"2025-12-28T18:17:54.695Z\",\n  \"username\": \"BenDol\",\n  \"userId\": 0,\n  \"entityId\": \"55\",\n  \"createdAt\": \"2025-12-28T18:17:55.211Z\",\n  \"updatedAt\": \"2025-12-28T18:17:55.211Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T18:17:56Z",
+          "updated_at": "2025-12-28T18:17:56Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/271#issuecomment-3694936603"
+        }
+      ]
+    },
+    {
+      "number": 270,
+      "title": "[Soul Weapon Grid] soul-weapon-57",
+      "body": "Storage for soul-weapon grid submissions: 57",
+      "state": "open",
+      "labels": [
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        },
+        {
+          "name": "soul-weapon-grids",
+          "color": "db8c1d",
+          "description": "Soul weapon engraving grid submissions (managed by bot)"
+        },
+        {
+          "name": "weapon-id:57",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-28T18:17:23Z",
+      "updated_at": "2025-12-28T18:17:24Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/270",
+      "comments": [
+        {
+          "id": 3694936310,
+          "body": "{\n  \"weaponId\": \"57\",\n  \"weaponName\": \"Deviation\",\n  \"gridType\": \"5x5\",\n  \"completionEffect\": {\n    \"atk\": 48,\n    \"hp\": 210.3\n  },\n  \"activeSlots\": [\n    {\n      \"row\": 0,\n      \"col\": 0\n    },\n    {\n      \"row\": 0,\n      \"col\": 1\n    },\n    {\n      \"row\": 0,\n      \"col\": 2\n    },\n    {\n      \"row\": 0,\n      \"col\": 3\n    },\n    {\n      \"row\": 0,\n      \"col\": 4\n    },\n    {\n      \"row\": 1,\n      \"col\": 0\n    },\n    {\n      \"row\": 1,\n      \"col\": 1\n    },\n    {\n      \"row\": 1,\n      \"col\": 2\n    },\n    {\n      \"row\": 1,\n      \"col\": 3\n    },\n    {\n      \"row\": 1,\n      \"col\": 4\n    },\n    {\n      \"row\": 2,\n      \"col\": 0\n    },\n    {\n      \"row\": 2,\n      \"col\": 2\n    },\n    {\n      \"row\": 2,\n      \"col\": 3\n    },\n    {\n      \"row\": 2,\n      \"col\": 4\n    },\n    {\n      \"row\": 3,\n      \"col\": 0\n    },\n    {\n      \"row\": 3,\n      \"col\": 3\n    }\n  ],\n  \"totalActiveSlots\": 16,\n  \"id\": \"grid-1766945842124-ahzgo9sat\",\n  \"submittedBy\": \"BenDol\",\n  \"submittedAt\": \"2025-12-28T18:17:22.124Z\",\n  \"username\": \"BenDol\",\n  \"userId\": 0,\n  \"entityId\": \"57\",\n  \"createdAt\": \"2025-12-28T18:17:22.667Z\",\n  \"updatedAt\": \"2025-12-28T18:17:22.667Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-28T18:17:24Z",
+          "updated_at": "2025-12-28T18:17:24Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/270#issuecomment-3694936310"
+        }
+      ]
+    },
+    {
+      "number": 269,
+      "title": "[My Spirits] BenDol",
+      "body": "[\n  {\n    \"spiritId\": 3,\n    \"level\": 1,\n    \"awakeningLevel\": 0,\n    \"evolutionLevel\": 4,\n    \"skillEnhancementLevel\": 0,\n    \"id\": \"my-spirits-1766865269639-3u0cdcajb\",\n    \"createdAt\": \"2025-12-27T19:54:29.639Z\",\n    \"updatedAt\": \"2025-12-27T19:54:29.893Z\"\n  },\n  {\n    \"spiritId\": 1,\n    \"level\": 1,\n    \"awakeningLevel\": 0,\n    \"evolutionLevel\": 4,\n    \"skillEnhancementLevel\": 0,\n    \"id\": \"my-spirits-1766865272598-zrxk1dw8k\",\n    \"createdAt\": \"2025-12-27T19:54:32.598Z\",\n    \"updatedAt\": \"2025-12-27T19:54:32.853Z\"\n  },\n  {\n    \"spiritId\": 4,\n    \"level\": 1,\n    \"awakeningLevel\": 0,\n    \"evolutionLevel\": 4,\n    \"skillEnhancementLevel\": 0,\n    \"id\": \"my-spirits-1766865275251-zivbvyxxw\",\n    \"createdAt\": \"2025-12-27T19:54:35.251Z\",\n    \"updatedAt\": \"2025-12-27T19:54:35.425Z\"\n  }\n]",
+      "state": "open",
+      "labels": [
+        {
+          "name": "user-id:1935706",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "my-spirits",
+          "color": "9f1ddb",
+          "description": "User spirit collection storage (managed by bot)"
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T19:54:31Z",
+      "updated_at": "2025-12-27T19:54:37Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/269",
+      "comments": []
+    },
+    {
+      "number": 267,
+      "title": "[Ban List]",
+      "body": "🚫 **Banned Users**\n\nThis issue stores the list of users who are banned from commenting and contributing to the wiki.\n\n**Banned Users:**\n```json\n[]\n```\n\n---\n\n⚠️ **This issue is managed by the wiki bot.** Repository owner and admins can manage the ban list via the Admin Panel.\n\n🤖 *This issue is managed by the wiki bot.*",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "branch:main",
+          "color": "0e8a16",
+          "description": "Items for main branch namespace"
+        },
+        {
+          "name": "wiki-ban-list",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T18:58:01Z",
+      "updated_at": "2025-12-31T00:36:27Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/267",
+      "comments": []
+    },
+    {
+      "number": 266,
+      "title": "[Battle Loadout] BenDol",
+      "body": "[\n  {\n    \"name\": \"Dimensional Rift\",\n    \"skillBuildId\": \"skill-builds-1766821946497-o0rgoqe45\",\n    \"spiritBuildId\": \"spirit-builds-1766823297154-7nqpu1eun\",\n    \"soulWeaponBuild\": {\n      \"weaponId\": 36,\n      \"weaponName\": \"Vision\",\n      \"gridState\": [\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          }\n        ]\n      ],\n      \"inventory\": [\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        }\n      ]\n    },\n    \"skillStoneBuild\": {\n      \"name\": \"\",\n      \"slots\": [\n        {\n          \"type\": \"cooldown\",\n          \"element\": \"fire\",\n          \"tier\": \"A\"\n        },\n        {\n          \"type\": \"time\",\n          \"element\": \"wind\",\n          \"tier\": \"A\"\n        },\n        {\n          \"type\": \"heat\",\n          \"element\": \"earth\",\n          \"tier\": \"B\"\n        }\n      ]\n    },\n    \"spirit\": null,\n    \"skillStone\": null,\n    \"promotionAbility\": null,\n    \"familiar\": null,\n    \"id\": \"battle-loadouts-1766399063157-yzovrzleg\",\n    \"createdAt\": \"2025-12-30T01:50:08.439Z\",\n    \"updatedAt\": \"2025-12-30T01:50:29.196Z\"\n  },\n  {\n    \"name\": \"Dimensional Rift1\",\n    \"skillBuildId\": \"skill-builds-1766821946497-o0rgoqe45\",\n    \"spiritBuildId\": \"spirit-builds-1766823297154-7nqpu1eun\",\n    \"soulWeaponBuild\": {\n      \"weaponId\": 36,\n      \"weaponName\": \"Vision\",\n      \"gridState\": [\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 0,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 0\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 0,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 1\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 90,\n              \"anchorRow\": 2,\n              \"anchorCol\": 2,\n              \"inventoryIndex\": 2\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          }\n        ],\n        [\n          {\n            \"active\": false,\n            \"piece\": null\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": true,\n            \"piece\": {\n              \"shapeId\": 1,\n              \"rarity\": 5,\n              \"level\": 50,\n              \"rotation\": 270,\n              \"anchorRow\": 3,\n              \"anchorCol\": 1,\n              \"inventoryIndex\": 3\n            }\n          },\n          {\n            \"active\": false,\n            \"piece\": null\n          }\n        ]\n      ],\n      \"inventory\": [\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 1,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        },\n        {\n          \"shapeId\": 5,\n          \"rarity\": 5,\n          \"level\": 50\n        }\n      ]\n    },\n    \"skillStoneBuild\": {\n      \"name\": \"\",\n      \"slots\": [\n        {\n          \"type\": \"cooldown\",\n          \"element\": \"fire\",\n          \"tier\": \"A\"\n        },\n        {\n          \"type\": \"time\",\n          \"element\": \"wind\",\n          \"tier\": \"A\"\n        },\n        {\n          \"type\": \"heat\",\n          \"element\": \"earth\",\n          \"tier\": \"B\"\n        }\n      ]\n    },\n    \"spirit\": null,\n    \"skillStone\": null,\n    \"promotionAbility\": null,\n    \"familiar\": null,\n    \"id\": \"battle-loadouts-1767094537289-s3f3z1t53\",\n    \"createdAt\": \"2025-12-30T11:35:37.289Z\",\n    \"updatedAt\": \"2025-12-30T11:35:37.457Z\"\n  }\n]",
+      "state": "open",
+      "labels": [
+        {
+          "name": "user-id:1935706",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "battle-loadouts",
+          "color": "1d76db",
+          "description": "User battle loadout storage (managed by bot)"
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T08:14:59Z",
+      "updated_at": "2025-12-30T11:35:38Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/266",
+      "comments": []
+    },
+    {
+      "number": 265,
+      "title": "[Spirit Build] BenDol",
+      "body": "[\n  {\n    \"slots\": [\n      {\n        \"type\": \"collection\",\n        \"mySpiritId\": \"my-spirits-1766865272598-zrxk1dw8k\"\n      },\n      {\n        \"type\": \"collection\",\n        \"mySpiritId\": \"my-spirits-1766865269639-3u0cdcajb\"\n      },\n      {\n        \"type\": \"collection\",\n        \"mySpiritId\": \"my-spirits-1766865275251-zivbvyxxw\"\n      }\n    ],\n    \"name\": \"Test\",\n    \"id\": \"spirit-builds-1766823297154-7nqpu1eun\",\n    \"createdAt\": \"2025-12-27T19:54:21.580Z\",\n    \"updatedAt\": \"2025-12-30T11:36:14.066Z\"\n  }\n]",
+      "state": "open",
+      "labels": [
+        {
+          "name": "user-id:1935706",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "spirit-builds",
+          "color": "db1d7a",
+          "description": "User spirit build storage (managed by bot)"
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T08:14:57Z",
+      "updated_at": "2025-12-30T11:36:14Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/265",
+      "comments": []
+    },
+    {
+      "number": 264,
+      "title": "[Achievements] thatoneguy9012",
+      "body": "{\n  \"userId\": 205460656,\n  \"username\": \"thatoneguy9012\",\n  \"lastUpdated\": \"2025-12-27T07:52:54.825Z\",\n  \"achievements\": [\n    {\n      \"id\": \"first-login\",\n      \"unlockedAt\": \"2025-12-27T07:52:51.009Z\",\n      \"progress\": 100\n    }\n  ],\n  \"version\": \"1.0\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "achievements",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "user-id:205460656",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T07:52:55Z",
+      "updated_at": "2025-12-27T07:52:55Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/264",
+      "comments": []
+    },
+    {
+      "number": 263,
+      "title": "[Skill Build] BenDol",
+      "body": "[\n  {\n    \"name\": \"Test\",\n    \"maxSlots\": 10,\n    \"slots\": [\n      {\n        \"skillId\": 3,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 2,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 1,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 4,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 6,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 5,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 10,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 8,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 9,\n        \"level\": 1\n      },\n      {\n        \"skillId\": 13,\n        \"level\": 1\n      }\n    ],\n    \"id\": \"skill-builds-1766821946497-o0rgoqe45\",\n    \"createdAt\": \"2025-12-27T07:52:26.497Z\",\n    \"updatedAt\": \"2025-12-27T07:52:26.833Z\"\n  }\n]",
+      "state": "open",
+      "labels": [
+        {
+          "name": "user-id:1935706",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "skill-builds",
+          "color": "0e8a16",
+          "description": "User skill build storage (managed by bot)"
+        },
+        {
+          "name": "data-version:v1",
+          "color": "5319e7",
+          "description": "Data model version 1 (storage versioning)"
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T07:52:27Z",
+      "updated_at": "2025-12-30T12:10:54Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/263",
+      "comments": []
+    },
+    {
+      "number": 262,
+      "title": "[Achievements] BenDol",
+      "body": "{\n  \"userId\": 1935706,\n  \"username\": \"BenDol\",\n  \"lastUpdated\": \"2025-12-30T09:02:17.972Z\",\n  \"achievements\": [\n    {\n      \"id\": \"first-login\",\n      \"unlockedAt\": \"2025-12-27T07:44:44.657Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-pr\",\n      \"unlockedAt\": \"2025-12-27T07:44:44.657Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-merge\",\n      \"unlockedAt\": \"2025-12-27T07:44:44.657Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-edit\",\n      \"unlockedAt\": \"2025-12-27T07:44:44.657Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"night-owl\",\n      \"unlockedAt\": \"2025-12-27T07:44:46.454Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"early-adopter\",\n      \"unlockedAt\": \"2025-12-27T19:16:00.351Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-build\",\n      \"unlockedAt\": \"2025-12-27T19:16:00.535Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"first-loadout\",\n      \"unlockedAt\": \"2025-12-27T19:16:01.148Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"lines-apprentice\",\n      \"unlockedAt\": \"2025-12-30T09:02:15.776Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"lines-journeyman\",\n      \"unlockedAt\": \"2025-12-30T09:02:15.776Z\",\n      \"progress\": 100\n    },\n    {\n      \"id\": \"files-novice\",\n      \"unlockedAt\": \"2025-12-30T09:02:15.776Z\",\n      \"progress\": 100\n    }\n  ],\n  \"version\": \"1.0\"\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "user-id:1935706",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "achievements",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T07:44:46Z",
+      "updated_at": "2025-12-30T09:02:18Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/262",
+      "comments": []
+    },
+    {
+      "number": 261,
+      "title": "[User Index]",
+      "body": "# User Index\n\n[1f93ec4aca5ecab2de1b057214256b9c519e6feb3c6e1af0f1fdcf3b51369014]=3693806398\n[2ada490188f99200b49d1b00786b704673b9f7529615fb3dd5632f50ed9e57a3]=3697585138\n",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "user-index",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T07:44:44Z",
+      "updated_at": "2025-12-29T21:30:51Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/261",
+      "comments": [
+        {
+          "id": 3693806398,
+          "body": "{\n  \"emailHash\": \"1f93ec4aca5ecab2de1b057214256b9c519e6feb3c6e1af0f1fdcf3b51369014\",\n  \"userId\": 1935706,\n  \"username\": \"BenDol\",\n  \"linkedAt\": \"2025-12-27T07:44:44.231Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-27T07:44:44Z",
+          "updated_at": "2025-12-27T07:44:44Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/261#issuecomment-3693806398"
+        },
+        {
+          "id": 3697585138,
+          "body": "{\n  \"emailHash\": \"2ada490188f99200b49d1b00786b704673b9f7529615fb3dd5632f50ed9e57a3\",\n  \"userId\": 249419067,\n  \"username\": \"bonfyrenz\",\n  \"linkedAt\": \"2025-12-29T21:30:49.383Z\"\n}",
+          "user": {
+            "login": "slayer-wiki-bot",
+            "id": 249643268
+          },
+          "created_at": "2025-12-29T21:30:51Z",
+          "updated_at": "2025-12-29T21:30:51Z",
+          "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/261#issuecomment-3697585138"
+        }
+      ]
+    },
+    {
+      "number": 260,
+      "title": "[Content Creator Index]",
+      "body": "# Content Creator Index\n\n## Approved Creators\n\n## Pending Approvals\n\n---\n\n🤖 Managed by wiki bot",
+      "state": "open",
+      "labels": [
+        {
+          "name": "content-creator-index",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "slayer-wiki-bot",
+        "id": 249643268,
+        "type": "User"
+      },
+      "created_at": "2025-12-27T07:11:26Z",
+      "updated_at": "2025-12-27T07:11:27Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/260",
+      "comments": []
+    },
+    {
+      "number": 259,
+      "title": "[User Snapshot] BenDol",
+      "body": "{\n  \"userId\": 1935706,\n  \"username\": \"BenDol\",\n  \"lastUpdated\": \"2026-01-01T05:02:01.271Z\",\n  \"stats\": {\n    \"totalPRs\": 1,\n    \"openPRs\": 0,\n    \"mergedPRs\": 1,\n    \"closedPRs\": 0,\n    \"totalAdditions\": 1301,\n    \"totalDeletions\": 309,\n    \"totalFiles\": 20,\n    \"mostRecentEdit\": \"2025-12-30T06:12:55.000Z\"\n  },\n  \"pullRequests\": [\n    {\n      \"number\": 296,\n      \"title\": \"WIP\",\n      \"state\": \"closed\",\n      \"created_at\": \"2025-12-30T06:12:55Z\",\n      \"updated_at\": \"2025-12-30T08:58:11Z\",\n      \"merged_at\": \"2025-12-30T08:58:11Z\",\n      \"closed_at\": \"2025-12-30T08:58:11Z\",\n      \"additions\": 1301,\n      \"deletions\": 309,\n      \"changed_files\": 20,\n      \"html_url\": \"https://github.com/BenDol/SlayerLegendWiki/pull/296\",\n      \"user\": {\n        \"login\": \"BenDol\",\n        \"id\": 1935706,\n        \"avatar_url\": \"https://avatars.githubusercontent.com/u/1935706?v=4\",\n        \"html_url\": \"https://github.com/BenDol\"\n      },\n      \"labels\": []\n    }\n  ],\n  \"pullRequestsCount\": 1,\n  \"pullRequestsStored\": 1,\n  \"pullRequestsTruncated\": false,\n  \"user\": {\n    \"id\": 1935706,\n    \"login\": \"BenDol\",\n    \"name\": \"Ben Dol\",\n    \"avatar_url\": \"https://avatars.githubusercontent.com/u/1935706?v=4\",\n    \"bio\": null\n  }\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        },
+        {
+          "name": "user-snapshot",
+          "color": "5319e7",
+          "description": "User profile snapshot data (managed by bot)"
+        },
+        {
+          "name": "user-id:1935706",
+          "color": "ededed",
+          "description": ""
+        }
+      ],
+      "user": {
+        "login": "github-actions[bot]",
+        "id": 41898282,
+        "type": "Bot"
+      },
+      "created_at": "2025-12-27T05:25:10Z",
+      "updated_at": "2026-01-01T05:02:01Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/259",
+      "comments": []
+    },
+    {
+      "number": 258,
+      "title": "[Cache] Contributor Highscore",
+      "body": "{\n  \"lastUpdated\": \"2026-01-01T02:50:24.111Z\",\n  \"categories\": {\n    \"allTime\": {\n      \"contributors\": [\n        {\n          \"userId\": 1935706,\n          \"login\": \"BenDol\",\n          \"avatarUrl\": \"https://avatars.githubusercontent.com/u/1935706?v=4\",\n          \"contributions\": 84,\n          \"additions\": 126,\n          \"deletions\": 68,\n          \"profileUrl\": \"https://github.com/BenDol\",\n          \"prestige\": 0,\n          \"type\": \"User\",\n          \"score\": 8405,\n          \"displayName\": \"Bonfyre\"\n        },\n        {\n          \"userId\": 251925542,\n          \"login\": \"andyluc\",\n          \"avatarUrl\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n          \"contributions\": 31,\n          \"additions\": 305,\n          \"deletions\": 188,\n          \"profileUrl\": \"https://github.com/andyluc\",\n          \"prestige\": 0,\n          \"type\": \"User\",\n          \"score\": 3132,\n          \"displayName\": \"Andy\"\n        }\n      ]\n    },\n    \"thisMonth\": {\n      \"startDate\": \"2025-12-02T02:50:24.111Z\",\n      \"endDate\": \"2026-01-01T02:50:24.111Z\",\n      \"contributors\": [\n        {\n          \"userId\": 1935706,\n          \"login\": \"BenDol\",\n          \"avatarUrl\": \"https://avatars.githubusercontent.com/u/1935706?v=4\",\n          \"contributions\": 84,\n          \"additions\": 126,\n          \"deletions\": 68,\n          \"profileUrl\": \"https://github.com/BenDol\",\n          \"prestige\": 0,\n          \"type\": \"User\",\n          \"score\": 8405,\n          \"displayName\": \"Bonfyre\"\n        },\n        {\n          \"userId\": 251925542,\n          \"login\": \"andyluc\",\n          \"avatarUrl\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n          \"contributions\": 31,\n          \"additions\": 305,\n          \"deletions\": 188,\n          \"profileUrl\": \"https://github.com/andyluc\",\n          \"prestige\": 0,\n          \"type\": \"User\",\n          \"score\": 3132,\n          \"displayName\": \"Andy\"\n        }\n      ]\n    },\n    \"thisWeek\": {\n      \"startDate\": \"2025-12-25T02:50:24.111Z\",\n      \"endDate\": \"2026-01-01T02:50:24.111Z\",\n      \"contributors\": [\n        {\n          \"userId\": 1935706,\n          \"login\": \"BenDol\",\n          \"avatarUrl\": \"https://avatars.githubusercontent.com/u/1935706?v=4\",\n          \"contributions\": 84,\n          \"additions\": 126,\n          \"deletions\": 68,\n          \"profileUrl\": \"https://github.com/BenDol\",\n          \"prestige\": 0,\n          \"type\": \"User\",\n          \"score\": 8405,\n          \"displayName\": \"Bonfyre\"\n        },\n        {\n          \"userId\": 251925542,\n          \"login\": \"andyluc\",\n          \"avatarUrl\": \"https://avatars.githubusercontent.com/u/251925542?v=4\",\n          \"contributions\": 31,\n          \"additions\": 305,\n          \"deletions\": 188,\n          \"profileUrl\": \"https://github.com/andyluc\",\n          \"prestige\": 0,\n          \"type\": \"User\",\n          \"score\": 3132,\n          \"displayName\": \"Andy\"\n        }\n      ]\n    }\n  }\n}",
+      "state": "open",
+      "labels": [
+        {
+          "name": "highscore-cache",
+          "color": "ededed",
+          "description": ""
+        },
+        {
+          "name": "automated",
+          "color": "e99695",
+          "description": "Created and managed by automation"
+        }
+      ],
+      "user": {
+        "login": "github-actions[bot]",
+        "id": 41898282,
+        "type": "Bot"
+      },
+      "created_at": "2025-12-27T05:12:17Z",
+      "updated_at": "2026-01-01T02:50:45Z",
+      "html_url": "https://github.com/BenDol/SlayerLegendWiki/issues/258",
+      "comments": []
+    }
+  ]
+}

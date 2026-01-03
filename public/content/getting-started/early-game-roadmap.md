@@ -1,13 +1,16 @@
 ---
 id: early-game-roadmap
-title: ''
-description: ''
-tags: []
-category: ''
-date: ''
-order: 0
+title: Early Game Roadmap
+description: Step-by-step guide for your first days in Slayer Legend, covering essential progression milestones and strategies
+tags:
+  - beginner
+  - roadmap
+  - progression
+  - guide
+category: Getting Started
+date: 2025-12-22
 ---
 # Early Roadmap
-Stages 1-35: Get companions. 35-100: Memory Tree, promotions.
 
-asdasd
+{{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->
+

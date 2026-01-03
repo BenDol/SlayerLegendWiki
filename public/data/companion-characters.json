@@ -1,0 +1,418 @@
+[
+  {
+    "id": 1,
+    "name": "Ellie",
+    "type": "Elf 000",
+    "element": "Wind",
+    "description": "Wind element companion",
+    "dataSource": "Player-contributed (Master Optimizer)",
+    "skills": [
+      {
+        "name": "Intensive Fire",
+        "maxLevel": 100,
+        "effect": "Accuracy",
+        "value": "+0",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Blessing of Forest",
+        "maxLevel": 100,
+        "effect": "Extra ATK",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Song of Elf",
+        "maxLevel": 100,
+        "effect": "Reduce Enemy HP",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Green Soul Weapon Completion Effect",
+        "maxLevel": 100,
+        "effect": "Green Soul Weapon Completion Effect",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      },
+      {
+        "name": "Destructionist DMG",
+        "maxLevel": 100,
+        "effect": "Destructionist DMG",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      },
+      {
+        "name": "Wind Spirit Stats",
+        "maxLevel": 100,
+        "effect": "Wind Spirit Stats",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      }
+    ],
+    "passives": [
+      {
+        "name": "Wind's Understanding",
+        "costType": "Stone and Emerald",
+        "maxLevel": 1500,
+        "stoneCost": "11,796,000",
+        "emeraldCost": "1,990,575"
+      }
+    ],
+    "promotionOptions": [
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": true
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Zeke",
+    "type": "Tramp Swordsman 000",
+    "element": "Earth",
+    "description": "Earth element companion",
+    "dataSource": "Player-contributed (Master Optimizer)",
+    "skills": [
+      {
+        "name": "Fortitude",
+        "maxLevel": 100,
+        "effect": "HP Increase",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Lunatic",
+        "maxLevel": 100,
+        "effect": "CRIT Dmg",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Blade Dance",
+        "maxLevel": 100,
+        "effect": "ATK Sum",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Chaos Soul",
+        "maxLevel": 100,
+        "effect": "Chaos Soul",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      },
+      {
+        "name": "Rift Demon DMG Reduction",
+        "maxLevel": 100,
+        "effect": "Rift Demon DMG Reduction",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      },
+      {
+        "name": "Earth Spirit Stats",
+        "maxLevel": 100,
+        "effect": "Earth Spirit Stats",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      }
+    ],
+    "passives": [
+      {
+        "name": "Earth Ineraction",
+        "costType": "Stone and Emerald",
+        "maxLevel": 1500,
+        "stoneCost": "745,000",
+        "emeraldCost": "126,650"
+      }
+    ],
+    "promotionOptions": [
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": true
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Miho",
+    "type": "Looter 000",
+    "element": "Fire",
+    "description": "Fire element companion",
+    "dataSource": "Player-contributed (Master Optimizer)",
+    "skills": [
+      {
+        "name": "Shadow Step",
+        "maxLevel": 100,
+        "effect": "Dmg Resist",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Shadow Dance",
+        "maxLevel": 100,
+        "effect": "Dodge",
+        "value": "+0",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Gold Rush",
+        "maxLevel": 100,
+        "effect": "Total Gold",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Red Soul Weapon Completion Effect",
+        "maxLevel": 100,
+        "effect": "Red Soul Weapon Completion Effect",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      },
+      {
+        "name": "Devournist DMG",
+        "maxLevel": 100,
+        "effect": "Devournist DMG",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      },
+      {
+        "name": "Fire Spirit Stats",
+        "maxLevel": 100,
+        "effect": "Fire Spirit Stats",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      }
+    ],
+    "passives": [
+      {
+        "name": "Fire Understanding",
+        "costType": "Stone and Emerald",
+        "maxLevel": 1500,
+        "stoneCost": "11,796,000",
+        "emeraldCost": "1,990,575"
+      }
+    ],
+    "promotionOptions": [
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": true
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Luna",
+    "type": "Trainee Magician 000",
+    "element": "Water",
+    "description": "Water element companion",
+    "dataSource": "Player-contributed (Master Optimizer)",
+    "skills": [
+      {
+        "name": "Mana Dope",
+        "maxLevel": 100,
+        "effect": "Mana Recovery",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Mana Amplification",
+        "maxLevel": 100,
+        "effect": "Extra Mana",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Wisdom of War",
+        "maxLevel": 100,
+        "effect": "Skill Dmg",
+        "value": "+0%",
+        "type": "active",
+        "unlocked": true
+      },
+      {
+        "name": "Blue Soul Weapon Completion Effect",
+        "maxLevel": 100,
+        "effect": "Blue Soul Weapon Completion Effect",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      },
+      {
+        "name": "Origin of Chaos DMG",
+        "maxLevel": 100,
+        "effect": "Origin of Chaos DMG",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      },
+      {
+        "name": "Water Spirit Stats",
+        "maxLevel": 100,
+        "effect": "Water Spirit Stats",
+        "value": "+0%",
+        "type": "locked",
+        "unlocked": false
+      }
+    ],
+    "passives": [
+      {
+        "name": "Sea's Understanding",
+        "costType": "Stone and Emerald",
+        "maxLevel": 1500,
+        "stoneCost": "11,796,000",
+        "emeraldCost": "1,990,575"
+      }
+    ],
+    "promotionOptions": [
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": true
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      },
+      {
+        "name": "Extra ATK",
+        "value": "20%",
+        "unlocked": false
+      }
+    ]
+  }
+]

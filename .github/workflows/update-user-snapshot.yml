@@ -1,0 +1,627 @@
+name: Update User Profile Snapshot
+
+# This workflow automatically updates a user's profile snapshot when their PR is merged.
+# Snapshots store comprehensive profile data (stats, PRs, user info) in GitHub issues.
+# This allows viewing detailed profiles for all users, not just those with recent PRs.
+#
+# The snapshots are stored in GitHub issues with the label "user-snapshot"
+# and title "[User Snapshot] username"
+#
+# IMPORTANT: PRs from forked repositories cannot create snapshots automatically due to
+# GitHub security restrictions (GITHUB_TOKEN has read-only access for forks).
+# To create snapshots for fork contributors, manually trigger this workflow with
+# "refresh_all" or "force_reload_all" mode from the Actions tab.
+#
+# Triggers:
+# - When a PR is closed (merged) - only for PRs from the main repo
+# - When code is pushed directly to main branch (for direct commits)
+# - Manually via GitHub UI (Actions tab) - works for all users
+on:
+  pull_request:
+    types: [closed]
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Update mode'
+        required: true
+        type: choice
+        options:
+          - single
+          - refresh_all
+          - force_reload_all
+        default: single
+      username:
+        description: 'GitHub username (for single mode only)'
+        required: false
+        type: string
+
+jobs:
+  update-snapshot:
+    # Only run if:
+    # - PR was merged (not just closed)
+    # - Direct push to main
+    # - Manually triggered
+    if: |
+      github.event.pull_request.merged == true ||
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write  # Need write permission to create/update snapshot issues
+      pull-requests: read  # Need read permission to fetch PR data
+
+    env:
+      WIKI_BOT_USERNAME: slayer-wiki-bot  # Bot service account username (anonymous contributions)
+      VITE_RELEASE_DATE: ${{ vars.VITE_RELEASE_DATE }}  # Release date for filtering PRs (optional)
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if PR is from fork
+        id: check-fork
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.fork }}" == "true" ]; then
+            echo "is_fork=true" >> $GITHUB_OUTPUT
+            echo "⚠️ PR is from a fork - snapshot will not be created due to GitHub security restrictions"
+          else
+            echo "is_fork=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update user snapshot
+        # Skip for PRs from forks (token doesn't have write access)
+        if: steps.check-fork.outputs.is_fork != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const SNAPSHOT_LABEL = 'user-snapshot';
+            const SNAPSHOT_TITLE_PREFIX = '[User Snapshot]';
+            const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
+
+            // Read release date from environment variable
+            let releaseDate = null; // null = no filtering
+            const releaseDateStr = process.env.VITE_RELEASE_DATE;
+            if (releaseDateStr && releaseDateStr.trim() !== '') {
+              releaseDate = new Date(releaseDateStr);
+              if (isNaN(releaseDate.getTime())) {
+                console.warn('⚠️ Invalid VITE_RELEASE_DATE format:', releaseDateStr);
+                releaseDate = null;
+              } else {
+                console.log(`📅 Release date configured: ${releaseDate.toISOString()}`);
+                console.log(`   Only PRs after this date will be included in snapshots`);
+              }
+            }
+
+            /**
+             * Filter PRs by release date
+             * @param {Array} prs - Array of PRs to filter
+             * @returns {Array} Filtered PRs after release date
+             */
+            function filterByReleaseDate(prs) {
+              if (!releaseDate) return prs;
+
+              const beforeCount = prs.length;
+              const filtered = prs.filter(pr => {
+                const prDate = new Date(pr.created_at);
+                return prDate >= releaseDate;
+              });
+
+              const filteredCount = beforeCount - filtered.length;
+              if (filteredCount > 0) {
+                console.log(`   📅 Filtered out ${filteredCount} PR(s) created before release date`);
+              }
+
+              return filtered;
+            }
+
+            // Determine mode
+            const mode = context.payload.inputs?.mode || 'single';
+
+            // Get username from different event types
+            let inputUsername;
+            if (context.payload.inputs?.username) {
+              // Manual workflow trigger with username
+              inputUsername = context.payload.inputs.username;
+            } else if (context.payload.pull_request?.user?.login) {
+              // Pull request merge
+              inputUsername = context.payload.pull_request.user.login;
+            } else if (context.eventName === 'push') {
+              // Direct push to main - use the pusher's GitHub username
+              inputUsername = context.payload.pusher?.name || context.actor;
+              console.log(`📝 Detected push to main by @${inputUsername}`);
+            }
+
+            console.log(`🚀 Running snapshot update in mode: ${mode}${inputUsername ? ` for @${inputUsername}` : ''}`);
+
+            /**
+             * Build snapshot for a single user
+             */
+            async function buildUserSnapshot(username) {
+              console.log(`\n🔍 Building profile snapshot for @${username}...`);
+
+              // Skip bot account - no snapshots for service accounts
+              if (username === BOT_USERNAME) {
+                console.log(`⏭️  Skipping bot account: ${BOT_USERNAME} (anonymous contributions tracked separately)`);
+                return null;
+              }
+
+              // Fetch user data (this gives us the permanent user ID)
+              const { data: userData } = await github.rest.users.getByUsername({
+                username: username,
+              });
+
+              console.log(`✅ User data fetched: ${userData.name || username} (ID: ${userData.id})`);
+
+              // Fetch all PRs by this user (direct PRs + linked anonymous edits)
+              console.log('🔍 Fetching pull requests...');
+              let allPRs = [];
+              let page = 1;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: 100,
+                  page: page,
+                });
+
+                // Filter PRs by this user (direct PRs + linked anonymous edits)
+                const userPRs = prs.filter(pr => {
+                  // Direct PR from user
+                  const isDirectPR = pr.user.login === username;
+
+                  // Linked anonymous PR (has user-id label)
+                  const isLinkedPR = pr.labels.some(label => {
+                    const labelName = typeof label === 'string' ? label : label.name;
+                    return labelName === `user-id:${userData.id}`;
+                  });
+
+                  return isDirectPR || isLinkedPR;
+                });
+                allPRs.push(...userPRs);
+
+                hasMore = prs.length === 100;
+                page++;
+              }
+
+              console.log(`✅ Found ${allPRs.length} PRs for @${username} (including linked anonymous edits)`);
+
+              // Filter PRs by release date
+              allPRs = filterByReleaseDate(allPRs);
+              console.log(`✅ After release date filter: ${allPRs.length} PRs`);
+
+              // Fetch detailed data for each PR (additions, deletions, changed_files)
+              // For bot-created PRs, we need to get stats from commits, not just PR summary
+              console.log('📊 Fetching detailed PR data (additions, deletions, files)...');
+              const detailedPRs = [];
+
+              for (const pr of allPRs) {
+                try {
+                  const { data: detailedPR } = await github.rest.pulls.get({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pr.number,
+                  });
+
+                  // If additions/deletions are missing or zero (can happen with bot PRs),
+                  // fetch from commits within the PR
+                  if (!detailedPR.additions && !detailedPR.deletions) {
+                    console.log(`   ⚙️ PR #${pr.number} missing stats, fetching from commits...`);
+                    try {
+                      const { data: commits } = await github.rest.pulls.listCommits({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: pr.number,
+                        per_page: 100,
+                      });
+
+                      // Sum up additions/deletions from all commits
+                      let totalAdditions = 0;
+                      let totalDeletions = 0;
+                      let totalFiles = 0;
+
+                      for (const commit of commits) {
+                        // Fetch detailed commit data to get stats
+                        const { data: commitData } = await github.rest.repos.getCommit({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          ref: commit.sha,
+                        });
+
+                        totalAdditions += commitData.stats?.additions || 0;
+                        totalDeletions += commitData.stats?.deletions || 0;
+                        totalFiles += commitData.files?.length || 0;
+                      }
+
+                      // Update PR with calculated stats
+                      detailedPR.additions = totalAdditions;
+                      detailedPR.deletions = totalDeletions;
+                      detailedPR.changed_files = totalFiles;
+
+                      console.log(`   ✅ PR #${pr.number} stats from commits: +${totalAdditions}/-${totalDeletions}, ${totalFiles} files`);
+                    } catch (commitError) {
+                      console.warn(`   ⚠️ Failed to fetch commits for PR #${pr.number}:`, commitError.message);
+                    }
+                  }
+
+                  detailedPRs.push(detailedPR);
+                } catch (error) {
+                  console.warn(`⚠️ Failed to fetch details for PR #${pr.number}:`, error.message);
+                  // Use the basic PR data as fallback (will have 0 for additions/deletions/files)
+                  detailedPRs.push(pr);
+                }
+              }
+
+              console.log(`✅ Fetched detailed data for ${detailedPRs.length} PRs`);
+
+              // Calculate statistics (use detailedPRs which has additions/deletions/files)
+              // ONLY count additions/deletions/files from MERGED PRs (not closed without merging)
+              const mergedPRs = detailedPRs.filter(pr => pr.merged_at || pr.state === 'merged');
+              const stats = {
+                totalPRs: detailedPRs.length,
+                openPRs: detailedPRs.filter(pr => pr.state === 'open').length,
+                mergedPRs: mergedPRs.length,
+                closedPRs: detailedPRs.filter(pr => (pr.state === 'closed' || pr.state === 'merged') && !pr.merged_at).length,
+                totalAdditions: mergedPRs.reduce((sum, pr) => sum + (pr.additions || 0), 0),
+                totalDeletions: mergedPRs.reduce((sum, pr) => sum + (pr.deletions || 0), 0),
+                totalFiles: mergedPRs.reduce((sum, pr) => sum + (pr.changed_files || 0), 0),
+                mostRecentEdit: detailedPRs.length > 0
+                  ? new Date(Math.max(...detailedPRs.map(pr => new Date(pr.created_at).getTime()))).toISOString()
+                  : null,
+              };
+
+              // Build pull requests list (store essential data)
+              // Limit to most recent 100 PRs to stay within GitHub issue size limits (~65KB)
+              const recentPRs = detailedPRs
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 100);
+
+              console.log(`📝 Storing ${recentPRs.length} most recent PRs (out of ${detailedPRs.length} total)`);
+
+              const pullRequests = recentPRs.map(pr => ({
+                number: pr.number,
+                title: pr.title,
+                state: pr.state,
+                created_at: pr.created_at,
+                updated_at: pr.updated_at,
+                merged_at: pr.merged_at,
+                closed_at: pr.closed_at,
+                additions: pr.additions,
+                deletions: pr.deletions,
+                changed_files: pr.changed_files,
+                html_url: pr.html_url,
+                user: {
+                  login: pr.user.login,
+                  id: pr.user.id,
+                  avatar_url: pr.user.avatar_url,
+                  html_url: pr.user.html_url,
+                },
+                labels: pr.labels.map(label => ({
+                  name: label.name,
+                  color: label.color,
+                })),
+              }));
+
+              // Build snapshot object (use user ID as primary identifier)
+              const snapshot = {
+                userId: userData.id, // Permanent identifier (usernames can change!)
+                username: userData.login, // Current username (may change)
+                lastUpdated: new Date().toISOString(),
+                stats: stats,
+                pullRequests: pullRequests,
+                pullRequestsCount: detailedPRs.length,
+                pullRequestsStored: recentPRs.length,
+                pullRequestsTruncated: detailedPRs.length > 100,
+                user: {
+                  id: userData.id, // Store ID here too for easy access
+                  login: userData.login,
+                  name: userData.name,
+                  avatar_url: userData.avatar_url,
+                  bio: userData.bio,
+                },
+              };
+
+              console.log('📊 Snapshot statistics:');
+              console.log(`   Total PRs: ${stats.totalPRs}`);
+              console.log(`   Merged: ${stats.mergedPRs}`);
+              console.log(`   Additions: +${stats.totalAdditions.toLocaleString()}`);
+              console.log(`   Deletions: -${stats.totalDeletions.toLocaleString()}`);
+              console.log(`   Files: ${stats.totalFiles}`);
+
+              return snapshot;
+            }
+
+            /**
+             * Save snapshot to GitHub issue
+             * Uses user ID label for permanent identification (usernames can change)
+             */
+            async function saveSnapshot(snapshot, existingIssue = null) {
+              // Title includes username for human readability, but we use ID label for searching
+              const issueTitle = `${SNAPSHOT_TITLE_PREFIX} ${snapshot.username}`;
+              const issueBody = JSON.stringify(snapshot, null, 2);
+
+              // Use user ID as label for permanent identification
+              const userIdLabel = `user-id:${snapshot.userId}`;
+
+              let issueNumber;
+
+              if (existingIssue) {
+                // Update existing snapshot (update both title and body in case username changed)
+                issueNumber = existingIssue.number;
+                console.log(`📝 Updating existing snapshot issue #${issueNumber}...`);
+
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  title: issueTitle, // Update title to reflect current username
+                  body: issueBody,
+                });
+              } else {
+                // Create new snapshot with user ID label
+                console.log('📝 Creating new snapshot issue...');
+
+                const { data: newIssue } = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: issueTitle,
+                  body: issueBody,
+                  labels: [SNAPSHOT_LABEL, userIdLabel, 'automated'],
+                });
+
+                issueNumber = newIssue.number;
+
+                // Lock the issue to prevent unwanted comments
+                try {
+                  await github.rest.issues.lock({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    lock_reason: 'off-topic'
+                  });
+                  console.log(`🔒 Locked snapshot issue for @${snapshot.username} to collaborators only`);
+                } catch (lockError) {
+                  console.warn('⚠️ Failed to lock issue:', lockError.message);
+                }
+              }
+
+              console.log(`✅ Snapshot saved successfully!`);
+              console.log(`   User: @${snapshot.username} (ID: ${snapshot.userId})`);
+              console.log(`   Issue: #${issueNumber}`);
+              console.log(`   Last Updated: ${snapshot.lastUpdated}`);
+
+              return issueNumber;
+            }
+
+            /**
+             * Get all existing snapshot issues
+             * Returns a Map keyed by user ID (permanent identifier)
+             */
+            async function getExistingSnapshots() {
+              console.log('🔍 Fetching existing snapshots...');
+              const snapshots = new Map();
+
+              let page = 1;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: issues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: SNAPSHOT_LABEL,
+                  state: 'open',
+                  per_page: 100,
+                  page: page,
+                });
+
+                for (const issue of issues) {
+                  // Extract user ID from label "user-id:12345"
+                  const userIdLabel = issue.labels.find(label =>
+                    typeof label === 'string' ? label.startsWith('user-id:') : label.name?.startsWith('user-id:')
+                  );
+
+                  if (userIdLabel) {
+                    const labelName = typeof userIdLabel === 'string' ? userIdLabel : userIdLabel.name;
+                    const userId = labelName.replace('user-id:', '');
+                    snapshots.set(userId, issue);
+                  } else {
+                    // Legacy snapshot without user ID label - parse from title for backwards compatibility
+                    const match = issue.title.match(/\[User Snapshot\]\s+(.+)/);
+                    if (match) {
+                      // Store by username for legacy snapshots (will be migrated on next update)
+                      snapshots.set(`legacy:${match[1]}`, issue);
+                    }
+                  }
+                }
+
+                hasMore = issues.length === 100;
+                page++;
+              }
+
+              console.log(`✅ Found ${snapshots.size} existing snapshots`);
+              return snapshots;
+            }
+
+            /**
+             * Get all unique contributors (PR authors)
+             * Returns array of contributor objects with {login, id}
+             */
+            async function getAllContributors() {
+              console.log('🔍 Fetching all contributors...');
+              const contributorsMap = new Map(); // Use map to dedupe by user ID
+
+              let page = 1;
+              let hasMore = true;
+
+              while (hasMore) {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: 100,
+                  page: page,
+                });
+
+                // Filter PRs by release date before collecting contributors
+                const filteredPRs = filterByReleaseDate(prs);
+
+                for (const pr of filteredPRs) {
+                  if (pr.user && pr.user.login && pr.user.id) {
+                    // Skip bot account - no snapshots for service accounts
+                    if (pr.user.login === BOT_USERNAME) {
+                      continue;
+                    }
+
+                    // Store by user ID (permanent), keep latest username
+                    contributorsMap.set(pr.user.id.toString(), {
+                      id: pr.user.id,
+                      login: pr.user.login
+                    });
+                  }
+                }
+
+                hasMore = prs.length === 100;
+                page++;
+              }
+
+              const contributors = Array.from(contributorsMap.values());
+              console.log(`✅ Found ${contributors.length} unique contributors`);
+              return contributors;
+            }
+
+            // === MAIN EXECUTION ===
+
+            if (mode === 'single') {
+              // Single user mode (PR trigger or manual single user)
+              if (!inputUsername) {
+                console.error('❌ No username provided for single mode');
+                throw new Error('Username is required for single mode');
+              }
+
+              const snapshot = await buildUserSnapshot(inputUsername);
+
+              // Skip if bot account (buildUserSnapshot returns null for bot)
+              if (!snapshot) {
+                console.log('✅ Skipped snapshot creation (bot account)');
+                return;
+              }
+
+              // Find existing snapshot issue by user ID (permanent identifier)
+              const existingSnapshots = await getExistingSnapshots();
+              const existingIssue = existingSnapshots.get(snapshot.userId.toString()) ||
+                                     existingSnapshots.get(`legacy:${inputUsername}`); // Fallback for legacy snapshots
+
+              await saveSnapshot(snapshot, existingIssue);
+
+            } else if (mode === 'refresh_all') {
+              // Refresh all mode - only create snapshots for users who don't have one yet
+              console.log('🔄 Refresh All Mode: Creating snapshots for users without existing snapshots...');
+
+              const contributors = await getAllContributors();
+              const existingSnapshots = await getExistingSnapshots();
+
+              // Filter by user ID (permanent identifier)
+              const usersWithoutSnapshots = contributors.filter(contributor =>
+                !existingSnapshots.has(contributor.id.toString())
+              );
+
+              console.log(`📋 ${usersWithoutSnapshots.length} users need snapshots created`);
+              console.log(`✅ ${existingSnapshots.size} users already have snapshots (skipping)`);
+
+              if (usersWithoutSnapshots.length === 0) {
+                console.log('✅ All contributors already have snapshots!');
+                return;
+              }
+
+              let successCount = 0;
+              let errorCount = 0;
+
+              for (const contributor of usersWithoutSnapshots) {
+                try {
+                  const snapshot = await buildUserSnapshot(contributor.login);
+
+                  // Skip if bot account
+                  if (!snapshot) {
+                    continue;
+                  }
+
+                  await saveSnapshot(snapshot, null); // No existing issue
+                  successCount++;
+
+                  // Small delay to avoid rate limiting
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                  console.error(`❌ Failed to create snapshot for @${contributor.login}:`, error.message);
+                  errorCount++;
+                }
+              }
+
+              console.log(`\n✅ Refresh All Complete!`);
+              console.log(`   Created: ${successCount} snapshots`);
+              console.log(`   Failed: ${errorCount} snapshots`);
+              console.log(`   Skipped: ${existingSnapshots.size} (already exist)`);
+
+            } else if (mode === 'force_reload_all') {
+              // Force reload all mode - rebuild ALL contributor snapshots
+              console.log('🔥 Force Reload All Mode: Rebuilding ALL contributor snapshots...');
+
+              const contributors = await getAllContributors();
+              const existingSnapshots = await getExistingSnapshots();
+
+              console.log(`📋 Rebuilding snapshots for ${contributors.length} contributors...`);
+
+              let successCount = 0;
+              let errorCount = 0;
+
+              for (const contributor of contributors) {
+                try {
+                  const snapshot = await buildUserSnapshot(contributor.login);
+
+                  // Skip if bot account
+                  if (!snapshot) {
+                    continue;
+                  }
+
+                  // Look up existing issue by user ID (permanent identifier)
+                  const existingIssue = existingSnapshots.get(contributor.id.toString()) ||
+                                         existingSnapshots.get(`legacy:${contributor.login}`); // Fallback for legacy
+                  await saveSnapshot(snapshot, existingIssue);
+                  successCount++;
+
+                  // Small delay to avoid rate limiting
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                  console.error(`❌ Failed to update snapshot for @${contributor.login}:`, error.message);
+                  errorCount++;
+                }
+              }
+
+              console.log(`\n✅ Force Reload All Complete!`);
+              console.log(`   Updated: ${successCount} snapshots`);
+              console.log(`   Failed: ${errorCount} snapshots`);
+            }
+
+      - name: Notify fork PR skipped
+        if: steps.check-fork.outputs.is_fork == 'true'
+        run: |
+          echo "⚠️ Snapshot creation skipped for fork PR"
+          echo ""
+          echo "This PR is from a forked repository. Due to GitHub security restrictions,"
+          echo "the GITHUB_TOKEN does not have write access to create snapshot issues for fork PRs."
+          echo ""
+          echo "To create a snapshot for @${{ github.event.pull_request.user.login }}, you can:"
+          echo "  1. Go to the Actions tab"
+          echo "  2. Select 'Update User Profile Snapshot' workflow"
+          echo "  3. Click 'Run workflow'"
+          echo "  4. Select 'single' mode and enter the username"
+          echo "  OR"
+          echo "  5. Use 'refresh_all' mode to create snapshots for all users without them"
