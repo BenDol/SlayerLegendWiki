@@ -10,7 +10,7 @@ date: '2026-01-03'
 order: 0
 ---
 # <span class="text-gray-900 dark:text-gray-100">Class Overview</span>
-**This content is unlocked at Stage 120 and Level 250, granting additional bonuses to ATK and HP. There are 20 available classes, with additional secret classes unlocked through awakenings. Classes can be obtained through summoning using<img src="/images/content/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />diamonds or <img src="/images/content/goods/Goods_SummonSlayerClass.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 20px; height: 20px; margin: -5px 0 0 0;" data-inline="true" /> class tickets. [insert pic] Blast (Grade 20) cannot be summoned and requires five [insert pic] Dark Rain (Grade 19) to unlock. Classes can also be obtained by combining five of the same grade to upgrade to the next higher grade.**
+This content is unlocked at Stage 120 and Level 250, granting additional bonuses to ATK and HP. There are 20 available classes, with additional secret classes unlocked through awakenings. Classes can be obtained through summoning using<img src="/images/content/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />diamonds or <img src="/images/content/goods/Goods_SummonSlayerClass.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 20px; height: 20px; margin: -5px 0 0 0;" data-inline="true" /> class tickets. [insert pic] Blast (Grade 20) cannot be summoned and requires five [insert pic] Dark Rain (Grade 19) to unlock. Classes can also be obtained by combining five of the same grade to upgrade to the next higher grade.
 
 
 | <div style="text-align: center;">**Class**</div> | <div style="text-align: center;">**Title**</div> | <div style="text-align: center;">**Summon Rate**</div> |
@@ -37,7 +37,7 @@ order: 0
 |<div style="text-align: center;">s</div>|<div style="text-align: center;">Blast (Grade 20)</d>|<div style="text-align: center;">0%</div>|
 
 
-**Legend: | <span class="text-gray-400 dark:text-gray-300">Common</span> | <span class="text-green-800 dark:text-green-600">Great</span> | <span class="text-orange-800 dark:text-orange-600">Rare</span> | <span class="text-purple-600 dark:text-purple-400">Epic</span> | <span class="text-red-600 dark:text-red-400">Legendary**</span>
+Legend: | <span class="text-gray-400 dark:text-gray-300">Common</span> | <span class="text-green-800 dark:text-green-600">Great</span> | <span class="text-orange-800 dark:text-orange-600">Rare</span> | <span class="text-purple-600 dark:text-purple-400">Epic</span> | <span class="text-red-600 dark:text-red-400">Legendary</span>
 
 
 # <span class="text-gray-900 dark:text-gray-100">Class Awakening</span>
