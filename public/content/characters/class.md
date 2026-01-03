@@ -9,23 +9,16 @@ category: Characters
 date: '2026-01-03'
 order: 0
 ---
-# Page Title
+# <span class="text-gray-900 dark:text-gray-100">Class Overview</span>
+**Insert text here.**
 
-This page provides an overview and detailed information about the topic.
 
-## Introduction
+# <span class="text-gray-900 dark:text-gray-100">Class Awakening</span>
+**Insert text here.**
 
-Add your introduction here. Explain what this page covers and why it's important.
 
-## Main Content
+# <span class="text-gray-900 dark:text-gray-100">Memory Tree</span>
+**Insert text here.**
 
-Add the main content sections here. You can include:
 
-- Key concepts and definitions
-- Step-by-step guides or instructions
-- Important tips and best practices
-- Examples and use cases
-
-## Additional Information
-
-Include any supplementary details, notes, or related information.
+# <span class="text-gray-900 dark:text-gray-100">Constellations</span>
