@@ -40,7 +40,7 @@ This content is unlocked at stage 120 and level 250, granting additional bonuses
 **Legend: | <span class="text-gray-400 dark:text-gray-300">Common</span> | <span class="text-green-800 dark:text-green-600">Great</span> | <span class="text-orange-800 dark:text-orange-600">Rare</span> | <span class="text-purple-600 dark:text-purple-400">Epic</span> | <span class="text-red-600 dark:text-red-400">Legendary</span>**
 
 
-Your class can be enhanced using **Cubes**. The base maximum level is 200. Once you start awakening your class, each awakening raises the level cap by +50.
+Your class can be enhanced using<img src="/images/content/goods/EnchantCube 1_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhancement Cubes**. The base maximum level is 200. Once you start awakening your class, each awakening raises the level cap by +50.
 
 
 # <span class="text-gray-900 dark:text-gray-100">Class Awakening</span>
