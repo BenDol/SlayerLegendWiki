@@ -67,8 +67,39 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 - **[Memory Tree Breakthroughs]** are unlocked by progressing through memory nodes. They are important because each breakthrough raises the memory tree’s level cap and provides additional ATK and HP bonuses based on your current promotion, offering a significant boost. The maximum breakthrough level is 5.
 
 
-| <div style="text-align: center;">**Memory Tree Level**</div> | <div style="text-align: center;">**Stats**</div> | <div style="text-align: center;">**Memory Tree Breakthrough**</div> |
-|----------|----------|----------|
+| **Memory Tree Level** | **Stats** 
+|----------|----------|
+|Level 1|Stats|
+|Level 2|Stats|
+|Level 3|Stats|
+|Level 4|Stats|
+|Level 5|Stats|
+|Level 6|Stats|
+|Level 7|Stats|
+|Level 8|Stats|
+|Level 9|Stats|
+|Level 10|Stats|
+|Level 11|Stats|
+|Level 12|Stats|
+|Level 13|Stats|
+|Level 14|Stats|
+|Level 15|Stats|
+|Level 16|Stats|
+|Level 17|Stats|
+|Level 18|Stats|
+|Level 19|Stats|
+|Level 20|Stats|
+|Level 21|Stats|
+|Level 22|Stats|
+|Level 23|Stats|
+|Level 24|Stats|
+|Level 25|Stats|
+| **Memory Tree Breakthrough** | **Stats**
+|Level 1|Stats|
+|Level 2|Stats|
+|Level 3|Stats|
+|Level 4|Stats|
+|Level 5|Stats|
 
 
 # <span class="text-gray-900 dark:text-gray-100">Constellations</span>
