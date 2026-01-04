@@ -729,25 +729,6 @@
     "order": 0
   },
   {
-    "id": "skills/earth-skills",
-    "title": "Earth Skills",
-    "description": "Comprehensive guide to earth element skills, sustained damage, and defensive strategies",
-    "content": "Earth Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
-    "section": "skills",
-    "sectionTitle": "Skills",
-    "pageId": "earth-skills",
-    "url": "/skills/earth-skills",
-    "tags": [
-      "skills",
-      "earth",
-      "elements",
-      "defense"
-    ],
-    "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
-    "order": 0
-  },
-  {
     "id": "skills/fire-skills",
     "title": "Fire Skills",
     "description": "Comprehensive guide to fire element skills, their effects, and optimal usage strategies",
@@ -784,25 +765,6 @@
     "order": 0
   },
   {
-    "id": "skills/skill-builds",
-    "title": "Skill Builds",
-    "description": "Comprehensive guide to skill build templates, optimal skill combinations, elemental synergies, and strategies for different playstyles and content types",
-    "content": "Skill Builds {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
-    "section": "skills",
-    "sectionTitle": "Skills",
-    "pageId": "skill-builds",
-    "url": "/skills/skill-builds",
-    "tags": [
-      "skills",
-      "builds",
-      "strategy",
-      "optimization"
-    ],
-    "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
-    "order": 0
-  },
-  {
     "id": "skills/skill-mastery",
     "title": "Skill Mastery",
     "description": "Guide to skill mastery system, leveling skills, and unlocking advanced skill features",
@@ -815,25 +777,6 @@
       "skills",
       "mastery",
       "progression"
-    ],
-    "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
-    "order": 0
-  },
-  {
-    "id": "skills/skill-mechanics",
-    "title": "Skill Mechanics",
-    "description": "Complete guide to how skills work in Slayer Legend, including damage calculation, cooldowns, skill types, combos, and advanced skill mechanics",
-    "content": "Skill Mechanics {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
-    "section": "skills",
-    "sectionTitle": "Skills",
-    "pageId": "skill-mechanics",
-    "url": "/skills/skill-mechanics",
-    "tags": [
-      "skills",
-      "mechanics",
-      "combat",
-      "damage"
     ],
     "category": "Skills",
     "date": "2025-12-21T00:00:00.000Z",
@@ -853,63 +796,6 @@
       "refinement",
       "enhancement",
       "progression"
-    ],
-    "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
-    "order": 0
-  },
-  {
-    "id": "skills/skill-stones",
-    "title": "Skill Stones",
-    "description": "Complete guide to Skill Stones, the primary materials for leveling and enhancing skills, including farming locations, usage strategies, and optimization",
-    "content": "Skill Stones {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
-    "section": "skills",
-    "sectionTitle": "Skills",
-    "pageId": "skill-stones",
-    "url": "/skills/skill-stones",
-    "tags": [
-      "skills",
-      "skill-stones",
-      "materials",
-      "farming"
-    ],
-    "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
-    "order": 0
-  },
-  {
-    "id": "skills/water-skills",
-    "title": "Water Skills",
-    "description": "Comprehensive guide to water element skills, crowd control effects, and defensive strategies",
-    "content": "Water Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
-    "section": "skills",
-    "sectionTitle": "Skills",
-    "pageId": "water-skills",
-    "url": "/skills/water-skills",
-    "tags": [
-      "skills",
-      "water",
-      "elements",
-      "crowd-control"
-    ],
-    "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
-    "order": 0
-  },
-  {
-    "id": "skills/wind-skills",
-    "title": "Wind Skills",
-    "description": "Comprehensive guide to wind element skills, high-speed combat, mobility, and burst damage strategies",
-    "content": "Wind Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
-    "section": "skills",
-    "sectionTitle": "Skills",
-    "pageId": "wind-skills",
-    "url": "/skills/wind-skills",
-    "tags": [
-      "skills",
-      "wind",
-      "elements",
-      "mobility"
     ],
     "category": "Skills",
     "date": "2025-12-21T00:00:00.000Z",
