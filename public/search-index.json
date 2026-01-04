@@ -729,24 +729,6 @@
     "order": 0
   },
   {
-    "id": "skills/fire-skills",
-    "title": "Fire Skills",
-    "description": "Comprehensive guide to fire element skills, their effects, and optimal usage strategies",
-    "content": "Fire Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
-    "section": "skills",
-    "sectionTitle": "Skills",
-    "pageId": "fire-skills",
-    "url": "/skills/fire-skills",
-    "tags": [
-      "skills",
-      "fire",
-      "elements"
-    ],
-    "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
-    "order": 0
-  },
-  {
     "id": "skills/index",
     "title": "Skills",
     "description": "Master the art of combat with elemental skills, skill mastery, and strategic skill combinations",
