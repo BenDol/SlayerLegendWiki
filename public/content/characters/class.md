@@ -69,16 +69,16 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 
 | **Memory Tree Level** | **Stats** 
 |----------|----------|
-|Level 1|Stats|
-|Level 2|Stats|
-|Level 3|Stats|
-|Level 4|Stats|
-|Level 5|Stats|
-|Level 6|Stats|
-|Level 7|Stats|
-|Level 8|Stats|
-|Level 9|Stats|
-|Level 10|Stats|
+|Level 1|50% ATK, 10% HP, and 5% HP Recovery.|
+|Level 2|100% ATK, 25% HP, and 10% HP Recovery.|
+|Level 3|150% ATK, 45% HP, and 15% HP Recovery.|
+|Level 4|100% ATK, 20% HP, and 10% HP Recovery.|
+|Level 5|130% ATK, 30% HP, and 15% HP Recovery.|
+|Level 6|170% ATK, 50% HP, and 25% HP Recovery.|
+|Level 7|50% ATK, 10% HP, and 5% HP Recovery.|
+|Level 8|100% ATK, 25% HP, and 10% HP Recovery.|
+|Level 9||150% ATK, 35% HP, and 20% HP Recovery.|
+|Level 10||200% ATK, 50% HP, and 35% HP Recovery.|
 |Level 11|Stats|
 |Level 12|Stats|
 |Level 13|Stats|
