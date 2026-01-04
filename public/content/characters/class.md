@@ -62,7 +62,7 @@ This content becomes available when you unlock<img src="https://raw.githubuserco
 <div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/d6e36689ac3a4473befc0dafec37224a.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 368px; height: 600px; margin: 0 0.25em;" data-inline="true" /><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/668b174b64834dda8037592214273210.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 359px; height: 600px; margin: 0 0.25em;" data-inline="true" /></div>
 
 
-To progress through the memory tree, you must unlock memory nodes using<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/0d56a0e813ef4d4794b0f719473e88d5.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Memory Essence**. Each node provides a resource buff, increasing the amount of resources you earn in-game. Unlocking more nodes levels up your memory tree and enables breakthroughs.
+To progress through the memory tree, you must unlock memory nodes using<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/0d56a0e813ef4d4794b0f719473e88d5.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Memory Essence**. Each node takes a set amount of time to unlock and provides a resource buff, increasing the resources you earn in-game. Unlocking more nodes levels up your memory tree and enables breakthroughs.
 - **[Memory Tree Levels]** are gained by unlocking memory nodes. Each level grants additional ATK, HP, and HP Recovery bonuses. The memory tree can reach a maximum of level 25.
 - **[Memory Tree Breakthroughs]** are unlocked by progressing through memory nodes. They are important because each breakthrough raises the memory tree’s level cap and provides additional ATK and HP bonuses based on your current promotion, offering a significant boost. The maximum breakthrough level is 5.
 
@@ -95,7 +95,7 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 |Level 24|Stats|
 |Level 25|Stats|
 | **Memory Tree Breakthrough** | **Stats**
-|Level 1|Stats|
+|Level 1|20% Promotional ATK, 20% Promotional HP, and raises the level cap to 6.|
 |Level 2|Stats|
 |Level 3|Stats|
 |Level 4|Stats|
