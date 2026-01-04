@@ -43,6 +43,9 @@ Thumbs.db
 # Debug logs (development only)
 logs/debug.log
 
+# Network debug data (development only)
+debug/
+
 # External
 external
 # Excluded game assets (not for wiki)

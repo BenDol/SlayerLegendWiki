@@ -48,8 +48,9 @@ function getFunctionsBaseUrl() {
 
   switch (platform) {
     case 'dev':
-      // In development with Netlify dev server, functions are at /.netlify/functions
-      return '/.netlify/functions';
+      // In dev mode, check which dev server is running via VITE_DEV_PLATFORM
+      const devPlatform = import.meta.env.VITE_DEV_PLATFORM || 'cloudflare';
+      return devPlatform === 'cloudflare' ? '/api' : '/.netlify/functions';
 
     case 'cloudflare':
       return '/api';

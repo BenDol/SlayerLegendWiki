@@ -355,6 +355,15 @@
         "description": "Highlights the word/element at cursor position in the live preview while editing"
       }
     },
+    "network": {
+      "debugMode": {
+        "enabled": false,
+        "autoReloadDelay": 5000,
+        "cacheBusting": true,
+        "maxCallsPerRoute": 1000,
+        "autoSaveOnWarmLoad": true
+      }
+    },
     "starContributor": {
       "enabled": true,
       "icon": "⭐"

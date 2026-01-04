@@ -59,11 +59,11 @@ const useScrollDepthTrigger = (threshold = 65, onTrigger, pageIdentifier = null)
       const milestone = Math.floor(scrollPercentage / 10) * 10;
       if (!lastMilestoneRef.current || lastMilestoneRef.current !== milestone) {
         lastMilestoneRef.current = milestone;
-        logger.trace(`Scroll: ${scrollPercentage.toFixed(1)}%`, {
-          page: pageIdentifier,
-          threshold,
-          triggered: hasTriggeredRef.current
-        });
+        // logger.trace(`Scroll: ${scrollPercentage.toFixed(1)}%`, {
+        //   page: pageIdentifier,
+        //   threshold,
+        //   triggered: hasTriggeredRef.current
+        // });
       }
 
       // Trigger when reaching the threshold

@@ -7,6 +7,9 @@ import ErrorBoundary from './wiki-framework/src/components/common/ErrorBoundary.
 import './wiki-framework/src/styles/index.css';
 import './src/styles/custom.css';
 import { Ghost, Sparkles, Sword, Video, Swords, Book } from 'lucide-react';
+import { createLogger } from './wiki-framework/src/utils/logger.js';
+
+const logger = createLogger('Main');
 
 // Initialize bot token for comment system (prevents users from closing comment issues)
 import { initializeBotOctokit } from './wiki-framework/src/services/github/api.js';
@@ -517,7 +520,7 @@ preloadImageConfig().then(() => {
   );
 }).catch(err => {
   // Config failed to load - render anyway with local paths as fallback
-  console.error('Failed to preload image config, using local paths:', err);
+  logger.error('Failed to preload image config, using local paths', { error: err });
   ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
       <HelmetProvider>

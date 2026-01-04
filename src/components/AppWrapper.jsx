@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import DonationSystem from '../../wiki-framework/src/components/donation/DonationSystem';
 import DonationMascot from './DonationMascot';
+import NetworkDebugBanner from '../../wiki-framework/src/components/common/NetworkDebugBanner';
 import useScrollDepthTrigger from '../hooks/useScrollDepthTrigger';
 import { createLogger } from '../utils/logger';
 
@@ -31,7 +32,7 @@ const AppWrapper = ({ children }) => {
         unsubscribe = useAuthStore.subscribe((state) => {
           // Check if auth state changed from false to true (user just logged in)
           if (state.isAuthenticated && !previousAuthState) {
-            logger.info('User logged in successfully - triggering donation prompt');
+            logger.debug('User logged in successfully - triggering donation prompt');
 
             // Small delay so prompt doesn't interfere with login UI closing
             setTimeout(() => {
@@ -63,6 +64,47 @@ const AppWrapper = ({ children }) => {
     };
   }, []);
 
+  // Initialize network debug mode if enabled
+  useEffect(() => {
+    // Prevent double-initialization from React StrictMode
+    if (window.__networkDebugInitialized__) {
+      logger.debug('Network debug already initialized (StrictMode double-mount), skipping');
+      return;
+    }
+
+    // Mark as initialized IMMEDIATELY to prevent race condition with second mount
+    window.__networkDebugInitialized__ = true;
+
+    const initDebug = async () => {
+      try {
+        // Wait for config to be available (with timeout)
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max wait
+        while (!window.__WIKI_CONFIG__ && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+
+        if (!window.__WIKI_CONFIG__) {
+          logger.warn('Wiki config not available after waiting, skipping network debug init');
+          return;
+        }
+
+        const { isNetworkDebugEnabled } = await import('../../wiki-framework/src/utils/networkDebugConfig');
+        if (isNetworkDebugEnabled()) {
+          logger.info('Network debug mode enabled - initializing');
+          const { initializeNetworkDebug } = await import('../../wiki-framework/src/utils/networkDebugInit');
+          await initializeNetworkDebug();
+          // Note: initializeNetworkDebug now handles initial route setup
+        }
+      } catch (error) {
+        logger.error('Failed to initialize network debug mode', { error });
+      }
+    };
+
+    initDebug();
+  }, []);
+
   // Track current page path - only set for markdown content pages
   useEffect(() => {
     logger.trace('Page tracking effect initialized');
@@ -72,30 +114,39 @@ const AppWrapper = ({ children }) => {
       const pathname = window.location.pathname;
       logger.trace('updatePagePath called', { pathname });
 
-      // Only track content pages (format: /section/page-name or /getting-started, etc.)
-      // Exclude special pages like /skill-builder, /donate, /search
+      // Exclude special tool pages from content tracking
       const specialPages = [
         '/skill-builder', '/spirit-builder', '/battle-loadouts',
         '/soul-weapon-engraving', '/my-spirits', '/my-collections',
         '/spirits/viewer', '/donate', '/search', '/profile', '/maintenance',
-        '/page-history', '/contributor-highscore', '/my-edits'
+        '/page-history', '/contributor-highscore', '/my-edits', '/debug/network'
       ];
 
+      // Check if it's a special page
+      const isSpecialPage = specialPages.some(sp => pathname.startsWith(sp));
+
+      // Notify network debug store for ALL pages (including homepage and special pages)
+      if (window.__networkDebugStore__) {
+        logger.debug('Calling handleRouteChange', { pathname });
+        const store = window.__networkDebugStore__.getState();
+        store.handleRouteChange(pathname);
+      } else {
+        logger.debug('Network debug store not available yet');
+      }
+
+      // For content tracking (editor features), only track non-special pages
       if (pathname && pathname !== '/') {
         const path = pathname.startsWith('/') ? pathname.slice(1) : pathname;
-
-        // Check if it's a special page
-        const isSpecialPage = specialPages.some(sp => pathname.startsWith(sp));
 
         if (!isSpecialPage && path) {
           logger.debug('Tracking content page', { path });
           setCurrentPagePath(path);
         } else {
-          logger.trace('Not tracking special page', { path });
+          logger.debug('Not tracking special page for content', { path });
           setCurrentPagePath(null);
         }
       } else {
-        logger.trace('Homepage or invalid path, not tracking');
+        logger.debug('Homepage - not tracking for content');
         setCurrentPagePath(null);
       }
     };
@@ -129,7 +180,7 @@ const AppWrapper = ({ children }) => {
 
   // Memoize the scroll trigger callback to prevent effect from re-running on every render
   const handleScrollTrigger = useCallback(() => {
-    logger.info('Scroll depth reached - attempting to trigger donation prompt');
+    logger.debug('Scroll depth reached - attempting to trigger donation prompt');
     const result = window.triggerDonationPrompt?.({
       messages: [
         "Learning something useful? 📖",
@@ -147,6 +198,9 @@ const AppWrapper = ({ children }) => {
 
   return (
     <>
+      {/* Network debug banner - shows when debug mode is active */}
+      <NetworkDebugBanner />
+
       {children}
 
       {/* Donation system - shows animated spirit prompts with custom mascot */}

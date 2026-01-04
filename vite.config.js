@@ -2,6 +2,7 @@ import { createWikiConfigSync } from './wiki-framework/vite.config.base.js';
 import { loggerPlugin } from './wiki-framework/vite-plugin-logger.js';
 import { githubProxyPlugin } from './wiki-framework/vite-plugin-github-proxy.js';
 import { imageDbPlugin } from './wiki-framework/vite-plugin-image-db.js';
+import { networkDebugPlugin } from './wiki-framework/vite-plugin-network-debug.js';
 import { localCdnPlugin } from './vite-plugin-local-cdn.js';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
@@ -45,6 +46,7 @@ export default createWikiConfigSync({
     loggerPlugin(),
     githubProxyPlugin(),
     imageDbPlugin(),
+    networkDebugPlugin(),
     // localCdnPlugin(), // Disabled - use actual CDN for testing
   ],
 
@@ -55,12 +57,20 @@ export default createWikiConfigSync({
     fs: {
       allow: ['..'],
     },
-    // Proxy API calls to Wrangler
+    // Proxy API calls to Wrangler (except debug endpoints)
     proxy: {
       '/api': {
         target: 'http://localhost:8788',
         changeOrigin: true,
+        // Bypass proxy for debug endpoints - handle with Vite plugin
+        bypass(req) {
+          if (req.url.startsWith('/api/debug/')) {
+            return req.url; // Don't proxy, let Vite middleware handle it
+          }
+        },
       },
+      // Legacy backwards compatibility for old URLs
+      // Remove this if you're sure all client code uses /api
       '/.netlify/functions': {
         target: 'http://localhost:8788',
         changeOrigin: true,

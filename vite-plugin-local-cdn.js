@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createLogger } from './wiki-framework/src/utils/logger.js';
 
+const logger = createLogger('LocalCDN');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOCAL_CDN_PATH = path.resolve(__dirname, '../cdn');
 
@@ -26,7 +28,7 @@ export function localCdnPlugin() {
           localPath = path.join(LOCAL_CDN_PATH, 'game-assets', 'images', 'image-index.json');
 
           if (fs.existsSync(localPath)) {
-            console.log('[local-cdn] Serving image-index.json from local CDN repository');
+            logger.debug('Serving image-index.json from local CDN repository');
             res.setHeader('X-Served-From', 'local-cdn');
             res.setHeader('Content-Type', 'application/json');
             res.setHeader('Cache-Control', 'no-cache'); // Disable caching for dev

@@ -2773,7 +2773,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
   const handleRemoveFromInventory = (slotIndex) => {
     gridLogger.trace('handleRemoveFromInventory called', { slotIndex });
-    console.trace('Stack trace for remove call');
+    gridLogger.trace('Stack trace for remove call');
 
     const newInventory = [...inventory];
     newInventory[slotIndex] = null;
