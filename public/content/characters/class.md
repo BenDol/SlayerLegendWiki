@@ -69,37 +69,37 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 
 | **Memory Tree Level** | **Stats** 
 |----------|----------|
-|Level 1|50% ATK, 10% HP, and 5% HP Recovery.|
-|Level 2|100% ATK, 25% HP, and 10% HP Recovery.|
-|Level 3|150% ATK, 45% HP, and 15% HP Recovery.|
-|Level 4|100% ATK, 20% HP, and 10% HP Recovery.|
-|Level 5|130% ATK, 30% HP, and 15% HP Recovery.|
-|Level 6|170% ATK, 50% HP, and 25% HP Recovery.|
-|Level 7|50% ATK, 10% HP, and 5% HP Recovery.|
-|Level 8|100% ATK, 25% HP, and 10% HP Recovery.|
-|Level 9||150% ATK, 35% HP, and 20% HP Recovery.|
-|Level 10||200% ATK, 50% HP, and 35% HP Recovery.|
-|Level 11|Stats|
-|Level 12|Stats|
-|Level 13|Stats|
-|Level 14|Stats|
-|Level 15|Stats|
-|Level 16|Stats|
-|Level 17|Stats|
-|Level 18|Stats|
-|Level 19|Stats|
-|Level 20|Stats|
+|Level 1|50% ATK, 10% HP, and 5% HP Recovery|
+|Level 2|100% ATK, 25% HP, and 10% HP Recovery|
+|Level 3|150% ATK, 45% HP, and 15% HP Recovery|
+|Level 4|100% ATK, 20% HP, and 10% HP Recovery|
+|Level 5|130% ATK, 30% HP, and 15% HP Recovery|
+|Level 6|170% ATK, 50% HP, and 25% HP Recovery|
+|Level 7|50% ATK, 10% HP, and 5% HP Recovery|
+|Level 8|100% ATK, 25% HP, and 10% HP Recovery|
+|Level 9|150% ATK, 35% HP, and 20% HP Recovery|
+|Level 10|200% ATK, 50% HP, and 35% HP Recovery|
+|Level 11|100% ATK, 30% HP, and 10% HP Recovery|
+|Level 12|200% ATK, 45% HP, and 30% HP Recovery|
+|Level 13|300% ATK, 65% HP, and 50% HP Recovery|
+|Level 14|50% ATK, 5% HP, and 5% HP Recovery|
+|Level 15|50% ATK, 15% HP, and 10% HP Recovery|
+|Level 16|100% ATK, 20% HP, and 15% HP Recovery|
+|Level 17|100% ATK, 30% HP, and 20% HP Recovery|
+|Level 18|150% ATK, 40% HP, and 25% HP Recovery|
+|Level 19|250% ATK, 50% HP, and 35% HP Recovery|
+|Level 20|50% ATK, 5% HP, and 5% HP Recovery|
 |Level 21|Stats|
 |Level 22|Stats|
 |Level 23|Stats|
 |Level 24|Stats|
 |Level 25|Stats|
 | **Memory Tree Breakthrough** | **Stats**
-|Level 1|20% Promotion ATK, 20% Promotion HP, and raises the level cap to 6.|
-|Level 2|40% Promotion ATK, 40% Promotion HP, and raises the level cap to 10.|
-|Level 3|60% Promotion ATK, 60% Promotion HP, and raises the level cap to 13.|
-|Level 4|80% Promotion ATK, 80% Promotion HP, and raises the level cap to 19.|
-|Level 5|100% Promotion ATK, 20% Promotion HP, and raises the level cap to 25.|
+|Level 1|20% Promotion ATK, 20% Promotion HP, and raises the level cap to 6|
+|Level 2|40% Promotion ATK, 40% Promotion HP, and raises the level cap to 10|
+|Level 3|60% Promotion ATK, 60% Promotion HP, and raises the level cap to 13|
+|Level 4|80% Promotion ATK, 80% Promotion HP, and raises the level cap to 19|
+|Level 5|100% Promotion ATK, 20% Promotion HP, and raises the level cap to 25|
 
 
 # <span class="text-gray-900 dark:text-gray-100">Constellations</span>
