@@ -55,7 +55,7 @@ Higher rarity classes can be unlocked through the awakening system after obtaini
 
 
 # <span class="text-gray-900 dark:text-gray-100">Memory Tree</span>
-Insert text here.
+This content becomes available when you unlock<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/29dcff08469f456c943a26b5510ecade.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Seed** which grants access to the Memory Tree and provides additional ATK and HP bonuses. To obtain these bonuses, you must level up your memory tree and unlock different breakthrough levels using **Memory Essence**.
 
 
 # <span class="text-gray-900 dark:text-gray-100">Constellations</span>
