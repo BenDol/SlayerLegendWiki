@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
+import { Navigate, useLocation } from 'react-router-dom';
 import App from './wiki-framework/src/App.jsx';
 import AppWrapper from './src/components/AppWrapper.jsx';
 import ErrorBoundary from './wiki-framework/src/components/common/ErrorBoundary.jsx';
@@ -10,6 +11,13 @@ import { Ghost, Sparkles, Sword, Video, Swords, Book } from 'lucide-react';
 import { createLogger } from './wiki-framework/src/utils/logger.js';
 
 const logger = createLogger('Main');
+
+// Temporary redirect component: /characters/** -> /character/**
+const CharactersRedirect = () => {
+  const location = useLocation();
+  const newPath = location.pathname.replace('/characters/', '/character/');
+  return <Navigate to={newPath} replace />;
+};
 
 // Initialize bot token for comment system (prevents users from closing comment issues)
 import { initializeBotOctokit } from './wiki-framework/src/services/github/api.js';
@@ -448,6 +456,18 @@ const ChangelogPage = React.lazy(() => import('./wiki-framework/src/pages/Change
 
 // Base routes that are always registered
 const baseRoutes = [
+  // Temporary redirect: /characters -> /character
+  {
+    path: 'characters',
+    component: <Navigate to="/character" replace />,
+    suspense: false
+  },
+  // Temporary redirect: /characters/* -> /character/*
+  {
+    path: 'characters/*',
+    component: <CharactersRedirect />,
+    suspense: false
+  },
   {
     path: 'skill-builder',
     component: <SkillBuildSimulatorPage />,

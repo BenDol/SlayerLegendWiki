@@ -6,7 +6,7 @@ tags:
   - character
   - progression
   - achievements
-category: Characters
+category: Character
 date: 2025-12-21T00:00:00.000Z
 order: 0
 ---

@@ -5,7 +5,7 @@ description: A brief overview of the class system.
 tags:
   - character
   - class
-category: Characters
+category: Character
 date: '2026-01-03'
 order: 0
 ---

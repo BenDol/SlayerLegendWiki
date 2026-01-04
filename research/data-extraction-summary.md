@@ -319,7 +319,7 @@ import DataDrivenPage from './wiki-framework/src/components/wiki/DataDrivenPage'
 - `/skills/fire` - Filter `skills.json` by attribute
 - `/resources/quests` - Use `quests.json`
 - `/progression/relics` - Use `relics.json`
-- `/characters/promotions` - Parse and use `promotions.json`
+- `/character/promotions` - Parse and use `promotions.json`
 
 ---
 

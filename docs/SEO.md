@@ -180,8 +180,8 @@ import { BreadcrumbStructuredData } from '../components/StructuredData';
 <BreadcrumbStructuredData
   items={[
     { name: 'Home', url: '/' },
-    { name: 'Characters', url: '/characters' },
-    { name: 'Awakening', url: '/characters/awakening' }
+    { name: 'Character', url: '/character' },
+    { name: 'Awakening', url: '/character/awakening' }
   ]}
 />
 ```

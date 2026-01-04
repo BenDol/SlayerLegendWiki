@@ -80,7 +80,7 @@ Use tables for structured data:
 
 ### Internal Links
 ```markdown
-[See Promotion Guide](/characters/promotions)
+[See Promotion Guide](/character/promotions)
 ```
 
 ### External Links

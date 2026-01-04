@@ -53,7 +53,7 @@ export function WikiArticleWithSEO() {
   const pageData = {
     title: 'Character Awakening Guide',
     description: 'Learn everything about character awakening in Slayer Legend. Detailed guide on awakening stages, requirements, and benefits.',
-    url: '/characters/awakening',
+    url: '/character/awakening',
     image: '/images/sections/characters.png',
     section: 'Characters',
     datePublished: '2024-01-15T00:00:00Z',
@@ -63,8 +63,8 @@ export function WikiArticleWithSEO() {
 
   const breadcrumbs = [
     { name: 'Home', url: 'https://slayerlegend.wiki/' },
-    { name: 'Characters', url: 'https://slayerlegend.wiki/characters' },
-    { name: 'Awakening', url: 'https://slayerlegend.wiki/characters/awakening' }
+    { name: 'Character', url: 'https://slayerlegend.wiki/character' },
+    { name: 'Awakening', url: 'https://slayerlegend.wiki/character/awakening' }
   ];
 
   return (
@@ -175,7 +175,7 @@ export function DynamicContentWithSEO({ characterData }) {
   const seoData = {
     title: characterData.name,
     description: `Learn about ${characterData.name}, a ${characterData.element} character in Slayer Legend. Stats, abilities, and build recommendations.`,
-    url: `/characters/${characterData.slug}`,
+    url: `/character/${characterData.slug}`,
     image: characterData.image || '/images/sections/characters.png',
     keywords: [
       characterData.name,

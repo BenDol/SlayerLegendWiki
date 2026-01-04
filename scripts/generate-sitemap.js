@@ -14,7 +14,7 @@ const OUTPUT_FILE = path.join(__dirname, '../public/sitemap.xml');
 // Priority and change frequency by section type
 const SECTION_CONFIG = {
   'getting-started': { priority: '1.0', changefreq: 'weekly' },
-  'characters': { priority: '0.9', changefreq: 'weekly' },
+  'character': { priority: '0.9', changefreq: 'weekly' },
   'equipment': { priority: '0.9', changefreq: 'weekly' },
   'skills': { priority: '0.9', changefreq: 'weekly' },
   'companions': { priority: '0.8', changefreq: 'weekly' },

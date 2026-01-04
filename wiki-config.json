@@ -75,7 +75,7 @@
       "icon": "🗺️",
       "order": 3,
       "expandedByDefault": false,
-      "sections": ["characters", "equipment", "companions", "skills", "stages", "spirits", "resources"]
+      "sections": ["character", "equipment", "companions", "skills", "stages", "spirits", "resources"]
     },
     {
       "id": "guides",
@@ -138,9 +138,9 @@
       "order": 1
     },
     {
-      "id": "characters",
-      "title": "Characters",
-      "path": "characters",
+      "id": "character",
+      "title": "Character",
+      "path": "character",
       "icon": "⚔️",
       "allowContributions": true,
       "order": 2
@@ -565,7 +565,7 @@
       "maxFileSizeMB": 10,
       "allowedFormats": ["jpg", "jpeg", "png", "webp", "gif"],
       "categories": [
-        "characters",
+        "character",
         "equipment",
         "stages",
         "companions",

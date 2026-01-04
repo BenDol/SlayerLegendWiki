@@ -1,13 +1,13 @@
 ---
 id: index
-title: Characters
+title: Character
 description: Master your character's progression through stats, promotions, enhancement, and more
-tags: [characters, progression, stats, promotions]
-category: Characters
+tags: [character, progression, stats, promotions]
+category: Character
 date: 2025-12-13
 ---
 
-# Characters
+# Character
 
 {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->
 
