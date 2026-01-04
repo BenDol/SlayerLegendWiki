@@ -95,11 +95,11 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 |Level 24|Stats|
 |Level 25|Stats|
 | **Memory Tree Breakthrough** | **Stats**
-|Level 1|20% Promotional ATK, 20% Promotional HP, and raises the level cap to 6.|
-|Level 2|Stats|
-|Level 3|Stats|
-|Level 4|Stats|
-|Level 5|Stats|
+|Level 1|20% Promotion ATK, 20% Promotion HP, and raises the level cap to 6.|
+|Level 2|40% Promotion ATK, 40% Promotion HP, and raises the level cap to 10.|
+|Level 3|60% Promotion ATK, 60% Promotion HP, and raises the level cap to 13.|
+|Level 4|80% Promotion ATK, 80% Promotion HP, and raises the level cap to 19.|
+|Level 5|100% Promotion ATK, 20% Promotion HP, and raises the level cap to 25.|
 
 
 # <span class="text-gray-900 dark:text-gray-100">Constellations</span>
