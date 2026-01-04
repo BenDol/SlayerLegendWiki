@@ -126,13 +126,20 @@ const AppWrapper = ({ children }) => {
       const isSpecialPage = specialPages.some(sp => pathname.startsWith(sp));
 
       // Notify network debug store for ALL pages (including homepage and special pages)
-      if (window.__networkDebugStore__) {
-        logger.debug('Calling handleRouteChange', { pathname });
-        const store = window.__networkDebugStore__.getState();
-        store.handleRouteChange(pathname);
-      } else {
-        logger.debug('Network debug store not available yet');
-      }
+      // ONLY if network debug mode is enabled
+      const checkNetworkDebug = async () => {
+        try {
+          const { isNetworkDebugEnabled } = await import('../../wiki-framework/src/utils/networkDebugConfig');
+          if (isNetworkDebugEnabled() && window.__networkDebugStore__) {
+            logger.debug('Calling handleRouteChange', { pathname });
+            const store = window.__networkDebugStore__.getState();
+            store.handleRouteChange(pathname);
+          }
+        } catch (error) {
+          logger.debug('Network debug not available', { error });
+        }
+      };
+      checkNetworkDebug();
 
       // For content tracking (editor features), only track non-special pages
       if (pathname && pathname !== '/') {
