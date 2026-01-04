@@ -12,7 +12,7 @@ date: 2025-12-21T00:00:00.000Z
 order: 0
 ---
 # <span class="text-gray-900 dark:text-gray-100">Character Level</span>
-As you progress through your Slayer Legend journey, you will earn<img src="/images/content/goods/Goods_Exp.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />**Experience** (EXP) that allows you to unlock new skills, gain stat points, and more.
+As you progress through your Slayer Legend journey, you will earn<img src="/images/content/goods/Goods_Exp.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />**Experience (EXP)** that allows you to unlock new skills, gain stat points, and more.
 
 # <span class="text-gray-900 dark:text-gray-100">Combat Stats</span>
 Your combat stats are divided into two categories: main stats and critical stats. Combat stats can be increased using<img src="/images/content/goods/Goods_Gold.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;" data-inline="true" />**Gold**.
