@@ -32,7 +32,7 @@ const logger = createLogger('BattleLoadouts');
  * Features:
  * - Named loadout saves (similar to skill builds)
  * - Skills section (10 slots) - integrates with Skill Builder
- * - Accompanying Spirit section (placeholder)
+ * - Partner Spirit section (placeholder)
  * - Skill Stone section (placeholder)
  * - Slayer Promotion Additional Ability section (placeholder)
  * - Familiar Skill section (placeholder)

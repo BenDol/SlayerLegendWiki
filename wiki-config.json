@@ -351,7 +351,7 @@
     },
     "editor": {
       "previewHighlight": {
-        "enabled": true,
+        "enabled": false,
         "description": "Highlights the word/element at cursor position in the live preview while editing"
       }
     },

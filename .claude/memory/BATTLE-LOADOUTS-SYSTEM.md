@@ -299,7 +299,7 @@ spirit: loadout.spirit ? deserializeSpirit(loadout.spirit, spiritData) : null
 
 Priority order for completing the system:
 
-1. **Spirit Builder** - Implement accompanying spirit configuration
+1. **Spirit Builder** - Implement partner spirit configuration
 2. **Skill Stone Builder** - Implement skill stone management
 3. **Promotion Ability Builder** - Implement slayer promotion abilities
 4. **Familiar Builder** - Implement familiar skill configuration

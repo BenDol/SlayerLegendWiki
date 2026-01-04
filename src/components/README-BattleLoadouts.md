@@ -9,7 +9,7 @@ The Battle Loadouts system provides a complete interface for managing battle con
 - **Skills Section** - 10 skill slots with Skill Builder integration
 - **Save/Load System** - Store up to 10 loadouts per user (GitHub-backed)
 - **Placeholder Sections** for future builders:
-  - Accompanying Spirit
+  - Partner Spirit
   - Skill Stone
   - Slayer Promotion Additional Ability
   - Familiar Skill
@@ -252,7 +252,7 @@ When adding new builder systems:
 
 ### Planned Builders
 
-- [ ] **Spirit Builder** - Configure accompanying spirits
+- [ ] **Spirit Builder** - Configure partner spirits
 - [ ] **Skill Stone Builder** - Manage skill stones
 - [ ] **Promotion Ability Builder** - Select slayer promotion abilities
 - [ ] **Familiar Builder** - Configure familiar skills

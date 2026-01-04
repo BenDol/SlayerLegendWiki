@@ -227,11 +227,11 @@ const SpiritSlot = ({
         <div className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
           {isCompanionSlot ? (
             <span className="text-yellow-600 dark:text-yellow-400 font-bold">
-              Accompanying
+              Partner Spirit
             </span>
           ) : (
             <>
-              <span className="hidden sm:inline">Partner Spirit {slotNumber}</span>
+              <span className="hidden sm:inline">Spirit {slotNumber}</span>
               <span className="inline sm:hidden">Partner {slotNumber}</span>
             </>
           )}
