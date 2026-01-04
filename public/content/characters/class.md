@@ -89,11 +89,11 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 |Level 18|150% ATK, 40% HP, and 25% HP Recovery|
 |Level 19|250% ATK, 50% HP, and 35% HP Recovery|
 |Level 20|50% ATK, 5% HP, and 5% HP Recovery|
-|Level 21|Stats|
-|Level 22|Stats|
-|Level 23|Stats|
-|Level 24|Stats|
-|Level 25|Stats|
+|Level 21|50% ATK, 15% HP, and 10% HP Recovery|
+|Level 22|100% ATK, 25% HP, and 15% HP Recovery|
+|Level 23|100% ATK, 35% HP, and 20% HP Recovery|
+|Level 24|200% ATK, 45% HP, and 30% HP Recovery|
+|Level 25|300% ATK, 55% HP, and 40% HP Recovery|
 | **Memory Tree Breakthrough** | **Stats**
 |Level 1|20% Promotion ATK, 20% Promotion HP, and raises the level cap to 6|
 |Level 2|40% Promotion ATK, 40% Promotion HP, and raises the level cap to 10|
@@ -103,3 +103,4 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 
 
 # <span class="text-gray-900 dark:text-gray-100">Constellations</span>
+This part of the guide is still a work in progress.
