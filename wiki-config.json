@@ -8,7 +8,7 @@
     "manifest": "/site.webmanifest",
     "themeColor": "#3b82f6",
     "socialPreview": {
-      "defaultImage": "/images/og-default.svg",
+      "defaultImage": "/images/logo.png",
       "twitterCard": "summary_large_image"
     },
     "social": {

@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="/icon/favicon.ico" />
+    <!-- Favicons - Multiple formats for best compatibility -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="/icon/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icon/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon/android-chrome-192x192.png" />
@@ -14,7 +14,7 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Shortcut icon for older browsers -->
-    <link rel="shortcut icon" href="/icon/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" />
 
     <!-- Base Meta Tags (will be overridden by react-helmet-async) -->
     <title>Slayer Legend Wiki</title>
@@ -57,11 +57,13 @@
       "publisher": {
         "@type": "Organization",
         "name": "Slayer Legend Wiki",
+        "url": "https://slayerlegend.wiki",
         "logo": {
           "@type": "ImageObject",
           "url": "https://slayerlegend.wiki/images/logo.png",
           "width": 512,
-          "height": 512
+          "height": 512,
+          "contentUrl": "https://slayerlegend.wiki/images/logo.png"
         }
       },
       "potentialAction": {
