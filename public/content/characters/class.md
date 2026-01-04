@@ -46,10 +46,12 @@ Additional highe rarity classes can be unlocked through the awakening system aft
 
 | <div style="text-align: center;">**Class**</div> | <div style="text-align: center;">**Title**</div> | <div style="text-align: center;">**Requirement**</div> |
 |----------|----------|----------|
-|S|S|S|
+|<div style="text-align: center;">S</div>|<div style="text-align: center;">**<span class="text-blue-700 dark:text-blue-400">Mythic</span>**</div>|<div style="text-align: center;">S</div>
+|<div style="text-align: center;">S</div>|<div style="text-align: center;">**<span class="text-yellow-400 dark:text-yellow-300">Seed</span>**</div>|<div style="text-align: center;">S</div>
+|<div style="text-align: center;">S</div>|<div style="text-align: center;">**<span class="text-cyan-400 dark:text-cyan-300">Nova</span>**</div>|<div style="text-align: center;">S</div>
 
 
-**Legend: | <span class="text-gray-400 dark:text-gray-300">Common</span> | <span class="text-green-800 dark:text-green-600">Great</span> | <span class="text-orange-800 dark:text-orange-600">Rare</span> | <span class="text-purple-600 dark:text-purple-400">Epic</span> | <span class="text-red-600 dark:text-red-400">Legendary</span>**
+**Legend: | <span class="text-blue-700 dark:text-blue-400">Mythic</span> | <span class="text-yellow-400 dark:text-yellow-300">Immortal</span> | <span class="text-cyan-400 dark:text-cyan-300">Ancient</span> |**
 
 
 # <span class="text-gray-900 dark:text-gray-100">Memory Tree</span>
