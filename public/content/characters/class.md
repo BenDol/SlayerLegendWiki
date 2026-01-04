@@ -56,10 +56,7 @@ Higher rarity classes can be unlocked through the awakening system after obtaini
 
 # <span class="text-gray-900 dark:text-gray-100">Memory Tree</span>
 This content becomes available when you unlock<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/29dcff08469f456c943a26b5510ecade.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**<span class="text-yellow-400 dark:text-yellow-300">Seed</span>** which grants access to the memory tree and provides additional ATK and HP bonuses. To obtain these bonuses, you must level up your memory tree and unlock different breakthrough levels using<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/0d56a0e813ef4d4794b0f719473e88d5.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Memory Essence**.<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/0d56a0e813ef4d4794b0f719473e88d5.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Memory Essence** is earned by progressing through every five stages.
-
-
-**[Insert pic here]**
-
+<div style="text-align: center;"><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/d6e36689ac3a4473befc0dafec37224a.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 368px; height: 600px; margin: 0 0.25em;" data-inline="true" /><img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/668b174b64834dda8037592214273210.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 359px; height: 600px; margin: 0 0.25em;" data-inline="true" /></div>
 
 **Insert text here**
 
