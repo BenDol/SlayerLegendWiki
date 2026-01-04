@@ -41,7 +41,15 @@ This content is unlocked at Stage 120 and Level 250, granting additional bonuses
 
 
 # <span class="text-gray-900 dark:text-gray-100">Class Awakening</span>
-Insert text here.
+Additional highe rarity classes can be unlocked through the awakening system after obtaining<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/03a1af75f975429d999cd9a7fd926b71.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Blast (Grade 20)**. To advance to the next class, you must complete six awakenings, each requiring<img src="https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2026/01/e1ab16b3c70841f4819b10070bef9df2.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Dark Rain (Grade 19)** as a consumable.
+
+
+| <div style="text-align: center;">**Class**</div> | <div style="text-align: center;">**Title**</div> | <div style="text-align: center;">**Requirement**</div> |
+|----------|----------|----------|
+|S|S|S|
+
+
+**Legend: | <span class="text-gray-400 dark:text-gray-300">Common</span> | <span class="text-green-800 dark:text-green-600">Great</span> | <span class="text-orange-800 dark:text-orange-600">Rare</span> | <span class="text-purple-600 dark:text-purple-400">Epic</span> | <span class="text-red-600 dark:text-red-400">Legendary</span>**
 
 
 # <span class="text-gray-900 dark:text-gray-100">Memory Tree</span>
