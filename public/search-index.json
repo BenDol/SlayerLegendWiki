@@ -787,7 +787,7 @@
     "id": "skills/skills",
     "title": "Skills",
     "description": "A brief overview of the skill system.",
-    "content": "Page Title This page provides an overview and detailed information about the topic. Introduction Add your introduction here. Explain what this page covers and why it's important. Main Content Add the main content sections here. You can include: - Key concepts and definitions - Step-by-step guides or instructions - Important tips and best practices - Examples and use cases Additional Information Include any supplementary details, notes, or related information.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Skills Overview</span> Aside from your normal attacks, there are skills that deal more damage or help amplify combat and non-combat stats. <span class=\"text-gray-900 dark:text-gray-100\">Common Skills</span> This part of the guide is still a work in progress. <span class=\"text-gray-900 dark:text-gray-100\">Great Skills</span> This part of the guide is still a work in progress. <span class=\"text-gray-900 dark:text-gray-100\">Rare Skills</span> This part",
     "section": "skills",
     "sectionTitle": "Skills",
     "pageId": "skills",
