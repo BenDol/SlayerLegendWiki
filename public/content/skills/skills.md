@@ -8,23 +8,34 @@ category: Skills
 date: '2026-01-05'
 order: 0
 ---
-# Page Title
+# <span class="text-gray-900 dark:text-gray-100">Skills Overview</span>
+Aside from your normal attacks, there are skills that deal more damage or help amplify combat and non-combat stats.
 
-This page provides an overview and detailed information about the topic.
 
-## Introduction
+# <span class="text-gray-900 dark:text-gray-100">Common Skills</span>
+This part of the guide is still a work in progress.
 
-Add your introduction here. Explain what this page covers and why it's important.
 
-## Main Content
+# <span class="text-gray-900 dark:text-gray-100">Great 
+Skills</span>
+This part of the guide is still a work in progress.
 
-Add the main content sections here. You can include:
 
-- Key concepts and definitions
-- Step-by-step guides or instructions
-- Important tips and best practices
-- Examples and use cases
+# <span class="text-gray-900 dark:text-gray-100">Rare Skills</span>
+This part of the guide is still a work in progress.
 
-## Additional Information
 
-Include any supplementary details, notes, or related information.
+# <span class="text-gray-900 dark:text-gray-100">Epic Skills</span>
+This part of the guide is still a work in progress.
+
+
+# <span class="text-gray-900 dark:text-gray-100">Legendary Skills</span>
+This part of the guide is still a work in progress.
+
+
+# <span class="text-gray-900 dark:text-gray-100">Mythic Skills</span>
+This part of the guide is still a work in progress.
+
+
+# <span class="text-gray-900 dark:text-gray-100">Immortal Skills</span>
+This part of the guide is still a work in progress.
