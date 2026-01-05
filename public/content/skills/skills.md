@@ -16,8 +16,7 @@ Aside from your normal attacks, there are skills that deal more damage or help a
 This part of the guide is still a work in progress.
 
 
-# <span class="text-gray-900 dark:text-gray-100">Great 
-Skills</span>
+# <span class="text-gray-900 dark:text-gray-100">Great Skills</span>
 This part of the guide is still a work in progress.
 
 
