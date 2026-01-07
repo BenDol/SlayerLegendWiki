@@ -241,7 +241,8 @@
       "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\public\\\\sitemap.xml\")",
       "Bash(Select-String -Pattern \"loc>\")",
       "Bash(Measure-Object)",
-      "Bash(Select-String -Pattern \"Admin|StarContributor|top-contributor|Top Contributor\" -Context 2,2)"
+      "Bash(Select-String -Pattern \"Admin|StarContributor|top-contributor|Top Contributor\" -Context 2,2)",
+      "Bash(Select-String -Pattern \"joinedAt|UserSnapshot|Joined wiki\" -Context 1,1)"
     ]
   }
 }
