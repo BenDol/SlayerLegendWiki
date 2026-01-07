@@ -199,6 +199,12 @@ jobs:
                   repo: context.repo.repo
                 });
                 const repoOwner = repoData.owner.login;
+                console.log(`[TopContributor] Repository owner: ${repoOwner}`);
+                console.log(`[TopContributor] Wiki bot: ${BOT_USERNAME}`);
+                console.log(`[TopContributor] Processing ${commits.length} commits...`);
+
+                let processedCount = 0;
+                let skippedCount = 0;
 
                 commits.forEach((commit) => {
                   const username = commit.author.username;
@@ -207,26 +213,32 @@ jobs:
                   // Skip commits without GitHub user (local commits)
                   if (!username || !userId) {
                     console.log(`[TopContributor] Skipping commit without GitHub user: ${commit.sha.substring(0, 7)}`);
+                    skippedCount++;
                     return;
                   }
 
                   // Skip repository owner commits
                   if (username === repoOwner) {
-                    console.log(`[TopContributor] Skipping repository owner commit: ${commit.sha.substring(0, 7)}`);
+                    console.log(`[TopContributor] Skipping repository owner commit: ${username} (${commit.sha.substring(0, 7)})`);
+                    skippedCount++;
                     return;
                   }
 
                   // Skip wiki bot
                   if (username === BOT_USERNAME) {
                     console.log(`[TopContributor] Skipping wiki bot commit: ${BOT_USERNAME} (${commit.sha.substring(0, 7)})`);
+                    skippedCount++;
                     return;
                   }
 
                   // Skip GitHub Actions bot
                   if (username === GITHUB_ACTIONS_BOT) {
                     console.log(`[TopContributor] Skipping GitHub Actions bot commit: ${commit.sha.substring(0, 7)}`);
+                    skippedCount++;
                     return;
                   }
+
+                  processedCount++;
 
                   const stats = commit.stats || { additions: 0, deletions: 0, total: 0 };
 
@@ -255,8 +267,15 @@ jobs:
                   contributorScores[userId].deletions += stats.deletions;
                 });
 
+                console.log(`[TopContributor] Processing complete: ${processedCount} commits counted, ${skippedCount} commits skipped`);
+
                 // Find top contributor
                 const contributors = Object.values(contributorScores);
+
+                console.log(`[TopContributor] Found ${contributors.length} unique contributor(s)`);
+                if (contributors.length > 0) {
+                  console.log('[TopContributor] Contributors:', contributors.map(c => `${c.username} (${c.commits} commits, score: ${c.score.toFixed(2)})`).join(', '));
+                }
 
                 if (contributors.length === 0) {
                   console.log('[TopContributor] No community contributors found - returning null');
