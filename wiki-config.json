@@ -626,42 +626,42 @@
       {
         "id": "contributor",
         "title": "Contributor",
-        "minContributions": 1,
+        "minContributions": 100,
         "badge": "✍️",
         "color": "#3b82f6"
       },
       {
         "id": "regular",
         "title": "Regular Editor",
-        "minContributions": 5,
+        "minContributions": 500,
         "badge": "📝",
         "color": "#10b981"
       },
       {
         "id": "dedicated",
         "title": "Dedicated Writer",
-        "minContributions": 15,
+        "minContributions": 1500,
         "badge": "📚",
         "color": "#8b5cf6"
       },
       {
         "id": "expert",
         "title": "Wiki Expert",
-        "minContributions": 30,
+        "minContributions": 3000,
         "badge": "⭐",
         "color": "#f59e0b"
       },
       {
         "id": "master",
         "title": "Master Contributor",
-        "minContributions": 50,
+        "minContributions": 5000,
         "badge": "🏆",
         "color": "#f97316"
       },
       {
         "id": "legend",
         "title": "Wiki Legend",
-        "minContributions": 100,
+        "minContributions": 10000,
         "badge": "👑",
         "color": "#dc2626"
       },

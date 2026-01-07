@@ -107,29 +107,25 @@ jobs:
             console.log('🔍 Fetching contributor statistics for all time periods...');
 
             /**
-             * Calculate a fair contributor score that prevents gaming
-             * Formula: (contributions * 100) + (quality_bonus * 2)
+             * Calculate contributor score based on line changes only
+             * Formula: (additions * 10) + (deletions * 1)
              *
-             * - Base score from contributions (heavily weighted at 100x)
-             * - Quality bonus from average lines per contribution (2x weight)
-             * - This rewards both volume AND quality, preventing spam contributions
+             * - Additions are heavily weighted (10x) as they represent new content creation
+             * - Deletions have minimal weight (1x) as they represent cleanup/maintenance
+             * - Commit count is NOT included to focus purely on content contribution
              */
             function calculateContributorScore(contributor) {
-              const contributions = contributor.contributions || 0;
               const additions = contributor.additions || 0;
               const deletions = contributor.deletions || 0;
 
-              // Base score: contributions heavily weighted
-              const baseScore = contributions * 100;
+              // Additions heavily weighted (new content is most valuable)
+              const additionsScore = additions * 10;
 
-              // Quality bonus: average lines changed per contribution
-              // High value = meaningful contributions, Low value = spam
-              const totalLines = additions + deletions;
-              const averageLinesPerContribution = contributions > 0 ? totalLines / contributions : 0;
-              const qualityBonus = averageLinesPerContribution * 2;
+              // Deletions lightly weighted (cleanup is still valuable)
+              const deletionsScore = deletions * 1;
 
               // Final score
-              const score = baseScore + qualityBonus;
+              const score = additionsScore + deletionsScore;
 
               return Math.round(score);
             }
