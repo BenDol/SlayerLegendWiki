@@ -1458,7 +1458,7 @@ const BattleLoadouts = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Header */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-2">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Battle Loadouts</h1>
           </div>
@@ -1621,7 +1621,7 @@ const BattleLoadouts = () => {
         {isAuthenticated && (
           <div className="sticky bottom-0 left-0 right-0 z-40 mt-6">
             <div className="max-w-7xl mx-auto px-3 sm:px-4">
-              <div className="bg-gray-100 dark:bg-gray-900 rounded-t-lg border border-gray-200 dark:border-gray-700 border-b-0 shadow-2xl py-3">
+              <div className="bg-gray-100 dark:bg-gray-900 rounded-t-lg border border-gray-200 dark:border-gray-700 border-b-0 shadow-2xl py-0.5">
                 <div className="flex flex-col items-center gap-2">
                   {/* Error Message */}
                   {saveError && (
@@ -1635,7 +1635,7 @@ const BattleLoadouts = () => {
                     {/* Unsaved Changes Indicator */}
                     {hasUnsavedChanges && (
                       <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                         <span className="hidden sm:inline text-sm">Unsaved changes</span>
@@ -1650,18 +1650,18 @@ const BattleLoadouts = () => {
                     >
                       {saving ? (
                         <>
-                          <Loader className="w-5 h-5 animate-spin flex-shrink-0" />
+                          <Loader className="w-4 h-4 animate-spin flex-shrink-0" />
                           <span>Saving...</span>
                         </>
                       ) : saveSuccess ? (
                         <>
-                          <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                           <span>Saved!</span>
                         </>
                       ) : (
                         <>
-                          <Save className="w-5 h-5 flex-shrink-0" />
-                          <span>Save Loadout</span>
+                          <Save className="w-4 h-4 flex-shrink-0" />
+                          <span style={{ fontSize: '0.9rem', lineHeight: '0' }}>Save Loadout</span>
                         </>
                       )}
                     </button>

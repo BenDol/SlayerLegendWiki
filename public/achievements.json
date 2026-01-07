@@ -275,7 +275,7 @@
     {
       "id": "veteran",
       "title": "Long-Time Member",
-      "description": "Your GitHub account is over 1 year old",
+      "description": "Been a wiki member for over 1 year",
       "icon": "🎂",
       "category": "milestone",
       "rarity": "rare",
