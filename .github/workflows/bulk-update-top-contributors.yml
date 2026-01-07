@@ -111,36 +111,49 @@ jobs:
               const filePath = `${CONTENT_PATH}/${sectionId}/${pageId}.md`;
 
               try {
-                // Fetch ALL commits for the file (with pagination)
+                // Fetch ALL commits for the file using git log --follow (follows renames)
+                // Note: GitHub API listCommits does NOT follow renames, so we use local git instead
                 console.log(`[TopContributor] Fetching commits for ${filePath}...`);
+                console.log(`[TopContributor] Using 'git log --follow' to track file history including renames`);
 
-                let commitList = [];
-                let page = 1;
-                const perPage = 100;
+                const { execSync } = require('child_process');
+                const gitLogOutput = execSync(
+                  `git log --follow --format="%H" -- "${filePath}"`,
+                  { encoding: 'utf8', cwd: process.env.GITHUB_WORKSPACE }
+                );
 
-                while (true) {
-                  const { data: commits } = await github.rest.repos.listCommits({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    path: filePath,
-                    per_page: perPage,
-                    page: page,
-                  });
+                const commitShas = gitLogOutput.trim().split('\n').filter(sha => sha.length > 0);
+                console.log(`[TopContributor] Found ${commitShas.length} total commits (including renames)`);
 
-                  commitList.push(...commits);
-                  console.log(`[TopContributor] Fetched page ${page}: ${commits.length} commits`);
-
-                  if (commits.length < perPage) {
-                    break; // Last page
-                  }
-
-                  page++;
+                // Log first 3 commit SHAs to verify
+                if (commitShas.length > 0) {
+                  const sampleShas = commitShas.slice(0, Math.min(3, commitShas.length)).map(sha => sha.substring(0, 7));
+                  console.log(`[TopContributor]   Sample SHAs: ${sampleShas.join(', ')}`);
                 }
 
-                console.log(`[TopContributor] Found ${commitList.length} total commits`);
+                // Fetch commit details from GitHub API
+                console.log(`[TopContributor] Fetching commit details from GitHub API...`);
+                const commitList = await Promise.all(
+                  commitShas.map(async (sha) => {
+                    try {
+                      const { data: commit } = await github.rest.repos.getCommit({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        ref: sha,
+                      });
+                      return commit;
+                    } catch (error) {
+                      console.warn(`[TopContributor] Failed to fetch commit ${sha.substring(0, 7)}:`, error.message);
+                      return null;
+                    }
+                  })
+                );
+
+                const validCommits = commitList.filter(c => c !== null);
+                console.log(`[TopContributor] Successfully fetched ${validCommits.length} commit details`);
 
                 // Filter commits by release date
-                const filteredCommitList = filterByReleaseDate(commitList);
+                const filteredCommitList = filterByReleaseDate(validCommits);
                 console.log(`[TopContributor] After release date filter: ${filteredCommitList.length} commits`);
 
                 if (filteredCommitList.length === 0) {
