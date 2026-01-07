@@ -667,7 +667,7 @@
       },
       {
         "id": "owner",
-        "title": "Owner",
+        "title": "Wiki Owner",
         "minContributions": 999999,
         "badge": "💻",
         "color": "#1f2937"
