@@ -81,18 +81,23 @@ jobs:
                     // Check if expired
                     if (now > data.expiresAt) {
                       // Delete expired comment
-                      await github.rest.issues.deleteComment({
-                        owner,
-                        repo,
-                        comment_id: comment.id,
-                      });
+                      try {
+                        await github.rest.issues.deleteComment({
+                          owner,
+                          repo,
+                          comment_id: comment.id,
+                        });
 
-                      // Track deleted email hash for index update
-                      deletedEmailHashes.push(data.emailHash);
+                        // Track deleted email hash for index update
+                        deletedEmailHashes.push(data.emailHash);
 
-                      const ageMinutes = Math.round((now - data.expiresAt) / 1000 / 60);
-                      console.log(`[Cleanup] Deleted expired comment #${comment.id} (expired ${ageMinutes} minutes ago)`);
-                      deletedCount++;
+                        const ageMinutes = Math.round((now - data.expiresAt) / 1000 / 60);
+                        console.log(`[Cleanup] Deleted expired comment #${comment.id} (expired ${ageMinutes} minutes ago)`);
+                        deletedCount++;
+                      } catch (deleteError) {
+                        console.error(`[Cleanup] Failed to delete comment #${comment.id}:`, deleteError.message);
+                        errorCount++;
+                      }
                     } else {
                       const remainingMinutes = Math.round((data.expiresAt - now) / 1000 / 60);
                       console.log(`[Cleanup] Skipping valid comment #${comment.id} (expires in ${remainingMinutes} minutes)`);
@@ -106,9 +111,6 @@ jobs:
                   // Not a valid JSON comment, skip it
                   console.log(`[Cleanup] Skipping non-JSON comment #${comment.id}`);
                   skippedCount++;
-                } catch (deleteError) {
-                  console.error(`[Cleanup] Failed to delete comment #${comment.id}:`, deleteError.message);
-                  errorCount++;
                 }
               }
 

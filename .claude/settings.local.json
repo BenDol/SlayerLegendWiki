@@ -237,7 +237,11 @@
       "Bash(Get-Content wiki-framework/logs/debug.log)",
       "Bash(Select-String -Pattern \"Wrapping Octokit|OctokitProxy|Initializing Octokit|network debug\" -Context 0,2)",
       "Bash(Select-Object -Last 20)",
-      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\.wrangler\\\\server.log\" -Tail 100)"
+      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\.wrangler\\\\server.log\" -Tail 100)",
+      "Bash(Get-Content \"C:\\\\Projects\\\\slayerlegend\\\\wiki\\\\public\\\\sitemap.xml\")",
+      "Bash(Select-String -Pattern \"loc>\")",
+      "Bash(Measure-Object)",
+      "Bash(Select-String -Pattern \"Admin|StarContributor|top-contributor|Top Contributor\" -Context 2,2)"
     ]
   }
 }

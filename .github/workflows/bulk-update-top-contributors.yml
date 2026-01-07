@@ -289,21 +289,23 @@ jobs:
              * Update or create top contributor issue
              */
             async function updateTopContributorIssue(sectionId, pageId, contributorData) {
-              const issueTitle = `[Top Contributor] ${sectionId}/${pageId}`;
+              const pageIdentifier = `${sectionId}/${pageId}`;
+              const issueTitle = `[Top Contributor] ${pageIdentifier}`;
               const issueLabel = 'top-contributor';
               const branch = getCurrentBranch();
               const branchLabel = `branch:${branch}`;
+              const pageIdLabel = `page:${pageIdentifier}`; // Unique label per page
 
-              console.log(`[TopContributor] Using labels: "${issueLabel}", "${branchLabel}"`);
+              console.log(`[TopContributor] Using labels: "${issueLabel}", "${branchLabel}", "${pageIdLabel}"`);
 
               try {
-                // Find existing issue (search by both labels)
+                // Find existing issue (search by page-specific label for fast lookup)
                 const { data: issues } = await github.rest.issues.listForRepo({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   state: 'open',
-                  labels: `${issueLabel},${branchLabel}`,
-                  per_page: 100
+                  labels: `${issueLabel},${branchLabel},${pageIdLabel}`,
+                  per_page: 1 // Only need 1 result since page label is unique
                 });
 
                 const existingIssue = issues.find(issue => issue.title === issueTitle);
@@ -328,7 +330,7 @@ jobs:
                     repo: context.repo.repo,
                     title: issueTitle,
                     body: issueBody,
-                    labels: [issueLabel, branchLabel, 'automated']
+                    labels: [issueLabel, branchLabel, pageIdLabel, 'automated']
                   });
 
                   // Lock the issue to prevent comments
