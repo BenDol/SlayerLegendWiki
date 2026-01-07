@@ -126,16 +126,33 @@ jobs:
               const filePath = `${CONTENT_PATH}/${sectionId}/${pageId}.md`;
 
               try {
-                // Fetch ALL commits for the file (up to 100)
+                // Fetch ALL commits for the file (with pagination)
                 console.log(`[TopContributor] Fetching commits for ${filePath}...`);
-                const { data: commitList } = await github.rest.repos.listCommits({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  path: filePath,
-                  per_page: 100,
-                });
 
-                console.log(`[TopContributor] Found ${commitList.length} commits`);
+                let commitList = [];
+                let page = 1;
+                const perPage = 100;
+
+                while (true) {
+                  const { data: commits } = await github.rest.repos.listCommits({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    path: filePath,
+                    per_page: perPage,
+                    page: page,
+                  });
+
+                  commitList.push(...commits);
+                  console.log(`[TopContributor] Fetched page ${page}: ${commits.length} commits`);
+
+                  if (commits.length < perPage) {
+                    break; // Last page
+                  }
+
+                  page++;
+                }
+
+                console.log(`[TopContributor] Found ${commitList.length} total commits`);
 
                 // Filter commits by release date
                 const filteredCommitList = filterByReleaseDate(commitList);
