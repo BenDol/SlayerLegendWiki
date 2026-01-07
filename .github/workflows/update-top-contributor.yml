@@ -281,6 +281,8 @@ jobs:
              * Update or create top contributor issue
              */
             async function updateTopContributorIssue(sectionId, pageId, contributorData) {
+              console.log(`[TopContributor] updateTopContributorIssue called for ${sectionId}/${pageId}`);
+
               const pageIdentifier = `${sectionId}/${pageId}`;
               const issueTitle = `[Top Contributor] ${pageIdentifier}`;
               const issueLabel = 'top-contributor';
@@ -292,6 +294,7 @@ jobs:
 
               try {
                 // Find existing issue (search by page-specific label for fast lookup)
+                console.log(`[TopContributor] Searching for existing issue...`);
                 const { data: issues } = await github.rest.issues.listForRepo({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -300,6 +303,7 @@ jobs:
                   per_page: 1 // Only need 1 result since page label is unique
                 });
 
+                console.log(`[TopContributor] Search returned ${issues.length} issue(s)`);
                 const existingIssue = issues.find(issue => issue.title === issueTitle);
 
                 const issueBody = JSON.stringify(contributorData, null, 2);
