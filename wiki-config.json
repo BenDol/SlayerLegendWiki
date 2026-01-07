@@ -664,6 +664,13 @@
         "minContributions": 100,
         "badge": "👑",
         "color": "#dc2626"
+      },
+      {
+        "id": "owner",
+        "title": "Owner",
+        "minContributions": 999999,
+        "badge": "💻",
+        "color": "#1f2937"
       }
     ]
   }

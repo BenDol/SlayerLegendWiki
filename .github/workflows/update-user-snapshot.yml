@@ -311,11 +311,33 @@ jobs:
                 })),
               }));
 
+              // Get wiki join date from achievements issue (created on first login)
+              let joinedAt = null;
+              try {
+                const { data: achievementIssues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: `achievements,user-id:${userData.id}`,
+                  state: 'open',
+                  per_page: 1,
+                });
+
+                if (achievementIssues.length > 0) {
+                  joinedAt = achievementIssues[0].created_at;
+                  console.log(`✅ User joined wiki: ${new Date(joinedAt).toLocaleDateString()}`);
+                } else {
+                  console.log('⚠️ No achievements issue found (user may have just joined)');
+                }
+              } catch (error) {
+                console.warn('⚠️ Failed to fetch achievements issue:', error.message);
+              }
+
               // Build snapshot object (use user ID as primary identifier)
               const snapshot = {
                 userId: userData.id, // Permanent identifier (usernames can change!)
                 username: userData.login, // Current username (may change)
                 lastUpdated: new Date().toISOString(),
+                joinedAt: joinedAt, // When user first logged into wiki (from achievements issue)
                 stats: stats,
                 pullRequests: pullRequests,
                 pullRequestsCount: detailedPRs.length,
