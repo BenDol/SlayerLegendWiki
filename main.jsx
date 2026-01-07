@@ -23,6 +23,14 @@ const CharactersRedirect = () => {
 import { initializeBotOctokit } from './wiki-framework/src/services/github/api.js';
 initializeBotOctokit();
 
+// Crawler detection for SEO optimization
+// Log crawler status for debugging (only in development)
+if (import.meta.env.DEV) {
+  import('./src/utils/crawlerDetection.js').then(({ logCrawlerStatus }) => {
+    logCrawlerStatus();
+  });
+}
+
 // Register game-specific rarity colors with styleRegistry
 // This must be imported early to register styles before components render
 import './src/config/rarityColors.js';

@@ -3,6 +3,11 @@
 # which proxies to https://cdn.jsdelivr.net/gh/BenDol/SlayerLegendCDN@main/game-assets/images/
 # In dev, Vite proxy handles this (see vite.config.js)
 
+# Hash URL Migration (Old: /#/path → New: /path)
+# NOTE: Hash fragments (#/) are NOT sent to the server, so server-side redirects are impossible.
+# Client-side redirect is implemented in wiki-framework/src/main.jsx to handle old bookmarks.
+# For Google Search Console: Manually request removal of old /#/ URLs and submit updated sitemap.
+
 # Cloudflare Pages SPA routing fallback
 # Serve index.html for all routes that don't match static files
 # This allows React Router to handle client-side routing

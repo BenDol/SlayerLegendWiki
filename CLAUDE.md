@@ -177,6 +177,27 @@ Enable in `wiki-config.json`:
 }
 ```
 
+### SEO Optimization with Crawler Detection
+
+**Important:** Dynamic page loading is automatically disabled for search engine crawlers to ensure optimal SEO. This is called "dynamic rendering" and is [recommended by Google](https://developers.google.com/search/docs/crawling-indexing/javascript/dynamic-rendering).
+
+**How it works:**
+- **Crawlers (Googlebot, Bingbot, etc.):** Receive static bundled content (fast, pre-rendered)
+- **Regular users:** Receive dynamic content from GitHub (always up-to-date)
+
+**Implementation:**
+1. `src/utils/crawlerDetection.js` - Detects crawlers by User-Agent
+2. `src/services/dynamicPageLoaderWrapper.js` - Wraps framework module with detection
+3. `vite.config.js` - Aliases framework imports to use wrapper
+
+**Supported crawlers:**
+- Google (Googlebot, Google-InspectionTool, AdsBot, etc.)
+- Bing (bingbot, msnbot, BingPreview)
+- Social media (Facebook, Twitter, Discord, LinkedIn, Slack)
+- Other search engines (DuckDuckGo, Yahoo, Baidu, Yandex)
+
+This ensures the best of both worlds: fresh content for users + SEO-friendly static pages for crawlers.
+
 ### Conditional Deployments (GitHub Actions)
 
 When `dynamicPageLoading.enabled = true`, content-only commits automatically skip Cloudflare deployments to conserve build quota. This is handled by `.github/workflows/conditional-deploy.yml`.

@@ -20,6 +20,26 @@ export default createWikiConfigSync({
   // Explicitly use parent project's public directory
   publicDir: './public',
 
+  // Module resolution aliases for crawler detection
+  resolve: {
+    alias: [
+      {
+        // Intercept framework's dynamicPageLoader imports to add crawler detection
+        // This wrapper serves static content to search engines for better SEO
+        find: '../services/github/dynamicPageLoader',
+        replacement: new URL('./src/services/dynamicPageLoaderWrapper.js', import.meta.url).pathname,
+        customResolver(source, importer) {
+          // Don't apply alias if the importer is the wrapper itself (prevent circular dependency)
+          if (importer && importer.includes('dynamicPageLoaderWrapper.js')) {
+            return null; // Return null to skip this alias
+          }
+          // Apply alias for all other imports
+          return undefined; // Return undefined to use the replacement
+        }
+      }
+    ]
+  },
+
   // Define environment variables for client
   define: {
     'import.meta.env.VITE_DEV_PLATFORM': JSON.stringify(process.env.VITE_DEV_PLATFORM || 'cloudflare'),
