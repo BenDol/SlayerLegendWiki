@@ -242,7 +242,9 @@
       "Bash(Select-String -Pattern \"loc>\")",
       "Bash(Measure-Object)",
       "Bash(Select-String -Pattern \"Admin|StarContributor|top-contributor|Top Contributor\" -Context 2,2)",
-      "Bash(Select-String -Pattern \"joinedAt|UserSnapshot|Joined wiki\" -Context 1,1)"
+      "Bash(Select-String -Pattern \"joinedAt|UserSnapshot|Joined wiki\" -Context 1,1)",
+      "Bash(Get-Content \"wiki-framework/logs/debug.log\" -Tail 200)",
+      "Bash(Select-String -Pattern \"Donator|PrestigeAvatar.*badge|DonatorRegistry\" -Context 0,2)"
     ]
   }
 }

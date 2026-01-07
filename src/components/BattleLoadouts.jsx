@@ -1617,59 +1617,79 @@ const BattleLoadouts = () => {
         </div>
         </div>
 
-        {/* Sticky Footer with Save Button */}
+        {/* Floating Action Button (FAB) - Save Loadout */}
         {isAuthenticated && (
-          <div className="sticky bottom-0 left-0 right-0 z-40 mt-6">
-            <div className="max-w-7xl mx-auto px-3 sm:px-4">
-              <div className="bg-gray-100 dark:bg-gray-900 rounded-t-lg border border-gray-200 dark:border-gray-700 border-b-0 shadow-2xl py-0.5">
-                <div className="flex flex-col items-center gap-2">
-                  {/* Error Message */}
-                  {saveError && (
-                    <div className="p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
-                      {saveError}
-                    </div>
-                  )}
-
-                  {/* Save Button with Unsaved Changes Indicator */}
-                  <div className="flex items-center gap-3">
-                    {/* Unsaved Changes Indicator */}
-                    {hasUnsavedChanges && (
-                      <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
-                        <svg className="w-4 h-4 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <span className="hidden sm:inline text-sm">Unsaved changes</span>
-                      </div>
-                    )}
-
-                    {/* Save Button */}
-                    <button
-                      onClick={handleSaveLoadout}
-                      disabled={saving || saveSuccess}
-                      className="flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-base font-semibold transition-colors shadow-lg"
-                    >
-                      {saving ? (
-                        <>
-                          <Loader className="w-4 h-4 animate-spin flex-shrink-0" />
-                          <span>Saving...</span>
-                        </>
-                      ) : saveSuccess ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                          <span>Saved!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4 flex-shrink-0" />
-                          <span style={{ fontSize: '0.9rem', lineHeight: '0' }}>Save Loadout</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
+          <>
+            {/* Error Message Toast */}
+            {saveError && (
+              <div className="fixed bottom-24 right-6 z-50 p-3 bg-red-50 dark:bg-red-900/90 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200 shadow-lg max-w-sm">
+                {saveError}
               </div>
+            )}
+
+            {/* FAB Button */}
+            <div className="fixed bottom-6 right-6 z-50">
+              {/* Sonar Pulse Effect */}
+              {hasUnsavedChanges && !saving && !saveSuccess && (
+                <>
+                  <style>{`
+                    @keyframes sonar-pulse {
+                      0% {
+                        transform: scale(1);
+                        opacity: 0.7;
+                      }
+                      15% {
+                        opacity: 0.2;
+                      }
+                      25% {
+                        transform: scale(1.8);
+                        opacity: 0;
+                      }
+                      100% {
+                        transform: scale(1.8);
+                        opacity: 0;
+                      }
+                    }
+                    .sonar-pulse {
+                      animation: sonar-pulse 8s ease-out infinite;
+                    }
+                    .sonar-pulse-delayed {
+                      animation: sonar-pulse 8s ease-out infinite;
+                      animation-delay: 4s;
+                    }
+                  `}</style>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="sonar-pulse absolute w-14 h-14 rounded-full bg-blue-600 dark:bg-blue-500"></div>
+                    <div className="sonar-pulse-delayed absolute w-14 h-14 rounded-full bg-blue-600 dark:bg-blue-500"></div>
+                  </div>
+                </>
+              )}
+
+              <button
+                onClick={handleSaveLoadout}
+                disabled={!hasUnsavedChanges || saving || saveSuccess}
+                title={saving ? 'Saving...' : saveSuccess ? 'Saved!' : hasUnsavedChanges ? 'Save Loadout (unsaved changes)' : 'No unsaved changes'}
+                className={`
+                  relative
+                  w-14 h-14 rounded-full
+                  flex items-center justify-center
+                  bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:opacity-50
+                  text-white
+                  shadow-2xl
+                  transition-all duration-300
+                  ${!hasUnsavedChanges || saving || saveSuccess ? 'cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
+                `}
+              >
+                {saving ? (
+                  <Loader className="w-6 h-6 animate-spin" />
+                ) : saveSuccess ? (
+                  <CheckCircle2 className="w-6 h-6" />
+                ) : (
+                  <Save className="w-6 h-6" />
+                )}
+              </button>
             </div>
-          </div>
+          </>
         )}
       </div>
 
