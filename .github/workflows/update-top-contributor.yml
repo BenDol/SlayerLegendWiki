@@ -6,6 +6,12 @@ on:
       - main
     paths:
       - 'public/content/**/*.md'
+  workflow_dispatch:
+    inputs:
+      page:
+        description: 'Page to update (e.g., "character/stats" or "equipment/relics")'
+        required: true
+        type: string
 
 # Only allow one instance to run at a time
 concurrency:
@@ -33,8 +39,25 @@ jobs:
       - name: Detect changed files
         id: changed-files
         run: |
-          # Get list of changed content files in the push
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^public/content/.*\.md$' || true)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual trigger - use the input page
+            PAGE_INPUT="${{ github.event.inputs.page }}"
+            echo "Manual trigger for page: $PAGE_INPUT"
+
+            # Convert page input to file path (e.g., "character/stats" -> "public/content/character/stats.md")
+            FILE_PATH="public/content/${PAGE_INPUT}.md"
+
+            # Check if file exists
+            if [ ! -f "$FILE_PATH" ]; then
+              echo "Error: File not found: $FILE_PATH"
+              exit 1
+            fi
+
+            CHANGED_FILES="$FILE_PATH"
+          else
+            # Automatic trigger - get changed files from push
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^public/content/.*\.md$' || true)
+          fi
 
           echo "Changed content files:"
           echo "$CHANGED_FILES"
@@ -416,6 +439,12 @@ jobs:
         run: |
           echo "### Top Contributor Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Changed files:** ${{ steps.changed-files.outputs.files && 'See above' || 'None' }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "**Trigger:** Manual (workflow_dispatch)" >> $GITHUB_STEP_SUMMARY
+            echo "**Page:** ${{ github.event.inputs.page }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Trigger:** Automatic (push)" >> $GITHUB_STEP_SUMMARY
+            echo "**Changed files:** ${{ steps.changed-files.outputs.files && 'See above' || 'None' }}" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Top contributor data has been calculated and stored in GitHub issues." >> $GITHUB_STEP_SUMMARY
