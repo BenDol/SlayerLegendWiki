@@ -914,7 +914,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         initializeDesignerGrid();
       }
     }
-  }, [existingSubmissions, forceDesignMode, loadingSharedBuild, selectedWeapon, wikiConfig, loadingSubmissions, gridState]);
+  }, [existingSubmissions, forceDesignMode, loadingSharedBuild, selectedWeapon, wikiConfig, loadingSubmissions]);
 
   // Update locked inventory indices when grid changes
   useEffect(() => {
@@ -1454,10 +1454,34 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
   };
 
   // Get grid data for any weapon (from official data or community submissions)
-  // Returns: { gridType, activeSlots, hasData, source, submittedBy } or null if no data available
-  const getWeaponGridData = async (weapon) => {
-    // First check if weapon has official grid data
-    if (weapon.activeSlots && Array.isArray(weapon.activeSlots)) {
+  // PRIORITY: Cached community submissions > Official data > Fresh community fetch
+  // Returns: { gridType, activeSlots, hasData, source, submittedBy, rateLimitWarning? } or null if no data available
+  const getWeaponGridData = async (weapon, skipGitHubFetch = false) => {
+    let rateLimitWarning = null;
+    const hasOfficialData = weapon.activeSlots && Array.isArray(weapon.activeSlots) && weapon.activeSlots.length > 0;
+
+    // FIRST: Check cache for community submissions (corrections override official data)
+    if (wikiConfig) {
+      const cache = getSubmissionCache();
+      const cached = cache[weapon.name];
+      if (cached && (Date.now() - cached.timestamp) < CACHE_TTL && cached.submissions.length > 0) {
+        const submission = cached.submissions[0]; // Use first submission
+        gridLogger.info(`   ✅ Using cached community submission for ${weapon.name} (${hasOfficialData ? 'overrides official data' : 'no official data'})`);
+        return {
+          gridType: submission.gridType,
+          activeSlots: submission.activeSlots,
+          completionEffect: submission.completionEffect,
+          hasData: true,
+          source: 'community',
+          submittedBy: submission.submittedBy,
+          weaponNameOverride: submission.weaponNameOverride
+        };
+      }
+    }
+
+    // SECOND: Use official data if available (and no cached community submission)
+    if (hasOfficialData) {
+      gridLogger.info(`   📊 Using official grid data for ${weapon.name}`);
       return {
         gridType: weapon.gridType,
         activeSlots: weapon.activeSlots,
@@ -1467,62 +1491,84 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
       };
     }
 
-    // If not, check for community submissions (read from comments)
-    if (!wikiConfig) return null;
+    // THIRD: Fetch from GitHub (only if no official data, no cache, and not skipping)
+    if (wikiConfig && !skipGitHubFetch) {
+      gridLogger.info(`   🔍 No official/cached data - fetching community submission for ${weapon.name} (ID: ${weapon.id})`);
 
-    try {
-      const owner = wikiConfig.wiki.repository.owner;
-      const repo = wikiConfig.wiki.repository.repo;
+      try {
+        const owner = wikiConfig.wiki.repository.owner;
+        const repo = wikiConfig.wiki.repository.repo;
 
-      // Get authenticated Octokit instance (uses user token if logged in)
-      const octokit = getOctokit();
+        // Get authenticated Octokit instance (uses user token if logged in)
+        const octokit = getOctokit();
 
-      // Search for OPEN issue with this weapon's label - closed issues are considered deleted
-      const weaponLabel = createWeaponLabel(weapon.name);
-      const { data } = await retryGitHubAPI(
-        async () => await octokit.rest.search.issuesAndPullRequests({
-          q: `repo:${owner}/${repo} label:soul-weapon-grids label:"${weaponLabel}" is:open`,
-          per_page: 1,
-        })
-      );
-
-      const issues = data.items || [];
-
-      if (issues.length > 0) {
-        const issue = issues[0];
-
-        // Fetch first comment (primary submission) using authenticated Octokit with retry
-        const { data: comments } = await retryGitHubAPI(
-          async () => await octokit.rest.issues.listComments({
-            owner,
-            repo,
-            issue_number: issue.number,
+        // Search for OPEN issue with this weapon's ID label - closed issues are considered deleted
+        // Use weapon-id label (not weapon name) to match loadExistingSubmissions behavior
+        const weaponLabel = createWeaponIdLabel(weapon.id);
+        gridLogger.info(`   🏷️  Searching with label: ${weaponLabel}`);
+        const { data } = await retryGitHubAPI(
+          async () => await octokit.rest.search.issuesAndPullRequests({
+            q: `repo:${owner}/${repo} label:soul-weapon-grids label:"${weaponLabel}" is:open`,
             per_page: 1,
           })
         );
 
-        if (comments.length > 0) {
-          // Parse JSON from first comment
-          const jsonMatch = comments[0].body.match(/```json\n([\s\S]*?)\n```/);
-          if (jsonMatch) {
-            const submission = JSON.parse(jsonMatch[1]);
-            return {
-              gridType: submission.gridType,
-              activeSlots: submission.activeSlots,
-              completionEffect: submission.completionEffect,
-              hasData: true,
-              source: 'community',
-              submittedBy: submission.submittedBy
-            };
+        const issues = data.items || [];
+        gridLogger.info(`   📋 Found ${issues.length} issue(s)`);
+
+        if (issues.length > 0) {
+          const issue = issues[0];
+
+          // Fetch first comment (primary submission) using authenticated Octokit with retry
+          const { data: comments } = await retryGitHubAPI(
+            async () => await octokit.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: issue.number,
+              per_page: 1,
+            })
+          );
+
+          if (comments.length > 0) {
+            // Parse JSON from first comment (plain JSON format)
+            try {
+              const submission = JSON.parse(comments[0].body);
+
+              // Cache the submission for future use
+              setSubmissionCache(weapon.name, [submission]);
+
+              gridLogger.info(`   ✅ Found community submission with ${submission.activeSlots?.length || 0} active slots (prioritized over official data)`);
+              return {
+                gridType: submission.gridType,
+                activeSlots: submission.activeSlots,
+                completionEffect: submission.completionEffect,
+                hasData: true,
+                source: 'community',
+                submittedBy: submission.submittedBy,
+                weaponNameOverride: submission.weaponNameOverride
+              };
+            } catch (parseError) {
+              logger.warn(`Failed to parse community submission for ${weapon.name}`, { error: parseError });
+            }
+          } else {
+            gridLogger.info(`   ⚠️ Issue found but no comments`);
           }
+        } else {
+          gridLogger.info(`   ⚠️ No community submission found`);
+        }
+      } catch (error) {
+        // Rate limit or network error - don't fail, just warn and fall back to official data
+        if (error.status === 403) {
+          logger.warn(`⚠️ Rate limit hit while checking community submission for ${weapon.name} - using official data`);
+          rateLimitWarning = 'Rate limit exceeded - some community submissions may not be included';
+        } else {
+          logger.error(`Failed to fetch community data for ${weapon.name}`, { error });
         }
       }
-
-      return null; // No data found
-    } catch (error) {
-      logger.error(`Failed to fetch community data for ${weapon.name}`, { error });
-      return null;
     }
+
+    // No data available
+    return null;
   };
 
 
@@ -1941,7 +1987,8 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
       activeSlots: submission.activeSlots,
       completionEffect: submission.completionEffect,
       submittedBy: submission.submittedBy || 'Anonymous',
-      submittedAt: submission.submittedAt
+      submittedAt: submission.submittedAt,
+      weaponNameOverride: submission.weaponNameOverride // Include name override for display
     };
     logger.debug('Setting currentSubmissionMeta', { submissionMeta });
     setCurrentSubmissionMeta(submissionMeta);
@@ -3687,13 +3734,44 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         }
       });
 
-      gridLogger.debug('Updated inventory, initializing grid');
+      // Clear pieces from grid while preserving active slots
+      // DON'T call initializeGrid() as it will trigger the mode-switching effect
+      // which would reload community submissions
+      const clearedGrid = gridState.map(row =>
+        row.map(cell => ({
+          active: cell.active, // Preserve active slots
+          piece: null // Clear all pieces
+        }))
+      );
+
+      gridLogger.debug('Updated inventory and cleared grid');
       setInventory(newInventory);
-      initializeGrid();
+      setGridState(clearedGrid);
       setHasUnsavedChanges(true);
       gridLogger.info('Grid cleared successfully');
     } else {
       gridLogger.debug('User cancelled clear grid');
+    }
+  };
+
+  // Clear designer grid (for designer mode)
+  const handleClearDesignerGrid = () => {
+    gridLogger.debug('Clear designer grid button clicked');
+
+    if (confirm('Clear all active cells in the designer grid?')) {
+      gridLogger.debug('User confirmed, clearing designer grid');
+
+      // Clear all active cells
+      const clearedGrid = designerGrid.map(row =>
+        row.map(cell => ({
+          active: false
+        }))
+      );
+
+      setDesignerGrid(clearedGrid);
+      gridLogger.info('Designer grid cleared successfully');
+    } else {
+      gridLogger.debug('User cancelled clear designer grid');
     }
   };
 
@@ -4257,7 +4335,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
       `Finding the best weapon will test ${unlockedWeapons.length} unlocked weapon${unlockedWeapons.length !== 1 ? 's' : ''} with your current inventory.\n\n` +
       `Highest unlocked: ${highestWeaponName}\n\n` +
       'This may take 10-30 seconds to complete.\n\n' +
-      'Note: This will check for both official grid data and community submissions.\n\n' +
+      'Note: Cached community submissions override official data. GitHub API is only called for weapons without official data or cache (with 150ms delay between calls to avoid rate limits).\n\n' +
       'Continue?'
     );
 
@@ -4275,6 +4353,9 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         const results = [];
         const startTime = Date.now();
         const newCacheEntries = {}; // Batch cache updates
+        let rateLimitHit = false; // Track if we hit rate limits
+        let skipGitHubFetch = false; // Skip GitHub API calls after rate limit
+        let apiCallCount = 0; // Track number of API calls made
 
         gridLogger.trace(`🔓 Testing ${unlockedWeapons.length} unlocked weapons (up to ${highestWeaponName})`);
 
@@ -4283,12 +4364,38 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
           const weapon = unlockedWeapons[weaponIndex];
           gridLogger.trace(`\n🗡️ Testing weapon ${weaponIndex + 1}/${unlockedWeapons.length}: ${weapon.name}`);
 
+          // Add delay between API calls if we're not using cache (avoids rate limits)
+          // Only delay if we'll need to fetch from GitHub (no official data AND no cache)
+          const hasOfficialData = weapon.activeSlots && Array.isArray(weapon.activeSlots) && weapon.activeSlots.length > 0;
+          const cache = getSubmissionCache();
+          const hasCachedSubmission = cache[weapon.name] && cache[weapon.name].submissions?.length > 0;
+          const willFetchFromGitHub = !hasOfficialData && !hasCachedSubmission && !skipGitHubFetch;
+
+          if (willFetchFromGitHub && apiCallCount > 0) {
+            // Small delay to avoid hitting rate limits (150ms per call)
+            await new Promise(resolve => setTimeout(resolve, 150));
+            gridLogger.trace(`   ⏱️ Rate limit protection delay (150ms)`);
+          }
+
           // Get grid data for this weapon (official or community)
-          const weaponGridData = await getWeaponGridData(weapon);
+          // Skip GitHub fetching if we've already hit rate limit
+          const weaponGridData = await getWeaponGridData(weapon, skipGitHubFetch);
+
+          // Track if we made an API call (only for weapons without official data or cache)
+          if (willFetchFromGitHub && weaponGridData) {
+            apiCallCount++;
+          }
 
           if (!weaponGridData || !weaponGridData.hasData) {
             gridLogger.trace(`   ⚠️ No grid data available (skipping)`);
             continue; // Skip weapons without grid data
+          }
+
+          // Track if we hit rate limits - stop fetching from GitHub for remaining weapons
+          if (weaponGridData.rateLimitWarning && !skipGitHubFetch) {
+            rateLimitHit = true;
+            skipGitHubFetch = true; // Stop making GitHub API calls for remaining weapons
+            gridLogger.info(`   🚫 Rate limit hit - using cached/official data only for remaining weapons`);
           }
 
           if (weaponGridData.source === 'community') {
@@ -4341,7 +4448,9 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
             const enrichedWeapon = {
               ...weapon,
               gridType: weapon.gridType || weaponGridData.gridType,
-              completionEffect: weaponGridData.completionEffect || weapon.completionEffect
+              completionEffect: weaponGridData.completionEffect || weapon.completionEffect,
+              // Override weapon name if community submission provides it
+              name: weaponGridData.weaponNameOverride || weapon.name
             };
 
             results.push({
@@ -4371,6 +4480,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
         gridLogger.trace(`\n🏆 Best weapon search complete in ${elapsed}s`);
         gridLogger.trace(`📊 Found ${results.length} weapons with solutions (tested ${unlockedWeapons.length} unlocked weapons)`);
+        gridLogger.trace(`🌐 Made ${apiCallCount} GitHub API calls (cached/official data used for remaining weapons)`);
 
         // Update cache with all new entries found during search
         if (Object.keys(newCacheEntries).length > 0) {
@@ -4388,6 +4498,13 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
           setBestWeaponCache(results);
           setBestWeaponResults(results);
           setShowBestWeaponModal(true);
+
+          // Show warning if rate limits were hit
+          if (rateLimitHit) {
+            setTimeout(() => {
+              alert('⚠️ GitHub API rate limit was hit during the search.\n\nSome community submissions may not have been checked. Results may be using official grid data instead.\n\nFor best results, try again after a few minutes or sign in to increase your rate limit.');
+            }, 300);
+          }
 
           // Trigger donation prompt on successful find
           window.triggerDonationPrompt?.({
@@ -5114,9 +5231,20 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                   description = 'Designer Mode (No Grid Data)';
                 }
 
+                // Check if there's a community submission with name override for this weapon
+                let weaponLabel = weapon.name;
+                const cache = getSubmissionCache();
+                const cachedSubmission = cache[weapon.name];
+                if (cachedSubmission && cachedSubmission.submissions && cachedSubmission.submissions.length > 0) {
+                  const firstSubmission = cachedSubmission.submissions[0];
+                  if (firstSubmission.weaponNameOverride) {
+                    weaponLabel = firstSubmission.weaponNameOverride;
+                  }
+                }
+
                 return {
                   value: weapon.id,
-                  label: weapon.name,
+                  label: weaponLabel,
                   image: weapon.image,
                   description: description
                 };
@@ -5134,12 +5262,25 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                 value={highestUnlockedWeapon}
                 selectedOptionOverride={(() => {
                   const weapon = allWeapons.find(w => w.id === highestUnlockedWeapon);
-                  return weapon ? {
+                  if (!weapon) return null;
+
+                  // Check if there's a community submission with name override
+                  let weaponLabel = weapon.name;
+                  const cache = getSubmissionCache();
+                  const cachedSubmission = cache[weapon.name];
+                  if (cachedSubmission && cachedSubmission.submissions && cachedSubmission.submissions.length > 0) {
+                    const firstSubmission = cachedSubmission.submissions[0];
+                    if (firstSubmission.weaponNameOverride) {
+                      weaponLabel = firstSubmission.weaponNameOverride;
+                    }
+                  }
+
+                  return {
                     value: weapon.id,
-                    label: weapon.name,
+                    label: weaponLabel,
                     image: weapon.image,
                     description: `${weapon.attack?.toLocaleString() || 'N/A'} ATK`
-                  } : null;
+                  };
                 })()}
                 onChange={(value) => {
                   const newValue = parseInt(value, 10);
@@ -5154,12 +5295,25 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                 }}
                 placeholder="Select Highest Unlocked"
                 className="flex-1"
-                options={allWeapons.map(weapon => ({
-                  value: weapon.id,
-                  label: weapon.name,
-                  image: weapon.image,
-                  description: `${weapon.attack?.toLocaleString() || 'N/A'} ATK`
-                }))}
+                options={allWeapons.map(weapon => {
+                  // Check if there's a community submission with name override for this weapon
+                  let weaponLabel = weapon.name;
+                  const cache = getSubmissionCache();
+                  const cachedSubmission = cache[weapon.name];
+                  if (cachedSubmission && cachedSubmission.submissions && cachedSubmission.submissions.length > 0) {
+                    const firstSubmission = cachedSubmission.submissions[0];
+                    if (firstSubmission.weaponNameOverride) {
+                      weaponLabel = firstSubmission.weaponNameOverride;
+                    }
+                  }
+
+                  return {
+                    value: weapon.id,
+                    label: weaponLabel,
+                    image: weapon.image,
+                    description: `${weapon.attack?.toLocaleString() || 'N/A'} ATK`
+                  };
+                })}
               />
               <button
                 onClick={() => {
@@ -5427,7 +5581,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
           <div className="space-y-2">
             {/* Clear Grid Button for Designer Mode */}
             <button
-              onClick={handleClearGrid}
+              onClick={handleClearDesignerGrid}
               disabled={!designerGrid.some(row => row.some(cell => cell.active))}
               className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors"
               title="Clear all active cells"
