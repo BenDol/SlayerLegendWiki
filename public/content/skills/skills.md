@@ -15,6 +15,19 @@ Aside from your normal attacks, there are skills that deal more damage or help a
 # <span class="text-gray-900 dark:text-gray-100">Common Skills</span>
 This part of the guide is still a work in progress.
 
+<img src="/images/content/skills/icons/00_FlameSlash.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/00_IceStone.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/00_StoneStrike.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/04_ManaRecovery_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/12_EarthCount.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/07_BurningWeapon_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/LightningSlash.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
 # <span class="text-gray-900 dark:text-gray-100">Great Skills</span>
 This part of the guide is still a work in progress.
