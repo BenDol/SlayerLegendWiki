@@ -81,6 +81,21 @@ This part of the guide is still a work in progress.
 # <span class="text-gray-900 dark:text-gray-100">Legendary Skills</span>
 This part of the guide is still a work in progress.
 
+<img src="/images/content/skills/icons/02_ExplosionSlash.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/02_IceMeteor.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/ThunderboltSlash.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/02_GigaStrike.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/09_Rage.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/05_Meditation.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/04_LightningSwing.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/04_GigaWave.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
 # <span class="text-gray-900 dark:text-gray-100">Mythic Skills</span>
 This part of the guide is still a work in progress.
