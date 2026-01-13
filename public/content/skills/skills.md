@@ -100,6 +100,25 @@ This part of the guide is still a work in progress.
 # <span class="text-gray-900 dark:text-gray-100">Mythic Skills</span>
 This part of the guide is still a work in progress.
 
+<img src="/images/content/skills/icons/06_ProminenceBurn.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/06_Blizard.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/06_BloodyTornado.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/05_Earthquake.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/10_WarriorBurn.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/StrongCurrent.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/10_WhiteLightning.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/06_Supernatural.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
 # <span class="text-gray-900 dark:text-gray-100">Immortal Skills</span>
 This part of the guide is still a work in progress.
+
+<img src="/images/content/skills/icons/16_BlazeDance.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/Rave.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 125px; height: 128px; margin: 0 0.25em;" data-inline="true" />
