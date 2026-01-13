@@ -42,9 +42,24 @@ This part of the guide is still a work in progress.
 
 <img src="/images/content/skills/icons/01_PowerStrike.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
+<img src="/images/content/skills/icons/03_PowerWave.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
 # <span class="text-gray-900 dark:text-gray-100">Rare Skills</span>
 This part of the guide is still a work in progress.
 
+<img src="/images/content/skills/icons/01_BlazeSlash.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/03_IceLancer.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/ThunderSlash.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/08_BurningWeapon_2.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/08_IceAge.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/07_StormBlade.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/08_EarthWill.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
 # <span class="text-gray-900 dark:text-gray-100">Epic Skills</span>
 This part of the guide is still a work in progress.
