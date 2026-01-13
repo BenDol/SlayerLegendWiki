@@ -32,6 +32,15 @@ This part of the guide is still a work in progress.
 # <span class="text-gray-900 dark:text-gray-100">Great Skills</span>
 This part of the guide is still a work in progress.
 
+<img src="/images/content/skills/icons/LightningStroke.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/01_IceShower.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/03_FireWind.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/09_Tornado.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
+<img src="/images/content/skills/icons/01_PowerStrike.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
 # <span class="text-gray-900 dark:text-gray-100">Rare Skills</span>
 This part of the guide is still a work in progress.
