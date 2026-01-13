@@ -83,6 +83,8 @@ This part of the guide is still a work in progress.
 
 <img src="/images/content/skills/icons/02_ExplosionSlash.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
+<img src="/images/content/skills/icons/04_FireWind_Expert.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+
 <img src="/images/content/skills/icons/02_IceMeteor.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
 <img src="/images/content/skills/icons/ThunderboltSlash.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
