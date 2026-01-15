@@ -5,6 +5,7 @@ import SkillSlot from './SkillSlot';
 import SkillInformation from './SkillInformation';
 import SpiritBuilderModal from './SpiritBuilderModal';
 import SpiritComponent from './SpiritComponent';
+import FamiliarBuilderModal from './FamiliarBuilderModal';
 import SoulWeaponEngravingBuilderModal from './SoulWeaponEngravingBuilderModal';
 import SoulWeaponEngravingGrid from './SoulWeaponEngravingGrid';
 import SkillStoneBuilderModal from './SkillStoneBuilderModal';
@@ -58,6 +59,7 @@ const BattleLoadouts = () => {
   const [showSpiritBuilder, setShowSpiritBuilder] = useState(false);
   const [showSoulWeaponBuilder, setShowSoulWeaponBuilder] = useState(false);
   const [showSkillStoneBuilder, setShowSkillStoneBuilder] = useState(false);
+  const [showFamiliarBuilder, setShowFamiliarBuilder] = useState(false);
   const [showSkillInfo, setShowSkillInfo] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -790,6 +792,18 @@ const BattleLoadouts = () => {
   const handleClearSpiritBuild = () => {
     if (!confirm('Remove spirit build from this loadout?')) return;
     setCurrentLoadout(prev => ({ ...prev, spiritBuild: null }));
+  };
+
+  // Handle familiar build save
+  const handleFamiliarBuildSave = (build) => {
+    setCurrentLoadout(prev => ({ ...prev, familiarBuild: build }));
+    setShowFamiliarBuilder(false);
+  };
+
+  // Clear familiar build
+  const handleClearFamiliarBuild = () => {
+    if (!confirm('Remove familiar build from this loadout?')) return;
+    setCurrentLoadout(prev => ({ ...prev, familiarBuild: null }));
   };
 
   // Handle soul weapon build save
@@ -1609,10 +1623,10 @@ const BattleLoadouts = () => {
           />
 
           {/* Familiar - Row 3, Col 1 */}
-          <PlaceholderSection
-            title="Familiar"
-            description="Familiar Builder coming soon"
-            icon="🐾"
+          <FamiliarSection
+            familiarBuild={currentLoadout.familiarBuild}
+            onEdit={() => setShowFamiliarBuilder(true)}
+            onClear={handleClearFamiliarBuild}
           />
         </div>
         </div>
@@ -1707,6 +1721,14 @@ const BattleLoadouts = () => {
         onClose={() => setShowSpiritBuilder(false)}
         initialBuild={currentLoadout.spiritBuild}
         onSave={handleSpiritBuildSave}
+      />
+
+      {/* Familiar Builder Modal */}
+      <FamiliarBuilderModal
+        isOpen={showFamiliarBuilder}
+        onClose={() => setShowFamiliarBuilder(false)}
+        initialBuild={currentLoadout.familiarBuild}
+        onSave={handleFamiliarBuildSave}
       />
 
       {/* Soul Weapon Engraving Builder Modal */}
@@ -2267,6 +2289,111 @@ const PlaceholderSection = ({ title, description, icon, matchHeight = false }) =
           <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base md:text-lg">{description}</p>
         </div>
       </div>
+    </div>
+  );
+};
+
+/**
+ * Familiar Section Component
+ */
+const FamiliarSection = ({ familiarBuild, onEdit, onClear }) => {
+  const hasFamiliar = familiarBuild && familiarBuild.slots && familiarBuild.slots.some(slot => slot.familiar !== null);
+
+  const handleClear = () => {
+    if (window.confirm('Are you sure you want to clear the familiar build? This cannot be undone.')) {
+      onClear();
+    }
+  };
+
+  // Show missing indicator if familiar build is marked as missing
+  if (familiarBuild?.missing) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="text-2xl sm:text-3xl">👹</span>
+            <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Familiar</span>
+          </div>
+        </div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-800 dark:text-red-300 font-medium mb-2">Familiar Build Missing</p>
+          <p className="text-red-600 dark:text-red-400 text-sm mb-3">
+            The familiar build for this loadout has been deleted.
+          </p>
+          <button
+            onClick={onEdit}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            Select New Familiar Build
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="text-2xl sm:text-3xl">👹</span>
+          <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Familiar</span>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={onEdit}
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
+          >
+            <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>{hasFamiliar ? 'Edit' : 'Create'}</span>
+          </button>
+          {hasFamiliar && (
+            <button
+              onClick={handleClear}
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
+            >
+              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {familiarBuild && familiarBuild.primeFamiliar ? (
+        <div className="text-center">
+          <div className="inline-block bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-800">
+            <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              {familiarBuild.primeFamiliar.name}
+              {familiarBuild.primeFamiliar.isCustom && (
+                <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(Custom)</span>
+              )}
+            </div>
+            {familiarBuild.primeFamiliar.skill && (
+              <div className="text-sm text-gray-700 dark:text-gray-300">
+                {familiarBuild.primeFamiliar.skill.name}
+              </div>
+            )}
+            <div className="mt-3 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+              {familiarBuild.slots && familiarBuild.slots.map((slot, index) => (
+                slot.familiar && (
+                  <div key={index}>
+                    {slot.familiar.name} ★{slot.starLevel}
+                  </div>
+                )
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={onEdit}
+          className="w-full flex items-center justify-center py-8 sm:py-10 md:py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+        >
+          <div className="text-center px-2">
+            <Plus className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">No familiar build configured</p>
+            <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Click here or "Create" to get started</p>
+          </div>
+        </button>
+      )}
     </div>
   );
 };

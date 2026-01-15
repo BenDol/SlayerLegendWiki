@@ -6,7 +6,7 @@
 /**
  * Valid data types supported by the system
  */
-export const VALID_DATA_TYPES = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'engraving-builds', 'skill-stone-builds', 'grid-submission', 'display-names'];
+export const VALID_DATA_TYPES = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'my-familiars', 'familiar-builds', 'engraving-builds', 'skill-stone-builds', 'grid-submission', 'display-names'];
 
 /**
  * Configuration for each data type
@@ -33,6 +33,18 @@ export const DATA_TYPE_CONFIGS = {
   'spirit-builds': {
     label: 'spirit-builds',
     titlePrefix: '[Spirit Build]',
+    itemsName: 'builds',
+    maxItems: 50,
+  },
+  'my-familiars': {
+    label: 'my-familiars',
+    titlePrefix: '[My Familiars]',
+    itemsName: 'familiars',
+    maxItems: 500,
+  },
+  'familiar-builds': {
+    label: 'familiar-builds',
+    titlePrefix: '[Familiar Build]',
     itemsName: 'builds',
     maxItems: 50,
   },
@@ -140,12 +152,12 @@ export function validateLoadData(data) {
  */
 export function validateDeleteData(data, type) {
   const { username, userId } = data;
-  const deleteId = type === 'my-spirits' ? data.spiritId : data.itemId;
+  const deleteId = type === 'my-spirits' ? data.spiritId : (type === 'my-familiars' ? data.familiarId : data.itemId);
 
   if (!username || !userId || !deleteId) {
     return {
       valid: false,
-      error: `Missing required fields: username, userId, ${type === 'my-spirits' ? 'spiritId' : 'itemId'}`
+      error: `Missing required fields: username, userId, ${type === 'my-spirits' ? 'spiritId' : (type === 'my-familiars' ? 'familiarId' : 'itemId')}`
     };
   }
 
