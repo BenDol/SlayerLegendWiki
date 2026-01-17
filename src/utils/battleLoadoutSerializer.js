@@ -308,6 +308,7 @@ export const serializeLoadoutForSharing = (loadout) => {
  * @param {Array} familiars - All familiars data
  * @param {Array} myFamiliars - User's familiar collection
  * @param {Array} allFamiliarBuilds - All saved familiar builds (for ID resolution)
+ * @param {Array} primeFamiliars - All prime familiar definitions (for prime familiar regeneration)
  * @returns {Object} Deserialized loadout with full build objects
  */
 export const deserializeLoadout = (
@@ -320,7 +321,8 @@ export const deserializeLoadout = (
   shapes = [],
   familiars = [],
   myFamiliars = [],
-  allFamiliarBuilds = []
+  allFamiliarBuilds = [],
+  primeFamiliars = []
 ) => {
   if (!loadout) return null;
 
@@ -378,7 +380,7 @@ export const deserializeLoadout = (
     // Storage format: resolve ID to build
     const found = allFamiliarBuilds.find(b => b.id === loadout.familiarBuildId);
     if (found) {
-      familiarBuild = deserializeFamiliarBuild(found, familiars, myFamiliars);
+      familiarBuild = deserializeFamiliarBuildUtil(found, familiars, myFamiliars, primeFamiliars);
     } else {
       // Build not found - mark as missing
       familiarBuild = {
@@ -392,7 +394,7 @@ export const deserializeLoadout = (
     }
   } else if (loadout.familiarBuild) {
     // Share format or embedded: already has full build data
-    familiarBuild = deserializeFamiliarBuild(loadout.familiarBuild, familiars, myFamiliars);
+    familiarBuild = deserializeFamiliarBuildUtil(loadout.familiarBuild, familiars, myFamiliars, primeFamiliars);
   }
 
   // Deserialize soul weapon build (reconstruct shape objects if needed)

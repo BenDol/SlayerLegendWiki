@@ -48,6 +48,7 @@ const FamiliarBuilder = forwardRef(({
   const [primeFamiliar, setPrimeFamiliar] = useState(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [currentLoadedBuildId, setCurrentLoadedBuildId] = useState(null);
+  const [originalBuildName, setOriginalBuildName] = useState(null); // Track original name to detect renames
 
   // UI state
   const [selectorState, setSelectorState] = useState({ open: false, slotIndex: null });
@@ -58,12 +59,26 @@ const FamiliarBuilder = forwardRef(({
   const [showSavedBuilds, setShowSavedBuilds] = useState(false);
   const [myFamiliars, setMyFamiliars] = useState([]);
   const [draggedSlotIndex, setDraggedSlotIndex] = useState(null);
+  const [draggedFamiliarCategory, setDraggedFamiliarCategory] = useState(null); // Track category of dragged familiar from collection
+  const [buildsRefreshTrigger, setBuildsRefreshTrigger] = useState(0);
+  const [familiarsRefreshTrigger, setFamiliarsRefreshTrigger] = useState(0);
+  const [savingToCollection, setSavingToCollection] = useState(null); // slot index being saved
 
   // Serialize draft data for auto-save
   const serializedDraft = hasUnsavedChanges && !isModal ? {
     ...serializeBuild(build),
     name: buildName
   } : null;
+
+  // Debug: Log when hasUnsavedChanges or draft data changes
+  useEffect(() => {
+    logger.debug('Draft state changed', {
+      hasUnsavedChanges,
+      isModal,
+      hasDraftData: !!serializedDraft,
+      buildName
+    });
+  }, [hasUnsavedChanges, serializedDraft, isModal, buildName]);
 
   // Draft auto-save hook (auto-saves when serializedDraft changes)
   const { loadDraft, clearDraft } = useDraftStorage(
@@ -122,8 +137,10 @@ const FamiliarBuilder = forwardRef(({
       const deserialized = deserializeBuild(initialBuild, familiarsData, myFamiliars);
       if (deserialized) {
         logger.debug('Setting initial build', { slotsCount: deserialized.slots?.length });
+        const loadedName = initialBuild.name || '';
         setBuild(deserialized);
-        setBuildName(initialBuild.name || '');
+        setBuildName(loadedName);
+        setOriginalBuildName(loadedName); // Track the original name
         setCurrentLoadedBuildId(initialBuild.id || null);
       }
     } else {
@@ -144,6 +161,7 @@ const FamiliarBuilder = forwardRef(({
           logger.debug('Setting draft build', { slotsCount: deserialized.slots?.length });
           setBuild(deserialized);
           setBuildName(draft.name || '');
+          setHasUnsavedChanges(true); // Mark as having unsaved changes so draft continues to save
         } else {
           logger.warn('Deserialized draft has no slots, clearing draft');
           clearDraft();
@@ -251,6 +269,8 @@ const FamiliarBuilder = forwardRef(({
     if (!slot || !slot.familiar) return;
 
     try {
+      setSavingToCollection(slotIndex);
+
       const token = useAuthStore.getState().getToken();
       const response = await fetch(getSaveDataEndpoint(), {
         method: 'POST',
@@ -267,12 +287,24 @@ const FamiliarBuilder = forwardRef(({
         })
       });
 
-      if (response.ok) {
-        logger.info('Familiar saved to collection', { familiarId: slot.familiar.id });
-        await loadMyFamiliars();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'Failed to save familiar to collection';
+        logger.error('API error when saving familiar', { status: response.status, error: errorMessage, errorData });
+        throw new Error(errorMessage);
       }
+
+      logger.info('Familiar saved to collection', { familiarId: slot.familiar.id, starLevel: slot.starLevel });
+
+      // Trigger refresh of familiars gallery
+      setFamiliarsRefreshTrigger(prev => prev + 1);
+
+      // Show success feedback briefly
+      setTimeout(() => setSavingToCollection(null), 1500);
     } catch (error) {
       logger.error('Failed to save to collection', { error });
+      alert('Failed to save familiar to collection: ' + error.message);
+      setSavingToCollection(null);
     }
   };
 
@@ -285,33 +317,73 @@ const FamiliarBuilder = forwardRef(({
 
   const handleDragOver = (e, slotIndex) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+
+    // Check if it's an external drag (from SavedFamiliarsGallery) by looking at data types
+    const hasExternalData = e.dataTransfer.types.includes('application/json');
+
+    // Set appropriate drop effect: 'copy' for external, 'move' for internal slot swaps
+    e.dataTransfer.dropEffect = hasExternalData ? 'copy' : 'move';
+
+    logger.debug('Drag over slot', { slotIndex, hasExternalData, types: e.dataTransfer.types });
+  };
+
+  // Handle when external familiar drag starts (from collection)
+  const handleExternalDragStart = (familiarCategory) => {
+    setDraggedFamiliarCategory(familiarCategory);
+    logger.debug('External drag started', { category: familiarCategory });
+  };
+
+  // Handle when external familiar drag ends
+  const handleExternalDragEnd = () => {
+    setDraggedFamiliarCategory(null);
+    logger.debug('External drag ended');
   };
 
   const handleDrop = (e, targetSlotIndex) => {
     e.preventDefault();
 
+    logger.debug('Drop event triggered', { targetSlotIndex });
+
     // Check if dropping from collection
     try {
       const jsonData = e.dataTransfer.getData('application/json');
+      logger.debug('Drag data received', { hasData: !!jsonData, jsonData });
+
       if (jsonData) {
         const data = JSON.parse(jsonData);
+        logger.debug('Parsed drag data', { type: data.type, familiar: data.familiar?.name });
+
         if (data.type === 'collection-familiar') {
           const newSlots = [...build.slots];
+          const targetCategory = newSlots[targetSlotIndex].category;
+          const familiarCategory = data.familiar.category;
+
+          logger.debug('Category validation', { targetCategory, familiarCategory });
+
+          // Validate category match
+          if (familiarCategory !== targetCategory) {
+            alert(`This familiar cannot be placed in the ${targetCategory} slot. It belongs in the ${familiarCategory} slot.`);
+            setDraggedSlotIndex(null);
+            return;
+          }
+
           newSlots[targetSlotIndex] = {
             type: 'collection',
             myFamiliarId: data.myFamiliarId,
-            category: newSlots[targetSlotIndex].category,
+            category: targetCategory,
             familiar: data.familiar,
             starLevel: data.starLevel
           };
           setBuild({ ...build, slots: newSlots });
           setHasUnsavedChanges(true);
           setDraggedSlotIndex(null);
+          setDraggedFamiliarCategory(null); // Clear highlight
+          logger.info('Familiar dropped successfully', { familiarName: data.familiar.name });
           return;
         }
       }
     } catch (err) {
+      logger.error('Error processing drop', { error: err });
       // Not collection data, continue with slot swap
     }
 
@@ -327,6 +399,38 @@ const FamiliarBuilder = forwardRef(({
     setDraggedSlotIndex(null);
   };
 
+  // Handle clicking a saved familiar from gallery
+  const handleSavedFamiliarSelected = (savedFamiliar) => {
+    logger.debug('Saved familiar selected from gallery', { familiar: savedFamiliar.familiar.name });
+
+    // Find the appropriate slot based on familiar category
+    const familiarCategory = savedFamiliar.familiar.category;
+    const targetSlotIndex = build.slots.findIndex(slot => slot.category === familiarCategory);
+
+    if (targetSlotIndex === -1) {
+      alert(`No slot found for ${familiarCategory} familiar.`);
+      return;
+    }
+
+    const newSlots = [...build.slots];
+    newSlots[targetSlotIndex] = {
+      type: 'collection',
+      myFamiliarId: savedFamiliar.id,
+      category: familiarCategory,
+      familiar: savedFamiliar.familiar,
+      starLevel: savedFamiliar.starLevel
+    };
+
+    setBuild({ ...build, slots: newSlots });
+    setHasUnsavedChanges(true);
+
+    logger.info('Familiar added to build from collection', {
+      familiarName: savedFamiliar.familiar.name,
+      category: familiarCategory,
+      slotIndex: targetSlotIndex
+    });
+  };
+
   // Handle save build to backend (inline Save button)
   const handleSaveNewBuild = async () => {
     if (!allowSavingBuilds) return;
@@ -339,14 +443,42 @@ const FamiliarBuilder = forwardRef(({
     try {
       setSaving(true);
 
+      const serializedBuild = serializeBuild(build);
       const buildData = {
-        ...serializeBuild(build),
+        ...serializedBuild,
         name: buildName,
         primeFamiliar: primeFamiliar ? {
           id: primeFamiliar.id,
           isCustom: primeFamiliar.isCustom
         } : null
       };
+
+      // Check if we're updating an existing build or creating a new one
+      // Create new build if:
+      // 1. No loaded build (creating from scratch)
+      // 2. Name changed from the original loaded build name (save-as behavior)
+      const nameChanged = currentLoadedBuildId && originalBuildName && buildName !== originalBuildName;
+      const isCreatingNew = !currentLoadedBuildId || nameChanged;
+
+      logger.info('Save decision logic', {
+        currentLoadedBuildId,
+        originalBuildName,
+        buildName,
+        nameChanged,
+        isCreatingNew
+      });
+
+      if (isCreatingNew) {
+        // Create new build - remove ID to force creation
+        delete buildData.id;
+        delete buildData.createdAt;
+        delete buildData.updatedAt;
+        logger.info('Creating new familiar build', { reason: nameChanged ? 'name changed' : 'no loaded build', buildName });
+      } else {
+        // Update existing build - preserve the ID
+        buildData.id = currentLoadedBuildId;
+        logger.info('Updating existing familiar build', { buildId: currentLoadedBuildId, buildName });
+      }
 
       const token = useAuthStore.getState().getToken();
       const response = await fetch(getSaveDataEndpoint(), {
@@ -367,16 +499,35 @@ const FamiliarBuilder = forwardRef(({
 
       const responseData = await response.json();
 
+      logger.info('Save response received', {
+        success: responseData.success,
+        hasBuild: !!responseData.build,
+        buildId: responseData.build?.id
+      });
+
       setSaveSuccess(true);
       setHasUnsavedChanges(false);
       setTimeout(() => setSaveSuccess(false), 2000);
 
       logger.info('Familiar build saved', { buildName });
 
-      // Update current loaded build ID
+      // Clear draft after successful save
+      clearDraft();
+
+      // Update current loaded build ID and original name
       if (responseData.build && responseData.build.id) {
         setCurrentLoadedBuildId(responseData.build.id);
+        setOriginalBuildName(buildName); // Save the name we just used
+        logger.info('Updated tracking after save', {
+          newLoadedBuildId: responseData.build.id,
+          newOriginalBuildName: buildName
+        });
+      } else {
+        logger.warn('No build ID returned in save response', { responseData });
       }
+
+      // Trigger refresh of saved builds list
+      setBuildsRefreshTrigger(prev => prev + 1);
     } catch (error) {
       logger.error('Failed to save build', { error });
       alert('Failed to save build: ' + error.message);
@@ -411,10 +562,18 @@ const FamiliarBuilder = forwardRef(({
       ? savedBuild // Already deserialized by SavedFamiliarBuildsPanel
       : deserializeBuild(savedBuild, familiarsData, myFamiliars); // Deserialize serialized data
 
+    const loadedName = savedBuild.name || '';
     setBuild(deserializedBuild);
-    setBuildName(savedBuild.name || '');
+    setBuildName(loadedName);
+    setOriginalBuildName(loadedName); // Track the original name
     setHasUnsavedChanges(false); // Loaded from saved, no changes yet
     setCurrentLoadedBuildId(savedBuild.id);
+
+    logger.info('Build loaded successfully', {
+      buildId: savedBuild.id,
+      buildName: loadedName,
+      setOriginalBuildName: loadedName
+    });
   };
 
   // Handle share
@@ -632,6 +791,8 @@ const FamiliarBuilder = forwardRef(({
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 isDragging={draggedSlotIndex === index}
+                savingToCollection={savingToCollection === index}
+                isValidDropTarget={draggedFamiliarCategory === slot.category}
               />
             ))}
           </div>
@@ -692,7 +853,13 @@ const FamiliarBuilder = forwardRef(({
           {/* Saved Familiars */}
           {isAuthenticated && (
             <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <SavedFamiliarsGallery enableDrag={true} />
+              <SavedFamiliarsGallery
+                onFamiliarSelect={handleSavedFamiliarSelected}
+                onDragStart={handleExternalDragStart}
+                onDragEnd={handleExternalDragEnd}
+                enableDrag={true}
+                refreshTrigger={familiarsRefreshTrigger}
+              />
             </div>
           )}
 
@@ -705,6 +872,7 @@ const FamiliarBuilder = forwardRef(({
                 onLoadBuild={handleLoadBuild}
                 currentLoadedBuildId={currentLoadedBuildId}
                 defaultExpanded={!isModal}
+                refreshTrigger={buildsRefreshTrigger}
               />
             </div>
           )}

@@ -16,11 +16,17 @@ const logger = createLogger('SavedFamiliarsGallery');
  * Used in FamiliarBuilder as a sidebar panel
  *
  * @param {function} onFamiliarSelect - Callback when familiar is clicked (not dragged)
+ * @param {function} onDragStart - Callback when drag starts with familiar category
+ * @param {function} onDragEnd - Callback when drag ends
  * @param {boolean} enableDrag - Enable drag & drop functionality
+ * @param {number} refreshTrigger - Increment to force refresh from API
  */
 const SavedFamiliarsGallery = ({
   onFamiliarSelect,
-  enableDrag = true
+  onDragStart,
+  onDragEnd,
+  enableDrag = true,
+  refreshTrigger = 0
 }) => {
   const { isAuthenticated, user } = useAuthStore();
   const { familiarsData, progressionData } = useFamiliarsData();
@@ -31,25 +37,28 @@ const SavedFamiliarsGallery = ({
 
   useEffect(() => {
     if (isAuthenticated && user && familiarsData.length > 0) {
-      loadMyFamiliars();
+      // Skip cache if refreshTrigger > 0 (meaning a refresh was triggered)
+      loadMyFamiliars(refreshTrigger > 0);
     } else if (!isAuthenticated) {
       setLoading(false);
     }
-  }, [isAuthenticated, user, familiarsData]);
+  }, [isAuthenticated, user, familiarsData, refreshTrigger]);
 
-  const loadMyFamiliars = async () => {
+  const loadMyFamiliars = async (skipCache = false) => {
     try {
       setLoading(true);
 
-      // Try cache first
-      const cached = getCache('my_familiars', user.id);
-      if (cached) {
-        const deserializedFamiliars = cached
-          .map(f => deserializeFamiliar(f, familiarsData))
-          .filter(f => f !== null && f.familiar !== null);
-        setMyFamiliars(deserializedFamiliars);
-        setLoading(false);
-        return;
+      // Try cache first (unless we're forcing a refresh)
+      if (!skipCache) {
+        const cached = getCache('my_familiars', user.id);
+        if (cached) {
+          const deserializedFamiliars = cached
+            .map(f => deserializeFamiliar(f, familiarsData))
+            .filter(f => f !== null && f.familiar !== null);
+          setMyFamiliars(deserializedFamiliars);
+          setLoading(false);
+          return;
+        }
       }
 
       // Fetch from API
@@ -168,7 +177,7 @@ const SavedFamiliarsGallery = ({
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             {filteredFamiliars.map(mf => (
               <div
                 key={mf.id}
@@ -176,12 +185,29 @@ const SavedFamiliarsGallery = ({
                 onDragStart={(e) => {
                   if (enableDrag) {
                     e.dataTransfer.effectAllowed = 'copy';
-                    e.dataTransfer.setData('application/json', JSON.stringify({
+                    const dragData = {
                       type: 'collection-familiar',
                       myFamiliarId: mf.id,
                       familiar: mf.familiar,
                       starLevel: mf.starLevel
-                    }));
+                    };
+                    e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+                    logger.debug('Drag started for familiar', {
+                      familiarName: mf.familiar.name,
+                      category: mf.familiar.category,
+                      dragData
+                    });
+
+                    // Notify parent about drag start with category
+                    if (onDragStart) {
+                      onDragStart(mf.familiar.category);
+                    }
+                  }
+                }}
+                onDragEnd={(e) => {
+                  // Notify parent about drag end
+                  if (onDragEnd) {
+                    onDragEnd();
                   }
                 }}
                 onClick={() => {
@@ -189,14 +215,14 @@ const SavedFamiliarsGallery = ({
                     onFamiliarSelect(mf);
                   }
                 }}
-                className={`group relative p-2 rounded-lg border border-gray-200 dark:border-gray-700 transition-all ${
+                className={`group relative p-2 rounded-lg border border-gray-200 dark:border-gray-700 transition-all select-none ${
                   enableDrag
                     ? 'cursor-move hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md'
                     : 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 {/* Sprite */}
-                <div className="aspect-square mb-2">
+                <div className="aspect-square mb-2" draggable={false}>
                   <FamiliarSprite
                     familiarId={mf.familiar.id}
                     starLevel={mf.starLevel}
@@ -207,7 +233,7 @@ const SavedFamiliarsGallery = ({
                 </div>
 
                 {/* Info */}
-                <div className="text-center">
+                <div className="text-center" draggable={false}>
                   <div className="text-xs font-semibold text-gray-900 dark:text-white truncate">
                     {mf.familiar.name}
                   </div>
@@ -223,6 +249,13 @@ const SavedFamiliarsGallery = ({
               </div>
             ))}
           </div>
+        )}
+
+        {/* Usage hint */}
+        {filteredFamiliars.length > 0 && (
+          <p className="text-xs text-gray-500 dark:text-gray-500 text-center mt-3">
+            Click or drag a familiar to add it to your build
+          </p>
         )}
       </div>
     </div>

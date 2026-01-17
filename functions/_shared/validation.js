@@ -634,8 +634,8 @@ export function validateBuildData(data, type) {
     };
   }
 
-  // Validate name (required for non-spirit builds)
-  if (type !== 'my-spirits' && !data.name) {
+  // Validate name (required for builds, not for collections)
+  if (type !== 'my-spirits' && type !== 'my-familiars' && !data.name) {
     return {
       valid: false,
       error: VALIDATION_MESSAGES.BUILD_NAME_REQUIRED,

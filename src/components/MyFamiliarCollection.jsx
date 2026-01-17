@@ -321,8 +321,6 @@ const MyFamiliarCollection = () => {
               <div
                 key={familiar.id}
                 className="relative group"
-                onMouseEnter={() => setHoveredFamiliarId(familiar.id)}
-                onMouseLeave={() => setHoveredFamiliarId(null)}
               >
                 <FamiliarSlot
                   slot={{ type: 'base' }}
@@ -338,27 +336,44 @@ const MyFamiliarCollection = () => {
 
                 {/* Usage Badge */}
                 {buildsUsing.length > 0 && (
-                  <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg">
-                    Used in {buildsUsing.length} {buildsUsing.length === 1 ? 'build' : 'builds'}
-                  </div>
-                )}
+                  <div
+                    className="absolute top-0 left-0 z-10"
+                    onMouseEnter={() => setHoveredFamiliarId(familiar.id)}
+                    onMouseLeave={() => setHoveredFamiliarId(null)}
+                  >
+                    <div className="relative">
+                      <div className="bg-blue-600 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-tl-lg rounded-br-lg shadow-md cursor-help">
+                        Used in {buildsUsing.length}
+                      </div>
 
-                {/* Usage Popup */}
-                {isHovered && buildsUsing.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-3 z-10">
-                    <div className="text-xs font-semibold text-gray-900 dark:text-white mb-2">
-                      Used in these builds:
-                    </div>
-                    <ul className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
-                      {buildsUsing.slice(0, 5).map(build => (
-                        <li key={build.id} className="truncate">• {build.name || 'Unnamed Build'}</li>
-                      ))}
-                      {buildsUsing.length > 5 && (
-                        <li className="text-gray-500 dark:text-gray-400">
-                          + {buildsUsing.length - 5} more
-                        </li>
+                      {/* Hover Popup - no gap to prevent hover loss */}
+                      {isHovered && (
+                        <div className="absolute top-full left-0 pt-1 z-40">
+                          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-3 min-w-[200px]">
+                            <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                              Used in these builds:
+                            </div>
+                            <div className="space-y-1">
+                              {buildsUsing.slice(0, 5).map(build => (
+                                <a
+                                  key={build.id}
+                                  href={`/familiar-builder?build=${build.id}`}
+                                  className="block text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
+                                  onClick={() => setHoveredFamiliarId(null)}
+                                >
+                                  {build.name}
+                                </a>
+                              ))}
+                              {buildsUsing.length > 5 && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  + {buildsUsing.length - 5} more
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       )}
-                    </ul>
+                    </div>
                   </div>
                 )}
               </div>

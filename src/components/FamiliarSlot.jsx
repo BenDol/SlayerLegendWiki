@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, X, Save, Move, Star } from 'lucide-react';
+import { Plus, X, Save, Move, Star, Check } from 'lucide-react';
 import FamiliarSprite from './FamiliarSprite';
 import { getRarityForStars } from '../utils/familiarHelpers';
 import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
@@ -30,6 +30,8 @@ import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
  * @param {function} onDragOver - Drag over handler
  * @param {function} onDrop - Drop handler
  * @param {boolean} isDragging - Is this slot being dragged
+ * @param {boolean} savingToCollection - Is this slot currently being saved to collection
+ * @param {boolean} isValidDropTarget - Is this slot a valid drop target for the current drag
  */
 const FamiliarSlot = ({
   slot,
@@ -46,7 +48,9 @@ const FamiliarSlot = ({
   onDragStart,
   onDragOver,
   onDrop,
-  isDragging = false
+  isDragging = false,
+  savingToCollection = false,
+  isValidDropTarget = false
 }) => {
   const isEmpty = !familiar;
   const [showConfig, setShowConfig] = useState(false);
@@ -77,7 +81,9 @@ const FamiliarSlot = ({
 
   return (
     <div
-      className={`relative flex flex-col items-center ${isDragging ? 'opacity-50' : ''}`}
+      className={`relative flex flex-col items-center transition-all ${isDragging ? 'opacity-50' : ''} ${
+        isValidDropTarget ? 'scale-105 animate-pulse' : ''
+      }`}
       draggable={!isEmpty && !readOnly && onDragStart}
       onDragStart={(e) => {
         if (!isEmpty && !readOnly && onDragStart) {
@@ -96,12 +102,16 @@ const FamiliarSlot = ({
       }}
     >
       {/* Category Label */}
-      <div className={`${categoryColors[category] || 'bg-gray-500'} text-white text-xs font-semibold px-3 py-1 rounded-t-lg`}>
+      <div className={`${categoryColors[category] || 'bg-gray-500'} text-white text-xs font-semibold px-3 py-1 rounded-t-lg transition-all ${
+        isValidDropTarget ? 'ring-4 ring-green-400 ring-opacity-75 shadow-lg' : ''
+      }`}>
         {categoryNames[category] || category}
       </div>
 
       {/* Slot Container */}
-      <div className="relative bg-gray-100 dark:bg-gray-800 rounded-b-lg p-4 w-full max-w-xs">
+      <div className={`relative bg-gray-100 dark:bg-gray-800 rounded-b-lg p-4 w-full max-w-xs transition-all ${
+        isValidDropTarget ? 'ring-4 ring-green-400 ring-opacity-75 bg-green-50 dark:bg-green-900/20 shadow-lg' : ''
+      }`}>
         {/* Empty Slot */}
         {isEmpty && (
           <div
@@ -111,8 +121,20 @@ const FamiliarSlot = ({
                 onSelectFamiliar();
               }
             }}
+            onDragOver={(e) => {
+              // Allow drop on empty slot
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onDrop={(e) => {
+              // Forward drop to parent
+              e.stopPropagation();
+              if (!readOnly && onDrop) {
+                onDrop(e, slotIndex);
+              }
+            }}
           >
-            <div className="text-center">
+            <div className="text-center" style={{ pointerEvents: 'none' }}>
               <Plus className="w-12 h-12 mx-auto mb-2 text-gray-400 dark:text-gray-600" />
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Select {categoryNames[category]}
@@ -235,12 +257,23 @@ const FamiliarSlot = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSaveToCollection();
+                      if (!savingToCollection) {
+                        onSaveToCollection();
+                      }
                     }}
-                    className="absolute bottom-0 left-0 bg-green-600 hover:bg-green-700 text-white rounded-tr-lg rounded-bl-lg p-1 sm:p-1.5 shadow-lg opacity-70 hover:opacity-100 transition-opacity z-10"
-                    title="Save to My Familiar Collection"
+                    disabled={savingToCollection}
+                    className={`absolute bottom-0 left-0 text-white rounded-tr-lg rounded-bl-lg p-1 sm:p-1.5 shadow-lg transition-all z-10 ${
+                      savingToCollection
+                        ? 'bg-blue-600 opacity-100'
+                        : 'bg-green-600 hover:bg-green-700 opacity-70 hover:opacity-100'
+                    }`}
+                    title={savingToCollection ? 'Saved!' : 'Save to My Familiar Collection'}
                   >
-                    <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                    {savingToCollection ? (
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                    ) : (
+                      <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                    )}
                   </button>
                 )}
 

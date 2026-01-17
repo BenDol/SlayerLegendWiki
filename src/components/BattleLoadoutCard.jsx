@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Share2, Copy, Loader, Check, AlertCircle } from 'lucide-react';
 import SkillSlot from './SkillSlot';
 import SpiritComponent from './SpiritComponent';
+import PrimeFamiliarPreview from './PrimeFamiliarPreview';
+import FamiliarSprite from './FamiliarSprite';
 import SoulWeaponEngravingGrid from './SoulWeaponEngravingGrid';
 import SkillStone from './SkillStone';
 import BattleLoadoutModal from './BattleLoadoutModal';
@@ -44,8 +46,13 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
   const [skills, setSkills] = useState([]);
   const [spirits, setSpirits] = useState([]);
   const [mySpirits, setMySpirits] = useState([]);
+  const [familiars, setFamiliars] = useState([]);
+  const [primeFamiliars, setPrimeFamiliars] = useState([]);
+  const [myFamiliars, setMyFamiliars] = useState([]);
+  const [progressionData, setProgressionData] = useState([]);
   const [allSkillBuilds, setAllSkillBuilds] = useState([]);
   const [allSpiritBuilds, setAllSpiritBuilds] = useState([]);
+  const [allFamiliarBuilds, setAllFamiliarBuilds] = useState([]);
   const [weapons, setWeapons] = useState([]);
   const [skillStonesData, setSkillStonesData] = useState(null);
   const [shapes, setShapes] = useState([]);
@@ -63,12 +70,15 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
   useEffect(() => {
     const loadGameData = async () => {
       try {
-        const [skillsRes, spiritsRes, weaponsRes, skillStonesRes, shapesRes] = await Promise.all([
+        const [skillsRes, spiritsRes, weaponsRes, skillStonesRes, shapesRes, familiarsRes, primeFamiliarsRes, progressionRes] = await Promise.all([
           fetch('/data/skills.json'),
           fetch('/data/spirit-characters.json'),
           fetch('/data/soul-weapons.json'),
           fetch('/data/skill_stones.json'),
-          fetch('/data/soul-weapon-engravings.json')
+          fetch('/data/soul-weapon-engravings.json'),
+          fetch('/data/familiars.json'),
+          fetch('/data/prime-familiars.json'),
+          fetch('/data/familiar-progression.json')
         ]);
 
         const skillsData = await skillsRes.json();
@@ -76,18 +86,27 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
         const weaponsData = await weaponsRes.json();
         const skillStonesDataRes = await skillStonesRes.json();
         const shapesData = await shapesRes.json();
+        const familiarsData = await familiarsRes.json();
+        const primeFamiliarsData = await primeFamiliarsRes.json();
+        const progressionDataRes = await progressionRes.json();
 
         setSkills(skillsData);
         setSpirits(spiritsData.spirits || []);
         setWeapons(weaponsData || []); // soul-weapons.json is a direct array
         setSkillStonesData(skillStonesDataRes);
         setShapes(shapesData.shapes || []);
+        setFamiliars(familiarsData || []); // familiars.json is a direct array
+        setPrimeFamiliars(primeFamiliarsData.primeFamiliars || []);
+        setProgressionData(progressionDataRes.starLevels || []); // Extract starLevels array from progression data
 
         logger.debug('Game data loaded', {
           skillsCount: skillsData?.length || 0,
           spiritsCount: spiritsData.spirits?.length || 0,
           weaponsCount: weaponsData?.length || 0,
-          shapesCount: shapesData.shapes?.length || 0
+          shapesCount: shapesData.shapes?.length || 0,
+          familiarsCount: familiarsData?.length || 0,
+          primeFamiliarsCount: primeFamiliarsData.primeFamiliars?.length || 0,
+          progressionCount: progressionDataRes.starLevels?.length || 0
         });
       } catch (err) {
         logger.error('Failed to load game data', { error: err });
@@ -110,44 +129,60 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
         const cachedSkillBuilds = getCache('skill_builds', loadoutOwnerId);
         const cachedSpiritBuilds = getCache('spirit_builds', loadoutOwnerId);
         const cachedSpirits = getCache('my_spirits', loadoutOwnerId);
+        const cachedFamiliarBuilds = getCache('familiar_builds', loadoutOwnerId);
+        const cachedFamiliars = getCache('my_familiars', loadoutOwnerId);
 
-        if (cachedSkillBuilds && cachedSpiritBuilds && cachedSpirits) {
+        if (cachedSkillBuilds && cachedSpiritBuilds && cachedSpirits && cachedFamiliarBuilds && cachedFamiliars) {
           logger.debug('Using cached loadout owner data', { ownerId: loadoutOwnerId });
           setAllSkillBuilds(cachedSkillBuilds);
           setAllSpiritBuilds(cachedSpiritBuilds);
           setMySpirits(cachedSpirits);
+          setAllFamiliarBuilds(cachedFamiliarBuilds);
+          setMyFamiliars(cachedFamiliars);
           return;
         }
 
         // Load from API
-        const [skillBuildsRes, spiritBuildsRes, mySpiritsRes] = await Promise.all([
+        const [skillBuildsRes, spiritBuildsRes, mySpiritsRes, familiarBuildsRes, myFamiliarsRes] = await Promise.all([
           fetch(getLoadDataEndpoint() + '?type=skill-builds&userId=' + loadoutOwnerId),
           fetch(getLoadDataEndpoint() + '?type=spirit-builds&userId=' + loadoutOwnerId),
-          fetch(getLoadDataEndpoint() + '?type=my-spirits&userId=' + loadoutOwnerId)
+          fetch(getLoadDataEndpoint() + '?type=my-spirits&userId=' + loadoutOwnerId),
+          fetch(getLoadDataEndpoint() + '?type=familiar-builds&userId=' + loadoutOwnerId),
+          fetch(getLoadDataEndpoint() + '?type=my-familiars&userId=' + loadoutOwnerId)
         ]);
 
         const skillBuildsData = await skillBuildsRes.json();
         const spiritBuildsData = await spiritBuildsRes.json();
         const mySpiritsData = await mySpiritsRes.json();
+        const familiarBuildsData = await familiarBuildsRes.json();
+        const myFamiliarsData = await myFamiliarsRes.json();
 
         const skillBuilds = skillBuildsData.builds || [];
         const spiritBuilds = spiritBuildsData.builds || [];
         const spirits = mySpiritsData.spirits || [];
+        const familiarBuilds = familiarBuildsData.builds || [];
+        const familiarsList = myFamiliarsData.familiars || [];
 
         setAllSkillBuilds(skillBuilds);
         setAllSpiritBuilds(spiritBuilds);
         setMySpirits(spirits);
+        setAllFamiliarBuilds(familiarBuilds);
+        setMyFamiliars(familiarsList);
 
         // Cache the data
         setCache('skill_builds', loadoutOwnerId, skillBuilds);
         setCache('spirit_builds', loadoutOwnerId, spiritBuilds);
         setCache('my_spirits', loadoutOwnerId, spirits);
+        setCache('familiar_builds', loadoutOwnerId, familiarBuilds);
+        setCache('my_familiars', loadoutOwnerId, familiarsList);
 
         logger.debug('Loaded and cached loadout owner data', {
           ownerId: loadoutOwnerId,
           skillBuilds: skillBuilds.length,
           spiritBuilds: spiritBuilds.length,
-          spirits: spirits.length
+          spirits: spirits.length,
+          familiarBuilds: familiarBuilds.length,
+          familiars: familiarsList.length
         });
       } catch (err) {
         logger.error('Failed to load loadout owner data', { error: err, ownerId: loadoutOwnerId });
@@ -159,7 +194,34 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
 
   // Load loadout data
   useEffect(() => {
-    if (!identifier || skills.length === 0 || spirits.length === 0) return;
+    // Wait for basic game data to load (skills, spirits, familiars, shapes, weapons, progression)
+    // User-specific data (mySpirits, allSkillBuilds, etc.) may remain empty if unauthenticated
+    logger.debug('Load effect triggered', {
+      identifier,
+      skillsLength: skills.length,
+      spiritsLength: spirits.length,
+      familiarsLength: familiars.length,
+      primeFamiliarsLength: primeFamiliars.length,
+      progressionDataLength: progressionData.length,
+      shapesLength: shapes.length,
+      weaponsLength: weapons.length
+    });
+
+    if (!identifier || skills.length === 0 || spirits.length === 0 || familiars.length === 0 ||
+        primeFamiliars.length === 0 || progressionData.length === 0 || shapes.length === 0 ||
+        weapons.length === 0) {
+      logger.debug('Waiting for data to load', {
+        hasIdentifier: !!identifier,
+        skillsReady: skills.length > 0,
+        spiritsReady: spirits.length > 0,
+        familiarsReady: familiars.length > 0,
+        primeFamiliarsReady: primeFamiliars.length > 0,
+        progressionReady: progressionData.length > 0,
+        shapesReady: shapes.length > 0,
+        weaponsReady: weapons.length > 0
+      });
+      return;
+    }
 
     const loadLoadoutData = async () => {
       setLoading(true);
@@ -238,7 +300,11 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
           mySpirits,
           allSkillBuilds,
           allSpiritBuilds,
-          shapes
+          shapes,
+          familiars,
+          myFamiliars,
+          allFamiliarBuilds,
+          primeFamiliars
         );
 
         setLoadout(deserialized);
@@ -266,6 +332,18 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
           });
         }
 
+        // Debug familiar data
+        logger.info('CARD: Familiar build data', {
+          hasFamiliarBuild: !!deserialized.familiarBuild,
+          familiarBuildSlots: deserialized.familiarBuild?.slots?.length || 0,
+          hasPrimeFamiliar: !!deserialized.familiarBuild?.primeFamiliar,
+          primeFamiliarName: deserialized.familiarBuild?.primeFamiliar?.name,
+          rawLoadoutDataFamiliarBuild: loadoutData.familiarBuild,
+          familiarsArrayLength: familiars.length,
+          myFamiliarsArrayLength: myFamiliars.length,
+          primeFamiliarsArrayLength: primeFamiliars.length
+        });
+
         logger.info('Loadout loaded successfully', { name: deserialized.name });
       } catch (err) {
         logger.error('Failed to load loadout', { error: err, identifier });
@@ -276,7 +354,7 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
     };
 
     loadLoadoutData();
-  }, [identifier, skills, spirits, mySpirits, allSkillBuilds, allSpiritBuilds, isAuthenticated, user, weapons]);
+  }, [identifier, skills.length, spirits.length, familiars.length, primeFamiliars.length, progressionData.length, shapes.length, weapons.length, mySpirits.length, allSkillBuilds.length, allSpiritBuilds.length, myFamiliars.length, allFamiliarBuilds.length, isAuthenticated, user?.id]);
 
   // Share handler
   const handleShare = async () => {
@@ -382,7 +460,11 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
           mySpirits,
           allSkillBuilds,
           allSpiritBuilds,
-          shapes
+          shapes,
+          familiars,
+          myFamiliars,
+          allFamiliarBuilds,
+          primeFamiliars
         );
 
         logger.info('Deserialized duplicated loadout', {
@@ -483,9 +565,9 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
 
         {/* Content */}
         <div className="p-4">
-          {mode === 'compact' && <CompactLoadout loadout={loadout} weapons={weapons} skillStonesData={skillStonesData} />}
-          {mode === 'detailed' && <DetailedLoadout loadout={loadout} weapons={weapons} skillStonesData={skillStonesData} />}
-          {mode === 'advanced' && <AdvancedLoadout loadout={loadout} weapons={weapons} skillStonesData={skillStonesData} />}
+          {mode === 'compact' && <CompactLoadout loadout={loadout} weapons={weapons} skillStonesData={skillStonesData} progressionData={progressionData} />}
+          {mode === 'detailed' && <DetailedLoadout loadout={loadout} weapons={weapons} skillStonesData={skillStonesData} progressionData={progressionData} />}
+          {mode === 'advanced' && <AdvancedLoadout loadout={loadout} weapons={weapons} skillStonesData={skillStonesData} progressionData={progressionData} />}
         </div>
       </div>
 
@@ -536,9 +618,10 @@ const BattleLoadoutCard = ({ identifier, mode = 'detailed', showActions = true }
 /**
  * Compact mode: Very dense icon grid
  */
-const CompactLoadout = ({ loadout, weapons, skillStonesData }) => {
+const CompactLoadout = ({ loadout, weapons, skillStonesData, progressionData }) => {
   const hasSkills = loadout.skillBuild?.slots?.some(s => s.skill);
   const hasSpirits = loadout.spiritBuild?.slots?.some(s => s.spirit);
+  const hasFamiliars = loadout.familiarBuild?.slots?.some(s => s.familiar);
   const hasSoulWeapon = loadout.soulWeaponBuild?.weaponId;
 
   // Find weapon data
@@ -595,6 +678,45 @@ const CompactLoadout = ({ loadout, weapons, skillStonesData }) => {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Familiars - Compact prime familiar preview and slots */}
+      {hasFamiliars && loadout.familiarBuild?.primeFamiliar && (
+        <div className="mt-2">
+          <div className="transform scale-50 origin-top-left flex gap-2 items-center">
+            <PrimeFamiliarPreview
+              elementFamiliar={loadout.familiarBuild.slots?.[0]?.familiar}
+              attributeFamiliar={loadout.familiarBuild.slots?.[1]?.familiar}
+              weaponFamiliar={loadout.familiarBuild.slots?.[2]?.familiar}
+              elementStarLevel={loadout.familiarBuild.slots?.[0]?.starLevel || 0}
+              attributeStarLevel={loadout.familiarBuild.slots?.[1]?.starLevel || 0}
+              weaponStarLevel={loadout.familiarBuild.slots?.[2]?.starLevel || 0}
+              primeFamiliar={loadout.familiarBuild.primeFamiliar}
+              progressionData={progressionData}
+              size="medium"
+              showDetails={false}
+              showStars={false}
+              animated={true}
+            />
+            <div className="flex gap-1 items-center">
+              {loadout.familiarBuild.slots?.map((slot, index) => (
+                <div key={index} className="flex-shrink-0">
+                  {slot.familiar ? (
+                    <FamiliarSprite
+                      familiarId={slot.familiar.id}
+                      starLevel={slot.starLevel}
+                      progressionData={progressionData}
+                      animated={false}
+                      size="48px"
+                      familiarData={slot.familiar}
+                      showStars={true}
+                    />
+                  ) : null}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -672,9 +794,10 @@ const CompactLoadout = ({ loadout, weapons, skillStonesData }) => {
 /**
  * Detailed mode: Builder-like layout scaled down
  */
-const DetailedLoadout = ({ loadout, weapons, skillStonesData }) => {
+const DetailedLoadout = ({ loadout, weapons, skillStonesData, progressionData }) => {
   const hasSkills = loadout.skillBuild?.slots?.some(s => s.skill);
   const hasSpirits = loadout.spiritBuild?.slots?.some(s => s.spirit);
+  const hasFamiliars = loadout.familiarBuild?.slots?.some(s => s.familiar);
   const hasSoulWeapon = loadout.soulWeaponBuild?.weaponId;
 
   // Find weapon data
@@ -731,6 +854,66 @@ const DetailedLoadout = ({ loadout, weapons, skillStonesData }) => {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Familiars Section */}
+      {hasFamiliars && (
+        <div className="px-1">
+          <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">👹 Familiars</h4>
+          {loadout.familiarBuild?.primeFamiliar ? (
+            <div className="flex gap-3 items-center max-w-md">
+              <PrimeFamiliarPreview
+                elementFamiliar={loadout.familiarBuild.slots?.[0]?.familiar}
+                attributeFamiliar={loadout.familiarBuild.slots?.[1]?.familiar}
+                weaponFamiliar={loadout.familiarBuild.slots?.[2]?.familiar}
+                elementStarLevel={loadout.familiarBuild.slots?.[0]?.starLevel || 0}
+                attributeStarLevel={loadout.familiarBuild.slots?.[1]?.starLevel || 0}
+                weaponStarLevel={loadout.familiarBuild.slots?.[2]?.starLevel || 0}
+                primeFamiliar={loadout.familiarBuild.primeFamiliar}
+                progressionData={progressionData}
+                size="small"
+                showDetails={false}
+                showStars={false}
+                animated={true}
+              />
+              <div className="flex gap-1.5 items-center">
+                {loadout.familiarBuild.slots?.map((slot, index) => (
+                  <div key={index} className="flex-shrink-0">
+                    {slot.familiar ? (
+                      <FamiliarSprite
+                        familiarId={slot.familiar.id}
+                        starLevel={slot.starLevel}
+                        progressionData={progressionData}
+                        animated={false}
+                        size="64px"
+                        familiarData={slot.familiar}
+                        showStars={true}
+                      />
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-1.5 items-center">
+              {loadout.familiarBuild.slots?.map((slot, index) => (
+                <div key={index} className="flex-shrink-0">
+                  {slot.familiar ? (
+                    <FamiliarSprite
+                      familiarId={slot.familiar.id}
+                      starLevel={slot.starLevel}
+                      progressionData={progressionData}
+                      animated={false}
+                      size="64px"
+                      familiarData={slot.familiar}
+                      showStars={true}
+                    />
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -829,9 +1012,10 @@ const DetailedLoadout = ({ loadout, weapons, skillStonesData }) => {
 /**
  * Advanced mode: Full builder-like layout
  */
-const AdvancedLoadout = ({ loadout, weapons, skillStonesData }) => {
+const AdvancedLoadout = ({ loadout, weapons, skillStonesData, progressionData }) => {
   const hasSkills = loadout.skillBuild?.slots?.some(s => s.skill);
   const hasSpirits = loadout.spiritBuild?.slots?.some(s => s.spirit);
+  const hasFamiliars = loadout.familiarBuild?.slots?.some(s => s.familiar);
   const hasSoulWeapon = loadout.soulWeaponBuild?.weaponId;
 
   // Find weapon data
@@ -890,6 +1074,66 @@ const AdvancedLoadout = ({ loadout, weapons, skillStonesData }) => {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Familiars Section */}
+      {hasFamiliars && (
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 px-2">
+          <h4 className="text-base font-bold text-gray-900 dark:text-white mb-3 px-1">👹 Familiars</h4>
+          {loadout.familiarBuild?.primeFamiliar ? (
+            <div className="flex gap-4 px-1 items-center" style={{ maxWidth: '500px' }}>
+              <PrimeFamiliarPreview
+                elementFamiliar={loadout.familiarBuild.slots?.[0]?.familiar}
+                attributeFamiliar={loadout.familiarBuild.slots?.[1]?.familiar}
+                weaponFamiliar={loadout.familiarBuild.slots?.[2]?.familiar}
+                elementStarLevel={loadout.familiarBuild.slots?.[0]?.starLevel || 0}
+                attributeStarLevel={loadout.familiarBuild.slots?.[1]?.starLevel || 0}
+                weaponStarLevel={loadout.familiarBuild.slots?.[2]?.starLevel || 0}
+                primeFamiliar={loadout.familiarBuild.primeFamiliar}
+                progressionData={progressionData}
+                size="medium"
+                showDetails={true}
+                showStars={false}
+                animated={true}
+              />
+              <div className="flex gap-2 items-center">
+                {loadout.familiarBuild.slots?.map((slot, index) => (
+                  <div key={index} className="flex-shrink-0">
+                    {slot.familiar ? (
+                      <FamiliarSprite
+                        familiarId={slot.familiar.id}
+                        starLevel={slot.starLevel}
+                        progressionData={progressionData}
+                        animated={false}
+                        size="96px"
+                        familiarData={slot.familiar}
+                        showStars={true}
+                      />
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-2 px-1 items-center">
+              {loadout.familiarBuild.slots?.map((slot, index) => (
+                <div key={index} className="flex-shrink-0">
+                  {slot.familiar ? (
+                    <FamiliarSprite
+                      familiarId={slot.familiar.id}
+                      starLevel={slot.starLevel}
+                      progressionData={progressionData}
+                      animated={false}
+                      size="96px"
+                      familiarData={slot.familiar}
+                      showStars={true}
+                    />
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

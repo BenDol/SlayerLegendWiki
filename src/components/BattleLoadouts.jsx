@@ -162,12 +162,13 @@ const BattleLoadouts = () => {
           const buildData = await loadBuild(owner, repo, shareChecksum);
 
           if (buildData.type === 'battle-loadouts') {
-            // Deserialize skill build, spirit build, and soul weapon build
+            // Deserialize skill build, spirit build, soul weapon build, and familiar build
             const deserializedLoadout = {
               ...buildData.data,
               skillBuild: buildData.data.skillBuild ? deserializeSkillBuild(buildData.data.skillBuild, skills) : null,
               spiritBuild: buildData.data.spiritBuild ? deserializeSpiritBuild(buildData.data.spiritBuild, spirits, mySpirits) : null,
-              soulWeaponBuild: buildData.data.soulWeaponBuild ? deserializeSoulWeaponBuild(buildData.data.soulWeaponBuild, shapes) : null
+              soulWeaponBuild: buildData.data.soulWeaponBuild ? deserializeSoulWeaponBuild(buildData.data.soulWeaponBuild, shapes) : null,
+              familiarBuild: buildData.data.familiarBuild ? deserializeFamiliarBuildUtil(buildData.data.familiarBuild, familiars, myFamiliars, primeFamiliars) : null
             };
             setCurrentLoadout(deserializedLoadout);
             setLoadoutName(deserializedLoadout.name || '');

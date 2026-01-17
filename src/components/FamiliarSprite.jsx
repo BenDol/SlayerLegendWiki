@@ -16,6 +16,7 @@ const logger = createLogger('FamiliarSprite');
  * @param {boolean} animated - Whether to animate the sprite (default: true)
  * @param {number} fps - Animation speed in frames per second (default: 8)
  * @param {boolean} showInfo - Whether to show familiar name and star level (default: false)
+ * @param {boolean} showStars - Whether to show just stars (without name) (default: false)
  * @param {string} size - Size preset: 'small' (64px), 'medium' (128px), 'large' (256px), or custom CSS value
  * @param {string} className - Additional CSS classes
  * @param {Object} familiarData - Familiar data object (name, element, etc.)
@@ -28,6 +29,7 @@ const FamiliarSprite = ({
   animated = true,
   fps = 8,
   showInfo = false,
+  showStars = false,
   size = 'medium',
   className = '',
   familiarData = null,
@@ -189,11 +191,13 @@ const FamiliarSprite = ({
         <img
           src={recoloredUrl || resolvedUrl}
           alt={familiarData?.name || `Familiar ${familiarId}`}
+          draggable={false}
           className={`absolute inset-0 object-contain ${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-200`}
           style={{
             width: spriteSize,
             height: spriteSize,
-            imageRendering: 'pixelated' // Keep pixel art crisp
+            imageRendering: 'pixelated', // Keep pixel art crisp
+            pointerEvents: 'none' // Don't interfere with parent drag
           }}
         />
       )}
@@ -206,6 +210,31 @@ const FamiliarSprite = ({
             {'★'.repeat(starLevel)}
             {starLevel < 10 && '☆'.repeat(10 - starLevel)}
           </div>
+        </div>
+      )}
+
+      {/* Stars only overlay (no name) */}
+      {showStars && !showInfo && starLevel > 0 && (
+        <div
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center z-20"
+          title={`Star Level: ${starLevel}/10${starLevel > 5 ? ' (Red Stars)' : ''}`}
+        >
+          {(() => {
+            const useRedStar = starLevel > 5;
+            const displayStars = starLevel > 5 ? starLevel - 5 : starLevel;
+            const starImage = useRedStar ? 'familiars/Demonstar_2.png' : 'familiars/Demonstar_1.png';
+
+            return Array.from({ length: 5 }).map((_, index) => (
+              <img
+                key={index}
+                src={resolveImagePath(starImage)}
+                alt="star"
+                draggable={false}
+                className={`w-3 h-3 sm:w-4 sm:h-4 ${index < displayStars ? 'opacity-100' : 'opacity-20'}`}
+                style={{ marginLeft: index > 0 ? '-4px' : '0', pointerEvents: 'none' }}
+              />
+            ));
+          })()}
         </div>
       )}
     </div>

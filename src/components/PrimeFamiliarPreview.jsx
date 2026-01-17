@@ -187,6 +187,28 @@ const PrimeFamiliarPreview = ({
 
   return (
     <div className={`relative w-full ${className}`} style={{ maxWidth: dimensions.container }}>
+      {/* CSS Keyframe Animations */}
+      <style>
+        {`
+          @keyframes primeFamiliarBodyBob {
+            0%, 100% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-8px);
+            }
+          }
+
+          @keyframes primeFamiliarWeaponBob-${weaponScale.toString().replace('.', '_')} {
+            0%, 100% {
+              transform: translate(15px, calc(-25% + 26px)) rotate(-10deg) scale(${weaponScale});
+            }
+            50% {
+              transform: translate(15px, calc(-25% + 18px)) rotate(-10deg) scale(${weaponScale});
+            }
+          }
+        `}
+      </style>
       {/* Main composite sprite container */}
       <div
         className="relative rounded-lg overflow-visible aspect-square w-full"
@@ -214,9 +236,8 @@ const PrimeFamiliarPreview = ({
               top: '25%',
               width: dimensions.weapon,
               height: dimensions.weapon,
-              transform: `translate(30px, calc(-25% + 26px)) rotate(-10deg) scale(${weaponScale})`,
               zIndex: 10,
-              transition: 'right 0.3s ease-out, transform 0.3s ease-out' // Smooth transition when star level changes
+              transition: 'right 0.3s ease-out'
             }}
           >
             <img
@@ -226,7 +247,9 @@ const PrimeFamiliarPreview = ({
               className="w-full h-full object-contain"
               style={{
                 imageRendering: 'pixelated',
-                filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))',
+                transform: animated ? undefined : `translate(15px, calc(-25% + 26px)) rotate(-10deg) scale(${weaponScale})`,
+                animation: animated ? `primeFamiliarWeaponBob-${weaponScale.toString().replace('.', '_')} 3.5s ease-in-out infinite 0.3s` : 'none'
               }}
             />
           </div>
@@ -236,7 +259,8 @@ const PrimeFamiliarPreview = ({
         <div
           className="absolute inset-0 flex items-center justify-center"
           style={{
-            zIndex: 11
+            zIndex: 11,
+            animation: animated ? 'primeFamiliarBodyBob 3.5s ease-in-out infinite' : 'none'
           }}
         >
           <FamiliarSprite

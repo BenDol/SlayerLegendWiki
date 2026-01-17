@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import BattleLoadoutCard from './BattleLoadoutCard';
+import FamiliarSprite from './FamiliarSprite';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { getLoadDataEndpoint } from '../utils/apiEndpoints';
 import { getSkillGradeColor } from '../config/rarityColors';
@@ -31,6 +32,8 @@ const BattleLoadoutPicker = ({ isOpen, onClose, onSelect, renderPreview = null }
   const [isMobile, setIsMobile] = useState(false);
   const [skills, setSkills] = useState([]);
   const [spirits, setSpirits] = useState([]);
+  const [familiars, setFamiliars] = useState([]);
+  const [progressionData, setProgressionData] = useState([]);
   const loadoutsPerPage = 12;
 
   // Detect mobile viewport
@@ -43,20 +46,26 @@ const BattleLoadoutPicker = ({ isOpen, onClose, onSelect, renderPreview = null }
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Load skills and spirits data
+  // Load skills, spirits, familiars, and progression data
   useEffect(() => {
     const loadGameData = async () => {
       try {
-        const [skillsRes, spiritsRes] = await Promise.all([
+        const [skillsRes, spiritsRes, familiarsRes, progressionRes] = await Promise.all([
           fetch('/data/skills.json'),
-          fetch('/data/spirit-characters.json')
+          fetch('/data/spirit-characters.json'),
+          fetch('/data/familiars.json'),
+          fetch('/data/familiar-progression.json')
         ]);
 
         const skillsData = await skillsRes.json();
         const spiritsData = await spiritsRes.json();
+        const familiarsData = await familiarsRes.json();
+        const progressionDataRes = await progressionRes.json();
 
         setSkills(skillsData);
         setSpirits(spiritsData.spirits || []);
+        setFamiliars(familiarsData || []); // familiars.json is a direct array
+        setProgressionData(progressionDataRes.starLevels || []); // Extract starLevels array from progression data
       } catch (err) {
         logger.error('Failed to load game data', { error: err });
       }
@@ -201,6 +210,26 @@ const BattleLoadoutPicker = ({ isOpen, onClose, onSelect, renderPreview = null }
     return loadoutSpirits;
   };
 
+  // Helper: Get familiars from loadout
+  const getLoadoutFamiliars = (loadout) => {
+    if (!loadout.familiarBuild?.slots) return [];
+    if (!Array.isArray(familiars) || familiars.length === 0) return [];
+
+    const loadoutFamiliars = loadout.familiarBuild.slots
+      .filter(slot => slot.familiar || slot.familiarId)
+      .map(slot => {
+        if (slot.familiar) {
+          return slot.familiar;
+        } else if (slot.familiarId) {
+          return familiars.find(f => f.id === slot.familiarId);
+        }
+        return null;
+      })
+      .filter(familiar => familiar !== null);
+
+    return loadoutFamiliars;
+  };
+
   // Modal content
   const modalContent = (
     <div
@@ -343,6 +372,28 @@ const BattleLoadoutPicker = ({ isOpen, onClose, onSelect, renderPreview = null }
                                     src={resolveImagePath(spirit.thumbnail || spirit.image)}
                                     alt={spirit.name}
                                     className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Familiars Section */}
+                          {getLoadoutFamiliars(loadout).length > 0 && (
+                            <div className="flex flex-wrap gap-0.5">
+                              {getLoadoutFamiliars(loadout).map((familiar, index) => (
+                                <div
+                                  key={index}
+                                  className="w-6 h-6 rounded overflow-hidden"
+                                  title={familiar.name}
+                                >
+                                  <FamiliarSprite
+                                    familiarId={familiar.id}
+                                    starLevel={0}
+                                    progressionData={progressionData}
+                                    animated={false}
+                                    size="24px"
+                                    familiarData={familiar}
                                   />
                                 </div>
                               ))}
