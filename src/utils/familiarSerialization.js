@@ -85,8 +85,8 @@ export const serializeSlot = (slot) => {
     return {
       type: "collection",
       myFamiliarId: slot.myFamiliarId,
-      category: slot.category,
-      starLevel: slot.starLevel || 0  // Save build-specific star level
+      category: slot.category
+      // Note: starLevel is NOT saved - it always comes from the collection familiar record
     };
   }
 
@@ -145,7 +145,7 @@ export const deserializeSlot = (slot, familiarsData, myFamiliars = []) => {
       myFamiliarId: myFamiliar.id,
       category: slot.category,
       familiar: baseFamiliar || null,
-      starLevel: slot.starLevel !== undefined ? slot.starLevel : myFamiliar.starLevel  // Use build override if present
+      starLevel: myFamiliar.starLevel  // Always use collection familiar's star level
     };
   }
 
@@ -160,7 +160,7 @@ export const deserializeSlot = (slot, familiarsData, myFamiliars = []) => {
           myFamiliarId: collectionFamiliar.id,
           category: slot.category,
           familiar: slot.familiar,
-          starLevel: slot.starLevel !== undefined ? slot.starLevel : collectionFamiliar.starLevel  // Preserve build star level
+          starLevel: collectionFamiliar.starLevel  // Always use collection familiar's star level
         };
       }
     }
@@ -186,7 +186,7 @@ export const deserializeSlot = (slot, familiarsData, myFamiliars = []) => {
           myFamiliarId: collectionFamiliar.id,
           category: slot.category,
           familiar: familiar || null,
-          starLevel: slot.starLevel !== undefined ? slot.starLevel : collectionFamiliar.starLevel  // Preserve build star level
+          starLevel: collectionFamiliar.starLevel  // Always use collection familiar's star level
         };
       }
     }

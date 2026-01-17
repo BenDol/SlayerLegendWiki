@@ -10,7 +10,7 @@ import { useFamiliarsData } from '../hooks/useFamiliarsData';
 import { serializeBuild, deserializeBuild, createEmptyBuild, serializeBuildForSharing } from '../utils/familiarSerialization';
 import { findPrimeFamiliar, isBuildComplete, validateBuildCategories } from '../utils/familiarHelpers';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
-import { getCache, setCache } from '../utils/buildCache';
+import { getCache, setCache, clearCache } from '../utils/buildCache';
 import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { createLogger } from '../utils/logger';
@@ -255,12 +255,58 @@ const FamiliarBuilder = forwardRef(({
   };
 
   // Handle star level change
-  const handleStarLevelChange = (slotIndex, newStarLevel) => {
+  const handleStarLevelChange = async (slotIndex, newStarLevel) => {
+    const slot = build.slots[slotIndex];
     const newSlots = [...build.slots];
     newSlots[slotIndex] = { ...newSlots[slotIndex], starLevel: newStarLevel };
 
     setBuild({ ...build, slots: newSlots });
     setHasUnsavedChanges(true);
+
+    // If this is a collection familiar, update the collection record too
+    if (slot.type === 'collection' && slot.myFamiliarId) {
+      try {
+        logger.info('Updating collection familiar star level', {
+          myFamiliarId: slot.myFamiliarId,
+          newStarLevel
+        });
+
+        const token = useAuthStore.getState().getToken();
+        const response = await fetch(getSaveDataEndpoint(), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: 'my-familiars',
+            data: {
+              familiarId: slot.familiar.id,
+              starLevel: newStarLevel
+            },
+            familiarId: slot.myFamiliarId // Pass familiarId to update existing entry
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          logger.error('Failed to update collection familiar', { status: response.status, errorText });
+        } else {
+          logger.info('Collection familiar updated successfully');
+
+          // Update local myFamiliars state
+          setMyFamiliars(prev => prev.map(f =>
+            f.id === slot.myFamiliarId ? { ...f, starLevel: newStarLevel } : f
+          ));
+
+          // Clear cache to force refresh
+          clearCache('my_familiars', user.id);
+        }
+      } catch (error) {
+        logger.error('Error updating collection familiar', { error });
+        // Don't show error to user, just log it - local changes still applied
+      }
+    }
   };
 
   // Handle save to collection
