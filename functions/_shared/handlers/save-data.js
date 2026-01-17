@@ -54,7 +54,7 @@ export async function handleSaveData(adapter, configAdapter) {
     }
 
     // Parse request body
-    const { type, data, spiritId, replace = false } = JSON.parse(body);
+    const { type, data, spiritId, familiarId, replace = false } = JSON.parse(body);
 
     // Validate required fields
     if (!type || !data) {
@@ -118,6 +118,10 @@ export async function handleSaveData(adapter, configAdapter) {
         return adapter.createJsonResponse(400, { error: 'Spirit data must include a spiritId' });
       }
 
+      if (type === 'my-familiars' && !data.familiarId) {
+        return adapter.createJsonResponse(400, { error: 'Familiar data must include a familiarId' });
+      }
+
       if (type === 'skill-builds' && (!data.maxSlots || !data.slots)) {
         return adapter.createJsonResponse(400, { error: 'Build must have maxSlots and slots' });
       }
@@ -155,7 +159,9 @@ export async function handleSaveData(adapter, configAdapter) {
     }
 
     // Handle user-centric data
-    return await handleUserCentricSave(adapter, storage, config, type, username, userId, data, spiritId);
+    // Pass spiritId or familiarId based on type
+    const recordId = type === 'my-spirits' ? spiritId : (type === 'my-familiars' ? familiarId : undefined);
+    return await handleUserCentricSave(adapter, storage, config, type, username, userId, data, recordId);
 
   } catch (error) {
     console.error('[save-data] Error:', error);
@@ -317,17 +323,17 @@ async function handleGridSubmission(adapter, storage, config, data, username, re
 /**
  * Handle user-centric data save
  */
-async function handleUserCentricSave(adapter, storage, config, type, username, userId, data, spiritId) {
+async function handleUserCentricSave(adapter, storage, config, type, username, userId, data, recordId) {
   try {
     // Load existing items
     const items = await storage.load(type, userId);
 
     // Find existing item
     let itemIndex = -1;
-    if (type === 'my-spirits' && spiritId) {
-      // For my-spirits updates, find by spiritId
-      itemIndex = items.findIndex(item => item.id === spiritId);
-    } else if (type !== 'my-spirits') {
+    if ((type === 'my-spirits' || type === 'my-familiars') && recordId) {
+      // For my-spirits/my-familiars updates, find by recordId
+      itemIndex = items.findIndex(item => item.id === recordId);
+    } else if (type !== 'my-spirits' && type !== 'my-familiars') {
       // For other types, match by ID only (not by name)
       // This enables "Save As" behavior: when user changes name in UI, frontend
       // removes the ID, causing backend to create a new entry instead of renaming

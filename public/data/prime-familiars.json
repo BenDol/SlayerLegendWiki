@@ -1,0 +1,249 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "totalPrimeFamiliars": 16,
+    "description": "Prime familiars created by combining 3 base familiars from different categories"
+  },
+  "primeFamiliars": [
+    {
+      "id": 1,
+      "name": "Infernal Guardian",
+      "combination": {
+        "elementFamiliarId": 1,
+        "attributeFamiliarId": 4,
+        "weaponFamiliarId": 1
+      },
+      "skill": {
+        "name": "Blazing Fortress",
+        "description": "Creates a fiery defensive barrier that reflects 30% damage and burns attackers",
+        "type": "defensive-offensive",
+        "cooldown": 20
+      }
+    },
+    {
+      "id": 2,
+      "name": "Aqua Tempest",
+      "combination": {
+        "elementFamiliarId": 2,
+        "attributeFamiliarId": 3,
+        "weaponFamiliarId": 2
+      },
+      "skill": {
+        "name": "Tidal Surge",
+        "description": "Summons a massive wave that deals 250% water damage and slows enemies by 40%",
+        "type": "offensive",
+        "cooldown": 18
+      }
+    },
+    {
+      "id": 3,
+      "name": "Zephyr Blade",
+      "combination": {
+        "elementFamiliarId": 3,
+        "attributeFamiliarId": 3,
+        "weaponFamiliarId": 1
+      },
+      "skill": {
+        "name": "Cyclone Strike",
+        "description": "Executes rapid wind-enhanced strikes dealing 180% damage 5 times in 2 seconds",
+        "type": "offensive",
+        "cooldown": 15
+      }
+    },
+    {
+      "id": 4,
+      "name": "Terra Colossus",
+      "combination": {
+        "elementFamiliarId": 4,
+        "attributeFamiliarId": 4,
+        "weaponFamiliarId": 4
+      },
+      "skill": {
+        "name": "Stone Prison",
+        "description": "Encases enemies in stone, stunning them for 5 seconds and reducing their defense by 50%",
+        "type": "defensive-control",
+        "cooldown": 25
+      }
+    },
+    {
+      "id": 5,
+      "name": "Flame Phantom",
+      "combination": {
+        "elementFamiliarId": 1,
+        "attributeFamiliarId": 3,
+        "weaponFamiliarId": 4
+      },
+      "skill": {
+        "name": "Shadow Immolation",
+        "description": "Becomes intangible while dealing continuous fire damage in a large area",
+        "type": "offensive-mobility",
+        "cooldown": 22
+      }
+    },
+    {
+      "id": 6,
+      "name": "Frost Sentinel",
+      "combination": {
+        "elementFamiliarId": 2,
+        "attributeFamiliarId": 4,
+        "weaponFamiliarId": 3
+      },
+      "skill": {
+        "name": "Frozen Aegis",
+        "description": "Conjures a shield of ice that absorbs 500% of max HP as damage and freezes nearby enemies",
+        "type": "defensive",
+        "cooldown": 30
+      }
+    },
+    {
+      "id": 7,
+      "name": "Storm Reaper",
+      "combination": {
+        "elementFamiliarId": 3,
+        "attributeFamiliarId": 1,
+        "weaponFamiliarId": 1
+      },
+      "skill": {
+        "name": "Tempest Harvest",
+        "description": "Sweeps through enemies with a wind-empowered scythe, dealing 300% damage and healing for 20% of damage dealt",
+        "type": "offensive-sustain",
+        "cooldown": 18
+      }
+    },
+    {
+      "id": 8,
+      "name": "Earthshaker",
+      "combination": {
+        "elementFamiliarId": 4,
+        "attributeFamiliarId": 1,
+        "weaponFamiliarId": 2
+      },
+      "skill": {
+        "name": "Seismic Spear",
+        "description": "Slams the ground with massive force, creating shockwaves that deal 280% damage and knock back enemies",
+        "type": "offensive-control",
+        "cooldown": 20
+      }
+    },
+    {
+      "id": 9,
+      "name": "Pyro Sage",
+      "combination": {
+        "elementFamiliarId": 1,
+        "attributeFamiliarId": 2,
+        "weaponFamiliarId": 3
+      },
+      "skill": {
+        "name": "Arcane Inferno",
+        "description": "Channels powerful flame magic dealing 400% damage over 6 seconds with a 30% chance to cause burn",
+        "type": "offensive-magic",
+        "cooldown": 24
+      }
+    },
+    {
+      "id": 10,
+      "name": "Tidebreaker",
+      "combination": {
+        "elementFamiliarId": 2,
+        "attributeFamiliarId": 1,
+        "weaponFamiliarId": 1
+      },
+      "skill": {
+        "name": "Torrent Cleave",
+        "description": "Delivers a devastating water-enhanced strike that deals 350% damage and applies a stacking vulnerability debuff",
+        "type": "offensive",
+        "cooldown": 16
+      }
+    },
+    {
+      "id": 11,
+      "name": "Gale Warden",
+      "combination": {
+        "elementFamiliarId": 3,
+        "attributeFamiliarId": 4,
+        "weaponFamiliarId": 2
+      },
+      "skill": {
+        "name": "Wind Barrier",
+        "description": "Summons a protective vortex that deflects projectiles and grants 50% evasion for 8 seconds",
+        "type": "defensive",
+        "cooldown": 28
+      }
+    },
+    {
+      "id": 12,
+      "name": "Boulder Crusher",
+      "combination": {
+        "elementFamiliarId": 4,
+        "attributeFamiliarId": 1,
+        "weaponFamiliarId": 3
+      },
+      "skill": {
+        "name": "Meteor Wand",
+        "description": "Calls down rocks from above dealing 320% earth damage in a wide area",
+        "type": "offensive-aoe",
+        "cooldown": 22
+      }
+    },
+    {
+      "id": 13,
+      "name": "Ember Wraith",
+      "combination": {
+        "elementFamiliarId": 1,
+        "attributeFamiliarId": 1,
+        "weaponFamiliarId": 2
+      },
+      "skill": {
+        "name": "Piercing Flames",
+        "description": "Launches a flaming spear that pierces all enemies in a line, dealing 260% damage",
+        "type": "offensive",
+        "cooldown": 14
+      }
+    },
+    {
+      "id": 14,
+      "name": "Aqua Mystic",
+      "combination": {
+        "elementFamiliarId": 2,
+        "attributeFamiliarId": 2,
+        "weaponFamiliarId": 4
+      },
+      "skill": {
+        "name": "Shadowy Depths",
+        "description": "Cloaks the area in watery darkness, reducing enemy accuracy by 40% and dealing 150% damage per second",
+        "type": "control-damage",
+        "cooldown": 26
+      }
+    },
+    {
+      "id": 15,
+      "name": "Whirlwind Champion",
+      "combination": {
+        "elementFamiliarId": 3,
+        "attributeFamiliarId": 2,
+        "weaponFamiliarId": 3
+      },
+      "skill": {
+        "name": "Cyclone Channeling",
+        "description": "Creates a sustained wind vortex around the familiar, dealing 200% damage per second to nearby enemies",
+        "type": "offensive-sustained",
+        "cooldown": 20
+      }
+    },
+    {
+      "id": 16,
+      "name": "Quake Behemoth",
+      "combination": {
+        "elementFamiliarId": 4,
+        "attributeFamiliarId": 2,
+        "weaponFamiliarId": 1
+      },
+      "skill": {
+        "name": "Earthen Harvest",
+        "description": "Swings a massive earth-empowered scythe in a circle, dealing 290% damage and restoring 15% HP",
+        "type": "offensive-sustain",
+        "cooldown": 19
+      }
+    }
+  ]
+}

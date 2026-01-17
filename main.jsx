@@ -113,6 +113,37 @@ dataRegistry.register('spirits', {
   type: 'array'
 });
 
+dataRegistry.register('familiars', {
+  file: '/data/familiars.json',
+  label: 'Familiars',
+  idField: 'id',
+  display: {
+    primary: 'name',
+    secondary: ['element', 'attribute'],
+    badges: ['element']
+  },
+  searchFields: ['name', 'element', 'attribute'],
+  icon: '👹',
+  description: 'Demon familiar characters',
+  type: 'array'
+});
+
+dataRegistry.register('prime-familiars', {
+  file: '/data/prime-familiars.json',
+  label: 'Prime Familiars',
+  idField: 'id',
+  display: {
+    primary: 'name',
+    secondary: ['skill.type'],
+    badges: ['skill.type']
+  },
+  dataPath: 'primeFamiliars',
+  searchFields: ['name', 'skill.name'],
+  icon: '⭐',
+  description: 'Combined Prime Familiars',
+  type: 'array'
+});
+
 dataRegistry.register('spirit-upgrades', {
   file: '/data/spirit-upgrades.json',
   label: 'Spirit Upgrades',
@@ -415,6 +446,7 @@ import { registerBuildTypes } from './wiki-framework/src/utils/buildTypeRegistry
 registerBuildTypes({
   'skill-builds': '/skill-builder',
   'spirit-builds': '/spirit-builder',
+  'familiar-builds': '/familiar-builder',
   'battle-loadouts': '/battle-loadouts',
   'soul-weapon-engraving': '/soul-weapon-engraving',
   'skill-stone-builds': '/skill-stone-builder',
@@ -456,6 +488,8 @@ const BattleLoadoutsPage = React.lazy(() => import('./src/pages/BattleLoadoutsPa
 const SpiritSpriteDemoPage = React.lazy(() => import('./src/pages/SpiritSpriteDemoPage.jsx'));
 const SpiritBuilderPage = React.lazy(() => import('./src/pages/SpiritBuilderPage.jsx'));
 const MySpiritCollectionPage = React.lazy(() => import('./src/pages/MySpiritCollectionPage.jsx'));
+const FamiliarBuilderPage = React.lazy(() => import('./src/pages/FamiliarBuilderPage.jsx'));
+const MyFamiliarCollectionPage = React.lazy(() => import('./src/pages/MyFamiliarCollectionPage.jsx'));
 const MyCollectionsPage = React.lazy(() => import('./src/pages/MyCollectionsPage.jsx'));
 const SoulWeaponEngravingBuilderPage = React.lazy(() => import('./src/pages/SoulWeaponEngravingBuilderPage.jsx'));
 const ContentCreatorsPage = React.lazy(() => import('./wiki-framework/src/pages/ContentCreatorsPage.jsx'));
@@ -494,6 +528,16 @@ const baseRoutes = [
   {
     path: 'my-spirits',
     component: <MySpiritCollectionPage />,
+    suspense: true
+  },
+  {
+    path: 'familiar-builder',
+    component: <FamiliarBuilderPage />,
+    suspense: true
+  },
+  {
+    path: 'my-familiars',
+    component: <MyFamiliarCollectionPage />,
     suspense: true
   },
   {

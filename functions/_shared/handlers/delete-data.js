@@ -40,26 +40,26 @@ export async function handleDeleteData(adapter, configAdapter) {
 
   try {
     // Parse request body
-    const { type, itemId, spiritId } = await adapter.getJsonBody();
+    const { type, itemId, spiritId, familiarId, recordId } = await adapter.getJsonBody();
 
     // Validate required fields
-    const deleteId = type === 'my-spirits' ? spiritId : itemId;
+    const deleteId = type === 'my-spirits' ? spiritId : (type === 'my-familiars' ? (familiarId || recordId) : (itemId || recordId));
     if (!type || !deleteId) {
       return adapter.createJsonResponse(400, {
-        error: `Missing required fields: type, ${type === 'my-spirits' ? 'spiritId' : 'itemId'}`
+        error: `Missing required fields: type, ${type === 'my-spirits' ? 'spiritId' : (type === 'my-familiars' ? 'familiarId or recordId' : 'itemId or recordId')}`
       });
     }
 
     // Validate type
-    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'engraving-builds', 'skill-stone-builds'];
+    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'my-familiars', 'familiar-builds', 'engraving-builds', 'skill-stone-builds'];
     if (!validTypes.includes(type)) {
       return adapter.createJsonResponse(400, {
         error: `Invalid type. Must be one of: ${validTypes.join(', ')}`
       });
     }
 
-    // Validate deleteId (itemId or spiritId)
-    const idFieldName = type === 'my-spirits' ? 'Spirit ID' : 'Item ID';
+    // Validate deleteId (itemId, spiritId, familiarId, or recordId)
+    const idFieldName = type === 'my-spirits' ? 'Spirit ID' : (type === 'my-familiars' ? 'Familiar ID' : 'Item ID');
     const deleteIdResult = validateItemId(deleteId, idFieldName);
     if (!deleteIdResult.valid) {
       return adapter.createJsonResponse(400, { error: deleteIdResult.error });

@@ -1,0 +1,119 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Familiar star level progression system with rarity tiers",
+    "totalStarLevels": 11
+  },
+  "starLevels": [
+    {
+      "stars": 0,
+      "rarity": "common",
+      "rarityDisplay": "Common",
+      "spriteVariant": "base",
+      "weaponTier": 1,
+      "color": "#9CA3AF",
+      "glow": false,
+      "statMultiplier": 1.0
+    },
+    {
+      "stars": 1,
+      "rarity": "common",
+      "rarityDisplay": "Common",
+      "spriteVariant": "base",
+      "weaponTier": 1,
+      "color": "#9CA3AF",
+      "glow": false,
+      "statMultiplier": 1.1
+    },
+    {
+      "stars": 2,
+      "rarity": "common",
+      "rarityDisplay": "Common",
+      "spriteVariant": "base",
+      "weaponTier": 1,
+      "color": "#9CA3AF",
+      "glow": false,
+      "statMultiplier": 1.2
+    },
+    {
+      "stars": 3,
+      "rarity": "rare",
+      "rarityDisplay": "Rare",
+      "spriteVariant": "rare",
+      "weaponTier": 2,
+      "color": "#3B82F6",
+      "glow": false,
+      "statMultiplier": 1.35
+    },
+    {
+      "stars": 4,
+      "rarity": "rare",
+      "rarityDisplay": "Rare",
+      "spriteVariant": "rare",
+      "weaponTier": 2,
+      "color": "#3B82F6",
+      "glow": false,
+      "statMultiplier": 1.5
+    },
+    {
+      "stars": 5,
+      "rarity": "rare",
+      "rarityDisplay": "Rare",
+      "spriteVariant": "rare",
+      "weaponTier": 2,
+      "color": "#3B82F6",
+      "glow": false,
+      "statMultiplier": 1.7
+    },
+    {
+      "stars": 6,
+      "rarity": "hero",
+      "rarityDisplay": "Hero",
+      "spriteVariant": "hero",
+      "weaponTier": 3,
+      "color": "#8B5CF6",
+      "glow": false,
+      "statMultiplier": 2.0
+    },
+    {
+      "stars": 7,
+      "rarity": "hero",
+      "rarityDisplay": "Hero",
+      "spriteVariant": "hero",
+      "weaponTier": 3,
+      "color": "#8B5CF6",
+      "glow": false,
+      "statMultiplier": 2.3
+    },
+    {
+      "stars": 8,
+      "rarity": "legend",
+      "rarityDisplay": "Legend",
+      "spriteVariant": "legend",
+      "weaponTier": 3,
+      "color": "#F59E0B",
+      "glow": false,
+      "statMultiplier": 2.7
+    },
+    {
+      "stars": 9,
+      "rarity": "legend",
+      "rarityDisplay": "Legend",
+      "spriteVariant": "legend",
+      "weaponTier": 4,
+      "color": "#F59E0B",
+      "glow": false,
+      "statMultiplier": 3.2
+    },
+    {
+      "stars": 10,
+      "rarity": "mythology",
+      "rarityDisplay": "Mythology",
+      "spriteVariant": "mythology",
+      "weaponTier": 4,
+      "color": "#EF4444",
+      "glow": true,
+      "statMultiplier": 4.0
+    }
+  ]
+}

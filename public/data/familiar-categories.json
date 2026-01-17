@@ -1,0 +1,120 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Familiar category definitions and mappings"
+  },
+  "categories": {
+    "element": {
+      "name": "Element",
+      "description": "Attribute familiars that boost elemental damage (Fire, Water, Wind, Earth)",
+      "slot": 0,
+      "slotLabel": "Element Familiar",
+      "required": true
+    },
+    "attribute": {
+      "name": "Battle",
+      "description": "Battle familiars that provide combat abilities (Coup, Painting, Shaman, Pho)",
+      "slot": 1,
+      "slotLabel": "Battle Familiar",
+      "required": true
+    },
+    "weapon": {
+      "name": "Weapon",
+      "description": "Weapon familiars that deal damage in various ranges (Me, Leone, Le, Mousse)",
+      "slot": 2,
+      "slotLabel": "Weapon Familiar",
+      "required": true
+    }
+  },
+  "familiarCategories": [
+    {
+      "familiarId": 1,
+      "name": "He",
+      "categories": {
+        "primary": "element"
+      }
+    },
+    {
+      "familiarId": 2,
+      "name": "Ah",
+      "categories": {
+        "primary": "element"
+      }
+    },
+    {
+      "familiarId": 3,
+      "name": "My",
+      "categories": {
+        "primary": "element"
+      }
+    },
+    {
+      "familiarId": 4,
+      "name": "Tea",
+      "categories": {
+        "primary": "element"
+      }
+    },
+    {
+      "familiarId": 5,
+      "name": "Coup",
+      "categories": {
+        "primary": "attribute"
+      }
+    },
+    {
+      "familiarId": 6,
+      "name": "Painting",
+      "categories": {
+        "primary": "attribute"
+      }
+    },
+    {
+      "familiarId": 7,
+      "name": "Shaman",
+      "categories": {
+        "primary": "attribute"
+      }
+    },
+    {
+      "familiarId": 8,
+      "name": "Pho",
+      "categories": {
+        "primary": "attribute"
+      }
+    },
+    {
+      "familiarId": 9,
+      "name": "Me",
+      "categories": {
+        "primary": "weapon"
+      }
+    },
+    {
+      "familiarId": 10,
+      "name": "Leone",
+      "categories": {
+        "primary": "weapon"
+      }
+    },
+    {
+      "familiarId": 11,
+      "name": "Le",
+      "categories": {
+        "primary": "weapon"
+      }
+    },
+    {
+      "familiarId": 12,
+      "name": "Mousse",
+      "categories": {
+        "primary": "weapon"
+      }
+    }
+  ],
+  "categoryMappings": {
+    "element": [1, 2, 3, 4],
+    "attribute": [5, 6, 7, 8],
+    "weapon": [9, 10, 11, 12]
+  }
+}

@@ -3,11 +3,11 @@ const logger = createLogger('LoadData');
 
 /**
  * Load Data Handler (Platform-Agnostic)
- * Handles loading skill builds, battle loadouts, engraving builds, and spirit collection
+ * Handles loading skill builds, battle loadouts, engraving builds, spirit collection, and familiar collection
  *
  * GET /api/load-data?type=TYPE&userId=USER_ID
  * Query Params:
- *   type: 'skill-builds' | 'battle-loadouts' | 'my-spirits' | 'spirit-builds' | 'engraving-builds'
+ *   type: 'skill-builds' | 'battle-loadouts' | 'my-spirits' | 'spirit-builds' | 'my-familiars' | 'familiar-builds' | 'engraving-builds' | 'skill-stone-builds'
  *   userId: number
  */
 
@@ -46,7 +46,7 @@ export async function handleLoadData(adapter, configAdapter) {
     }
 
     // Validate type
-    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'engraving-builds', 'skill-stone-builds'];
+    const validTypes = ['skill-builds', 'battle-loadouts', 'my-spirits', 'spirit-builds', 'my-familiars', 'familiar-builds', 'engraving-builds', 'skill-stone-builds'];
     if (!validTypes.includes(type)) {
       return adapter.createJsonResponse(400, {
         error: `Invalid type. Must be one of: ${validTypes.join(', ')}`

@@ -22,6 +22,16 @@ const MyCollectionsPage = () => {
       iconBg: 'bg-purple-100 dark:bg-purple-900/30',
       iconColor: 'text-purple-600 dark:text-purple-400'
     },
+    {
+      id: 'my-familiars',
+      title: 'My Familiar Collection',
+      description: 'Manage your configured familiars with custom star levels. Save your favorite familiar configurations to quickly use them in Prime Familiar builds.',
+      icon: Ghost,
+      path: '/my-familiars',
+      color: 'from-red-500 to-orange-500',
+      iconBg: 'bg-red-100 dark:bg-red-900/30',
+      iconColor: 'text-red-600 dark:text-red-400'
+    },
     // Future collections can be added here:
     // {
     //   id: 'my-skills',
@@ -39,10 +49,10 @@ const MyCollectionsPage = () => {
     <>
       <MetaTags
         title="My Collections"
-        description="Manage and track your personal game collections. View your spirits, skills, equipment, and unlocked content across different collection types."
+        description="Manage and track your personal game collections. View your spirits, familiars, skills, equipment, and unlocked content across different collection types."
         image="/images/content/tools/my-collections.png"
         url="/my-collections"
-        keywords={['collections', 'my collection', 'tracker', 'progress', 'inventory']}
+        keywords={['collections', 'my collection', 'tracker', 'progress', 'inventory', 'spirits', 'familiars']}
       />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Header */}
@@ -111,7 +121,7 @@ const MyCollectionsPage = () => {
         </div>
 
         {/* Empty state / Coming soon */}
-        {collections.length === 1 && (
+        {collections.length < 3 && (
           <div className="mt-8 text-center">
             <div className="inline-block p-6 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
               <BookOpen className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />

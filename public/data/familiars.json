@@ -1,282 +1,214 @@
 [
   {
     "id": 1,
-    "name": "Fire Demon",
+    "name": "Hi",
+    "nameKorean": "헤",
     "element": "Fire",
-    "attribute": "Offensive",
-    "description": "A fierce demon familiar aligned with the fire element, specializing in high burst damage attacks",
-    "unlockRequirement": "Unknown",
-    "baseStats": {
-      "attack": "High",
-      "defense": "Medium",
-      "speed": "Medium"
+    "type": "attribute",
+    "category": "element",
+    "color": "#F6473F",
+    "description": "Increases fire attribute damage",
+    "ability": {
+      "name": "Fire Attribute Boost",
+      "description": "Increases fire attribute damage by n%",
+      "scalesWithStars": true
     },
-    "attackStyle": {
-      "type": 1,
-      "name": "Aggressive Assault",
-      "description": "Close-range combat with rapid consecutive attacks"
-    },
-    "attackRange": {
-      "type": 1,
-      "range": "Close",
-      "pattern": "Circular AOE"
-    },
-    "weapons": [
-      {
-        "id": "scythe",
-        "name": "Demon Scythe",
-        "type": "Scythe",
-        "tiers": 4,
-        "description": "Curved blade weapon for sweeping attacks",
-        "image": "familiars/DemonScythe_1_01.png"
-      },
-      {
-        "id": "spear",
-        "name": "Demon Spear",
-        "type": "Spear",
-        "tiers": 4,
-        "description": "Long-range piercing weapon",
-        "image": "familiars/DemonSpear_1_01.png"
-      },
-      {
-        "id": "wand",
-        "name": "Demon Wand",
-        "type": "Wand",
-        "tiers": 4,
-        "description": "Magical catalyst for elemental attacks",
-        "image": "familiars/DemonWand_1_01.png"
-      },
-      {
-        "id": "shadow",
-        "name": "Shadow Blade",
-        "type": "Shadow",
-        "tiers": 4,
-        "description": "Dark energy weapon",
-        "image": "familiars/DemonShadow_1_01.png"
-      }
-    ],
     "images": {
-      "attackStyle": "familiars/Demon_AttackStyle_Display_01.png",
-      "attackRange": "familiars/Demon_AttackRange_Display_01.png",
-      "attribute": "familiars/Demon_Attribute_Display_01.png"
-    },
-    "skills": [
-      {
-        "name": "Rift Demon DMG Reduction",
-        "description": "Reduces damage taken from Rift Demons",
-        "type": "passive",
-        "unlockCondition": "Unknown"
-      }
-    ]
+      "sprite": "familiars/Demon_1.png"
+    }
   },
   {
     "id": 2,
-    "name": "Water Demon",
+    "name": "A",
+    "nameKorean": "아",
     "element": "Water",
-    "attribute": "Balanced",
-    "description": "A mystical demon familiar attuned to water, providing balanced offense and defense",
-    "unlockRequirement": "Unknown",
-    "baseStats": {
-      "attack": "Medium",
-      "defense": "High",
-      "speed": "Medium"
+    "type": "attribute",
+    "category": "element",
+    "color": "#4CB0F9",
+    "description": "Increases water attribute damage",
+    "ability": {
+      "name": "Water Attribute Boost",
+      "description": "Increases water attribute damage by n%",
+      "scalesWithStars": true
     },
-    "attackStyle": {
-      "type": 2,
-      "name": "Flowing Strikes",
-      "description": "Medium-range fluid combat with continuous attacks"
-    },
-    "attackRange": {
-      "type": 2,
-      "range": "Medium",
-      "pattern": "Linear sweep"
-    },
-    "weapons": [
-      {
-        "id": "scythe",
-        "name": "Demon Scythe",
-        "type": "Scythe",
-        "tiers": 4,
-        "description": "Curved blade weapon for sweeping attacks",
-        "image": "familiars/DemonScythe_2_01.png"
-      },
-      {
-        "id": "spear",
-        "name": "Demon Spear",
-        "type": "Spear",
-        "tiers": 4,
-        "description": "Long-range piercing weapon",
-        "image": "familiars/DemonSpear_2_01.png"
-      },
-      {
-        "id": "wand",
-        "name": "Demon Wand",
-        "type": "Wand",
-        "tiers": 4,
-        "description": "Magical catalyst for elemental attacks",
-        "image": "familiars/DemonWand_2_01.png"
-      },
-      {
-        "id": "shadow",
-        "name": "Shadow Blade",
-        "type": "Shadow",
-        "tiers": 4,
-        "description": "Dark energy weapon",
-        "image": "familiars/DemonShadow_2_01.png"
-      }
-    ],
     "images": {
-      "attackStyle": "familiars/Demon_AttackStyle_Display_02.png",
-      "attackRange": "familiars/Demon_AttackRange_Display_02.png",
-      "attribute": "familiars/Demon_Attribute_Display_02.png"
-    },
-    "skills": [
-      {
-        "name": "Water Spirit Stats",
-        "description": "Enhances water spirit statistics",
-        "type": "passive",
-        "unlockCondition": "Unknown"
-      }
-    ]
+      "sprite": "familiars/Demon_2.png"
+    }
   },
   {
     "id": 3,
-    "name": "Wind Demon",
+    "name": "Je",
+    "nameKorean": "마이",
     "element": "Wind",
-    "attribute": "Speed",
-    "description": "An agile demon familiar empowered by wind, specializing in rapid attack speed",
-    "unlockRequirement": "Unknown",
-    "baseStats": {
-      "attack": "Medium",
-      "defense": "Low",
-      "speed": "Very High"
+    "type": "attribute",
+    "category": "element",
+    "color": "#64E69A",
+    "description": "Increases wind attribute damage",
+    "ability": {
+      "name": "Wind Attribute Boost",
+      "description": "Increases wind attribute damage by n%",
+      "scalesWithStars": true
     },
-    "attackStyle": {
-      "type": 3,
-      "name": "Swift Tempest",
-      "description": "Fast-paced attacks with enhanced mobility"
-    },
-    "attackRange": {
-      "type": 3,
-      "range": "Medium",
-      "pattern": "Multi-directional"
-    },
-    "weapons": [
-      {
-        "id": "scythe",
-        "name": "Demon Scythe",
-        "type": "Scythe",
-        "tiers": 4,
-        "description": "Curved blade weapon for sweeping attacks",
-        "image": "familiars/DemonScythe_3_01.png"
-      },
-      {
-        "id": "spear",
-        "name": "Demon Spear",
-        "type": "Spear",
-        "tiers": 4,
-        "description": "Long-range piercing weapon",
-        "image": "familiars/DemonSpear_3_01.png"
-      },
-      {
-        "id": "wand",
-        "name": "Demon Wand",
-        "type": "Wand",
-        "tiers": 4,
-        "description": "Magical catalyst for elemental attacks",
-        "image": "familiars/DemonWand_3_01.png"
-      },
-      {
-        "id": "shadow",
-        "name": "Shadow Blade",
-        "type": "Shadow",
-        "tiers": 4,
-        "description": "Dark energy weapon",
-        "image": "familiars/DemonShadow_3_01.png"
-      }
-    ],
     "images": {
-      "attackStyle": "familiars/Demon_AttackStyle_Display_03.png",
-      "attackRange": "familiars/Demon_AttackRange_Display_03.png",
-      "attribute": "familiars/Demon_Attribute_Display_03.png"
-    },
-    "skills": [
-      {
-        "name": "Wind Spirit Stats",
-        "description": "Enhances wind spirit statistics",
-        "type": "passive",
-        "unlockCondition": "Unknown"
-      }
-    ]
+      "sprite": "familiars/Demon_3.png"
+    }
   },
   {
     "id": 4,
-    "name": "Earth Demon",
+    "name": "Ti",
+    "nameKorean": "티",
     "element": "Earth",
-    "attribute": "Defensive",
-    "description": "A sturdy demon familiar grounded in earth element, excelling in defense and sustainability",
-    "unlockRequirement": "Unknown",
-    "baseStats": {
-      "attack": "Low",
-      "defense": "Very High",
-      "speed": "Low"
+    "type": "attribute",
+    "category": "element",
+    "color": "#F59B25",
+    "description": "Increases earth attribute damage",
+    "ability": {
+      "name": "Earth Attribute Boost",
+      "description": "Increases earth attribute damage by n%",
+      "scalesWithStars": true
     },
-    "attackStyle": {
-      "type": 4,
-      "name": "Heavy Impact",
-      "description": "Powerful slow attacks with high damage per hit"
-    },
-    "attackRange": {
-      "type": 4,
-      "range": "Wide",
-      "pattern": "Ground slam AOE"
-    },
-    "weapons": [
-      {
-        "id": "scythe",
-        "name": "Demon Scythe",
-        "type": "Scythe",
-        "tiers": 4,
-        "description": "Curved blade weapon for sweeping attacks",
-        "image": "familiars/DemonScythe_4_01.png"
-      },
-      {
-        "id": "spear",
-        "name": "Demon Spear",
-        "type": "Spear",
-        "tiers": 4,
-        "description": "Long-range piercing weapon",
-        "image": "familiars/DemonSpear_4_01.png"
-      },
-      {
-        "id": "wand",
-        "name": "Demon Wand",
-        "type": "Wand",
-        "tiers": 4,
-        "description": "Magical catalyst for elemental attacks",
-        "image": "familiars/DemonWand_4_01.png"
-      },
-      {
-        "id": "shadow",
-        "name": "Shadow Blade",
-        "type": "Shadow",
-        "tiers": 4,
-        "description": "Dark energy weapon",
-        "image": "familiars/DemonShadow_4_01.png"
-      }
-    ],
     "images": {
-      "attackStyle": "familiars/Demon_AttackStyle_Display_04.png",
-      "attackRange": "familiars/Demon_AttackRange_Display_04.png",
-      "attribute": "familiars/Demon_Attribute_Display_04.png"
+      "sprite": "familiars/Demon_4.png"
+    }
+  },
+  {
+    "id": 5,
+    "name": "Ku",
+    "nameKorean": "쿠",
+    "element": "Neutral",
+    "type": "battle",
+    "category": "attribute",
+    "description": "Grants immediate attacks",
+    "ability": {
+      "name": "Immediate Strike",
+      "description": "Grants n immediate attacks",
+      "scalesWithStars": true
     },
-    "skills": [
-      {
-        "name": "Earth Spirit Stats",
-        "description": "Enhances earth spirit statistics",
-        "type": "passive",
-        "unlockCondition": "Unknown"
-      }
-    ]
+    "images": {
+      "sprite": "familiars/Demon_5.png"
+    }
+  },
+  {
+    "id": 6,
+    "name": "Pe",
+    "nameKorean": "페인팅",
+    "element": "Neutral",
+    "type": "battle",
+    "category": "attribute",
+    "description": "Rapid consecutive attacks",
+    "ability": {
+      "name": "Rapid Assault",
+      "description": "Attacks n times per second for n seconds",
+      "scalesWithStars": true
+    },
+    "images": {
+      "sprite": "familiars/Demon_6.png"
+    }
+  },
+  {
+    "id": 7,
+    "name": "Sha",
+    "nameKorean": "샤만",
+    "element": "Neutral",
+    "type": "battle",
+    "category": "attribute",
+    "description": "Random area attacks",
+    "ability": {
+      "name": "Chaos Strike",
+      "description": "Randomly attacks n times within range",
+      "scalesWithStars": true
+    },
+    "images": {
+      "sprite": "familiars/Demon_7.png"
+    }
+  },
+  {
+    "id": 8,
+    "name": "Po",
+    "nameKorean": "포",
+    "element": "Neutral",
+    "type": "battle",
+    "category": "attribute",
+    "description": "Delayed powerful attacks",
+    "ability": {
+      "name": "Delayed Barrage",
+      "description": "Attacks n times after 2 seconds in battle",
+      "scalesWithStars": true
+    },
+    "images": {
+      "sprite": "familiars/Demon_8.png"
+    }
+  },
+  {
+    "id": 9,
+    "name": "Na",
+    "nameKorean": "메",
+    "element": "Neutral",
+    "type": "weapon",
+    "category": "weapon",
+    "weaponType": "Spear",
+    "description": "Close-range area damage",
+    "ability": {
+      "name": "Point Blank",
+      "description": "Deals n% damage to enemies within range 1",
+      "scalesWithStars": true
+    },
+    "images": {
+      "sprite": "familiars/Demon_9.png"
+    }
+  },
+  {
+    "id": 10,
+    "name": "Rion",
+    "nameKorean": "레오네",
+    "element": "Neutral",
+    "type": "weapon",
+    "category": "weapon",
+    "weaponType": "Sword",
+    "description": "Variable range damage",
+    "ability": {
+      "name": "Variable Strike",
+      "description": "Deals n% damage to enemies within range n",
+      "scalesWithStars": true
+    },
+    "images": {
+      "sprite": "familiars/Demon_10.png"
+    }
+  },
+  {
+    "id": 11,
+    "name": "Ru",
+    "nameKorean": "레",
+    "element": "Neutral",
+    "type": "weapon",
+    "category": "weapon",
+    "weaponType": "Scythe",
+    "description": "Extended range damage",
+    "ability": {
+      "name": "Long Reach",
+      "description": "Deals n% damage to enemies within range n",
+      "scalesWithStars": true
+    },
+    "images": {
+      "sprite": "familiars/Demon_11.png"
+    }
+  },
+  {
+    "id": 12,
+    "name": "Mus",
+    "nameKorean": "무스",
+    "element": "Neutral",
+    "type": "weapon",
+    "category": "weapon",
+    "weaponType": "Wand",
+    "description": "Area effect damage",
+    "ability": {
+      "name": "Area Blast",
+      "description": "Deals n% damage to enemies within range n",
+      "scalesWithStars": true
+    },
+    "images": {
+      "sprite": "familiars/Demon_12.png"
+    }
   }
 ]

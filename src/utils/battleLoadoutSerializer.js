@@ -16,6 +16,11 @@
 
 import { createLogger } from './logger.js';
 import { serializeBuild, deserializeBuild, serializeBuildForSharing } from './spiritSerialization.js';
+import {
+  serializeBuild as serializeFamiliarBuildUtil,
+  deserializeBuild as deserializeFamiliarBuildUtil,
+  serializeBuildForSharing as serializeFamiliarBuildForSharing
+} from './familiarSerialization.js';
 
 const logger = createLogger('BattleLoadoutSerializer');
 
@@ -161,6 +166,32 @@ export const deserializeSpiritBuild = (build, spiritsArray, mySpiritsArray = [])
 };
 
 /**
+ * Serialize familiar build for storage (familiar objects -> familiar IDs)
+ * Uses shared serialization utility
+ *
+ * @param {Object} build - Familiar build with full familiar objects
+ * @returns {Object} Serialized build
+ */
+export const serializeFamiliarBuild = (build) => {
+  if (!build) return null;
+  return serializeFamiliarBuildUtil(build);
+};
+
+/**
+ * Deserialize familiar build (familiar IDs -> full familiar objects)
+ * Uses shared deserialization utility
+ *
+ * @param {Object} build - Serialized familiar build
+ * @param {Array} familiarsArray - Array of all familiars
+ * @param {Array} myFamiliarsArray - Array of user's collection familiars
+ * @returns {Object} Deserialized build with full familiar objects
+ */
+export const deserializeFamiliarBuild = (build, familiarsArray, myFamiliarsArray = []) => {
+  if (!build) return null;
+  return deserializeFamiliarBuildUtil(build, familiarsArray, myFamiliarsArray);
+};
+
+/**
  * Deserialize soul weapon build by reconstructing shape objects
  *
  * @param {Object} build - Serialized soul weapon build
@@ -224,12 +255,12 @@ export const serializeLoadoutForStorage = (loadout) => {
     name: loadout.name,
     skillBuildId: loadout.skillBuild?.id || null,
     spiritBuildId: loadout.spiritBuild?.id || null,
+    familiarBuildId: loadout.familiarBuild?.id || null,
     soulWeaponBuild: loadout.soulWeaponBuild ? serializeSoulWeaponBuild(loadout.soulWeaponBuild) : null,
     skillStoneBuild: loadout.skillStoneBuild || null,
     spirit: loadout.spirit || null,
     skillStone: loadout.skillStone || null,
-    promotionAbility: loadout.promotionAbility || null,
-    familiar: loadout.familiar || null
+    promotionAbility: loadout.promotionAbility || null
   };
 
   // Preserve ID and timestamps if they exist
@@ -254,12 +285,12 @@ export const serializeLoadoutForSharing = (loadout) => {
     name: loadout.name,
     skillBuild: loadout.skillBuild ? serializeSkillBuild(loadout.skillBuild) : null,
     spiritBuild: loadout.spiritBuild ? serializeBuildForSharing(loadout.spiritBuild) : null,
+    familiarBuild: loadout.familiarBuild ? serializeFamiliarBuildForSharing(loadout.familiarBuild) : null,
     soulWeaponBuild: loadout.soulWeaponBuild ? serializeSoulWeaponBuild(loadout.soulWeaponBuild) : null,
     skillStoneBuild: loadout.skillStoneBuild || null,
     spirit: loadout.spirit || null,
     skillStone: loadout.skillStone || null,
-    promotionAbility: loadout.promotionAbility || null,
-    familiar: loadout.familiar || null
+    promotionAbility: loadout.promotionAbility || null
   };
 };
 
@@ -274,6 +305,10 @@ export const serializeLoadoutForSharing = (loadout) => {
  * @param {Array} allSkillBuilds - All saved skill builds (for ID resolution)
  * @param {Array} allSpiritBuilds - All saved spirit builds (for ID resolution)
  * @param {Array} shapes - All engraving shapes (for soul weapon deserialization)
+ * @param {Array} familiars - All familiars data
+ * @param {Array} myFamiliars - User's familiar collection
+ * @param {Array} allFamiliarBuilds - All saved familiar builds (for ID resolution)
+ * @param {Array} primeFamiliars - All prime familiar definitions (for prime familiar regeneration)
  * @returns {Object} Deserialized loadout with full build objects
  */
 export const deserializeLoadout = (
@@ -283,12 +318,17 @@ export const deserializeLoadout = (
   mySpirits = [],
   allSkillBuilds = [],
   allSpiritBuilds = [],
-  shapes = []
+  shapes = [],
+  familiars = [],
+  myFamiliars = [],
+  allFamiliarBuilds = [],
+  primeFamiliars = []
 ) => {
   if (!loadout) return null;
 
   let skillBuild = null;
   let spiritBuild = null;
+  let familiarBuild = null;
   let soulWeaponBuild = null;
 
   // Resolve skill build
@@ -335,6 +375,28 @@ export const deserializeLoadout = (
     spiritBuild = deserializeSpiritBuild(loadout.spiritBuild, spirits, mySpirits);
   }
 
+  // Resolve familiar build
+  if (loadout.familiarBuildId) {
+    // Storage format: resolve ID to build
+    const found = allFamiliarBuilds.find(b => b.id === loadout.familiarBuildId);
+    if (found) {
+      familiarBuild = deserializeFamiliarBuildUtil(found, familiars, myFamiliars, primeFamiliars);
+    } else {
+      // Build not found - mark as missing
+      familiarBuild = {
+        missing: true,
+        id: loadout.familiarBuildId,
+        name: 'Deleted Build',
+        slots: [],
+        primeFamiliar: null
+      };
+      logger.warn('Familiar build not found', { buildId: loadout.familiarBuildId });
+    }
+  } else if (loadout.familiarBuild) {
+    // Share format or embedded: already has full build data
+    familiarBuild = deserializeFamiliarBuildUtil(loadout.familiarBuild, familiars, myFamiliars, primeFamiliars);
+  }
+
   // Deserialize soul weapon build (reconstruct shape objects if needed)
   if (loadout.soulWeaponBuild && shapes.length > 0) {
     soulWeaponBuild = deserializeSoulWeaponBuild(loadout.soulWeaponBuild, shapes);
@@ -346,6 +408,7 @@ export const deserializeLoadout = (
     ...loadout,
     skillBuild,
     spiritBuild,
+    familiarBuild,
     soulWeaponBuild
   };
 };
