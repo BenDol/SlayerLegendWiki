@@ -11,6 +11,7 @@
  */
 
 import { createLogger } from './logger.js';
+import { findPrimeFamiliar } from './familiarHelpers.js';
 
 const logger = createLogger('FamiliarSerialization');
 
@@ -209,22 +210,25 @@ export const deserializeSlot = (slot, familiarsData, myFamiliars = []) => {
 /**
  * Deserialize a familiar build
  * Converts all slots with familiarId or myFamiliarId to full familiar objects
+ * Regenerates Prime Familiar data if slots are complete
  *
  * IMPORTANT: Ensures slot order is always: Element (0), Battle (1), Weapon (2)
  *
  * @param {Object} build - Build with serialized slots
  * @param {Array} familiarsData - Full familiars database
  * @param {Array} myFamiliars - User's familiar collection (optional)
+ * @param {Array} primeFamiliarsData - Prime familiar definitions (optional, for regeneration)
  * @returns {Object} Deserialized build with full familiar objects
  */
-export const deserializeBuild = (build, familiarsData, myFamiliars = []) => {
+export const deserializeBuild = (build, familiarsData, myFamiliars = [], primeFamiliarsData = []) => {
   if (!build) return null;
 
   logger.debug('Deserializing build', {
     hasBuild: !!build,
     slotsCount: build.slots?.length,
     familiarsDataCount: familiarsData?.length,
-    myFamiliarsCount: myFamiliars?.length
+    myFamiliarsCount: myFamiliars?.length,
+    primeFamiliarsDataCount: primeFamiliarsData?.length
   });
 
   let slots = build.slots?.map(slot => deserializeSlot(slot, familiarsData, myFamiliars)) || [];
@@ -247,14 +251,41 @@ export const deserializeBuild = (build, familiarsData, myFamiliars = []) => {
     }));
   }
 
+  // Regenerate Prime Familiar if all slots are filled
+  let primeFamiliar = null;
+  const allSlotsFilled = slots.every(slot => slot.familiar !== null);
+  if (allSlotsFilled) {
+    const elementFamiliarId = slots[0]?.familiar?.id;
+    const attributeFamiliarId = slots[1]?.familiar?.id;
+    const weaponFamiliarId = slots[2]?.familiar?.id;
+
+    if (elementFamiliarId && attributeFamiliarId && weaponFamiliarId) {
+      primeFamiliar = findPrimeFamiliar(
+        elementFamiliarId,
+        attributeFamiliarId,
+        weaponFamiliarId,
+        primeFamiliarsData,
+        familiarsData
+      );
+      logger.debug('Regenerated Prime Familiar', {
+        primeFamiliarId: primeFamiliar?.id,
+        primeFamiliarName: primeFamiliar?.name,
+        isCustom: primeFamiliar?.isCustom
+      });
+    }
+  }
+
   const deserialized = {
     ...build,
-    slots
+    slots,
+    primeFamiliar
   };
 
   logger.debug('Deserialized build result', {
     slotsCount: deserialized.slots?.length,
-    categories: deserialized.slots.map(s => s.category)
+    categories: deserialized.slots.map(s => s.category),
+    hasPrimeFamiliar: !!deserialized.primeFamiliar,
+    primeFamiliarName: deserialized.primeFamiliar?.name
   });
 
   return deserialized;
@@ -263,6 +294,7 @@ export const deserializeBuild = (build, familiarsData, myFamiliars = []) => {
 /**
  * Serialize a familiar build
  * Converts all slots with full familiar objects to appropriate format (collection or base)
+ * Note: Prime Familiar is NOT serialized - it's regenerated on deserialization based on slot familiars
  *
  * @param {Object} build - Build with full familiar objects
  * @returns {Object} Serialized build with only necessary data
@@ -270,15 +302,15 @@ export const deserializeBuild = (build, familiarsData, myFamiliars = []) => {
 export const serializeBuild = (build) => {
   if (!build) return null;
 
-  return {
+  const serialized = {
     ...build,
-    slots: build.slots?.map(slot => serializeSlot(slot)) || [],
-    // Serialize Prime Familiar (only store ID and custom flag)
-    primeFamiliar: build.primeFamiliar ? {
-      id: build.primeFamiliar.id,
-      isCustom: build.primeFamiliar.isCustom || false
-    } : null
+    slots: build.slots?.map(slot => serializeSlot(slot)) || []
   };
+
+  // Remove prime familiar - it will be regenerated on deserialization
+  delete serialized.primeFamiliar;
+
+  return serialized;
 };
 
 /**

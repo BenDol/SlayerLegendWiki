@@ -33,6 +33,7 @@ const logger = createLogger('PrimeFamiliarPreview');
  * @param {Array} progressionData - Star progression data
  * @param {string} size - Size preset: 'small', 'medium', 'large'
  * @param {boolean} showDetails - Show Prime Familiar name and skill (default: true)
+ * @param {boolean} showStars - Show star rating display (default: true)
  * @param {boolean} animated - Whether to animate sprites (default: true)
  * @param {string} className - Additional CSS classes
  */
@@ -47,6 +48,7 @@ const PrimeFamiliarPreview = ({
   progressionData = [],
   size = 'large',
   showDetails = true,
+  showStars = true,
   animated = true,
   className = ''
 }) => {
@@ -124,6 +126,41 @@ const PrimeFamiliarPreview = ({
     return color;
   }, [elementFamiliar]);
 
+  // Calculate weapon position and scale based on BODY (attribute) star level
+  // Position: Transitions from right: 3% at star 0 to right: -10% at star 10
+  // Scale: Increases with each body tier (every 3 star levels) from 100% to 150%
+  const { weaponRightPosition, weaponScale } = useMemo(() => {
+    // Position calculation based on attribute (battle/body) star level
+    const startPosition = 3; // 3% at star level 0
+    const endPosition = -10; // -10% at star level 10
+    const positionChange = endPosition - startPosition; // -13%
+    const positionPerStar = positionChange / 10; // -1.3% per star level
+    const calculatedPosition = startPosition + (attributeStarLevel * positionPerStar);
+
+    // Scale calculation based on body tier (attribute star level / 3)
+    // Tier 1 (0-2 stars): 1.0 (100%)
+    // Tier 2 (3-5 stars): 1.167 (116.7%)
+    // Tier 3 (6-8 stars): 1.333 (133.3%)
+    // Tier 4 (9-10 stars): 1.5 (150%)
+    const bodyTier = Math.min(4, Math.floor(attributeStarLevel / 3) + 1);
+    const baseScale = 1.0;
+    const maxScale = 1.5;
+    const scalePerTier = (maxScale - baseScale) / 3; // 0.1667 per tier
+    const calculatedScale = baseScale + (bodyTier - 1) * scalePerTier;
+
+    logger.debug('Weapon position and scale calculated from body star level', {
+      attributeStarLevel,
+      bodyTier,
+      position: `${calculatedPosition}%`,
+      scale: calculatedScale
+    });
+
+    return {
+      weaponRightPosition: `${calculatedPosition}%`,
+      weaponScale: calculatedScale
+    };
+  }, [attributeStarLevel]);
+
   // Size presets
   const sizeMap = {
     small: { container: '128px', weapon: '64px' },
@@ -136,8 +173,8 @@ const PrimeFamiliarPreview = ({
   // Check if we have enough data to render
   if (!attributeFamiliar) {
     return (
-      <div className={`flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg ${className}`}
-           style={{ width: dimensions.container, height: dimensions.container }}>
+      <div className={`w-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg aspect-square ${className}`}
+           style={{ maxWidth: dimensions.container, maxHeight: dimensions.container }}>
         <div className="text-center p-4">
           <div className="text-4xl mb-2">👹</div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -149,18 +186,18 @@ const PrimeFamiliarPreview = ({
   }
 
   return (
-    <div className={`relative ${className}`} style={{ width: dimensions.container }}>
+    <div className={`relative w-full ${className}`} style={{ maxWidth: dimensions.container }}>
       {/* Main composite sprite container */}
       <div
-        className="relative rounded-lg overflow-visible"
-        style={{ width: dimensions.container, height: dimensions.container }}
+        className="relative rounded-lg overflow-visible aspect-square w-full"
+        style={{ maxWidth: dimensions.container, maxHeight: dimensions.container }}
       >
         {/* Glow effect layer (if mythology tier) */}
-        {rarityData.glow && (
+        {rarityData.glow && elementColor && (
           <div
             className="absolute inset-0 animate-pulse"
             style={{
-              backgroundColor: rarityData.color,
+              backgroundColor: elementColor,
               opacity: 0.3,
               filter: 'blur(20px)'
             }}
@@ -173,12 +210,13 @@ const PrimeFamiliarPreview = ({
           <div
             className="absolute"
             style={{
-              right: '-10%',
+              right: weaponRightPosition,
               top: '25%',
               width: dimensions.weapon,
               height: dimensions.weapon,
-              transform: 'translate(30px, calc(-25% + 26px)) rotate(-10deg) scale(1.5)',
-              zIndex: 10
+              transform: `translate(30px, calc(-25% + 26px)) rotate(-10deg) scale(${weaponScale})`,
+              zIndex: 10,
+              transition: 'right 0.3s ease-out, transform 0.3s ease-out' // Smooth transition when star level changes
             }}
           >
             <img
@@ -230,7 +268,7 @@ const PrimeFamiliarPreview = ({
         </div>
 
         {/* Star rating display (bottom) */}
-        {averageStarLevel > 0 && (() => {
+        {showStars && averageStarLevel > 0 && (() => {
           // 0-5 stars: regular stars, 6-10 stars: red stars
           const useRedStar = averageStarLevel > 5;
           const displayStars = averageStarLevel > 5 ? averageStarLevel - 5 : averageStarLevel;
@@ -254,20 +292,6 @@ const PrimeFamiliarPreview = ({
           );
         })()}
       </div>
-
-      {/* Prime Familiar Name */}
-      {primeFamiliar && showDetails && (
-        <div className="mt-4 text-center">
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            {primeFamiliar.name}
-            {primeFamiliar.isCustom && (
-              <span className="ml-2 text-sm sm:text-base font-normal text-gray-500 dark:text-gray-400">
-                (Custom)
-              </span>
-            )}
-          </h3>
-        </div>
-      )}
     </div>
   );
 };

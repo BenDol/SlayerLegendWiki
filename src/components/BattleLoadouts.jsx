@@ -6,6 +6,8 @@ import SkillInformation from './SkillInformation';
 import SpiritBuilderModal from './SpiritBuilderModal';
 import SpiritComponent from './SpiritComponent';
 import FamiliarBuilderModal from './FamiliarBuilderModal';
+import PrimeFamiliarPreview from './PrimeFamiliarPreview';
+import FamiliarSprite from './FamiliarSprite';
 import SoulWeaponEngravingBuilderModal from './SoulWeaponEngravingBuilderModal';
 import SoulWeaponEngravingGrid from './SoulWeaponEngravingGrid';
 import SkillStoneBuilderModal from './SkillStoneBuilderModal';
@@ -19,10 +21,21 @@ import { saveBuild, loadBuild, generateShareUrl } from '../../wiki-framework/src
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
 import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
 import { serializeBuild, deserializeBuild, serializeBuildForSharing } from '../utils/spiritSerialization';
-import { serializeLoadoutForStorage, serializeLoadoutForSharing, deserializeSoulWeaponBuild } from '../utils/battleLoadoutSerializer';
+import {
+  serializeLoadoutForStorage as serializeLoadoutForStorageUtil,
+  serializeLoadoutForSharing as serializeLoadoutForSharingUtil,
+  deserializeSoulWeaponBuild,
+  deserializeLoadout
+} from '../utils/battleLoadoutSerializer';
+import {
+  serializeBuild as serializeFamiliarBuildUtil,
+  deserializeBuild as deserializeFamiliarBuildUtil,
+  serializeBuildForSharing as serializeFamiliarBuildForSharing
+} from '../utils/familiarSerialization';
 import { validateBuildName, STRING_LIMITS } from '../utils/validation';
 import { createLogger } from '../utils/logger';
 import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
+import { useFamiliarsData } from '../hooks/useFamiliarsData';
 
 const logger = createLogger('BattleLoadouts');
 
@@ -48,11 +61,15 @@ const BattleLoadouts = () => {
   const [skills, setSkills] = useState([]);
   const [spirits, setSpirits] = useState([]);
   const [mySpirits, setMySpirits] = useState([]);
+  const [familiars, setFamiliars] = useState([]);
+  const [myFamiliars, setMyFamiliars] = useState([]);
+  const [primeFamiliars, setPrimeFamiliars] = useState([]); // Prime familiars data
   const [shapes, setShapes] = useState([]); // Soul weapon engraving shapes
   const [allWeapons, setAllWeapons] = useState([]); // All weapons for soul weapon preview
   const [stoneData, setStoneData] = useState(null); // Skill stones data
   const [allSkillBuilds, setAllSkillBuilds] = useState([]);
   const [allSpiritBuilds, setAllSpiritBuilds] = useState([]);
+  const [allFamiliarBuilds, setAllFamiliarBuilds] = useState([]);
   const [userBuildsLoaded, setUserBuildsLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showSkillBuilder, setShowSkillBuilder] = useState(false);
@@ -85,12 +102,12 @@ const BattleLoadouts = () => {
     { loadoutName, currentLoadout }
   );
 
-  // Load skills, spirits, weapons, shapes, and stone data
+  // Load skills, spirits, familiars, prime familiars, weapons, shapes, and stone data
   useEffect(() => {
-    logger.info('BattleLoadouts: Starting initial data load (skills, spirits, weapons, shapes, stone data)');
+    logger.info('BattleLoadouts: Starting initial data load (skills, spirits, familiars, prime familiars, weapons, shapes, stone data)');
     const loadData = async () => {
       try {
-        await Promise.all([loadSkills(), loadSpirits(), loadWeapons(), loadShapes(), loadStoneData()]);
+        await Promise.all([loadSkills(), loadSpirits(), loadFamiliars(), loadPrimeFamiliars(), loadWeapons(), loadShapes(), loadStoneData()]);
         logger.info('BattleLoadouts: All initial data loaded successfully');
       } catch (error) {
         logger.error('BattleLoadouts: Error during initial data load', { error: error.message, stack: error.stack });
@@ -108,7 +125,9 @@ const BattleLoadouts = () => {
       // Not authenticated, clear builds and mark as loaded so draft can load
       setAllSkillBuilds([]);
       setAllSpiritBuilds([]);
+      setAllFamiliarBuilds([]);
       setMySpirits([]);
+      setMyFamiliars([]);
       setUserBuildsLoaded(true);
     }
   }, [isAuthenticated, user?.id]);
@@ -180,8 +199,20 @@ const BattleLoadouts = () => {
 
           const savedLoadout = loadouts.find(l => l.id === loadoutId);
           if (savedLoadout) {
+            logger.debug('LOAD: Found saved loadout', {
+              loadoutId,
+              familiarBuildId: savedLoadout.familiarBuildId,
+              hasFamiliarBuild: !!savedLoadout.familiarBuild
+            });
+
             // Resolve the loadout (handles both build IDs and embedded builds)
             const resolvedLoadout = resolveLoadoutBuilds(savedLoadout);
+
+            logger.debug('LOAD: After resolving loadout', {
+              hasFamiliarBuild: !!resolvedLoadout.familiarBuild,
+              familiarBuildId: resolvedLoadout.familiarBuild?.id,
+              familiarBuildMissing: resolvedLoadout.familiarBuild?.missing
+            });
 
             setCurrentLoadout(resolvedLoadout);
             setLoadoutName(resolvedLoadout.name || '');
@@ -298,6 +329,26 @@ const BattleLoadouts = () => {
     }
   };
 
+  const loadFamiliars = async () => {
+    try {
+      const response = await fetch('/data/familiars.json');
+      const data = await response.json();
+      setFamiliars(Array.isArray(data) ? data : []);
+    } catch (error) {
+      logger.error('Failed to load familiars', { error });
+    }
+  };
+
+  const loadPrimeFamiliars = async () => {
+    try {
+      const response = await fetch('/data/prime-familiars.json');
+      const data = await response.json();
+      setPrimeFamiliars(data.primeFamiliars || []);
+    } catch (error) {
+      logger.error('Failed to load prime familiars', { error });
+    }
+  };
+
   const loadWeapons = async () => {
     try {
       const response = await fetch('/data/soul-weapons.json');
@@ -339,21 +390,23 @@ const BattleLoadouts = () => {
   };
 
   /**
-   * Load user's skill builds, spirit builds, and my-spirits collection
+   * Load user's skill builds, spirit builds, familiar builds, and collections
    * Needed for resolving build IDs to full builds
    */
   const loadUserBuildsAndSpirits = async () => {
     if (!user?.id) return;
 
     try {
-      logger.debug('Loading user builds and spirits', { userId: user.id });
+      logger.debug('Loading user builds and collections', { userId: user.id });
 
-      // Load all three collections in parallel
+      // Load all collections in parallel
       const loadDataEndpoint = getLoadDataEndpoint();
-      const [skillBuildsRes, spiritBuildsRes, mySpiritsRes] = await Promise.all([
+      const [skillBuildsRes, spiritBuildsRes, mySpiritsRes, familiarBuildsRes, myFamiliarsRes] = await Promise.all([
         fetch(`${loadDataEndpoint}?type=skill-builds&userId=${user.id}`),
         fetch(`${loadDataEndpoint}?type=spirit-builds&userId=${user.id}`),
-        fetch(`${loadDataEndpoint}?type=my-spirits&userId=${user.id}`)
+        fetch(`${loadDataEndpoint}?type=my-spirits&userId=${user.id}`),
+        fetch(`${loadDataEndpoint}?type=familiar-builds&userId=${user.id}`),
+        fetch(`${loadDataEndpoint}?type=my-familiars&userId=${user.id}`)
       ]);
 
       logger.debug('Fetch responses', {
@@ -362,33 +415,45 @@ const BattleLoadouts = () => {
         spiritBuildsOk: spiritBuildsRes.ok,
         spiritBuildsStatus: spiritBuildsRes.status,
         mySpiritsOk: mySpiritsRes.ok,
-        mySpiritsStatus: mySpiritsRes.status
+        mySpiritsStatus: mySpiritsRes.status,
+        familiarBuildsOk: familiarBuildsRes.ok,
+        familiarBuildsStatus: familiarBuildsRes.status,
+        myFamiliarsOk: myFamiliarsRes.ok,
+        myFamiliarsStatus: myFamiliarsRes.status
       });
 
       // Parse responses
       const skillBuildsData = skillBuildsRes.ok ? await skillBuildsRes.json() : { builds: [] };
       const spiritBuildsData = spiritBuildsRes.ok ? await spiritBuildsRes.json() : { builds: [] };
       const mySpiritsData = mySpiritsRes.ok ? await mySpiritsRes.json() : { spirits: [] };
+      const familiarBuildsData = familiarBuildsRes.ok ? await familiarBuildsRes.json() : { builds: [] };
+      const myFamiliarsData = myFamiliarsRes.ok ? await myFamiliarsRes.json() : { familiars: [] };
 
       logger.debug('Parsed data', {
         skillBuildsData,
         spiritBuildsData,
-        mySpiritsData
+        mySpiritsData,
+        familiarBuildsData,
+        myFamiliarsData
       });
 
       setAllSkillBuilds(skillBuildsData.builds || []);
       setAllSpiritBuilds(spiritBuildsData.builds || []);
       setMySpirits(mySpiritsData.spirits || []);
+      setAllFamiliarBuilds(familiarBuildsData.builds || []);
+      setMyFamiliars(myFamiliarsData.familiars || []);
 
-      logger.debug('Loaded user builds and spirits', {
+      logger.debug('Loaded user builds and collections', {
         skillBuilds: skillBuildsData.builds?.length || 0,
         spiritBuilds: spiritBuildsData.builds?.length || 0,
-        mySpirits: mySpiritsData.spirits?.length || 0
+        mySpirits: mySpiritsData.spirits?.length || 0,
+        familiarBuilds: familiarBuildsData.builds?.length || 0,
+        myFamiliars: myFamiliarsData.familiars?.length || 0
       });
 
       setUserBuildsLoaded(true);
     } catch (error) {
-      logger.error('Failed to load user builds and spirits', {
+      logger.error('Failed to load user builds and collections', {
         error,
         errorMessage: error?.message,
         errorStack: error?.stack
@@ -496,40 +561,15 @@ const BattleLoadouts = () => {
    * Serialize entire loadout for storage (store build IDs, not full builds)
    */
   const serializeLoadout = (loadout) => {
-    return {
-      name: loadout.name,
-      skillBuildId: loadout.skillBuild?.id || null,
-      spiritBuildId: loadout.spiritBuild?.id || null,
-      soulWeaponBuild: loadout.soulWeaponBuild || null,
-      skillStoneBuild: loadout.skillStoneBuild || null,
-      spirit: loadout.spirit ? { spiritId: loadout.spirit.id } : null,
-      skillStone: loadout.skillStone,
-      promotionAbility: loadout.promotionAbility,
-      familiar: loadout.familiar
-    };
+    return serializeLoadoutForStorageUtil(loadout);
   };
 
   /**
    * Serialize loadout for sharing (embed full serialized builds, not IDs)
    * Recipients won't have access to build IDs or collection IDs, so we need full build data
    */
-  const serializeLoadoutForSharing = (loadout) => {
-    return {
-      name: loadout.name,
-      skillBuild: loadout.skillBuild ? serializeSkillBuild(loadout.skillBuild) : null,
-      spiritBuild: loadout.spiritBuild ? serializeBuildForSharing(loadout.spiritBuild) : null,
-      soulWeaponBuild: loadout.soulWeaponBuild ? {
-        weaponId: loadout.soulWeaponBuild.weaponId,
-        weaponName: loadout.soulWeaponBuild.weaponName,
-        gridState: loadout.soulWeaponBuild.gridState,
-        inventory: loadout.soulWeaponBuild.inventory
-      } : null,
-      skillStoneBuild: loadout.skillStoneBuild || null,
-      spirit: loadout.spirit ? { spiritId: loadout.spirit.id } : null,
-      skillStone: loadout.skillStone,
-      promotionAbility: loadout.promotionAbility,
-      familiar: loadout.familiar
-    };
+  const serializeLoadoutForSharingLocal = (loadout) => {
+    return serializeLoadoutForSharingUtil(loadout);
   };
 
   /**
@@ -623,6 +663,39 @@ const BattleLoadouts = () => {
       spiritBuild = normalizeSpiritBuild(spiritBuild);
     }
 
+    // Resolve familiar build
+    let familiarBuild = null;
+    if (loadout.familiarBuildId) {
+      logger.debug('Resolving familiar build', {
+        familiarBuildId: loadout.familiarBuildId,
+        allFamiliarBuildsCount: allFamiliarBuilds.length,
+        allFamiliarBuildIds: allFamiliarBuilds.map(b => b.id)
+      });
+
+      const found = allFamiliarBuilds.find(b => b.id === loadout.familiarBuildId);
+      if (found) {
+        logger.debug('Familiar build found', { buildId: found.id, buildName: found.name });
+        familiarBuild = deserializeFamiliarBuildUtil(found, familiars, myFamiliars, primeFamiliars);
+      } else {
+        // Build not found - mark as missing
+        familiarBuild = {
+          missing: true,
+          id: loadout.familiarBuildId,
+          name: 'Deleted Build',
+          slots: [],
+          primeFamiliar: null
+        };
+        logger.warn('Familiar build not found', {
+          familiarBuildId: loadout.familiarBuildId,
+          availableBuilds: allFamiliarBuilds.map(b => ({ id: b.id, name: b.name }))
+        });
+      }
+    }
+    // Handle old embedded format (migration)
+    else if (loadout.familiarBuild) {
+      familiarBuild = deserializeFamiliarBuildUtil(loadout.familiarBuild, familiars, myFamiliars, primeFamiliars);
+    }
+
     // Deserialize soul weapon build (reconstruct shape objects from shapeIds)
     let soulWeaponBuild = null;
     if (loadout.soulWeaponBuild && shapes.length > 0) {
@@ -638,6 +711,7 @@ const BattleLoadouts = () => {
       ...loadout,
       skillBuild,
       spiritBuild,
+      familiarBuild,
       soulWeaponBuild
     };
   };
@@ -669,6 +743,15 @@ const BattleLoadouts = () => {
       });
       return false;
     }
+    // If IDs match and both exist, compare content to detect unsaved edits
+    if (currentSkillBuildId !== null && savedSkillBuildId !== null && currentLoadout.skillBuild && savedLoadout.skillBuild) {
+      const currentSlots = JSON.stringify(currentLoadout.skillBuild?.slots || []);
+      const savedSlots = JSON.stringify(savedLoadout.skillBuild?.slots || []);
+      if (currentSlots !== savedSlots) {
+        logger.debug('loadoutsMatch: skill build content changed despite same ID');
+        return false;
+      }
+    }
 
     // Compare spirit build ID
     const currentSpiritBuildId = currentLoadout.spiritBuild?.id || null;
@@ -679,6 +762,74 @@ const BattleLoadouts = () => {
         savedSpiritBuildId
       });
       return false;
+    }
+    // If IDs match and both exist, compare content to detect unsaved edits
+    if (currentSpiritBuildId !== null && savedSpiritBuildId !== null && currentLoadout.spiritBuild && savedLoadout.spiritBuild) {
+      const currentSlots = JSON.stringify(currentLoadout.spiritBuild?.slots || []);
+      const savedSlots = JSON.stringify(savedLoadout.spiritBuild?.slots || []);
+      if (currentSlots !== savedSlots) {
+        logger.debug('loadoutsMatch: spirit build content changed despite same ID');
+        return false;
+      }
+    }
+
+    // Compare familiar build
+    // Special handling: presence of build matters even without ID (unsaved builds)
+    const hasFamiliarBuild = currentLoadout.familiarBuild !== null && currentLoadout.familiarBuild !== undefined;
+    const savedHasFamiliarBuild = (savedLoadout.familiarBuildId !== null && savedLoadout.familiarBuildId !== undefined) ||
+                                  (savedLoadout.familiarBuild !== null && savedLoadout.familiarBuild !== undefined);
+
+    logger.info('loadoutsMatch: comparing familiar builds', {
+      loadoutId: savedLoadout.id,
+      hasFamiliarBuild,
+      savedHasFamiliarBuild,
+      currentFamiliarBuildId: currentLoadout.familiarBuild?.id,
+      savedFamiliarBuildId: savedLoadout.familiarBuildId
+    });
+
+    if (hasFamiliarBuild !== savedHasFamiliarBuild) {
+      logger.info('loadoutsMatch: familiar build presence mismatch', {
+        hasFamiliarBuild,
+        savedHasFamiliarBuild
+      });
+      return false;
+    }
+
+    // If both have familiar builds, compare IDs (if available)
+    if (hasFamiliarBuild) {
+      const currentFamiliarBuildId = currentLoadout.familiarBuild?.id || null;
+      const savedFamiliarBuildId = savedLoadout.familiarBuildId || savedLoadout.familiarBuild?.id || null;
+
+      // If both have IDs, they must match
+      if (currentFamiliarBuildId !== null && savedFamiliarBuildId !== null) {
+        if (currentFamiliarBuildId !== savedFamiliarBuildId) {
+          logger.debug('loadoutsMatch: familiar build ID mismatch', {
+            currentFamiliarBuildId,
+            savedFamiliarBuildId
+          });
+          return false;
+        }
+        // IDs match - also compare build content to detect unsaved edits
+        // Compare name and slots (ignore primeFamiliar as it's computed)
+        const currentName = currentLoadout.familiarBuild?.name;
+        const savedName = savedLoadout.familiarBuild?.name;
+        const currentSlots = JSON.stringify(currentLoadout.familiarBuild?.slots || []);
+        const savedSlots = JSON.stringify(savedLoadout.familiarBuild?.slots || []);
+
+        if (currentName !== savedName || currentSlots !== savedSlots) {
+          logger.debug('loadoutsMatch: familiar build content changed despite same ID', {
+            nameChanged: currentName !== savedName,
+            slotsChanged: currentSlots !== savedSlots
+          });
+          return false;
+        }
+      } else {
+        // One or both don't have IDs - compare build content
+        if (JSON.stringify(currentLoadout.familiarBuild) !== JSON.stringify(savedLoadout.familiarBuild)) {
+          logger.debug('loadoutsMatch: familiar build content mismatch');
+          return false;
+        }
+      }
     }
 
     // Compare other properties
@@ -702,10 +853,8 @@ const BattleLoadouts = () => {
       logger.debug('loadoutsMatch: promotionAbility mismatch');
       return false;
     }
-    if (JSON.stringify(currentLoadout.familiar) !== JSON.stringify(savedLoadout.familiar)) {
-      logger.debug('loadoutsMatch: familiar mismatch');
-      return false;
-    }
+    // Note: familiarBuild comparison already done above (lines 769-777) via ID comparison
+    // No need to compare full object here since we're using build references
 
     logger.debug('loadoutsMatch: MATCH FOUND', { loadoutId: savedLoadout.id });
     return true;
@@ -724,12 +873,21 @@ const BattleLoadouts = () => {
     const hasContent = loadoutName.trim() !== '' ||
       currentLoadout.skillBuild !== null ||
       currentLoadout.spiritBuild !== null ||
+      currentLoadout.familiarBuild !== null ||
       currentLoadout.soulWeaponBuild !== null ||
       currentLoadout.skillStoneBuild !== null ||
       currentLoadout.spirit !== null ||
       currentLoadout.skillStone !== null ||
-      currentLoadout.promotionAbility !== null ||
-      currentLoadout.familiar !== null;
+      currentLoadout.promotionAbility !== null;
+
+    logger.info('Change detection useEffect', {
+      hasContent,
+      hasFamiliarBuild: currentLoadout.familiarBuild !== null,
+      familiarBuildId: currentLoadout.familiarBuild?.id,
+      familiarBuildName: currentLoadout.familiarBuild?.name,
+      hasUnsavedChanges,
+      savedLoadoutsCount: savedLoadouts.length
+    });
 
     if (!isAuthenticated || savedLoadouts.length === 0) {
       if (currentLoadedLoadoutId !== null) {
@@ -796,7 +954,20 @@ const BattleLoadouts = () => {
 
   // Handle familiar build save
   const handleFamiliarBuildSave = (build) => {
-    setCurrentLoadout(prev => ({ ...prev, familiarBuild: build }));
+    logger.info('handleFamiliarBuildSave called', {
+      buildId: build?.id,
+      buildName: build?.name,
+      hasSlots: !!build?.slots,
+      slotsCount: build?.slots?.length
+    });
+    setCurrentLoadout(prev => {
+      const updated = { ...prev, familiarBuild: build };
+      logger.info('Updated currentLoadout with familiar build', {
+        hasFamiliarBuild: !!updated.familiarBuild,
+        familiarBuildId: updated.familiarBuild?.id
+      });
+      return updated;
+    });
     setShowFamiliarBuilder(false);
   };
 
@@ -1072,6 +1243,13 @@ const BattleLoadouts = () => {
 
     if (savedBuild?.id) {
       logger.info('Skill build saved with ID', { id: savedBuild.id });
+
+      // Update allSkillBuilds with the new list from the server
+      if (data.builds) {
+        setAllSkillBuilds(data.builds);
+        logger.debug('Updated allSkillBuilds after skill build save', { count: data.builds.length });
+      }
+
       return savedBuild.id;
     }
 
@@ -1116,10 +1294,68 @@ const BattleLoadouts = () => {
 
     if (savedBuild?.id) {
       logger.info('Spirit build saved with ID', { id: savedBuild.id });
+
+      // Update allSpiritBuilds with the new list from the server
+      if (data.builds) {
+        setAllSpiritBuilds(data.builds);
+        logger.debug('Updated allSpiritBuilds after spirit build save', { count: data.builds.length });
+      }
+
       return savedBuild.id;
     }
 
     throw new Error('Failed to get spirit build ID from save response');
+  };
+
+  /**
+   * Helper: Save familiar build and return its ID
+   */
+  const saveFamiliarBuildAndGetId = async (familiarBuild) => {
+    if (!familiarBuild) return null;
+    if (familiarBuild.id) return familiarBuild.id; // Already has ID
+
+    logger.debug('Saving familiar build before loadout save');
+
+    const buildName = familiarBuild.name || 'Untitled Familiar Build';
+
+    // Serialize familiar build using existing utility
+    const serializedBuild = serializeFamiliarBuildUtil(familiarBuild);
+    serializedBuild.name = buildName;
+
+    const token = useAuthStore.getState().getToken();
+    const response = await fetch(getSaveDataEndpoint(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        type: 'familiar-builds',
+        data: serializedBuild
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to save familiar build: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    // Response format: { builds: [...] }
+    const savedBuild = data.builds?.find(b => b.name === buildName);
+
+    if (savedBuild?.id) {
+      logger.info('Familiar build saved with ID', { id: savedBuild.id });
+
+      // Update allFamiliarBuilds with the new list from the server
+      if (data.builds) {
+        setAllFamiliarBuilds(data.builds);
+        logger.debug('Updated allFamiliarBuilds after familiar build save', { count: data.builds.length });
+      }
+
+      return savedBuild.id;
+    }
+
+    throw new Error('Failed to get familiar build ID from save response');
   };
 
   // Save loadout
@@ -1153,7 +1389,18 @@ const BattleLoadouts = () => {
         }));
       }
 
-      // Step 3: Prepare loadout for serialization
+      // Step 3: Save familiar build if it doesn't have an ID
+      let familiarBuildId = currentLoadout.familiarBuild?.id || null;
+      if (currentLoadout.familiarBuild && !familiarBuildId) {
+        familiarBuildId = await saveFamiliarBuildAndGetId(currentLoadout.familiarBuild);
+        // Update the current loadout with the new ID
+        setCurrentLoadout(prev => ({
+          ...prev,
+          familiarBuild: { ...prev.familiarBuild, id: familiarBuildId }
+        }));
+      }
+
+      // Step 4: Prepare loadout for serialization
       // Check if name changed BEFORE serializing (so we can exclude ID if needed)
       const effectiveOriginalName = originalLoadedNameRef.current || originalLoadedName;
       const nameChanged = effectiveOriginalName && loadoutName !== effectiveOriginalName;
@@ -1163,7 +1410,8 @@ const BattleLoadouts = () => {
         ...currentLoadout,
         name: loadoutName,
         skillBuild: currentLoadout.skillBuild ? { ...currentLoadout.skillBuild, id: skillBuildId } : null,
-        spiritBuild: currentLoadout.spiritBuild ? { ...currentLoadout.spiritBuild, id: spiritBuildId } : null
+        spiritBuild: currentLoadout.spiritBuild ? { ...currentLoadout.spiritBuild, id: spiritBuildId } : null,
+        familiarBuild: currentLoadout.familiarBuild ? { ...currentLoadout.familiarBuild, id: familiarBuildId } : null
       };
 
       // Save As behavior: If name changed, remove ID BEFORE serializing to create new entry
@@ -1174,8 +1422,15 @@ const BattleLoadouts = () => {
         logger.info('Save As: Name changed, creating new loadout', { originalName: effectiveOriginalName, newName: loadoutName });
       }
 
+      // Log before serialization
+      logger.debug('SAVE: Before serialization', {
+        hasFamiliarBuild: !!loadoutToSave.familiarBuild,
+        familiarBuildId: loadoutToSave.familiarBuild?.id,
+        familiarBuildName: loadoutToSave.familiarBuild?.name
+      });
+
       // Now serialize (ID already removed if name changed)
-      const loadoutData = serializeLoadoutForStorage(loadoutToSave);
+      const loadoutData = serializeLoadout(loadoutToSave);
 
       logger.info('SAVE: Preparing to save battle loadout', {
         loadoutName: loadoutData.name,
@@ -1183,6 +1438,9 @@ const BattleLoadouts = () => {
         id: loadoutData.id,
         originalLoadedName,
         currentLoadoutName: loadoutName,
+        skillBuildId: loadoutData.skillBuildId,
+        spiritBuildId: loadoutData.spiritBuildId,
+        familiarBuildId: loadoutData.familiarBuildId,
         hasSkillStoneBuild: !!loadoutData.skillStoneBuild,
         hasSoulWeaponBuild: !!loadoutData.soulWeaponBuild,
         soulWeaponBuildSize: loadoutData.soulWeaponBuild ? JSON.stringify(loadoutData.soulWeaponBuild).length : 0
@@ -1302,7 +1560,7 @@ const BattleLoadouts = () => {
       const repo = config.wiki.repository.repo;
 
       // Serialize the loadout for sharing (embed full builds for recipients)
-      const serializedLoadout = serializeLoadoutForSharing(currentLoadout);
+      const serializedLoadout = serializeLoadoutForSharingLocal(currentLoadout);
 
       // Save build and get checksum
       const checksum = await saveBuild(owner, repo, 'battle-loadouts', serializedLoadout);
@@ -1334,7 +1592,7 @@ const BattleLoadouts = () => {
 
       // Fallback to old method if share service fails
       try {
-        const serializedLoadout = serializeLoadoutForSharing(currentLoadout);
+        const serializedLoadout = serializeLoadoutForSharingLocal(currentLoadout);
 
         const encoded = encodeLoadout(serializedLoadout);
         if (encoded) {
@@ -1599,12 +1857,11 @@ const BattleLoadouts = () => {
             draggedSlotIndex={draggedSpiritSlotIndex}
           />
 
-          {/* Soul Weapon Engraving - Row 1, Col 2 */}
-          <SoulWeaponSection
-            soulWeaponBuild={currentLoadout.soulWeaponBuild}
-            onEdit={() => setShowSoulWeaponBuilder(true)}
-            onClear={handleClearSoulWeaponBuild}
-            allWeapons={allWeapons}
+          {/* Familiar - Row 1, Col 2 */}
+          <FamiliarSection
+            familiarBuild={currentLoadout.familiarBuild}
+            onEdit={() => setShowFamiliarBuilder(true)}
+            onClear={handleClearFamiliarBuild}
           />
 
           {/* Skill Stones - Row 2, Col 1 */}
@@ -1615,18 +1872,19 @@ const BattleLoadouts = () => {
             stoneData={stoneData}
           />
 
-          {/* Promotion Abilities - Row 2, Col 2 */}
+          {/* Soul Weapon Engraving - Row 2, Col 2 */}
+          <SoulWeaponSection
+            soulWeaponBuild={currentLoadout.soulWeaponBuild}
+            onEdit={() => setShowSoulWeaponBuilder(true)}
+            onClear={handleClearSoulWeaponBuild}
+            allWeapons={allWeapons}
+          />
+
+          {/* Promotion Abilities - Row 3, Col 1 */}
           <PlaceholderSection
             title="Slayer Promotion Abilities"
             description="Promotion Ability Builder coming soon"
             icon="⭐"
-          />
-
-          {/* Familiar - Row 3, Col 1 */}
-          <FamiliarSection
-            familiarBuild={currentLoadout.familiarBuild}
-            onEdit={() => setShowFamiliarBuilder(true)}
-            onClear={handleClearFamiliarBuild}
           />
         </div>
         </div>
@@ -2205,7 +2463,7 @@ const SkillStoneSection = ({ skillStoneBuild, onEdit, onClear, stoneData }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-800 flex flex-col">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-2xl sm:text-3xl">💎</span>
@@ -2231,33 +2489,35 @@ const SkillStoneSection = ({ skillStoneBuild, onEdit, onClear, stoneData }) => {
       </div>
 
       {skillStoneBuild ? (
-        <div>
+        <>
           <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3">
             Build: <span className="text-gray-900 dark:text-white font-medium">{skillStoneBuild.name}</span>
           </div>
-          <div className="grid grid-cols-3 gap-4 justify-items-center">
-            {skillStoneBuild.slots.map((slot, index) => (
-              <div key={index} className="flex flex-col items-center gap-2">
-                {slot.element && slot.tier ? (
-                  <SkillStone
-                    stoneType={slot.type}
-                    element={slot.element}
-                    tier={slot.tier}
-                    data={stoneData}
-                    size="medium"
-                  />
-                ) : (
-                  <div className="w-24 h-28 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-400 dark:text-gray-500 text-xs">Empty</span>
-                  </div>
-                )}
-                <span className="text-xs text-gray-600 dark:text-gray-400">
-                  {stoneData?.stoneTypes[slot.type]?.name || slot.type}
-                </span>
-              </div>
-            ))}
+          <div className="flex flex-col justify-center flex-1">
+            <div className="grid grid-cols-3 gap-4 justify-items-center">
+              {skillStoneBuild.slots.map((slot, index) => (
+                <div key={index} className="flex flex-col items-center gap-2">
+                  {slot.element && slot.tier ? (
+                    <SkillStone
+                      stoneType={slot.type}
+                      element={slot.element}
+                      tier={slot.tier}
+                      data={stoneData}
+                      size="medium"
+                    />
+                  ) : (
+                    <div className="w-24 h-28 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-400 dark:text-gray-500 text-xs">Empty</span>
+                    </div>
+                  )}
+                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                    {stoneData?.stoneTypes[slot.type]?.name || slot.type}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       ) : (
         <button
           onClick={onEdit}
@@ -2297,6 +2557,7 @@ const PlaceholderSection = ({ title, description, icon, matchHeight = false }) =
  * Familiar Section Component
  */
 const FamiliarSection = ({ familiarBuild, onEdit, onClear }) => {
+  const { progressionData } = useFamiliarsData();
   const hasFamiliar = familiarBuild && familiarBuild.slots && familiarBuild.slots.some(slot => slot.familiar !== null);
 
   const handleClear = () => {
@@ -2358,29 +2619,91 @@ const FamiliarSection = ({ familiarBuild, onEdit, onClear }) => {
       </div>
 
       {familiarBuild && familiarBuild.primeFamiliar ? (
-        <div className="text-center">
-          <div className="inline-block bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-800">
-            <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-              {familiarBuild.primeFamiliar.name}
-              {familiarBuild.primeFamiliar.isCustom && (
-                <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(Custom)</span>
-              )}
-            </div>
-            {familiarBuild.primeFamiliar.skill && (
-              <div className="text-sm text-gray-700 dark:text-gray-300">
-                {familiarBuild.primeFamiliar.skill.name}
-              </div>
-            )}
-            <div className="mt-3 text-xs text-gray-600 dark:text-gray-400 space-y-1">
-              {familiarBuild.slots && familiarBuild.slots.map((slot, index) => (
-                slot.familiar && (
-                  <div key={index}>
-                    {slot.familiar.name} ★{slot.starLevel}
-                  </div>
-                )
-              ))}
-            </div>
+        <div className="relative flex justify-center" style={{ transform: 'scale(0.64)', transformOrigin: 'center' }}>
+          {/* Prime Familiar Preview */}
+          <PrimeFamiliarPreview
+            elementFamiliar={familiarBuild.slots?.[0]?.familiar}
+            attributeFamiliar={familiarBuild.slots?.[1]?.familiar}
+            weaponFamiliar={familiarBuild.slots?.[2]?.familiar}
+            elementStarLevel={familiarBuild.slots?.[0]?.starLevel || 0}
+            attributeStarLevel={familiarBuild.slots?.[1]?.starLevel || 0}
+            weaponStarLevel={familiarBuild.slots?.[2]?.starLevel || 0}
+            primeFamiliar={familiarBuild.primeFamiliar}
+            progressionData={progressionData}
+            size="medium"
+            showDetails={true}
+            showStars={false}
+            animated={true}
+          />
+
+          {/* 3 Familiar Sprites at Bottom (overlapping border) */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2 z-30" style={{ transform: 'translateX(-50%) translateY(80%)' }}>
+            {familiarBuild.slots?.map((slot, index) => {
+              if (!slot?.familiar) return null;
+
+              // Category names for display
+              const categoryNames = ['Attribute', 'Battle', 'Weapon'];
+              const categoryName = categoryNames[index] || 'Unknown';
+
+              // Get rarity info
+              const getRarityForStars = (stars, data) => {
+                const entry = data.find(d => stars >= d.minStars && stars <= d.maxStars);
+                return entry || { rarity: 'Common', rarityDisplay: 'Common' };
+              };
+              const rarityData = getRarityForStars(slot.starLevel || 0, progressionData);
+
+              // Build tooltip text
+              const tooltipText = `${slot.familiar.name}\n${categoryName} Familiar\n★ ${slot.starLevel}/10\n${rarityData.rarityDisplay}`;
+
+              // Star display logic
+              const starLevel = slot.starLevel || 0;
+              const useRedStar = starLevel > 5;
+              const displayStars = starLevel > 5 ? starLevel - 5 : starLevel;
+              const starImage = useRedStar ? 'familiars/Demonstar_2.png' : 'familiars/Demonstar_1.png';
+
+              return (
+                <div key={index} className="relative flex justify-center" title={tooltipText}>
+                  <FamiliarSprite
+                    familiarId={slot.familiar.id}
+                    starLevel={starLevel}
+                    progressionData={progressionData}
+                    animated={true}
+                    size="64px"
+                    familiarData={slot.familiar}
+                  />
+                  {/* Star rating display */}
+                  {starLevel > 0 && (
+                    <div
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center justify-center"
+                      style={{ zIndex: 40 }}
+                    >
+                      {Array.from({ length: 5 }).map((_, starIndex) => (
+                        <img
+                          key={starIndex}
+                          src={resolveImagePath(starImage)}
+                          alt="star"
+                          className={`w-3 h-3 ${starIndex < displayStars ? 'opacity-100' : 'opacity-20'}`}
+                          style={{ marginLeft: starIndex > 0 ? '-4px' : '0' }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
+
+          {/* Prime Familiar Name (below the 3 familiars) */}
+          {familiarBuild.primeFamiliar && (
+            <div
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 px-4 py-1 z-30"
+              style={{ transform: 'translateX(-50%) translateY(240%)' }}
+            >
+              <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap text-center">
+                {familiarBuild.primeFamiliar.name}
+              </h3>
+            </div>
+          )}
         </div>
       ) : (
         <button

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
-import { Save, Share2, Download, Upload, Trash2, Copy, Check } from 'lucide-react';
+import { Save, Share2, Download, Upload, Trash2, Copy, Check, Loader } from 'lucide-react';
 import FamiliarSlot from './FamiliarSlot';
 import FamiliarSelector from './FamiliarSelector';
 import PrimeFamiliarPreview from './PrimeFamiliarPreview';
@@ -7,11 +7,12 @@ import SavedFamiliarBuildsPanel from './SavedFamiliarBuildsPanel';
 import SavedFamiliarsGallery from './SavedFamiliarsGallery';
 import { useAuthStore } from '../../wiki-framework/src/store/authStore';
 import { useFamiliarsData } from '../hooks/useFamiliarsData';
-import { serializeBuild, deserializeBuild, createEmptyBuild } from '../utils/familiarSerialization';
+import { serializeBuild, deserializeBuild, createEmptyBuild, serializeBuildForSharing } from '../utils/familiarSerialization';
 import { findPrimeFamiliar, isBuildComplete, validateBuildCategories } from '../utils/familiarHelpers';
 import { useDraftStorage } from '../../wiki-framework/src/hooks/useDraftStorage';
 import { getCache, setCache } from '../utils/buildCache';
 import { getSaveDataEndpoint, getLoadDataEndpoint } from '../utils/apiEndpoints.js';
+import { saveBuild as saveSharedBuild, loadBuild as loadSharedBuild, generateShareUrl } from '../../wiki-framework/src/services/github/buildShare';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('FamiliarBuilder');
@@ -46,12 +47,14 @@ const FamiliarBuilder = forwardRef(({
   const [buildName, setBuildName] = useState('');
   const [primeFamiliar, setPrimeFamiliar] = useState(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [currentLoadedBuildId, setCurrentLoadedBuildId] = useState(null);
 
   // UI state
   const [selectorState, setSelectorState] = useState({ open: false, slotIndex: null });
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [shareUrl, setShareUrl] = useState(null);
+  const [sharing, setSharing] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [showSavedBuilds, setShowSavedBuilds] = useState(false);
   const [myFamiliars, setMyFamiliars] = useState([]);
   const [draggedSlotIndex, setDraggedSlotIndex] = useState(null);
@@ -78,6 +81,42 @@ const FamiliarBuilder = forwardRef(({
       return;
     }
 
+    // Check URL parameters for shared build
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareChecksum = urlParams.get('share');
+
+    // Load from new share system (short URL)
+    if (shareChecksum && !isModal) {
+      const loadFromSharedUrl = async () => {
+        try {
+          logger.info('Loading shared build', { shareChecksum });
+
+          const configResponse = await fetch('/wiki-config.json');
+          const config = await configResponse.json();
+          const owner = config.wiki.repository.owner;
+          const repo = config.wiki.repository.repo;
+
+          const buildData = await loadSharedBuild(owner, repo, shareChecksum);
+
+          if (buildData.type === 'familiar-builds') {
+            const deserializedBuild = deserializeBuild(buildData.data, familiarsData, myFamiliars);
+            setBuildName(buildData.data.name || '');
+            setBuild(deserializedBuild);
+            setHasUnsavedChanges(true);
+            logger.info('Shared build loaded successfully');
+          } else {
+            logger.error('Invalid build type', { type: buildData.type });
+            alert('Invalid build type. This URL is for a different builder.');
+          }
+        } catch (error) {
+          logger.error('Failed to load shared build', { error });
+          alert(`Failed to load shared build: ${error.message}`);
+        }
+      };
+      loadFromSharedUrl();
+      return;
+    }
+
     if (initialBuild) {
       logger.debug('Loading initial build', { initialBuild });
       const deserialized = deserializeBuild(initialBuild, familiarsData, myFamiliars);
@@ -85,6 +124,7 @@ const FamiliarBuilder = forwardRef(({
         logger.debug('Setting initial build', { slotsCount: deserialized.slots?.length });
         setBuild(deserialized);
         setBuildName(initialBuild.name || '');
+        setCurrentLoadedBuildId(initialBuild.id || null);
       }
     } else {
       const draft = loadDraft();
@@ -112,7 +152,7 @@ const FamiliarBuilder = forwardRef(({
         logger.debug('No draft found, using empty build');
       }
     }
-  }, [initialBuild, familiarsData]);
+  }, [initialBuild, familiarsData, myFamiliars, isModal]);
 
   // Update Prime Familiar when slots change
   useEffect(() => {
@@ -287,8 +327,8 @@ const FamiliarBuilder = forwardRef(({
     setDraggedSlotIndex(null);
   };
 
-  // Handle save build
-  const handleSaveBuild = async () => {
+  // Handle save build to backend (inline Save button)
+  const handleSaveNewBuild = async () => {
     if (!allowSavingBuilds) return;
 
     if (!buildName.trim()) {
@@ -325,15 +365,17 @@ const FamiliarBuilder = forwardRef(({
         throw new Error('Failed to save build');
       }
 
+      const responseData = await response.json();
+
       setSaveSuccess(true);
       setHasUnsavedChanges(false);
       setTimeout(() => setSaveSuccess(false), 2000);
 
       logger.info('Familiar build saved', { buildName });
 
-      if (isModal && onSave) {
-        const data = await response.json();
-        onSave(data.build);
+      // Update current loaded build ID
+      if (responseData.build && responseData.build.id) {
+        setCurrentLoadedBuildId(responseData.build.id);
       }
     } catch (error) {
       logger.error('Failed to save build', { error });
@@ -343,13 +385,80 @@ const FamiliarBuilder = forwardRef(({
     }
   };
 
+  // Handle save build (modal mode only - returns current config to battle loadout)
+  const handleSaveBuild = () => {
+    if (onSave) {
+      const buildData = {
+        id: currentLoadedBuildId, // Preserve build ID for existing builds
+        name: buildName,
+        slots: build.slots,
+        primeFamiliar: primeFamiliar
+      };
+      onSave(buildData);
+    }
+  };
+
+  // Handle load build from saved builds panel
+  const handleLoadBuild = (savedBuild) => {
+    logger.debug('Loading saved build', { savedBuild });
+
+    // Check if build is already deserialized
+    const isAlreadyDeserialized = savedBuild.slots?.some(slot =>
+      slot && typeof slot.familiar === 'object' && slot.familiar !== null
+    );
+
+    const deserializedBuild = isAlreadyDeserialized
+      ? savedBuild // Already deserialized by SavedFamiliarBuildsPanel
+      : deserializeBuild(savedBuild, familiarsData, myFamiliars); // Deserialize serialized data
+
+    setBuild(deserializedBuild);
+    setBuildName(savedBuild.name || '');
+    setHasUnsavedChanges(false); // Loaded from saved, no changes yet
+    setCurrentLoadedBuildId(savedBuild.id);
+  };
+
   // Handle share
-  const handleShare = () => {
-    const serialized = serializeBuild(build);
-    const encoded = btoa(JSON.stringify(serialized));
-    const url = `${window.location.origin}/familiar-builder?data=${encoded}`;
-    setShareUrl(url);
-    navigator.clipboard.writeText(url);
+  const handleShare = async () => {
+    try {
+      setSharing(true);
+      setCopied(false);
+
+      logger.debug('Generating share URL');
+
+      const configResponse = await fetch('/wiki-config.json');
+      const config = await configResponse.json();
+      const owner = config.wiki.repository.owner;
+      const repo = config.wiki.repository.repo;
+
+      // Serialize build for sharing (convert collection familiars to base format)
+      const serializedBuild = serializeBuildForSharing(build);
+      const buildData = {
+        name: buildName,
+        slots: serializedBuild.slots,
+        primeFamiliar: serializedBuild.primeFamiliar
+      };
+
+      // Save build and get checksum
+      const checksum = await saveSharedBuild(owner, repo, 'familiar-builds', buildData);
+
+      logger.debug('Generated checksum', { checksum });
+
+      // Generate share URL
+      const baseURL = window.location.origin;
+      const shareURL = generateShareUrl(baseURL, 'familiar-builds', checksum);
+
+      await navigator.clipboard.writeText(shareURL);
+
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+
+      logger.info('Build shared successfully', { checksum, shareURL });
+    } catch (error) {
+      logger.error('Failed to share build', { error });
+      alert(`Failed to share build: ${error.message}`);
+    } finally {
+      setSharing(false);
+    }
   };
 
   // Handle export
@@ -423,16 +532,16 @@ const FamiliarBuilder = forwardRef(({
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Header */}
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Familiar Builder
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Combine 3 familiars to create a Prime Familiar
             </p>
           </div>
@@ -458,7 +567,7 @@ const FamiliarBuilder = forwardRef(({
                 </div>
                 {isAuthenticated && (
                   <button
-                    onClick={handleSaveBuild}
+                    onClick={handleSaveNewBuild}
                     disabled={saving || !isValid || saveSuccess}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap disabled:cursor-not-allowed"
                   >
@@ -504,7 +613,7 @@ const FamiliarBuilder = forwardRef(({
           </div>
 
           {/* Familiar Slots - FIXED ORDER: Element (0), Battle (1), Weapon (2 - ALWAYS LAST) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {build.slots.map((slot, index) => (
               <FamiliarSlot
                 key={index}
@@ -533,10 +642,15 @@ const FamiliarBuilder = forwardRef(({
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={handleShare}
-                  disabled={!isValid}
+                  disabled={!isValid || sharing}
                   className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                 >
-                  {shareUrl ? (
+                  {sharing ? (
+                    <>
+                      <Loader className="w-4 h-4 flex-shrink-0 animate-spin text-blue-600 dark:text-blue-400" />
+                      <span>Generating...</span>
+                    </>
+                  ) : copied ? (
                     <>
                       <Check className="w-4 h-4 flex-shrink-0 text-green-600 dark:text-green-400" />
                       <span>Copied!</span>
@@ -585,7 +699,13 @@ const FamiliarBuilder = forwardRef(({
           {/* Saved Builds */}
           {allowSavingBuilds && isAuthenticated && (
             <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <SavedFamiliarBuildsPanel />
+              <SavedFamiliarBuildsPanel
+                currentBuild={build}
+                buildName={buildName}
+                onLoadBuild={handleLoadBuild}
+                currentLoadedBuildId={currentLoadedBuildId}
+                defaultExpanded={!isModal}
+              />
             </div>
           )}
         </div>

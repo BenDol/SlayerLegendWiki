@@ -45,6 +45,12 @@
         "description": "Build and share spirit configurations"
       },
       {
+        "title": "Familiar Builder",
+        "path": "/familiar-builder",
+        "icon": "👹",
+        "description": "Create and customize familiar builds"
+      },
+      {
         "title": "Soul Weapon",
         "path": "/soul-weapon-engraving",
         "icon": "🗡️",
@@ -267,6 +273,11 @@
           "title": "Spirit Builder",
           "path": "/spirit-builder",
           "icon": "🔮"
+        },
+        {
+          "title": "Familiar Builder",
+          "path": "/familiar-builder",
+          "icon": "👹"
         },
         {
           "title": "Soul Weapon",

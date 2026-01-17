@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search } from 'lucide-react';
+import { X, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import FamiliarSprite from './FamiliarSprite';
 import { createLogger } from '../utils/logger';
 
@@ -33,6 +33,7 @@ const FamiliarSelector = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [elementFilter, setElementFilter] = useState('All');
   const [attributeFilter, setAttributeFilter] = useState('All');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   useEffect(() => {
     loadFamiliars();
@@ -192,45 +193,68 @@ const FamiliarSelector = ({
             />
           </div>
 
-          {/* Element Filter */}
-          <div>
-            <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Element</div>
-            <div className="flex flex-wrap gap-2">
-              {elements.map(element => (
-                <button
-                  key={element}
-                  onClick={() => setElementFilter(element)}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                    elementFilter === element
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {element}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Toggle Advanced Filters Button */}
+          <button
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
+            {showAdvancedFilters ? (
+              <>
+                <ChevronUp className="w-4 h-4" />
+                <span>Hide Filters</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4" />
+                <span>Show Filters (Element & Type)</span>
+              </>
+            )}
+          </button>
 
-          {/* Type Filter */}
-          <div>
-            <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Type</div>
-            <div className="flex flex-wrap gap-2">
-              {types.map(type => (
-                <button
-                  key={type}
-                  onClick={() => setAttributeFilter(type)}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                    attributeFilter === type
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Advanced Filters (Hidden by default) */}
+          {showAdvancedFilters && (
+            <>
+              {/* Element Filter */}
+              <div>
+                <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Element</div>
+                <div className="flex flex-wrap gap-2">
+                  {elements.map(element => (
+                    <button
+                      key={element}
+                      onClick={() => setElementFilter(element)}
+                      className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                        elementFilter === element
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      {element}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Type Filter */}
+              <div>
+                <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Type</div>
+                <div className="flex flex-wrap gap-2">
+                  {types.map(type => (
+                    <button
+                      key={type}
+                      onClick={() => setAttributeFilter(type)}
+                      className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                        attributeFilter === type
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Familiar Grid */}

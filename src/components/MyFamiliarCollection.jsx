@@ -261,13 +261,13 @@ const MyFamiliarCollection = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
           My Familiar Collection
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
           Manage your configured familiars to use in builds
         </p>
       </div>
@@ -276,9 +276,9 @@ const MyFamiliarCollection = () => {
       <div className="mb-6">
         <button
           onClick={() => setShowFamiliarSelector(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+          className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base font-medium transition-colors"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
           Add Familiar
         </button>
       </div>
@@ -312,7 +312,7 @@ const MyFamiliarCollection = () => {
 
       {/* Familiar Grid */}
       {!loading && familiars.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {familiars.map(familiar => {
             const buildsUsing = getBuildsUsingFamiliar(familiar.id);
             const isHovered = hoveredFamiliarId === familiar.id;
@@ -380,9 +380,9 @@ const MyFamiliarCollection = () => {
 
       {/* Edit Modal */}
       {editingFamiliar && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-4">
               {editingFamiliar.isNew ? 'Add Familiar' : 'Edit Familiar'}
             </h3>
 
@@ -409,10 +409,10 @@ const MyFamiliarCollection = () => {
             )}
 
             {/* Actions */}
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => setEditingFamiliar(null)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 disabled={saving}
               >
                 Cancel
@@ -420,7 +420,7 @@ const MyFamiliarCollection = () => {
               <button
                 onClick={handleSaveFamiliar}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? (
                   <>
@@ -443,15 +443,15 @@ const MyFamiliarCollection = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6">
             <div className="flex items-start gap-3 mb-4">
-              <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">
                   Delete Familiar?
                 </h3>
-                <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mb-3">
                   This familiar is used in {deleteConfirm.buildsUsing.length} build(s). Those builds will show this familiar as missing.
                 </p>
                 <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1 mb-3">
@@ -465,16 +465,16 @@ const MyFamiliarCollection = () => {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => confirmDelete(deleteConfirm.familiarId)}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors"
               >
                 Delete Anyway
               </button>

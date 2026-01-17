@@ -129,6 +129,33 @@ const FamiliarSlot = ({
         {/* Filled Slot */}
         {!isEmpty && (
           <div className="space-y-3">
+            {/* Star Level Controls */}
+            {!readOnly && onStarLevelChange && (
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+                  Star Level: {starLevel}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={starLevel}
+                  onChange={handleStarLevelChange}
+                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  style={{
+                    background: `linear-gradient(to right, ${rarityData.color} 0%, ${rarityData.color} ${starLevel * 10}%, rgb(229 231 235) ${starLevel * 10}%, rgb(229 231 235) 100%)`
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Read-only star level display */}
+            {readOnly && (
+              <div className="text-center text-xs text-gray-600 dark:text-gray-400">
+                Star Level: {starLevel}
+              </div>
+            )}
+
             {/* Familiar Display */}
             <div
               className={`group relative aspect-square ${!readOnly && onSelectFamiliar ? 'cursor-pointer' : ''}`}
@@ -258,38 +285,6 @@ const FamiliarSlot = ({
                 {rarityData.rarityDisplay}
               </div>
             </div>
-
-            {/* Star Level Controls */}
-            {!readOnly && onStarLevelChange && (
-              <div className="space-y-2">
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
-                  Star Level: {starLevel}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="10"
-                  value={starLevel}
-                  onChange={handleStarLevelChange}
-                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                  style={{
-                    background: `linear-gradient(to right, ${rarityData.color} 0%, ${rarityData.color} ${starLevel * 10}%, rgb(229 231 235) ${starLevel * 10}%, rgb(229 231 235) 100%)`
-                  }}
-                />
-                <div className="flex justify-between text-[0.65rem] text-gray-500 dark:text-gray-400">
-                  <span>0</span>
-                  <span>5</span>
-                  <span>10</span>
-                </div>
-              </div>
-            )}
-
-            {/* Read-only star level display */}
-            {readOnly && (
-              <div className="text-center text-xs text-gray-600 dark:text-gray-400">
-                Star Level: {starLevel}
-              </div>
-            )}
           </div>
         )}
       </div>
