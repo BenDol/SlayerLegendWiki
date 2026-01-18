@@ -326,7 +326,7 @@ const MyFamiliarCollection = () => {
                   slot={{ type: 'base' }}
                   familiar={familiar.familiar}
                   starLevel={familiar.starLevel}
-                  category="element"
+                  category={familiar.familiar?.category || 'element'}
                   slotIndex={0}
                   progressionData={progressionData}
                   onSelectFamiliar={() => handleEditFamiliar(familiar)}
