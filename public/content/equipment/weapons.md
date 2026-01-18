@@ -1,8 +1,16 @@
 ---
-title: weapons
-tags: [equipment]
+id: weapons
+title: Weapons Guide
+description: 'Complete guide to weapons, weapon types, stats, and progression in Slayer Legend'
+tags:
+  - equipment
+  - weapons
+  - progression
 category: Equipment
-date: 2025-12-13  
+date: 2025-12-13T00:00:00.000Z
 ---
-# weapons
-Equipment guide
+# Weapons Guide
+
+{{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->
+
+Test
