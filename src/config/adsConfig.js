@@ -76,6 +76,9 @@ export const AD_EXCLUDED_PATH_PATTERNS = [
   /\/new\/?$/,
   /\/history\/?$/,
   /^\/search/,
+  // Legal pages: running ads against your own privacy disclosures reads badly,
+  // and reviewers look at this page specifically.
+  /^\/meta\/privacy-policy(\/|$)/,
   /^\/donate/,
   /^\/donation-success/,
   /^\/profile/,

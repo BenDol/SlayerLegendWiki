@@ -96,7 +96,7 @@
       "icon": "👥",
       "order": 5,
       "expandedByDefault": false,
-      "sections": ["community"]
+      "sections": ["community", "meta"]
     }
   ],
   "sidebar": {
