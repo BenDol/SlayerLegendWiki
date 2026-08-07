@@ -616,6 +616,26 @@
     "order": 0
   },
   {
+    "id": "meta/privacy-policy",
+    "title": "Privacy Policy",
+    "description": "How the Slayer Legend Wiki collects, uses, stores and shares your data, including cookies and advertising.",
+    "content": "Privacy Policy Last updated: 7 August 2026 This policy explains what data the Slayer Legend Wiki collects, why, where it is stored, and what control you have over it. It covers this website only (). The Slayer Legend Wiki is an independent, community-run fan project. It is not affiliated with, endorsed by, or operated by the developers or publishers of Slayer Legend. --- The short version - You can read the entire wiki without logging in, and without giving us anything. - If you sign in with Git",
+    "section": "meta",
+    "sectionTitle": "Meta",
+    "pageId": "privacy-policy",
+    "url": "/meta/privacy-policy",
+    "tags": [
+      "meta",
+      "privacy",
+      "legal",
+      "cookies",
+      "data"
+    ],
+    "category": "Meta",
+    "date": "2026-08-07",
+    "order": 100
+  },
+  {
     "id": "progression/index",
     "title": "Progression Systems",
     "description": "Overview of character progression, leveling, and advancement systems in Slayer Legend",

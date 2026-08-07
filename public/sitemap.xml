@@ -2,79 +2,79 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://slayerlegend.wiki/</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/skill-builder</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/spirit-builder</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/battle-loadouts</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/soul-weapon-engraving</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/skill-stone-builder</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/my-collections</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/my-spirits</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/spirits/viewer</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/highscore</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/creators</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/changelog</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://slayerlegend.wiki/donate</loc>
-    <lastmod>2026-01-04</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -283,6 +283,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://slayerlegend.wiki/meta/privacy-policy</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://slayerlegend.wiki/progression</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>weekly</changefreq>
@@ -319,25 +325,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://slayerlegend.wiki/skills/earth-skills</loc>
-    <lastmod>2026-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://slayerlegend.wiki/skills/fire-skills</loc>
-    <lastmod>2026-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://slayerlegend.wiki/skills</loc>
-    <lastmod>2026-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://slayerlegend.wiki/skills/skill-builds</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -349,32 +337,14 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://slayerlegend.wiki/skills/skill-mechanics</loc>
-    <lastmod>2026-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://slayerlegend.wiki/skills/skill-refinement</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://slayerlegend.wiki/skills/skill-stones</loc>
-    <lastmod>2026-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://slayerlegend.wiki/skills/water-skills</loc>
-    <lastmod>2026-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://slayerlegend.wiki/skills/wind-skills</loc>
-    <lastmod>2026-01-01</lastmod>
+    <loc>https://slayerlegend.wiki/skills/skills</loc>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
