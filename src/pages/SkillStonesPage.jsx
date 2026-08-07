@@ -1,5 +1,6 @@
 import React from 'react';
 import SkillStoneBuilder from '../components/SkillStoneBuilder';
+import ToolPageAd from '../components/ads/ToolPageAd';
 
 /**
  * SkillStonesPage Component
@@ -9,12 +10,15 @@ import SkillStoneBuilder from '../components/SkillStoneBuilder';
  */
 const SkillStonesPage = () => {
   return (
-    <SkillStoneBuilder
-      isModal={false}
-      initialBuild={null}
-      onSave={null}
-      allowSavingBuilds={true}
-    />
+    <>
+      <ToolPageAd />
+      <SkillStoneBuilder
+        isModal={false}
+        initialBuild={null}
+        onSave={null}
+        allowSavingBuilds={true}
+      />
+    </>
   );
 };
 

@@ -49,6 +49,7 @@ import { registerContentProcessor, registerCustomComponents, registerSkillPrevie
 import { registerDataSelector } from './wiki-framework/src/utils/dataSelectorRegistry.js';
 import { processGameSyntax, getGameComponents, renderSkillPreview, renderEquipmentPreview } from './src/utils/gameContentRenderer.jsx';
 import { searchDataForAutocomplete } from './src/utils/dataAutocompleteSearch.js';
+import { injectAdMarkers } from './src/utils/adInjection.js';
 import DataSelector from './src/components/DataSelector.jsx';
 import SpiritPicker from './src/components/SpiritPicker.jsx';
 import SkillPicker from './src/components/SkillPicker.jsx';
@@ -77,7 +78,9 @@ const renderSpiritBuildPreview = ({ build, mode }) => {
 };
 
 // Register custom markdown processors for skill/equipment cards and data injection
-registerContentProcessor(processGameSyntax);
+// Ad markers are injected last so game syntax processing never sees or rewrites them.
+// injectAdMarkers is a no-op when ads are disabled or the route is excluded (e.g. the editor preview).
+registerContentProcessor((content) => injectAdMarkers(processGameSyntax(content)));
 registerCustomComponents(getGameComponents());
 registerSkillPreview(renderSkillPreview);
 registerEquipmentPreview(renderEquipmentPreview);

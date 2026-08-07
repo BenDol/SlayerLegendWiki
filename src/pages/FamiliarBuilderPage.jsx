@@ -1,5 +1,6 @@
 import React from 'react';
 import FamiliarBuilder from '../components/FamiliarBuilder';
+import ToolPageAd from '../components/ads/ToolPageAd';
 
 /**
  * FamiliarBuilderPage
@@ -9,10 +10,13 @@ import FamiliarBuilder from '../components/FamiliarBuilder';
  */
 const FamiliarBuilderPage = () => {
   return (
-    <FamiliarBuilder
-      isModal={false}
-      allowSavingBuilds={true}
-    />
+    <>
+      <ToolPageAd />
+      <FamiliarBuilder
+        isModal={false}
+        allowSavingBuilds={true}
+      />
+    </>
   );
 };
 

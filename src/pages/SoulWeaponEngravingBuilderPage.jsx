@@ -1,6 +1,7 @@
 import React from 'react';
 import SoulWeaponEngravingBuilder from '../components/SoulWeaponEngravingBuilder';
 import MetaTags from '../components/MetaTags';
+import ToolPageAd from '../components/ads/ToolPageAd';
 
 /**
  * Page wrapper for Soul Weapon Engraving
@@ -16,6 +17,7 @@ const SoulWeaponEngravingBuilderPage = () => {
         keywords={['soul weapon', 'engraving', 'grid builder', 'engraving planner', 'soul weapon stats']}
       />
       <div className="container mx-auto">
+        <ToolPageAd />
         <SoulWeaponEngravingBuilder />
       </div>
     </>

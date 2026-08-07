@@ -22,6 +22,7 @@ console.log(`\n📦 Cloudflare Prebuild - Branch: ${branch || 'unknown'}\n`);
 console.log('🔧 Running prebuild steps...\n');
 try {
   execSync('node scripts/copyConfig.js', { stdio: 'inherit' });
+  execSync('node scripts/generateAdsTxt.js', { stdio: 'inherit' });
   execSync('node scripts/checkCommitForCachePurge.js', { stdio: 'inherit' });
   execSync('node scripts/injectVersion.js', { stdio: 'inherit' });
   execSync('node scripts/buildSearchIndex.js', { stdio: 'inherit' });

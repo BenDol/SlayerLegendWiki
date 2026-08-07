@@ -1,6 +1,7 @@
 import React from 'react';
 import SkillBuilder from '../components/SkillBuilder';
 import MetaTags from '../components/MetaTags';
+import ToolPageAd from '../components/ads/ToolPageAd';
 
 /**
  * Skill Builder Page
@@ -18,6 +19,7 @@ const SkillBuilderPage = () => {
         url="/skill-builder"
         keywords={['skill builder', 'skills', 'builds', 'planner', 'simulator', 'skill combinations']}
       />
+      <ToolPageAd />
       <SkillBuilder />
     </>
   );

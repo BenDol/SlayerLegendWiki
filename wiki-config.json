@@ -331,6 +331,28 @@
       "fallbackToStatic": true,
       "allowStaleOnRateLimit": true
     },
+    "ads": {
+      "enabled": true,
+      "provider": "adsense",
+      "hideForDonators": true,
+      "showInDevelopment": false,
+      "adsense": {
+        "client": "ca-pub-7343903229728203",
+        "slots": {
+          "contentTop": "",
+          "inArticle": "",
+          "contentBottom": "",
+          "toolTop": ""
+        }
+      },
+      "placement": {
+        "minWords": 250,
+        "minWordsBeforeFirstAd": 120,
+        "minWordsBetweenAds": 350,
+        "maxInArticleAds": 2,
+        "contentBottomAd": true
+      }
+    },
     "gameAssets": {
       "enabled": true,
       "cdn": {

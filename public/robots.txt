@@ -35,6 +35,18 @@ User-agent: Googlebot
 Allow: /
 Crawl-delay: 0
 
+# Google AdSense - contextual crawler that reads page content to pick relevant ads.
+# Must be allowed everywhere or ads fall back to generic/low-value targeting.
+User-agent: Mediapartners-Google
+Allow: /
+
+# Google Ads landing page quality crawlers
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
+Allow: /
+
 # Bing
 User-agent: Bingbot
 Allow: /
