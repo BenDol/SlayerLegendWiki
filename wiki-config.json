@@ -370,7 +370,7 @@
       "enabled": false
     },
     "developmentBanner": {
-      "enabled": true,
+      "enabled": false,
       "expiryMinutes": 60
     },
     "customHomePage": {
