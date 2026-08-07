@@ -68,3 +68,19 @@ backups/issues/*.json
 nul
 .wrangler-dev/
 /tmpclaude-*-cwd
+
+# agent-cohort: managed dock runtime paths (auto-added)
+.claude/agent-cohort/
+.codex/agent-cohort/
+.hermes/agent-cohort/
+.grok/agent-cohort/
+.kimi/agent-cohort/
+.opencode/agent-cohort/
+.claude/worktrees/
+.cohort/
+.agent/
+.codex/hooks.json
+.grok/hooks/agent-cohort.json
+.linked-*
+.claude/settings.local.json
+.claude/settings.local.json

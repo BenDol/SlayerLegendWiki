@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "agent-cohort": {
+      "command": "node",
+      "args": [
+        ".cohort/cohort-mcp.cjs"
+      ]
+    }
+  }
+}
