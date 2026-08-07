@@ -1,6 +1,7 @@
 import React from 'react';
 import BattleLoadouts from '../components/BattleLoadouts';
 import MetaTags from '../components/MetaTags';
+import ToolPageAd from '../components/ads/ToolPageAd';
 
 /**
  * Battle Loadouts Page
@@ -18,6 +19,7 @@ const BattleLoadoutsPage = () => {
         url="/battle-loadouts"
         keywords={['battle loadouts', 'loadout manager', 'equipment sets', 'skill sets', 'battle configuration']}
       />
+      <ToolPageAd />
       <BattleLoadouts />
     </>
   );

@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- AdSense site-ownership verification. Must be static HTML: the loader script is
+         injected by React at runtime, so the "AdSense code snippet" verification method
+         cannot see it. Do not remove - AdSense re-checks this periodically. -->
+    <meta name="google-adsense-account" content="ca-pub-7343903229728203" />
+
+    <!-- AdSense: warm up the ad hosts early so the loader script isn't the slow path.
+         Harmless when ads are disabled - these are hints, not requests for ad content. -->
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+    <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
+    <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
+
     <!-- Favicons - Multiple formats for best compatibility -->
     <link rel="icon" type="image/x-icon" href="/icon/favicon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="/icon/favicon-16x16.png" />

@@ -4,7 +4,7 @@
   "description": "My custom wiki built with GitHub Wiki Framework",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/killDevServer.js && node scripts/copyConfig.js && node scripts/injectVersion.js",
+    "predev": "node scripts/killDevServer.js && node scripts/copyConfig.js && node scripts/generateAdsTxt.js && node scripts/injectVersion.js",
     "dev": "concurrently --kill-others --names \"CONFIG,VITE,WRANGLER\" --prefix-colors \"cyan,blue,yellow\" \"npm:dev:watch\" \"npm:dev:vite-cf\" \"npm:dev:wrangler\"",
     "dev:watch": "node scripts/watchConfig.js",
     "dev:vite-cf": "cross-env VITE_DEV_PLATFORM=cloudflare vite",
@@ -15,7 +15,7 @@
     "dev:netlify-vite": "cross-env VITE_DEV_PLATFORM=netlify vite",
     "dev:netlify-server": "netlify dev",
     "dev:vite": "concurrently --kill-others --names \"CONFIG,VITE\" --prefix-colors \"cyan,green\" \"npm:dev:watch\" \"vite\"",
-    "prebuild": "node scripts/copyConfig.js && node scripts/checkCommitForCachePurge.js && node scripts/injectVersion.js && node scripts/buildSearchIndex.js && node scripts/generate-sitemap.js",
+    "prebuild": "node scripts/copyConfig.js && node scripts/generateAdsTxt.js && node scripts/checkCommitForCachePurge.js && node scripts/injectVersion.js && node scripts/buildSearchIndex.js && node scripts/generate-sitemap.js",
     "build": "cross-env VITE_PLATFORM=cloudflare VITE_CF_PAGES=1 vite build",
     "build:netlify": "cross-env VITE_PLATFORM=netlify vite build",
     "build:cloudflare": "cross-env VITE_PLATFORM=cloudflare VITE_CF_PAGES=1 vite build",

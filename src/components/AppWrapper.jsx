@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import DonationSystem from '../../wiki-framework/src/components/donation/DonationSystem';
 import DonationMascot from './DonationMascot';
 import NetworkDebugBanner from '../../wiki-framework/src/components/common/NetworkDebugBanner';
+import AdsProvider from './ads/AdsProvider';
 import useScrollDepthTrigger from '../hooks/useScrollDepthTrigger';
 import { createLogger } from '../utils/logger';
 
@@ -204,7 +205,7 @@ const AppWrapper = ({ children }) => {
   useScrollDepthTrigger(65, handleScrollTrigger, currentPagePath);
 
   return (
-    <>
+    <AdsProvider>
       {/* Network debug banner - shows when debug mode is active */}
       <NetworkDebugBanner />
 
@@ -212,7 +213,7 @@ const AppWrapper = ({ children }) => {
 
       {/* Donation system - shows animated spirit prompts with custom mascot */}
       <DonationSystem MascotComponent={DonationMascot} />
-    </>
+    </AdsProvider>
   );
 };
 

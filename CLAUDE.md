@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **[Security Audit Report](.claude/security-audit-report.md)** - HTML injection protections, XSS prevention, security layers
 
 ### Additional Resources
+- **[Google AdSense Setup & Targeting](.claude/google-ads-setup.md)** - Ad placements, config, Auto ads dashboard settings, what drives which ads show
 - **[PayPal Webhook Setup](.claude/paypal-webhook-setup.md)** - PayPal integration for donations
 - **[Serverless Caching Audit](.claude/serverless-caching-audit.md)** - Caching strategies and implementation
 - **[HTML Security Validation](.claude/memory/HTML-SECURITY-VALIDATION-WORKFLOW.md)** - Automated security testing workflow

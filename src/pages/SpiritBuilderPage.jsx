@@ -1,6 +1,7 @@
 import React from 'react';
 import SpiritBuilder from '../components/SpiritBuilder';
 import MetaTags from '../components/MetaTags';
+import ToolPageAd from '../components/ads/ToolPageAd';
 
 /**
  * SpiritBuilderPage Component
@@ -18,6 +19,7 @@ const SpiritBuilderPage = () => {
         url="/spirit-builder"
         keywords={['spirit builder', 'spirits', 'team builder', 'spirit planner', 'spirit upgrades']}
       />
+      <ToolPageAd />
       <SpiritBuilder isModal={false} allowSavingBuilds={true} />
     </>
   );

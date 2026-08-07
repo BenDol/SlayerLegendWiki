@@ -10,6 +10,7 @@ import BattleLoadoutCard from '../components/BattleLoadoutCard';
 import SkillBuildCard from '../components/SkillBuildCard';
 import SpiritBuildCard from '../components/SpiritBuildCard';
 import { VideoGuideCard } from '../../wiki-framework/src/components/contentCreators';
+import AdSlot from '../components/ads/AdSlot';
 
 /**
  * Process game-specific syntax in markdown content
@@ -391,6 +392,12 @@ const processChildrenWithMarkers = (children) => {
 export const CustomParagraph = ({ node, children, ...props }) => {
   // Extract full text content including markers from potentially nested children
   const content = extractTextContent(children).trim();
+
+  // Check for standalone ad marker (injected automatically by injectAdMarkers)
+  const adMatch = content.match(/^\{\{AD:(\w+)\}\}$/);
+  if (adMatch) {
+    return <AdSlot placement={adMatch[1]} />;
+  }
 
   // Check for standalone skill marker (entire paragraph is just a marker)
   const skillMatch = content.match(/^\{\{SKILL:([^:]+?)(?::(\w+?))?\}\}$/);

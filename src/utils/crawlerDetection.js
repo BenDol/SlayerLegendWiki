@@ -57,15 +57,39 @@ const CRAWLER_PATTERNS = [
   // Other bots
   'ia_archiver', // Internet Archive
   'archive.org_bot',
-  'crawler',
-  'spider',
-  'bot',
 
   // Rendering services
   'Lighthouse',
   'PageSpeed',
   'Chrome-Lighthouse',
   'PTST',
+];
+
+/**
+ * Google's advertising crawlers.
+ *
+ * These are a special case: they MUST be served the same ad code a human gets.
+ * Mediapartners-Google reads pages to pick contextually relevant ads, and the
+ * AdsBot crawlers check landing-page quality. Hiding the ad script from them
+ * degrades targeting and looks like cloaking to AdSense review.
+ */
+const AD_CRAWLER_PATTERNS = [
+  'Mediapartners-Google',
+  'AdsBot-Google',
+  'AdsBot-Google-Mobile',
+  'Google-AdSense',
+];
+
+/**
+ * Broad fallback patterns for crawlers we don't know by name.
+ *
+ * These are checked LAST, and only after NOT_CRAWLER_PATTERNS, because substrings
+ * like 'bot' appear in plenty of real browser User-Agents.
+ */
+const GENERIC_CRAWLER_PATTERNS = [
+  'crawler',
+  'spider',
+  'bot',
 ];
 
 /**
@@ -94,6 +118,19 @@ export function isCrawler(userAgent = null) {
     return false;
   }
 
+  const lowerUA = ua.toLowerCase();
+
+  // Named crawlers win outright. Modern Googlebot, AdsBot-Google and
+  // Mediapartners-Google (the AdSense contextual crawler) all advertise
+  // "Chrome" and "Safari" in their User-Agent, so they must be matched
+  // BEFORE the false-positive list below or they'd be treated as humans.
+  for (const pattern of CRAWLER_PATTERNS) {
+    if (lowerUA.includes(pattern.toLowerCase())) {
+      logger.info('Crawler detected', { ua, pattern });
+      return true;
+    }
+  }
+
   // Check if it's explicitly NOT a crawler
   for (const pattern of NOT_CRAWLER_PATTERNS) {
     if (ua.includes(pattern)) {
@@ -102,16 +139,35 @@ export function isCrawler(userAgent = null) {
     }
   }
 
-  // Check if it matches any crawler pattern (case-insensitive)
-  const lowerUA = ua.toLowerCase();
-  for (const pattern of CRAWLER_PATTERNS) {
-    if (lowerUA.includes(pattern.toLowerCase())) {
+  // Unknown agents that still look automated
+  for (const pattern of GENERIC_CRAWLER_PATTERNS) {
+    if (lowerUA.includes(pattern)) {
       logger.info('Crawler detected', { ua, pattern });
       return true;
     }
   }
 
   return false;
+}
+
+/**
+ * Detect Google's advertising crawlers specifically.
+ *
+ * Callers that suppress ad code for crawlers must exempt these - AdSense needs to
+ * see the same ad markup a human does, both for contextual targeting and for review.
+ *
+ * @param {string} userAgent - User agent string (defaults to navigator.userAgent)
+ * @returns {boolean} True if this is a Google ads crawler
+ */
+export function isAdNetworkCrawler(userAgent = null) {
+  const ua = userAgent || (typeof navigator !== 'undefined' ? navigator.userAgent : '');
+
+  if (!ua) {
+    return false;
+  }
+
+  const lowerUA = ua.toLowerCase();
+  return AD_CRAWLER_PATTERNS.some(pattern => lowerUA.includes(pattern.toLowerCase()));
 }
 
 /**
