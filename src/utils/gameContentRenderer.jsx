@@ -11,6 +11,7 @@ import SkillBuildCard from '../components/SkillBuildCard';
 import SpiritBuildCard from '../components/SpiritBuildCard';
 import { VideoGuideCard } from '../../wiki-framework/src/components/contentCreators';
 import AdSlot from '../components/ads/AdSlot';
+import { HOME_WIDGETS } from '../components/home';
 
 /**
  * Process game-specific syntax in markdown content
@@ -240,6 +241,12 @@ export const processGameSyntax = (content) => {
     return `{{SPIRIT_BUILD:${identifier}:${mode}}}`;
   });
 
+  // Process {{home:...}} format - homepage building blocks used by public/content/home.md
+  // Syntax: {{home:hero}}, {{home:creators}}, {{home:sections}}
+  processed = processed.replace(/\{\{\s*home:\s*(\w+)\s*\}\}/gi, (match, widget) => {
+    return `{{HOME:${widget.toLowerCase()}}}`;
+  });
+
   // Process {{emoticon:...}} format
   // Syntax: {{emoticon:ID:SIZE}} or {{emoticon:NAME:SIZE}}
   // Examples: {{emoticon:1}}, {{emoticon:Hello}}, {{emoticon:1001:large}}, {{emoticon:Happy:small}}
@@ -397,6 +404,13 @@ export const CustomParagraph = ({ node, children, ...props }) => {
   const adMatch = content.match(/^\{\{AD:(\w+)\}\}$/);
   if (adMatch) {
     return <AdSlot placement={adMatch[1]} />;
+  }
+
+  // Check for standalone homepage widget marker (used by public/content/home.md)
+  const homeMatch = content.match(/^\{\{HOME:(\w+)\}\}$/);
+  if (homeMatch) {
+    const HomeWidget = HOME_WIDGETS[homeMatch[1].toLowerCase()];
+    return HomeWidget ? <HomeWidget /> : null;
   }
 
   // Check for standalone skill marker (entire paragraph is just a marker)

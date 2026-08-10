@@ -46,7 +46,8 @@ const FORMAT_STYLES = {
  * - Remounts on route change so the unit refills instead of going stale
  * - Defers the push until the slot is near the viewport (better viewability, better CWV)
  * - Reserves height up front so filling the ad doesn't shift the page (CLS)
- * - Collapses itself when AdSense reports the slot as unfilled, so no blank gap is left
+ * - Collapses itself when AdSense reports the slot as unfilled or the loader script
+ *   is blocked (ad blockers), so no blank gap is left
  *
  * @param {string} placement - One of AD_PLACEMENT; selects the slot ID from wiki-config
  * @param {string} [format] - Override the placement's default AD_FORMAT
@@ -54,7 +55,7 @@ const FORMAT_STYLES = {
  * @param {boolean} [showLabel=true] - Render the "Advertisement" label
  */
 const AdSlot = ({ placement, format, className = '', showLabel = true }) => {
-  const { adsEnabled, scriptReady, clientId } = useAds();
+  const { adsEnabled, scriptReady, scriptFailed, clientId } = useAds();
   const location = useLocation();
   const containerRef = useRef(null);
   const insRef = useRef(null);
@@ -128,7 +129,9 @@ const AdSlot = ({ placement, format, className = '', showLabel = true }) => {
     return () => observer.disconnect();
   }, [shouldRender]);
 
-  if (!shouldRender || unfilled) return null;
+  // scriptFailed: an ad blocker (or network failure) stopped the loader - collapse
+  // instead of holding an empty labelled box open forever.
+  if (!shouldRender || unfilled || scriptFailed) return null;
 
   const reservedHeight = AD_RESERVED_HEIGHT[resolvedFormat];
 

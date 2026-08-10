@@ -34,12 +34,10 @@ const STATIC_ROUTES = [
   { url: '/', priority: '1.0', changefreq: 'daily' },
   { url: '/skill-builder', priority: '0.9', changefreq: 'monthly' },
   { url: '/spirit-builder', priority: '0.9', changefreq: 'monthly' },
+  { url: '/familiar-builder', priority: '0.9', changefreq: 'monthly' },
   { url: '/battle-loadouts', priority: '0.9', changefreq: 'monthly' },
   { url: '/soul-weapon-engraving', priority: '0.9', changefreq: 'monthly' },
   { url: '/skill-stone-builder', priority: '0.9', changefreq: 'monthly' },
-  { url: '/my-collections', priority: '0.7', changefreq: 'monthly' },
-  { url: '/my-spirits', priority: '0.7', changefreq: 'monthly' },
-  { url: '/spirits/viewer', priority: '0.6', changefreq: 'monthly' },
   { url: '/highscore', priority: '0.8', changefreq: 'daily' },
   { url: '/creators', priority: '0.7', changefreq: 'weekly' },
   { url: '/changelog', priority: '0.7', changefreq: 'weekly' },
@@ -159,6 +157,14 @@ function generateSitemap() {
   let skipped = 0;
 
   mdFiles.forEach(file => {
+    // Root-level files (e.g. home.md, the custom homepage) are not section
+    // pages - the homepage URL is already covered by STATIC_ROUTES.
+    if (!file.path.includes(path.sep)) {
+      console.log(`   ⏭️  Skipped: ${file.path} (root-level, no section route)`);
+      skipped++;
+      return;
+    }
+
     if (!shouldIndexPage(file.fullPath)) {
       console.log(`   ⏭️  Skipped: ${file.path} (noindex/draft)`);
       skipped++;

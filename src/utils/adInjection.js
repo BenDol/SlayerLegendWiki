@@ -144,6 +144,10 @@ export function injectAdMarkers(content) {
   if (!content || typeof content !== 'string') return content;
   if (!areAdsRuntimeEnabled()) return content;
 
+  // Hand-placed markers mean the author has taken manual control of ad
+  // placement for this page (e.g. the custom home page) - never stack more.
+  if (content.includes('{{AD:')) return content;
+
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
   if (!isAdAllowedPath(pathname)) return content;
 

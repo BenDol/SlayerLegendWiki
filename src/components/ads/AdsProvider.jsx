@@ -13,7 +13,7 @@ import { createLogger } from '../../utils/logger';
 
 const logger = createLogger('AdsProvider');
 
-const AdsContext = createContext({ adsEnabled: false, clientId: '', scriptReady: false });
+const AdsContext = createContext({ adsEnabled: false, clientId: '', scriptReady: false, scriptFailed: false });
 
 /**
  * Module-level mirror of `adsEnabled` so non-React code (the markdown content
@@ -46,22 +46,29 @@ export function useAds() {
  *
  * @param {string} clientId - AdSense publisher ID (ca-pub-...)
  * @param {function} onReady - Called once the script has loaded
- * @returns {function} Cleanup that cancels the pending callback
+ * @param {function} onFailed - Called when the script is blocked or fails to load
+ * @returns {function} Cleanup that cancels the pending callbacks
  */
-function loadAdSenseScript(clientId, onReady) {
+function loadAdSenseScript(clientId, onReady, onFailed) {
   if (typeof document === 'undefined') return () => {};
 
   let cancelled = false;
   const done = () => {
     if (!cancelled) onReady();
   };
+  const failed = () => {
+    if (!cancelled) onFailed();
+  };
 
   const existing = document.getElementById(ADSENSE_SCRIPT_ID);
   if (existing) {
     if (existing.dataset.loaded === 'true') {
       done();
+    } else if (existing.dataset.failed === 'true') {
+      failed();
     } else {
       existing.addEventListener('load', done, { once: true });
+      existing.addEventListener('error', failed, { once: true });
     }
     return () => {
       cancelled = true;
@@ -79,8 +86,11 @@ function loadAdSenseScript(clientId, onReady) {
     done();
   }, { once: true });
   script.addEventListener('error', () => {
-    // Almost always an ad blocker. Not an error worth alarming on.
+    // Almost always an ad blocker. Not an error worth alarming on, but the
+    // slots must know so they collapse instead of holding reserved whitespace.
+    script.dataset.failed = 'true';
     logger.debug('AdSense script blocked or failed to load');
+    failed();
   }, { once: true });
 
   document.head.appendChild(script);
@@ -103,7 +113,8 @@ const AdsProvider = ({ children }) => {
   const { config } = useWikiConfig();
   const user = useAuthStore(state => state.user);
   const { isDonator } = useDonatorStatus(user?.login || null, user?.id || null);
-  const [scriptReady, setScriptReady] = useState(false);
+  // 'pending' -> 'ready' once the loader arrives, or 'failed' when blocked
+  const [scriptState, setScriptState] = useState('pending');
 
   const configured = isAdsConfigured(config);
   const clientId = getAdClientId(config);
@@ -122,12 +133,21 @@ const AdsProvider = ({ children }) => {
 
   useEffect(() => {
     if (!adsEnabled) return undefined;
-    return loadAdSenseScript(clientId, () => setScriptReady(true));
+    return loadAdSenseScript(
+      clientId,
+      () => setScriptState('ready'),
+      () => setScriptState('failed')
+    );
   }, [adsEnabled, clientId]);
 
   const value = useMemo(
-    () => ({ adsEnabled, clientId, scriptReady }),
-    [adsEnabled, clientId, scriptReady]
+    () => ({
+      adsEnabled,
+      clientId,
+      scriptReady: scriptState === 'ready',
+      scriptFailed: scriptState === 'failed',
+    }),
+    [adsEnabled, clientId, scriptState]
   );
 
   return <AdsContext.Provider value={value}>{children}</AdsContext.Provider>;

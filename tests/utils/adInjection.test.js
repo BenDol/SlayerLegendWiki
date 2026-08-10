@@ -133,6 +133,14 @@ describe('injectAdMarkers', () => {
     expect(injectAdMarkers(content)).toBe(content);
   });
 
+  it('leaves pages with hand-placed ad markers untouched', () => {
+    const content = ['# Title', '', paragraph(200), '', '{{AD:contentTop}}', '', article(5, 200)].join('\n');
+    const result = injectAdMarkers(content);
+
+    expect(result).toBe(content);
+    expect(countAllMarkers(result)).toBe(1);
+  });
+
   it('handles articles with no headings', () => {
     const content = [paragraph(300), '', paragraph(300), '', paragraph(300)].join('\n');
     const result = injectAdMarkers(content);

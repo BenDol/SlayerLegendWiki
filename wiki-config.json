@@ -380,7 +380,7 @@
       "expiryMinutes": 60
     },
     "customHomePage": {
-      "enabled": false,
+      "enabled": true,
       "path": "home.md"
     },
     "sidebarTreeLines": {

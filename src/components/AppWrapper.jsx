@@ -3,6 +3,7 @@ import DonationSystem from '../../wiki-framework/src/components/donation/Donatio
 import DonationMascot from './DonationMascot';
 import NetworkDebugBanner from '../../wiki-framework/src/components/common/NetworkDebugBanner';
 import AdsProvider from './ads/AdsProvider';
+import SeoManager from './SeoManager';
 import useScrollDepthTrigger from '../hooks/useScrollDepthTrigger';
 import { createLogger } from '../utils/logger';
 
@@ -206,6 +207,9 @@ const AppWrapper = ({ children }) => {
 
   return (
     <AdsProvider>
+      {/* Per-page titles, descriptions, canonicals, and JSON-LD */}
+      <SeoManager />
+
       {/* Network debug banner - shows when debug mode is active */}
       <NetworkDebugBanner />
 
