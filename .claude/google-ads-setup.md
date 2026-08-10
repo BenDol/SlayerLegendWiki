@@ -48,6 +48,11 @@ clicking your own ads on localhost is still invalid traffic.
 
 ## 2. Where the ads actually appear
 
+**The homepage** (`/`) is a markdown-driven custom home page (`public/content/home.md`,
+enabled via `features.customHomePage`) with one hand-placed `{{AD:contentTop}}` unit after
+the intro copy - so the first pageview of a session carries an ad. Pages containing
+hand-placed `{{AD:...}}` markers are skipped by automatic injection entirely.
+
 **Wiki article pages** (anything rendered from markdown) get ads injected automatically -
 no `{{AD:...}}` markers needed in the content:
 
@@ -235,5 +240,6 @@ Notes on the tricky parts, since AdSense in a React SPA has sharp edges:
   throw `All ins elements in the DOM with class=adsbygoogle already have ads in them`.
 - Slots reserve their height before loading, so filling an ad doesn't shift the page (CLS).
 - When Google reports a slot `unfilled`, the container removes itself instead of leaving a
-  blank gap.
+  blank gap. The same happens for every slot when the loader script is blocked (ad
+  blockers) - no labelled empty boxes for adblock users.
 - Units load ~400px before entering the viewport: good for viewability *and* page speed.

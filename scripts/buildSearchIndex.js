@@ -77,6 +77,12 @@ function buildSearchIndex() {
       const relativePath = path.relative(contentDir, filePath);
       const pathParts = relativePath.split(path.sep);
 
+      // Root-level files (e.g. home.md, the custom homepage) are not section
+      // pages - they have no /section/page route and would index as noise.
+      if (pathParts.length < 2) {
+        return;
+      }
+
       // Extract section and page ID
       const section = pathParts[0];
       const fileName = pathParts[pathParts.length - 1];

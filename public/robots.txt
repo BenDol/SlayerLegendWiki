@@ -13,6 +13,24 @@ Disallow: /.github/
 Disallow: /dist/
 Disallow: /node_modules/
 
+# Thin, duplicate, or account-specific routes - no value in search results
+Disallow: /search
+Disallow: /admin
+Disallow: /profile
+Disallow: /donation-success
+Disallow: /404
+Disallow: /my-collections
+Disallow: /my-spirits
+Disallow: /my-edits
+Disallow: /dev-tools
+Disallow: /debug/
+
+# Editor and history views of wiki pages ($ anchors so page names like
+# "new-player-guide" or "editing-tips" are not accidentally blocked)
+Disallow: /*/edit$
+Disallow: /*/history$
+Disallow: /*/new$
+
 # Allow crawling of CSS, JS, and images for better indexing
 Allow: /*.css
 Allow: /*.js
