@@ -260,7 +260,8 @@ export const serializeLoadoutForStorage = (loadout) => {
     skillStoneBuild: loadout.skillStoneBuild || null,
     spirit: loadout.spirit || null,
     skillStone: loadout.skillStone || null,
-    promotionAbility: loadout.promotionAbility || null
+    promotionAbility: loadout.promotionAbility || null,
+    familiar: loadout.familiar || null
   };
 
   // Preserve ID and timestamps if they exist
@@ -290,7 +291,8 @@ export const serializeLoadoutForSharing = (loadout) => {
     skillStoneBuild: loadout.skillStoneBuild || null,
     spirit: loadout.spirit || null,
     skillStone: loadout.skillStone || null,
-    promotionAbility: loadout.promotionAbility || null
+    promotionAbility: loadout.promotionAbility || null,
+    familiar: loadout.familiar || null
   };
 };
 
