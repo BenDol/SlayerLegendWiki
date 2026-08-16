@@ -84,3 +84,5 @@ nul
 .linked-*
 .claude/settings.local.json
 .claude/settings.local.json
+.claude/content-fill-plan.md
+.claude/adsense-compliance-audit.md

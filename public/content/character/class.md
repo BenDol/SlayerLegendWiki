@@ -103,4 +103,4 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 
 
 # <span class="text-gray-900 dark:text-gray-100">Constellations</span>
-This part of the guide is still a work in progress.
+This part of the guide is still a work in progress - if you have reached constellation content in-game, your knowledge is exactly what this section is missing. [Become a contributor](/meta/contributing) and help document it for the community.

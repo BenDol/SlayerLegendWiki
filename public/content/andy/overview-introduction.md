@@ -31,4 +31,8 @@ Hello! Welcome to the Slayer Legend guide created by me (Andy). This guide is de
 ## INTRODUCTION
 So, you’ve created your character, huh? Don’t worry, you’ll be able to customize your Slayer Legend avatar as you obtain new outfits, and you can change your name once you reach level 100.
 
-From this point on, I’ll be skipping ahead to stage 340 (Ether Promotion), which marks the beginning of mid game. Anything before that is considered early game and is generally easy to progress through without much trouble. If you need help during these stages, I recommend checking the main Slayer Legend discord. Here are some important considerations and unlocks during this period:
+From this point on, I'll be skipping ahead to stage 340 (Ether Promotion), which marks the beginning of mid game. Anything before that is considered early game and is generally easy to progress through without much trouble. If you need help during these stages, I recommend checking the main Slayer Legend discord.
+
+---
+
+> **Editor's note:** the remaining sections of Andy's guide are still being migrated to the wiki. In the meantime, the wiki's own pages cover the same ground for the stretch this introduction describes: the [Early Game Roadmap](/getting-started/early-game-roadmap) walks the stage 0-340 period milestone by milestone (promotions, the [class unlock](/character/class) at stage 120, the [training diary](/character/training-diary) at level 400, and diamond priorities), and the [Farming Strategies](/resources/farming) page covers the daily routine Andy references throughout. If you have access to the full guide and want to help bring the remaining sections over, [become a contributor](/meta/contributing) - this page is the wiki's most requested migration.

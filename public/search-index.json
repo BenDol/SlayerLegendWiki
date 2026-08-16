@@ -35,8 +35,8 @@
   {
     "id": "character/index",
     "title": "Character",
-    "description": "Master your character's progression through stats, promotions, enhancement, and more",
-    "content": "Character {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Everything that grows your Slayer - stats, promotions, classes, latent power, and the training diary - and how the multipliers stack together.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Your Slayer</span> Every system in this section answers the same question: how do I make my Slayer hit harder and survive longer? The answer is layered. Your base stats are the foundation, and then promotions, classes, latent power, and the training diary each stack their own multipliers and bonuses on top. Understanding how the layers interact is most of what \"getting good\" at Slayer Legend means - the game rarely demands reflexes, but it constantl",
     "section": "character",
     "sectionTitle": "Character",
     "pageId": "index",
@@ -48,7 +48,7 @@
       "promotions"
     ],
     "category": "Character",
-    "date": "2025-12-13T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
@@ -128,8 +128,8 @@
   {
     "id": "companions/companion-builds",
     "title": "Companion Builds",
-    "description": "Comprehensive guide to companion build strategies, optimal companion selection, stat priorities, and team compositions for different content types",
-    "content": "Companion Builds {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "How to build the four companions in Slayer Legend - roll priorities, leveling order by playstyle, and how companions slot into farming and bossing setups.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Building Your Companions</span> Here's the liberating thing about companion builds in Slayer Legend: you don't pick a companion. All four of them - Ellie, Zeke, Miho, Luna - contribute simultaneously, so \"building companions\" really means deciding where your limited stones, emeralds, and dice go first. The build is a budget. This page is the budget meeting. <span class=\"text-gray-900 dark:text-gray-100\">Rolls: The Settled Question</span> For promoti",
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "companion-builds",
@@ -141,14 +141,14 @@
       "optimization"
     ],
     "category": "Companions",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "companions/ellie",
     "title": "Ellie",
-    "description": "Guide to Ellie, your first companion character. Learn her abilities, optimal builds, and enhancement strategies",
-    "content": "Ellie {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Guide to Ellie, the Wind companion - accuracy, extra ATK, and enemy HP reduction, plus her passive, locked skills, and leveling priorities.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Ellie</span> <img src=\"/images/content/companions/ellie/archer01.png\" alt=\"Ellie\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle; width: 96px; image-rendering: pixelated; margin: 0 0.5em 0 0;\" data-inline=\"true\" />Ellie is the Wind companion - an elf archer, and the offense enabler of the four. She doesn't carry your damage the way Zeke does; she makes your damage land. Accuracy is her signature, and if you've ever watched",
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "ellie",
@@ -159,14 +159,14 @@
       "support"
     ],
     "category": "Companions",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "companions/enhancement",
     "title": "Companion Enhancement",
-    "description": "Complete guide to companion enhancement system, leveling companions, stat upgrades, evolution, and maximizing companion power",
-    "content": "Companion Enhancement {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "How companion skills and passives level up in Slayer Legend - attribute stones, emeralds, the level 1500 passives, and sensible leveling priorities.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Enhancement Overview</span> Every companion grows along two tracks. Their three active skills each level to 100, delivering the effects you actually feel - Zeke's crit damage, Miho's gold, Luna's mana, Ellie's accuracy. And beneath those sits each companion's passive, a monster of a progression track that runs to level 1500 and consumes materials on a scale that makes the skill levels look like pocket change. Companion enhancement is not a project y",
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "enhancement",
@@ -178,14 +178,14 @@
       "stats"
     ],
     "category": "Companions",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "companions/index",
     "title": "Companions",
-    "description": "Guide to companion characters, their abilities, enhancement, and promotion systems in Slayer Legend",
-    "content": "Companions {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The four companions of Slayer Legend - Ellie, Zeke, Miho, and Luna - their elements, skills, passives, advancement battles, and promotion options.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Companions Overview</span> Companions are the four allies who fight at your side, one per element - and despite the shared name, they play nothing alike. Each companion brings three active skills (buffs that scale to level 100), a deep passive (level cap 1500), a set of later-game locked skills, and their own promotion option pages rolled with<img src=\"/images/content/goods/GoodsDice1.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; ve",
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "index",
@@ -196,14 +196,14 @@
       "progression"
     ],
     "category": "Companions",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "companions/luna",
     "title": "Luna",
-    "description": "Guide to Luna, an offensive combat companion. Learn her abilities, damage builds, and enhancement strategies",
-    "content": "Luna {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Guide to Luna, the Water companion - mana recovery, extra mana, and skill damage, the engine behind every skill-heavy build.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Luna</span> <img src=\"/images/content/companions/luna/mage01.png\" alt=\"Luna\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle; width: 96px; image-rendering: pixelated; margin: 0 0.5em 0 0;\" data-inline=\"true\" />Luna is the Water companion - a trainee magician, and the engine room of every skill-focused build in the game. Her kit reads modest next to Zeke's raw power: mana recovery, a bigger mana pool, and skill damage. But t",
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "luna",
@@ -211,17 +211,17 @@
     "tags": [
       "companions",
       "luna",
-      "offense"
+      "skills"
     ],
     "category": "Companions",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "companions/miho",
     "title": "Miho",
-    "description": "Guide to Miho, a defensive tank companion. Learn her tanking abilities, survivability builds, and enhancement strategies",
-    "content": "Miho {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Guide to Miho, the Fire companion - damage resistance, dodge, and the famous Gold Rush, plus her passive, locked skills, and leveling priorities.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Miho</span> <img src=\"/images/content/companions/miho/ninja01.png\" alt=\"Miho\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle; width: 96px; image-rendering: pixelated; margin: 0 0.5em 0 0;\" data-inline=\"true\" />Miho is the Fire companion - a shadow-stepping looter with a split personality. Half her kit is survival (damage resistance and dodge, both checked against enemy level, both increasingly precious as you push above yo",
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "miho",
@@ -229,10 +229,10 @@
     "tags": [
       "companions",
       "miho",
-      "tank"
+      "farming"
     ],
     "category": "Companions",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
@@ -254,8 +254,8 @@
   {
     "id": "companions/zeke",
     "title": "Zeke",
-    "description": "Guide to Zeke, a balanced all-rounder companion. Learn his versatile abilities, hybrid builds, and enhancement strategies",
-    "content": "Zeke {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Guide to Zeke, the Earth companion - HP, critical damage, and total ATK, plus his passive, locked skills, and leveling priorities.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Zeke</span> <img src=\"/images/content/companions/zeke/warrior01.png\" alt=\"Zeke\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle; width: 96px; image-rendering: pixelated; margin: 0 0.5em 0 0;\" data-inline=\"true\" />Zeke is the Earth companion - a wandering swordsman, and the most straightforwardly powerful of the four. No clever niche, no economy angle: HP to keep you standing, critical damage to make your hits detonate, and ",
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "zeke",
@@ -263,17 +263,17 @@
     "tags": [
       "companions",
       "zeke",
-      "balanced"
+      "offense"
     ],
     "category": "Companions",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "database/skills",
     "title": "Skill Database",
-    "description": "Complete database of all skills in Slayer Legend",
-    "content": "Skill Database {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Complete data reference for all 46 skills in Slayer Legend - element, MP cost, cooldown, max level, base values and per-level scaling for every grade.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Skill Database</span> Every skill in the wiki's database - 46 of them - with the numbers that matter: element, MP cost, cooldown, level cap, and the effect with its base value and per-level growth. This data is the same dataset that powers the wiki's Skill Builder, so what you plan there matches what you read here. \"Base\" is the skill's value at level 1; each level adds the amount in parentheses. Damage actives cap at level 130, most buffs at 20. Fo",
     "section": "database",
     "sectionTitle": "Database",
     "pageId": "skills",
@@ -283,14 +283,14 @@
       "database"
     ],
     "category": "Database",
-    "date": "2025-12-13T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "equipment/accessories",
     "title": "Accessories",
-    "description": "Complete guide to accessory equipment, rings, necklaces, and other supplementary gear that provides stat bonuses and special effects",
-    "content": "Accessories {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page --> Anon",
+    "description": "The accessory equipment slot in Slayer Legend - rarity grades, equip and owned effects, drops and summons, and why accessory investment can wait.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Accessories Overview</span> Accessories are your second equipment slot, running on the same machinery as weapons: the same Common through Immortal rarity ladder with Grade 4 to Grade 1 sub-grades, the same dual equip effect / owned effect structure, the same enhancement to level 200 with<img src=\"/images/content/goods/EnchantCube 11.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margi",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "accessories",
@@ -302,14 +302,14 @@
       "necklaces"
     ],
     "category": "Equipment",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "equipment/black-orbs",
     "title": "Black Orbs",
-    "description": "Guide to Black Orbs, a rare and powerful crafting material used for advanced equipment upgrades and special enhancements",
-    "content": "Black Orbs {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The Black Orb system in Slayer Legend - Black Mana summons, elemental damage equipment, awakening with black pieces from the Orb of Hope, and reset rules.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Black Orb Overview</span> Black Orbs are late-game equipment content built around elemental (attribute) damage. Where your weapon multiplies raw ATK, Black Orb equipment multiplies your fire, water, wind, and earth damage - the layer of your damage formula that skills, spirits, and companions all feed into. The system arrived in a later update and sits firmly in the endgame: by the time the game hands it to you, you'll have the soul weapon and awake",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "black-orbs",
@@ -321,14 +321,14 @@
       "crafting"
     ],
     "category": "Equipment",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "equipment/enhancement",
     "title": "Equipment Enhancement",
-    "description": "Complete guide to enhancing equipment, upgrading gear stats, enhancement strategies, and maximizing equipment potential",
-    "content": "Equipment Enhancement {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "How enhancement works in Slayer Legend - Enhance Cubes, the level 200 cap, what to level first, and where cubes actually come from.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Enhancement Overview</span> Owning good gear is half the job; the other half is leveling it. Enhancement pumps<img src=\"/images/content/goods/EnchantCube 11.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;\" data-inline=\"true\" />Enhance Cubes into a piece of equipment to raise its level and multiply its stat contribution. It applies across the board - weapons, accesso",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "enhancement",
@@ -340,14 +340,14 @@
       "progression"
     ],
     "category": "Equipment",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "equipment/fusion",
     "title": "Equipment Fusion",
-    "description": "Guide to equipment fusion system, combining and upgrading equipment, transferring stats, and recovering materials",
-    "content": "Equipment Fusion {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The five-into-one fusion system in Slayer Legend - how combining works for weapons, accessories, and classes, and how to fuse without regrets.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Fusion Overview</span> Fusion is the game's answer to bad summon luck: five items of the same grade combine into one item of the next grade up. It applies to weapons, accessories, and even classes (five same-grade classes fuse to the next grade, which is exactly how you climb toward the top of the class ladder between lucky pulls). The rule is beautifully simple and it converts volume into progress - every duplicate that drops or summons is a fifth ",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "fusion",
@@ -359,14 +359,14 @@
       "upgrading"
     ],
     "category": "Equipment",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "equipment/index",
     "title": "Equipment",
-    "description": "Comprehensive guide to weapons, armor, accessories, and equipment enhancement systems in Slayer Legend",
-    "content": "Equipment {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Overview of every equipment system in Slayer Legend - weapons, accessories, enhancement, fusion, soul weapons, black orbs, and relics - and how they fit together.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Equipment Overview</span> Equipment in Slayer Legend is not one system - it's five or six stacked on top of each other, unlocking in layers as you progress. The core pair is simple: a weapon (your main damage multiplier) and an accessory (your survivability and utility multiplier). Then the game keeps adding floors to the building: enhancement to level them, fusion to climb rarities, soul weapons wielded alongside your normal weapon, black orbs for ",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "index",
@@ -377,14 +377,14 @@
       "progression"
     ],
     "category": "Equipment",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "equipment/relics",
     "title": "Relics",
-    "description": "Guide to Relics, powerful equipment pieces that provide unique bonuses, special effects, and end-game power",
-    "content": "Relics {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "All twelve relics in Slayer Legend - what each one buffs, how relic leveling works, and why relics are a slow-burn investment rather than a priority.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Relics Overview</span> Relics are the quiet system of the equipment family: passive stat boosters (twelve in the wiki's current data) that don't occupy an equipment slot, don't drop from monsters, and don't demand build decisions. You acquire them through the shop and level them up over time, and each level nudges its stat a little higher - permanently, passively, account-wide. No single relic changes your game. All twelve, leveled patiently over mo",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "relics",
@@ -395,14 +395,14 @@
       "end-game"
     ],
     "category": "Equipment",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "equipment/soul-weapons",
     "title": "Soul Weapons",
-    "description": "Guide to Soul Weapons, special endgame weapons with unique abilities, evolution systems, and powerful passive effects",
-    "content": "Soul Weapons {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The soul weapon system in Slayer Legend - crafting with souls, the Green/Red/Blue lines, disassembly, and the engraving grid unlocked at stage 320.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Soul Weapons Overview</span> Soul weapons are the second blade your Slayer carries - crafted rather than summoned, wielded alongside your normal weapon, not instead of it. The currency is souls:<img src=\"/images/content/goods/GoodsSoulWhite.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;\" data-inline=\"true\" />White,<img src=\"/images/content/goods/GoodsSoulGreen.png\"",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "soul-weapons",
@@ -414,14 +414,14 @@
       "end-game"
     ],
     "category": "Equipment",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "equipment/weapons",
     "title": "Weapons Guide",
-    "description": "Complete guide to weapons, weapon types, stats, and progression in Slayer Legend",
-    "content": "Weapons Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The Slayer Legend weapon system - rarity grades from Common to Immortal, drops versus summons, equip and owned effects, and how to progress your blade.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Weapons Overview</span> Your weapon is one of the two primary damage sources in the game (skills being the other), and weapon progression is the single best place your<img src=\"/images/content/goods/GoodsDiamond.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;\" data-inline=\"true\" />Diamonds can go. Every weapon is a sword - this is a game about a Slayer and their bla",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "weapons",
@@ -432,14 +432,14 @@
       "progression"
     ],
     "category": "Equipment",
-    "date": "2025-12-13T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "getting-started/core-mechanics",
     "title": "Core Mechanics",
-    "description": "Understanding the fundamental game mechanics of Slayer Legend including stats, elements, combat systems, and progression",
-    "content": "Core Mechanics {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "How Slayer Legend actually works - combat and stages, stats, mana and skills, the four elements, promotions, and idle rewards.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">The Combat Loop</span> Your Slayer walks right and kills what's in front of them. Each stage sends waves of monsters and ends with a boss challenge - beat the boss, advance to the next stage, repeat across 2,000 stages and 30+ regions (see the stage list). If a boss is too strong you stay on the current stage and keep farming it, which is not a failure state: everything the stage drops - gold, EXP, cubes, stones, equipment - keeps flowing while you ",
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "core-mechanics",
@@ -451,14 +451,14 @@
       "stats"
     ],
     "category": "Getting Started",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "getting-started/early-game-roadmap",
     "title": "Early Game Roadmap",
-    "description": "Step-by-step guide for your first days in Slayer Legend, covering essential progression milestones and strategies",
-    "content": "Early Roadmap {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Milestone-by-milestone roadmap for the early game of Slayer Legend - promotions, class unlock, training diary, diamond priorities, and daily habits up to Ether (~stage 340).",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">The Shape of the Early Game</span> The community draws the line at the Ether promotion (around stage 340) - everything before that is \"early game,\" and it mostly plays itself if you keep your stats fed and your promotions taken. That doesn't mean decisions don't matter; it means the game is generous enough to absorb your mistakes. This roadmap covers the milestones in order and the habits worth building. For everything after Ether, Andy's Progressio",
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "early-game-roadmap",
@@ -470,14 +470,14 @@
       "guide"
     ],
     "category": "Getting Started",
-    "date": "2025-12-22T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "getting-started/first-steps",
     "title": "Your First Steps",
-    "description": "First hour guide",
-    "content": "First Steps {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "What to do in your first hour of Slayer Legend - guide quests, spending gold, learning skills, and your first promotion battles.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Your First Hour</span> Your Slayer fights by themselves. That is the whole premise - you are not tapping enemies, you are managing growth. So your first hour is really about learning where the growth levers are and pulling the right ones. The good news: the early game is very forgiving, and almost nothing you do in the first days is permanent. Relax and enjoy it. <span class=\"text-gray-900 dark:text-gray-100\">Follow the Guide Quests</span> The quest",
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "first-steps",
@@ -486,14 +486,14 @@
       "beginner"
     ],
     "category": "Getting Started",
-    "date": "2025-12-13T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "getting-started/index",
     "title": "Getting Started with Slayer Legend",
-    "description": "Welcome to the complete guide for Slayer Legend Idle RPG - learn the basics, master the systems, and become a legendary slayer",
-    "content": "Getting Started with Slayer Legend {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "New to Slayer Legend? Start here - what the game is, how to install it, your first hour, the core mechanics, and a roadmap through the early game.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Welcome, Slayer</span> Slayer Legend is a pixel-art idle RPG by GEAR2 where you grow a single sword-swinging character from a nobody in the Beginning Forest into something that one-shots screen-fulls of monsters across 2,000 stages. The core loop is simple - your Slayer fights on their own, you spend what they earn to make them stronger - but underneath that simple loop sits a surprisingly deep stack of systems: promotions, classes, skills, spirits,",
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "index",
@@ -505,14 +505,14 @@
       "new-player"
     ],
     "category": "Getting Started",
-    "date": "2025-12-13T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "getting-started/installation",
     "title": "Installation",
-    "description": "How to install and set up your wiki",
-    "content": "Installation Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "How to install Slayer Legend on Android, iOS, and PC, plus account linking and choosing a server before you start playing.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Installing the Game</span> Slayer Legend: Idle RPG (known in Korea as 슬레이어 키우기, literally \"Raising a Slayer\") is developed by GEAR2 and is free to play with optional in-app purchases. It is available on both major mobile stores: - Android - search \"Slayer Legend\" on Google Play, or look for the package by GEAR2 (). Watch out for similarly named clones; the real one has the pixel-art Slayer on the icon and GEAR2 as the developer. - iOS - search \"Slay",
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "installation",
@@ -522,14 +522,14 @@
       "setup"
     ],
     "category": "Getting Started",
-    "date": "2025-12-13T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "getting-started/ui-guide",
     "title": "UI Guide",
-    "description": "Complete guide to the user interface, menus, controls, and navigation in Slayer Legend",
-    "content": "UI Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page --> Test",
+    "description": "A tour of the Slayer Legend interface - the main battle screen, every bottom menu tab, battle settings, and the quality-of-life options worth turning on.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Reading the Main Screen</span> The battle screen is where you'll live. Across the top sit your currencies -<img src=\"/images/content/goods/GoodsGold.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;\" data-inline=\"true\" />Gold and<img src=\"/images/content/goods/GoodsDiamond.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30p",
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "ui-guide",
@@ -541,14 +541,14 @@
       "tutorial"
     ],
     "category": "Getting Started",
-    "date": "2025-12-22T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "guides/index",
     "title": "Guides",
-    "description": "Strategy guides and tips for Slayer Legend",
-    "content": "Guides {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Strategy guides for Slayer Legend - Andy's full progression walkthrough, the wiki's system guides, video guides, and how to contribute your own.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Guides</span> Reference pages tell you what a system is; guides tell you what to do with it. This section collects the strategy side of the wiki - the opinionated, experience-tested material - and points to the reference pages that back it up. <span class=\"text-gray-900 dark:text-gray-100\">The Big One: Andy's Progression Guide</span> Andy's Progression Guide is the wiki's flagship walkthrough - a full progression path written by a player with three ",
     "section": "guides",
     "sectionTitle": "Guides",
     "pageId": "index",
@@ -559,7 +559,7 @@
       "tips"
     ],
     "category": "Guides",
-    "date": "2025-12-16T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
@@ -638,8 +638,8 @@
   {
     "id": "progression/index",
     "title": "Progression Systems",
-    "description": "Overview of character progression, leveling, and advancement systems in Slayer Legend",
-    "content": "Progression Systems {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "How progression works in Slayer Legend - leveling, promotions, stage pushing, and the daily systems that compound into long-term power.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">How Progression Works</span> Slayer Legend's progression is a braid of three strands: your level (EXP), your stage (how far you've pushed), and your promotion rank (the permanent multipliers). They feed each other constantly - higher stages give more EXP and gold, more levels unlock systems and stat points, and promotions multiply you through the next set of stages. When one strand stalls, the other two are how you unstick it. That's the entire stra",
     "section": "progression",
     "sectionTitle": "Progression",
     "pageId": "index",
@@ -650,14 +650,14 @@
       "advancement"
     ],
     "category": "Progression",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "progression/leveling",
     "title": "Leveling Guide",
-    "description": "Complete guide to leveling your character efficiently, experience sources, and level milestones",
-    "content": "Leveling Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page --> <img src=\"https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/characters/2025/12/64f84b65d55049a791cfe63323dd4432.png\" alt=\"\" width=\"80\" height=\"80\" />",
+    "description": "Where EXP comes from in Slayer Legend, every level milestone that matters, and how to level efficiently from early game to late.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Why Levels Matter</span> Your character level is quieter than promotions or equipment - no flashy multiplier attached - but it gates a surprising amount of the game. Levels grant growth points to allocate across your stats, promotions list recommended levels, and several whole systems simply will not open until you hit their level requirement. EXP is the slow current underneath everything else; you want it flowing at all times. <span class=\"text-gra",
     "section": "progression",
     "sectionTitle": "Progression",
     "pageId": "leveling",
@@ -669,14 +669,14 @@
       "guide"
     ],
     "category": "Progression",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "resources/farming",
     "title": "Farming Strategies",
-    "description": "Comprehensive guide to efficient farming, resource optimization, and stage selection strategies",
-    "content": "Farming Strategies {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "How to farm efficiently in Slayer Legend - stage selection, buff stacking, offline versus active play, the farming build, and the daily routine that compounds.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Farming Is the Game</span> Strip away the systems and Slayer Legend is a farming game: everything - gold, EXP, cubes, stones, souls - flows from kills, and every upgrade exists to make the kills faster and deeper. So \"farming strategy\" isn't a side topic; it's the operating manual. The good news is that efficient farming comes down to four decisions, and none of them are complicated. <span class=\"text-gray-900 dark:text-gray-100\">Decision One: Where",
     "section": "resources",
     "sectionTitle": "Resources",
     "pageId": "farming",
@@ -688,14 +688,14 @@
       "optimization"
     ],
     "category": "Resources",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "resources/gold",
     "title": "Gold Farming Guide",
-    "description": "Complete guide to gold farming, optimal strategies, and maximizing gold income in Slayer Legend",
-    "content": "Gold Farming Guide {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The complete gold economy of Slayer Legend - every multiplier in the stack, where gold actually goes, and how to maximize income at any stage of the game.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Why Gold Never Stops Mattering</span> <img src=\"/images/content/goods/GoodsGold.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -5px 0 0 0;\" data-inline=\"true\" />Gold has one overwhelming sink: your combat stats. ATK, HP, HP Recovery, and the critical family all level with gold, the caps run to 1,750,000 levels, and costs scale relentlessly - which means gold demand outgrows go",
     "section": "resources",
     "sectionTitle": "Resources",
     "pageId": "gold",
@@ -707,14 +707,14 @@
       "currency"
     ],
     "category": "Resources",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "resources/index",
     "title": "Resources & Farming",
-    "description": "Guide to all game resources, farming strategies, and resource management for optimal progression",
-    "content": "Resources & Farming {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Every currency and material in Slayer Legend - what it does, where it comes from - plus the farming strategies that keep them all flowing.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Resources Overview</span> Slayer Legend runs on an economy of a dozen-plus currencies, and each one is a bottleneck for something specific. Gold feeds stats, cubes feed equipment, stones feed companions, souls feed soul weapons - and your progression at any moment is usually limited by exactly one of them. Knowing which one, and where it comes from, is half of playing this game well. This section is the map. <span class=\"text-gray-900 dark:text-gray",
     "section": "resources",
     "sectionTitle": "Resources",
     "pageId": "index",
@@ -726,14 +726,14 @@
       "materials"
     ],
     "category": "Resources",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "resources/materials",
     "title": "Materials & Crafting",
-    "description": "Guide to all crafting materials, farming locations, and material management strategies",
-    "content": "Materials & Crafting {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The complete material catalog of Slayer Legend - every upgrade material and system currency, what consumes it, and where it comes from.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">The Material Economy</span> Beyond gold and diamonds, Slayer Legend runs a whole shadow economy of materials - each one bound to a specific system, each one a potential bottleneck. The pattern worth noticing before the catalog: almost every material below arrives automatically as you play (drops, idle rewards, dailies), which means material shortages are almost never solved by \"farming harder\" - they're solved by fixing the rate: pushing stages, cla",
     "section": "resources",
     "sectionTitle": "Resources",
     "pageId": "materials",
@@ -745,14 +745,14 @@
       "farming"
     ],
     "category": "Resources",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "skills/index",
     "title": "Skills",
-    "description": "Master the art of combat with elemental skills, skill mastery, and strategic skill combinations",
-    "content": "Skills {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The Slayer Legend skill system - grades, elements, actives versus passives, MP and cooldowns, and how skill builds come together.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Skills Overview</span> Skills are the other half of your damage - your weapon swings on its own, but skills are where builds actually live. The wiki's database tracks 46 skills spread across seven grades (Common, Great, Rare, Epic, Legendary, Mythic, Immortal), and nearly every one carries one of the four elements - Fire, Water, Wind, or Earth - feeding the attribute damage systems that run through the whole game. You equip a loadout of them, and th",
     "section": "skills",
     "sectionTitle": "Skills",
     "pageId": "index",
@@ -763,14 +763,14 @@
       "elements"
     ],
     "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "skills/skill-mastery",
     "title": "Skill Mastery",
-    "description": "Guide to skill mastery system, leveling skills, and unlocking advanced skill features",
-    "content": "Skill Mastery {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The Skill Mastery system in Slayer Legend - unlocked after the Ether promotion, mastery points, the stat tree, and skill awakening.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Skill Mastery Overview</span> Skill Mastery is mid-game content with late-game consequences: it unlocks after clearing the Ether promotion (recommended around level 1000, roughly stage 340 - the same milestone the community treats as the start of mid game). Once open, it adds a mastery layer over your whole skill kit: a points system you charge up through normal progression, and a spending tree that converts those points into permanent power - inclu",
     "section": "skills",
     "sectionTitle": "Skills",
     "pageId": "skill-mastery",
@@ -781,14 +781,14 @@
       "progression"
     ],
     "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "skills/skill-refinement",
     "title": "Skill Refinement",
-    "description": "Guide to the Skill Refinement system, enhancing skills beyond normal levels for powerful permanent bonuses and advanced skill effects",
-    "content": "Skill Refinement {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Refining skills with skill stones in Slayer Legend - Cooldown, Time, and Heat stones, A and B tiers, elements, and how to tune a build with them.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Refinement Overview</span> Refinement is the fine-tuning layer of the skill system: skill stones that attach to your equipped skills and bend their mechanics - shorter cooldowns, longer buff durations, faster trigger conditions. Where leveling a skill makes its numbers bigger, refinement changes its rhythm, and rhythm is what separates a skill bar that fires in clean rotation from one that sits idle waiting on cooldowns. Late-game build optimization",
     "section": "skills",
     "sectionTitle": "Skills",
     "pageId": "skill-refinement",
@@ -800,14 +800,14 @@
       "progression"
     ],
     "category": "Skills",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "skills/skills",
     "title": "Skills",
     "description": "A brief overview of the skill system.",
-    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Skills Overview</span> Aside from your normal attacks, there are skills that deal more damage or help amplify combat and non-combat stats. <span class=\"text-gray-900 dark:text-gray-100\">Common Skills</span> This part of the guide is still a work in progress. <img src=\"/images/content/skills/icons/00FlameSlash.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;\" data-in",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Skills Overview</span> Aside from your normal attacks, there are skills that deal more damage or help amplify combat and non-combat stats. <span class=\"text-gray-900 dark:text-gray-100\">Common Skills</span> Your starting toolkit, unlocking within the first few character levels: the four elemental attacks (Fire Slash, Ice Stone, Lightning Slash, Stone Strike) plus the first buffs - Fire Sword for ATK, Mana's Blessing for mana recovery, and Ground's B",
     "section": "skills",
     "sectionTitle": "Skills",
     "pageId": "skills",
@@ -822,8 +822,8 @@
   {
     "id": "spirits/index",
     "title": "Spirits",
-    "description": "Overview of spirit companions, their abilities, and evolution system. Learn about all 12 spirits and how to maximize their potential",
-    "content": "Spirits {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The spirit system in Slayer Legend - all 12 spirits across four elements, tiers and combining, equip slots, upgrades, and the farming versus boss lineups.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Spirits Overview</span> Spirits are the small floating allies with outsized consequences. There are twelve of them - three per element, Fire, Water, Wind, and Earth - and each carries exactly one skill. But what skills: stopping time, executing monsters below an HP threshold, doubling your gold, doubling your EXP, +500% total HP. A spirit isn't a stat stick; it's a rule change. Choosing which rules apply to your account is what the spirit system act",
     "section": "spirits",
     "sectionTitle": "Spirits",
     "pageId": "index",
@@ -834,14 +834,14 @@
       "progression"
     ],
     "category": "Spirits",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "spirits/information",
     "title": "Spirit Information",
-    "description": "Complete guide to all Spirit characters, their unique skills, and strategic uses",
-    "content": "Spirit Information {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Complete reference for all 12 spirits in Slayer Legend - element, skill, effect ranges, and what each spirit is actually for.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">The Twelve Spirits</span> Every spirit in the game, organized by element. Effect ranges show the skill's span from low development to maximum - where a range reads \"10-80%\", your actual value depends on the spirit's tier and level. For how tiers, combining, and upgrades work, see the Spirits overview; to watch any of them animate through their 8 evolution stages, the Spirit Viewer has the full gallery. <span class=\"text-red-700 dark:text-red-400\">Fi",
     "section": "spirits",
     "sectionTitle": "Spirits",
     "pageId": "information",
@@ -853,14 +853,14 @@
       "strategy"
     ],
     "category": "Spirits",
-    "date": "2025-12-16T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "spirits/viewer",
     "title": "Spirit Viewer",
-    "description": "Interactive tool to view all 12 spirits and their evolution animations across 8 levels. Explore idle, attack, and movement animations with customizable controls",
-    "content": "Spirit Viewer {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "Interactive viewer for all 12 spirits in Slayer Legend - idle, attack, and movement animations across all 8 evolution stages.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Spirit Viewer</span> The Spirit Viewer is one of the wiki's interactive tools: a full animated gallery of all 12 spirits across every one of their 8 evolution stages. Each spirit's pixel art changes as it evolves - sometimes subtly, sometimes into something you'd barely recognize from stage one - and the viewer lets you browse idle, attack, and movement animations for any spirit at any stage, with playback controls for speed and animation type. It's",
     "section": "spirits",
     "sectionTitle": "Spirits",
     "pageId": "viewer",
@@ -871,14 +871,14 @@
       "viewer"
     ],
     "category": "Spirits",
-    "date": "2025-12-21T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "stages/index",
     "title": "Stages",
-    "description": "Guide to all stages, dungeons, and combat areas in Slayer Legend",
-    "content": "Stages {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The complete region list for Slayer Legend's 2,000 stages, how stage rewards and drops scale, and how to think about pushing versus farming.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">How Stages Work</span> The main game is a single long road: 2,000 stages, each one a set of monster waves capped by a boss challenge. Beat the boss and you advance; fail and you keep farming where you are, which is never wasted time - every reward the game gives scales with your stage number. Gold per kill, EXP, enhance cube drops, attribute stone chances, even the rarity of equipment drops all climb as you push. Deeper stages also start paying out<",
     "section": "stages",
     "sectionTitle": "Stages",
     "pageId": "index",
@@ -889,14 +889,14 @@
       "progression"
     ],
     "category": "Stages",
-    "date": "2025-12-22T00:00:00.000Z",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   },
   {
     "id": "tools/index",
     "title": "Tools & Calculators",
-    "description": "Interactive tools, simulators, and calculators for Slayer Legend",
-    "content": "Tools & Calculators {{contribution-banner:auto-generated}} <!-- DELETE ME when you update this page -->",
+    "description": "The wiki's free interactive tools for Slayer Legend - Battle Loadouts, Skill Builder, Spirit Builder, Familiar Builder, Soul Weapon engraving, and Skill Stones.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Tools & Calculators</span> Every tool on this page is free, runs right in your browser, and is built on the same game data as the wiki's reference pages - so what you plan in a tool matches what you read in the guides. Sign in with GitHub to save your builds and share them with other players; without signing in you can still experiment freely. The honest pitch for why these exist: Slayer Legend's build decisions are expensive to experiment with in-g",
     "section": "tools",
     "sectionTitle": "Tools",
     "pageId": "index",
@@ -908,7 +908,7 @@
       "build"
     ],
     "category": "Tools",
-    "date": "",
+    "date": "2026-08-16T00:00:00.000Z",
     "order": 0
   }
 ]
