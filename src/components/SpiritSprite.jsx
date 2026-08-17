@@ -3,6 +3,7 @@ import spiritData from '../../public/data/spirit-characters.json';
 import { cacheName } from '../../wiki-framework/src/utils/storageManager';
 import { createLogger } from '../utils/logger';
 import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
+import { setImageSrcWithCdnFallback } from '../utils/cdnFallback';
 
 const logger = createLogger('SpiritSprite');
 
@@ -283,7 +284,7 @@ const getCachedImage = (spiritId, level, frameNumber, framePath) => {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = resolvedUrl;
+    setImageSrcWithCdnFallback(img, resolvedUrl);
 
     // Timeout fallback
     setTimeout(() => {

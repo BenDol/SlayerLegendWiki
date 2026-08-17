@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createLogger } from '../utils/logger';
 import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
+import { setImageSrcWithCdnFallback } from '../utils/cdnFallback';
 import { getSpriteVariant, getWeaponTier } from '../utils/familiarHelpers';
 import { recolorSprite } from '../utils/spriteRecolor';
 
@@ -152,7 +153,7 @@ const FamiliarSprite = ({
       setRecoloredUrl(null);
     };
     img.crossOrigin = 'anonymous'; // Required for canvas manipulation
-    img.src = resolvedUrl;
+    setImageSrcWithCdnFallback(img, resolvedUrl);
   }, [familiarId, starLevel, recolorHex]);
 
   const framePath = getCurrentFramePath();

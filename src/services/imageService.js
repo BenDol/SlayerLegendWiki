@@ -4,6 +4,7 @@
  */
 
 import { createLogger } from '../utils/logger';
+import { setImageSrcWithCdnFallback } from '../utils/cdnFallback';
 
 const logger = createLogger('ImageService');
 
@@ -41,32 +42,34 @@ async function loadWikiConfig() {
 }
 
 /**
- * Construct CDN URL from wiki-config
- * @returns {Promise<string|null>} CDN base URL or null if not configured
+ * Construct CDN base URLs from wiki-config, primary first.
+ * The servingMode host is primary; the other GitHub host is the fallback
+ * (jsDelivr refuses files when the repo exceeds its 50 MB package limit,
+ * raw.githubusercontent.com can be rate limited - each covers the other).
+ * @returns {Promise<Array<string>>} CDN base URLs in priority order (may be empty)
  */
-async function getCdnBaseUrl() {
+async function getCdnBaseUrls() {
   const config = await loadWikiConfig();
 
   if (!config?.features?.gameAssets?.enabled || !config.features.gameAssets.cdn) {
     logger.warn('Game assets CDN not enabled in wiki-config');
-    return null;
+    return [];
   }
 
   const cdn = config.features.gameAssets.cdn;
 
   if (cdn.provider === 'github') {
     const { owner, repo, basePath, servingMode, branch } = cdn.github;
+    const jsdelivrBase = `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/${basePath}`;
+    const rawBase = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${basePath}`;
 
-    if (servingMode === 'jsdelivr') {
-      return `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${branch}/${basePath}`;
-    } else {
-      // Raw GitHub serving mode
-      return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${basePath}`;
-    }
+    return servingMode === 'jsdelivr'
+      ? [jsdelivrBase, rawBase]
+      : [rawBase, jsdelivrBase];
   }
 
   logger.warn('Unknown CDN provider', { provider: cdn.provider });
-  return null;
+  return [];
 }
 
 // Cache for image database
@@ -74,12 +77,12 @@ let imageIndexCache = null;
 
 /**
  * Load JSON with CDN fallback and localStorage caching
- * @param {string|null} cdnUrl - CDN URL (null to skip CDN)
+ * @param {Array<string>} cdnUrls - CDN URLs to try in order (empty to skip CDN)
  * @param {string} fallbackUrl - Fallback static URL (may not exist in production, gracefully fails)
  * @param {string} cacheKey - localStorage cache key
  * @returns {Promise<Object|null>} JSON data or null if all sources fail
  */
-async function loadJSONWithCache(cdnUrl, fallbackUrl, cacheKey) {
+async function loadJSONWithCache(cdnUrls, fallbackUrl, cacheKey) {
   // Check localStorage cache
   const cached = localStorage.getItem(cacheKey);
   const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
@@ -92,8 +95,11 @@ async function loadJSONWithCache(cdnUrl, fallbackUrl, cacheKey) {
     }
   }
 
-  // Try CDN first (if configured)
-  if (cdnUrl) {
+  // Try each CDN in priority order (if configured)
+  if (cdnUrls.length === 0) {
+    logger.debug(`CDN not configured, using static fallback for ${cacheKey}`);
+  }
+  for (const cdnUrl of cdnUrls) {
     try {
       logger.debug(`Fetching ${cacheKey} from CDN`, { url: cdnUrl });
       const response = await fetch(cdnUrl);
@@ -105,12 +111,10 @@ async function loadJSONWithCache(cdnUrl, fallbackUrl, cacheKey) {
         logger.debug(`Loaded ${cacheKey} from CDN`, { totalImages: data.totalImages });
         return data;
       }
-      logger.warn(`CDN fetch failed for ${cacheKey}`, { status: response.status });
+      logger.warn(`CDN fetch failed for ${cacheKey}, trying next source`, { url: cdnUrl, status: response.status });
     } catch (err) {
-      logger.warn(`CDN error for ${cacheKey}, falling back to static`, { error: err.message });
+      logger.warn(`CDN error for ${cacheKey}, trying next source`, { url: cdnUrl, error: err.message });
     }
-  } else {
-    logger.debug(`CDN not configured, using static fallback for ${cacheKey}`);
   }
 
   // Fallback to static file
@@ -137,12 +141,12 @@ async function loadJSONWithCache(cdnUrl, fallbackUrl, cacheKey) {
 async function loadImageIndex() {
   if (imageIndexCache) return imageIndexCache;
 
-  const cdnBaseUrl = await getCdnBaseUrl();
+  const cdnBaseUrls = await getCdnBaseUrls();
   // Image index is located at game-assets/images/image-index.json
-  const cdnUrl = cdnBaseUrl ? `${cdnBaseUrl}/images/image-index.json` : null;
+  const cdnUrls = cdnBaseUrls.map(base => `${base}/images/image-index.json`);
 
   imageIndexCache = await loadJSONWithCache(
-    cdnUrl,
+    cdnUrls,
     '/data/image-index.json',
     'image-index'
   );
@@ -219,7 +223,7 @@ export function getGenericSkillIcon() {
 export function preloadImages(imagePaths) {
   imagePaths.forEach(path => {
     const img = new Image();
-    img.src = path;
+    setImageSrcWithCdnFallback(img, path);
   });
 }
 

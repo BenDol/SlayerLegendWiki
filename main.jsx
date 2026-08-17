@@ -23,6 +23,11 @@ const CharactersRedirect = () => {
 import { initializeBotOctokit } from './wiki-framework/src/services/github/api.js';
 initializeBotOctokit();
 
+// Global <img> fallback: failed jsDelivr CDN loads retry via raw.githubusercontent.com
+// (the CDN repo exceeds jsDelivr's 50 MB package limit, so uncached files 403)
+import { installCdnImageFallback } from './src/utils/cdnFallback.js';
+installCdnImageFallback();
+
 // Crawler detection for SEO optimization
 // Log crawler status for debugging (only in development)
 if (import.meta.env.DEV) {

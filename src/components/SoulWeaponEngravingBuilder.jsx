@@ -18,6 +18,7 @@ import { validateBuildName, validateCompletionEffect, validateWeaponName, STRING
 import { setCache } from '../utils/buildCache';
 import { createLogger } from '../utils/logger';
 import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
+import { setImageSrcWithCdnFallback } from '../utils/cdnFallback';
 
 const logger = createLogger('SoulWeapon');
 const cacheLogger = logger.child('Cache');
@@ -2220,7 +2221,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
           resolve();
         };
         img.onerror = reject;
-        img.src = resolvedUrl;
+        setImageSrcWithCdnFallback(img, resolvedUrl);
       });
     } catch (error) {
       gridLogger.error('Failed to calculate natural cell size, using default 45px', { error });
@@ -2260,7 +2261,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
         const fallbackSize = getPieceImageSizeFallback(pattern);
         resolve(fallbackSize);
       };
-      img.src = resolvedUrl;
+      setImageSrcWithCdnFallback(img, resolvedUrl);
     });
   };
 

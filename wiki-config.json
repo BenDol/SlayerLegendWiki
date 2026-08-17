@@ -563,7 +563,7 @@
           "github": {
             "owner": "BenDol",
             "repo": "SlayerLegendCDN",
-            "servingMode": "jsdelivr",
+            "servingMode": "raw",
             "maxFileSizeMB": 500,
             "allowedFormats": ["mp4", "webm", "mov", "avi"],
             "lfs": {
@@ -595,7 +595,7 @@
           "owner": "BenDol",
           "repo": "SlayerLegendCDN",
           "path": "avatars",
-          "servingMode": "jsdelivr"
+          "servingMode": "raw"
         }
       }
     },
@@ -643,8 +643,8 @@
           "owner": "BenDol",
           "repo": "SlayerLegendCDN",
           "basePath": "user-content/images",
-          "servingMode": "jsdelivr",
-          "indexUrl": "https://cdn.jsdelivr.net/gh/BenDol/SlayerLegendCDN@main/user-content/images/image-index.json"
+          "servingMode": "raw",
+          "indexUrl": "https://raw.githubusercontent.com/BenDol/SlayerLegendCDN/main/user-content/images/image-index.json"
         }
       }
     }
