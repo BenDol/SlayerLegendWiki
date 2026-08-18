@@ -19,6 +19,7 @@ Everything is off until a publisher ID is filled in. Three steps:
    | In-article ad | `wiki-in-article` | `inArticle` |
    | Multiplex ad | `wiki-content-bottom` | `contentBottom` |
    | Display ad (responsive) | `wiki-tool-top` | `toolTop` |
+   | Display ad (**fixed 160x600**, not responsive) | `wiki-side-rail` | `sideRail` |
 
 3. **Fill in the root `wiki-config.json`** (never `public/wiki-config.json`):
 
@@ -31,7 +32,8 @@ Everything is off until a publisher ID is filled in. Three steps:
       "contentTop": "1234567890",
       "inArticle": "2345678901",
       "contentBottom": "3456789012",
-      "toolTop": "4567890123"
+      "toolTop": "4567890123",
+      "sideRail": "5678901234"
     }
   }
 }
@@ -102,14 +104,14 @@ is all the code they need. Turn them on at AdSense → *Ads* → *By site* → e
 | Setting | Recommendation | Why |
 |---|---|---|
 | **Anchor ads** | ✅ On | Sticky, dismissible, highest viewability of any format. The single best RPM addition. Mostly mobile - which is where a mobile-game audience lives. |
-| **Side rails** | ✅ On | Uses dead margin space on widescreen desktop. Zero layout impact. |
+| **Side rails** | ❌ Off | Replaced by the manual sticky rail in the page aside (`sideRail` slot, `<SideRailAd>`), which reaches all ≥1280px desktops instead of only ultra-wide monitors and reports under its own slot ID. Never run both - wide screens would get double side ads. |
 | **Vignette ads** | ⚠️ Start off | Full-screen between pageviews. Highest RPM, highest bounce risk. Google [expanded the triggers in Feb 2026](https://www.adwaitx.com/google-adsense-vignette-ad-triggers-2026/), so they fire more than they used to. Turn on later and compare sessions/user + total revenue over 2 weeks. |
 | **In-page / banner** | ❌ Off | This project places in-page units manually. Leaving Auto ads on for these means Google adds *more* on top of ours. |
 | **Multiplex** | ❌ Off | Same reason - the trailing grid is already placed manually. |
 | **Ad load slider** | ~50-60% | The slider only affects Auto ads placements. Middle keeps overlays present without stacking. |
 
-Net result per long article: **3 manual in-page units + 1 anchor + 1 side rail on desktop.**
-That is the "noticeable but not spammy" band.
+Net result per long article on desktop: **up to 3 manual in-page units + the sticky
+side rail in the aside + 1 anchor.** That is the "noticeable but not spammy" band.
 
 ---
 

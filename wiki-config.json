@@ -348,7 +348,8 @@
           "contentTop": "",
           "inArticle": "",
           "contentBottom": "",
-          "toolTop": ""
+          "toolTop": "",
+          "sideRail": ""
         }
       },
       "placement": {

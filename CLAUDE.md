@@ -29,6 +29,7 @@ This is a **parent wiki project** built using the [GitHub Wiki Framework](https:
 - Custom routes for tools/builders
 - Data files for Data Browser
 - Pickers for page editor
+- Page aside components (e.g. the side-rail ad below the table of contents)
 
 ## Logging System
 

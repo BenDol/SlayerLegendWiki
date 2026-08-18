@@ -5,11 +5,14 @@
  * (never public/wiki-config.json - that one is generated).
  *
  * Design notes:
- * - IN-PAGE units (top of content, in-article, bottom multiplex, tool pages) are placed
- *   manually by this project so we control exactly how many appear and where.
- * - OVERLAY units (anchor, side rail, vignette) are NOT hand-rolled. They are served by
- *   Google's Auto ads and toggled in the AdSense dashboard - the loader script below is
- *   all the code they need. See .claude/google-ads-setup.md.
+ * - IN-PAGE units (top of content, in-article, bottom multiplex, tool pages, and the
+ *   sticky side rail in the page aside) are placed manually by this project so we
+ *   control exactly how many appear and where.
+ * - OVERLAY units (anchor, vignette) are NOT hand-rolled. They are served by Google's
+ *   Auto ads and toggled in the AdSense dashboard - the loader script below is all the
+ *   code they need. Google's own "side rails" Auto format must stay OFF in the
+ *   dashboard now that the manual side rail exists, or wide screens get both.
+ *   See .claude/google-ads-setup.md.
  */
 
 import { createLogger } from '../utils/logger';
@@ -26,6 +29,7 @@ export const AD_PLACEMENT = {
   IN_ARTICLE: 'inArticle',
   CONTENT_BOTTOM: 'contentBottom',
   TOOL_TOP: 'toolTop',
+  SIDE_RAIL: 'sideRail',
 };
 
 /** AdSense ad unit formats we support. */
@@ -33,7 +37,12 @@ export const AD_FORMAT = {
   DISPLAY: 'display', // Responsive display unit
   IN_ARTICLE: 'in-article', // Native fluid unit that blends into prose
   MULTIPLEX: 'multiplex', // Native grid of ads (AdSense "autorelaxed")
+  SKYSCRAPER: 'skyscraper', // Fixed 160x600 vertical unit for the side rail
 };
+
+/** Fixed dimensions for the skyscraper unit, in px (standard IAB 160x600). */
+export const SKYSCRAPER_WIDTH = 160;
+export const SKYSCRAPER_HEIGHT = 600;
 
 /** Which format each placement renders as. */
 export const AD_PLACEMENT_FORMAT = {
@@ -41,6 +50,7 @@ export const AD_PLACEMENT_FORMAT = {
   [AD_PLACEMENT.IN_ARTICLE]: AD_FORMAT.IN_ARTICLE,
   [AD_PLACEMENT.CONTENT_BOTTOM]: AD_FORMAT.MULTIPLEX,
   [AD_PLACEMENT.TOOL_TOP]: AD_FORMAT.DISPLAY,
+  [AD_PLACEMENT.SIDE_RAIL]: AD_FORMAT.SKYSCRAPER,
 };
 
 /** Reserved height per format, in px. Prevents layout shift (CLS) while the ad loads. */
@@ -48,6 +58,7 @@ export const AD_RESERVED_HEIGHT = {
   [AD_FORMAT.DISPLAY]: 120,
   [AD_FORMAT.IN_ARTICLE]: 140,
   [AD_FORMAT.MULTIPLEX]: 320,
+  [AD_FORMAT.SKYSCRAPER]: SKYSCRAPER_HEIGHT,
 };
 
 /** Start loading an ad unit this far before it scrolls into view. */
