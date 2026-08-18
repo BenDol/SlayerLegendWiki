@@ -52,9 +52,11 @@ registerMigrations(gameMigrations);
 // Register game-specific content renderers
 import { registerContentProcessor, registerCustomComponents, registerSkillPreview, registerEquipmentPreview, registerDataAutocompleteSearch, registerPicker } from './wiki-framework/src/utils/contentRendererRegistry.js';
 import { registerDataSelector } from './wiki-framework/src/utils/dataSelectorRegistry.js';
+import { registerPageAsideComponents } from './wiki-framework/src/utils/pageAsideRegistry.js';
 import { processGameSyntax, getGameComponents, renderSkillPreview, renderEquipmentPreview } from './src/utils/gameContentRenderer.jsx';
 import { searchDataForAutocomplete } from './src/utils/dataAutocompleteSearch.js';
 import { injectAdMarkers } from './src/utils/adInjection.js';
+import SideRailAd from './src/components/ads/SideRailAd.jsx';
 import DataSelector from './src/components/DataSelector.jsx';
 import SpiritPicker from './src/components/SpiritPicker.jsx';
 import SkillPicker from './src/components/SkillPicker.jsx';
@@ -99,6 +101,11 @@ registerPicker('spirit-build', SpiritBuildPicker, { icon: Ghost, label: 'Spirit 
 registerPicker('video-guide', VideoGuidePicker, { icon: Video, label: 'Video Guide' });
 
 registerDataAutocompleteSearch(searchDataForAutocomplete);
+
+// Sticky side-rail ad in the content page aside (below the table of contents).
+// AdSlot inside it self-gates on ads-enabled, route exclusions, and the sideRail
+// slot ID being configured - with no slot ID it renders nothing at all.
+registerPageAsideComponents([SideRailAd]);
 
 // Register data sources for data injection
 import dataRegistry from './src/utils/dataRegistry.js';

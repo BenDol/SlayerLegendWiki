@@ -7,6 +7,8 @@ import {
   AD_PLACEMENT_FORMAT,
   AD_RESERVED_HEIGHT,
   DEFAULT_AD_LABEL,
+  SKYSCRAPER_HEIGHT,
+  SKYSCRAPER_WIDTH,
   getAdSlotId,
   isAdAllowedPath,
 } from '../../config/adsConfig';
@@ -30,12 +32,19 @@ const FORMAT_ATTRIBUTES = {
   [AD_FORMAT.MULTIPLEX]: {
     'data-ad-format': 'autorelaxed',
   },
+  // Fixed-size units carry no data-ad-format - the explicit width/height IS the format
+  [AD_FORMAT.SKYSCRAPER]: {},
 };
 
 const FORMAT_STYLES = {
   [AD_FORMAT.DISPLAY]: { display: 'block' },
   [AD_FORMAT.IN_ARTICLE]: { display: 'block', textAlign: 'center' },
   [AD_FORMAT.MULTIPLEX]: { display: 'block' },
+  [AD_FORMAT.SKYSCRAPER]: {
+    display: 'inline-block',
+    width: `${SKYSCRAPER_WIDTH}px`,
+    height: `${SKYSCRAPER_HEIGHT}px`,
+  },
 };
 
 /**
