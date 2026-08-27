@@ -414,3 +414,218 @@ header.sticky {
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
 }
+
+/* ===== Mobile: the horizontal overflow that shrinks the whole page ===== */
+/*
+ * Measured on the dev server at 393x852 (headless Chrome, mobile emulation,
+ * DPR 2): `document.documentElement.clientWidth` is 393 but `scrollWidth` is
+ * 450. One element is 57px too wide, and on a phone that single overflow is
+ * expensive out of all proportion - it is the shared cause of three separate
+ * symptoms that look unrelated:
+ *
+ *   - Chrome's shrink-to-fit renders the whole document at 393/450 = 0.873, so
+ *     every font, icon and tap target on the page is 13% smaller than designed.
+ *   - `vh` still resolves against the un-zoomed viewport, so the sidebar's
+ *     `h-[calc(100vh-4rem)]` paints 788 CSS px = 688 device px and stops ~115px
+ *     short of the bottom of the screen.
+ *   - `position: fixed` boxes size to the widened 450px layout viewport, while
+ *     the `w-full` sticky <header> is 100% of the 393px body - so the header
+ *     ends visibly before the right edge of the page.
+ *
+ * The offender is the footer's right-hand link row: Discord, GitHub, Donate,
+ * Changelog, the config-driven links and the "Powered by GitHub Wiki Framework"
+ * note, laid out as one non-wrapping `flex items-center space-x-6` that
+ * measures 506.8px. Its parent centres it, so it hangs ~57px off each side.
+ *
+ * Letting it wrap is the fix, and `space-x-6` has to go at the same time: it is
+ * a `margin-left` on every sibling but the first, which on a wrapped row leaves
+ * an orphan 24px indent at the start of each new line. `gap` does the same job
+ * wrap-aware, so the two are swapped rather than stacked - the horizontal value
+ * is kept at 1.5rem so an unwrapped row is pixel-identical to today.
+ *
+ * Deliberately not behind a media query. A row that fits never wraps, so this
+ * is inert at every width where the layout is already correct, and it stays
+ * correct if the footer later gains another link or a longer wiki title. The
+ * `footer` scope is load-bearing, though: the header's left-hand group carries
+ * the exact same `flex items-center space-x-6` utilities.
+ */
+footer div.flex.items-center.space-x-6 {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+}
+
+footer div.flex.items-center.space-x-6 > :not([hidden]) ~ :not([hidden]) {
+  margin-left: 0;
+}
+
+/* ===== Mobile: navigation drawer ===== */
+/*
+ * Below `lg` the framework's <aside> stops being a column of the page and
+ * becomes an overlay drawer (`fixed`, translated off-canvas, dismissed by a
+ * full-screen scrim). It keeps the desktop's metrics while doing it: a 256px
+ * panel of 14px rows at 40px tall. On a 393px phone that is 65% of the screen
+ * spent on targets 8px under the 48px Material / 44px HIG minimum, which is
+ * what makes the tree fiddly to hit rather than the page zoom alone.
+ *
+ * Everything here is scoped to `aside.fixed` and to `max-width: 1023.98px` -
+ * the exact complement of Tailwind's `lg` (1024px), which is the breakpoint the
+ * framework itself switches the sidebar's behaviour on. Desktop, where the
+ * sidebar is a resizable sticky column, is untouched. `aside.fixed` also keeps
+ * these rules off the other two <aside> elements in the app (PageViewerPage's
+ * `hidden xl:block` side rail and SearchPage's `lg:col-span-1` filter column),
+ * neither of which is positioned.
+ *
+ * tests/custom-css-contract.test.js pins the framework markup and the 1024px
+ * breakpoint these selectors are derived from.
+ */
+@media (max-width: 1023.98px) {
+  /*
+   * Height: replace the `h-[calc(100vh-4rem)]` class rather than fight it.
+   *
+   * `100vh` is the *large* viewport - the height the page would have with the
+   * browser's URL bar collapsed - so on every mobile browser that retracts its
+   * chrome on scroll the drawer is already taller than the screen before the
+   * zoom above is accounted for, and its last entries sit under the toolbar.
+   *
+   * `bottom: 0` with `height: auto` sizes the panel from its own fixed
+   * containing block instead of from a unit, which is exact wherever fixed
+   * positioning is anchored to the visible viewport (iOS Safari). `max-height`
+   * in `dvh` then clamps it on browsers that anchor fixed boxes to the large
+   * viewport instead (Chrome for Android), where `bottom: 0` alone would still
+   * land under the toolbar. Browsers too old for `dvh` drop that one
+   * declaration and keep the `bottom: 0` behaviour, which is still strictly
+   * better than the `vh` calc it replaces.
+   */
+  aside.fixed {
+    top: 4rem;
+    bottom: 0;
+    height: auto;
+    max-height: calc(100dvh - 4rem);
+
+    /*
+     * Width beats the framework's inline `style={{ width }}`, so !important is
+     * required here and nowhere else in this block. The framework clamps that
+     * inline value to 85vw, but only from the desktop default of 256px, so it
+     * never actually widens anything. `min()` keeps the scrim wide enough to
+     * stay an obvious dismiss target on a small phone while capping the panel
+     * on a tablet, where 86vw would be most of the screen.
+     */
+    width: min(86vw, 22rem) !important;
+
+    /* An overlay needs to read as one: lift it off the page it covers. */
+    box-shadow: 0 0 2rem rgb(0 0 0 / 0.45);
+
+    /* Don't hand the scroll to the page behind when the tree hits its end. */
+    overscroll-behavior: contain;
+
+    /*
+     * The framework animates with `transition-all`, which on open/close also
+     * transitions the box-shadow and the height above - the two most expensive
+     * properties to animate on a phone. Only the translate is wanted.
+     */
+    transition-property: transform;
+  }
+
+  /* Pointer-only affordance: a 8px drag strip is unusable and un-hintable on
+     touch, and it sits at z-50 over the edge of the panel. */
+  aside.fixed > div.cursor-col-resize {
+    display: none;
+  }
+
+  /* Room to scroll past the last entry instead of ending flush at the edge. */
+  aside.fixed nav {
+    padding-bottom: 1.5rem;
+  }
+
+  /*
+   * Rows. `min-height` rather than padding alone so a row that wraps to two
+   * lines grows instead of being pinned, and `padding-left` is left alone
+   * because TreeNode sets it inline per depth (level * 20px + 12px) and the
+   * tree-line guides are positioned against those exact numbers.
+   *
+   * `:not(.absolute)` excludes the per-section "create new page" button, which
+   * is the only other <button> inside the nav and is handled below.
+   */
+  aside.fixed nav a,
+  aside.fixed nav button:not(.absolute) {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    min-height: 3rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  /*
+   * The framework reserves `pr-10` (40px) on section toggles for the absolutely
+   * positioned add button. That button grows to a 44px target below, so the
+   * reserve has to grow with it or the title runs underneath it.
+   */
+  aside.fixed nav button:not(.absolute) {
+    padding-right: 3.5rem;
+  }
+
+  /* Emoji icons and the expand chevron, scaled with the text they sit beside. */
+  aside.fixed nav a > span.text-base,
+  aside.fixed nav button:not(.absolute) > span.text-base {
+    font-size: 1.25rem;
+  }
+
+  aside.fixed nav button:not(.absolute) > svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Add button: 16px icon + 2 x 14px padding = a 44px target. */
+  aside.fixed nav button.absolute {
+    padding: 0.875rem;
+  }
+}
+
+/* ===== Tablet / landscape phone: the header row does not fit ===== */
+/*
+ * Same visible symptom as the footer overflow above - a header that stops
+ * before the right edge of the page - but a different cause, and it lives in a
+ * band the phone-portrait fix does not reach: 768px to 1023px, which is a
+ * tablet in portrait AND any modern phone held in landscape (844, 852, 926).
+ *
+ * The framework switches the header's desktop nav on at `md` (768px) but keeps
+ * the sidebar hamburger until `lg` (1024px), so between those two breakpoints
+ * the bar carries both. Measured at 768x1024 the row wants 908px of a 736px
+ * content box - 172px of overflow - made up of:
+ *
+ *   left   hamburger 40 + logo/title 198 + nav 227   (two 24px gaps)
+ *   right  Data 81 + Search 159 + theme 36 + account 96
+ *
+ * Neither group can give way: they are flex items with the default
+ * `min-width: auto`, so the row overflows rather than shrinking, and the same
+ * shrink-to-fit zoom described above kicks in.
+ *
+ * What is removed below `lg` is only what is redundant there, which recovers
+ * ~267px and leaves ~95px of slack at the worst width:
+ *
+ *   - `nav > a` (115px). These are the `sidebar.pages` entries. Sidebar.jsx
+ *     already renders the same links wrapped in `lg:hidden`, so below `lg` they
+ *     are on screen twice; this deletes the duplicate, not the destination.
+ *   - The `md:inline` labels and shortcut hints (152px): "Data", "Search" and
+ *     the Search button's `Ctrl+K`. Both buttons keep their icon and their
+ *     `title`, and a keyboard hint is noise on a touch device anyway - which is
+ *     presumably why the Data button's own `Ctrl+Shift+B` hint is already
+ *     `lg:inline`. This aligns Search with the sibling it sits next to.
+ *
+ * The Tools dropdown is deliberately left visible even though the sidebar also
+ * carries a Tools category: FirstTimeTutorial anchors to that button by ref
+ * whenever the viewport is >= 768px, and a `display: none` anchor measures as a
+ * zero rect, which would park the popup off the top-left corner of the screen.
+ * Removing it needs the framework's `isMobile` breakpoint moved to match, so it
+ * is out of scope for a stylesheet.
+ */
+@media (max-width: 1023.98px) {
+  header.sticky nav > a {
+    display: none;
+  }
+
+  header.sticky .md\:inline {
+    display: none;
+  }
+}
