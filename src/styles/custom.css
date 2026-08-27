@@ -343,3 +343,74 @@ body::before {
 .page-viewer-container:fullscreen::before {
   background-image: url('/images/page-bg-lite.jpg');
 }
+
+/* ===== Header: full-bleed nav row ===== */
+/*
+ * The framework header wraps its row in `container mx-auto px-2 sm:px-4`. The
+ * sticky bar itself is `w-full`, but that inner container caps the row at the
+ * Tailwind breakpoint max-width, so on a wide screen the logo/nav group and the
+ * Data/Search/theme/account group get pulled inward with dead space outside
+ * each. Removing the cap lets the row's existing `justify-between` push the two
+ * groups out to the edges of the bar they already sit on: a flat `px-2 sm:px-4`
+ * inset at every width instead of half the leftover viewport.
+ *
+ * That inset is the container's, not the logo's. The left group is
+ * `flex items-center space-x-6`, which compiles to
+ * `.space-x-6>:not([hidden])~:not([hidden]){margin-left:1.5rem}` - and
+ * `:not([hidden])` tests the HTML `hidden` ATTRIBUTE, which the hamburger never
+ * sets; it hides itself with the `lg:hidden` CLASS. So `display: none` does not
+ * take the button out of the space-x sibling chain, and the logo keeps its 24px
+ * left margin at lg+ even though the button occupies no width. Net logo offset
+ * above `sm` is 16px + 24px = 40px, which deliberately does NOT line up with
+ * the sidebar's nav links at 16px - closing that gap would mean overriding a
+ * framework spacing utility, which is a separate decision from this one.
+ *
+ * Responsive behaviour, read off the project's compiled Tailwind (3.4.19, no
+ * `theme.container` or custom `screens` override) rather than assumed:
+ *   .container { width: 100% } + max-width 640/768/1024/1280/1536px at those
+ *   min-widths, and nothing below 640px.
+ * So on phones in portrait the row was already full-bleed and this rule is a
+ * no-op. It only widens the row from landscape phones up, and widening a
+ * `justify-between` flex row strictly adds horizontal room - no child can be
+ * squeezed or pushed into overflow. Preflight's `box-sizing: border-box` keeps
+ * `px-2 sm:px-4` inside the 100%, so the bar cannot exceed the viewport.
+ *
+ * Specificity here is (0,3,2) against the framework's (0,1,0), so this wins
+ * over every `.container` breakpoint rule regardless of source order.
+ * tests/custom-css-contract.test.js pins both couplings.
+ */
+header.sticky > div.container.mx-auto {
+  max-width: none;
+}
+
+/*
+ * Safe-area guard for the full-bleed row above.
+ *
+ * Padding the <header> rather than the inner container keeps the bar's
+ * background and bottom border running edge to edge while the content inset
+ * grows, and it stacks with the framework's `px-2 sm:px-4` instead of restating
+ * those values here (which would silently drift from the submodule).
+ *
+ * `index.html` ships `width=device-width, initial-scale=1.0` with no
+ * `viewport-fit=cover`, so every `env(safe-area-inset-*)` resolves to 0 and
+ * this rule is inert today - it is insurance, not a live fix. It is worth
+ * carrying because `site.webmanifest` is `display: standalone`: the moment
+ * anyone opts into an edge-to-edge viewport, a full-bleed header is the first
+ * thing a landscape notch or a rounded corner clips, and the container's auto
+ * margins are no longer there to absorb it. Browsers without env() support drop
+ * the declarations and fall back to the framework padding.
+ *
+ * Scope is deliberately just this bar - the one thing the rule above made
+ * full-bleed. An edge-to-edge viewport would also need the sidebar (`left-0`)
+ * and the page container insetting; this is not a site-wide safe-area story.
+ *
+ * Padding the header cannot disturb its positioned descendants, by rule rather
+ * than by enumeration: each one is either anchored to its own `relative`
+ * wrapper inside the row (Tools dropdown, UserMenu), so it travels with the
+ * group, or `position: fixed` with no transformed ancestor in its chain
+ * (SearchBar's overlay, FirstTimeTutorial), so it stays viewport-relative.
+ */
+header.sticky {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
