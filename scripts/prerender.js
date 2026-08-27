@@ -141,8 +141,9 @@ function stripRendererTokens(markdown) {
   // Preserve tokens inside fenced code blocks and inline code spans: pages
   // like meta/guidelines.md document the {{...}} syntax as code examples,
   // and stripping there would gut the documentation in the crawler view.
-  // split() with a capture group returns code segments at odd indices.
-  const parts = markdown.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]*`)/);
+  // Handles ``` / ~~~ fences plus ``...`` and `...` inline spans; split()
+  // with a capture group returns the code segments at odd indices.
+  const parts = markdown.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|``(?:(?!``)[^\n])*``|`[^`\n]*`)/);
   return parts
     .map((part, i) => (i % 2 === 1 ? part : part.replace(/\{\{[^{}]*\}\}/g, '')))
     .join('');
@@ -564,4 +565,5 @@ export {
   setTitle,
   setMetaContent,
   insertBeforeHeadClose,
+  buildArticleShell,
 };

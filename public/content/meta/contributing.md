@@ -63,7 +63,7 @@ The wiki supports GitHub-flavored Markdown:
 
 ## What Happens After You Submit
 
-Every edit - whether from a long-time contributor or a first-timer - becomes a pull request that a maintainer reviews before it goes live. Automated checks scan submissions for unsafe HTML and formatting problems, and a human confirms the change is accurate and fits the page. This usually happens within a day or two. If your edit needs adjustments, you'll get feedback on the pull request rather than a silent rejection, so check back after submitting.
+Every edit - whether from a long-time contributor or a first-timer - becomes a pull request that a maintainer reviews before it goes live. Automated checks scan submissions for unsafe HTML and formatting problems, and a human confirms the change is accurate and fits the page. This usually happens within a few days. If your edit needs adjustments, you'll get feedback on the pull request rather than a silent rejection, so check back after submitting.
 
 ## What the Wiki Needs Most
 
