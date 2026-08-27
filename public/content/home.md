@@ -1,8 +1,7 @@
 ---
 title: Slayer Legend Wiki
 description: Community wiki and guides for Slayer Legend Idle RPG (슬레이어 키우기) - progression guides, builds, equipment, skills, spirits, and free build-planning tools.
-# The {{home:hero}} in the body renders the title; without this flag the
-# PageViewer metadata header would show a second "Slayer Legend Wiki" above it.
+# {{home:hero}} renders the title - see the framework README frontmatter docs.
 hideHeader: true
 ---
 
