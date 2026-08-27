@@ -22,6 +22,20 @@ If this page loaded as plain text rather than the interactive viewer, your brows
 
 A spirit's evolution stage is tied to its development - as you upgrade a spirit through its tiers and levels, its appearance advances through the eight stages, growing from a small flickering creature into its fully realized form. The viewer shows all eight side by side, which makes it easy to see how far along your own spirits are and what the next milestone looks like. Sprite animations run at the game's native frame counts, so what you see here is exactly what you'll see in battle.
 
+# <span class="text-gray-900 dark:text-gray-100">Comparing Spirits: What Actually Matters</span>
+
+Looking at spirits is the fun part; choosing between them is the game. A few principles from the [Spirit Information](/spirits/information) data that make the comparison honest:
+
+**The effect's *condition* matters more than its number.** Every spirit carries exactly one skill, and the ranges look superficially similar - lots of "10-80%" entries. But an 80% chance to double gold (Todd), an 80% skill-damage boost against bosses only (Loar), and an 80% damage boost that only applies while the enemy is above 70% HP (Radon) are three completely different tools. Read the condition first, the percentage second. Radon is the classic example: his restriction sounds crippling until you're strong enough to one-shot monsters, at which point *every* hit lands above 70% and the condition effectively vanishes.
+
+**Slots are the real constraint.** Only equipped spirits do anything, and the full set of three equip slots costs a cumulative 15,000 Emeralds to unlock - the same Emeralds your [companion](/companions) passives are hungry for. Twelve spirits, three slots: you are not choosing which spirits are good, you're choosing which three rules apply to the content in front of you. That's why the community runs two standing lineups - an economy set (Todd, Luga, and killers like Zappy) for farming, and a boss set (Noah, Loar, Sala or Ark) for timed promotion fights - and swaps per content rather than settling on favorites.
+
+**Element ties into your companions.** Each companion's late-game kit boosts their own element's spirit stats, so a spirit's element is a small synergy consideration on top of its skill - Earth spirits get a push from [Zeke](/companions/zeke), Fire from [Miho](/companions/miho), and so on. Not a reason to pick a worse skill, but a nice thumb on the scale between close calls.
+
+# <span class="text-gray-900 dark:text-gray-100">Development Is a Long Game</span>
+
+The viewer's eight stages are also a progress bar for a genuinely long investment. Spirits climb tiers - Common, Great, Rare, Epic, Legendary - by combining three of the same tier into one of the next, and the upgrade track runs to level 400, fed by Enhance Cubes and Mana Crystals. Skill effects scale with that development (Todd's double-gold chance grows from 10% toward 80%, Ark's time freeze from 4 seconds toward 10), which is why a well-developed "lesser" spirit often beats a neglected meta pick. After the Ether promotion, spirit upgrades also feed your [skill mastery](/skills/skill-mastery) points, so none of the investment is a dead end. When you're planning where the cubes go, the [Spirits overview](/spirits) covers the mechanics and the [Spirit Builder](/spirit-builder) lets you sketch the lineup before you commit anything.
+
 # <span class="text-gray-900 dark:text-gray-100">Related Pages</span>
 
 - **[Spirits overview](/spirits)** - how tiers, combining, equip slots, and upgrades work.

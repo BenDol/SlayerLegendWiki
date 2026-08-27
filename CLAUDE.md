@@ -202,13 +202,13 @@ This ensures the best of both worlds: fresh content for users + SEO-friendly sta
 
 ### Conditional Deployments (GitHub Actions)
 
-When `dynamicPageLoading.enabled = true`, content-only commits automatically skip Cloudflare deployments to conserve build quota. This is handled by `.github/workflows/conditional-deploy.yml`.
+Deploys are triggered by `.github/workflows/conditional-deploy.yml`. **Since the build now prerenders crawler-visible HTML for every route (`scripts/prerender.js`), all pushes to main trigger a deploy** - a skipped build would leave crawlers seeing stale prerendered content while users get fresh content from GitHub (cloaking drift). The only way to skip is the explicit commit-message override.
 
 **Behavior:**
-- ✅ **Content-only commits** (`public/content/*.md` only) → No deploy (pages load from GitHub)
+- ✅ **Content-only commits** (`public/content/*.md` only) → Full deploy (keeps prerendered crawler HTML in sync)
 - ✅ **Code/config commits** → Full deploy triggered
 - ✅ **Submodule updates** (`wiki-framework` changes) → Full deploy triggered
-- ✅ **Dynamic loading disabled** → All commits deploy (backward compatible)
+- ✅ **`[skip-deploy]` / `[no-deploy]` in commit message** → No deploy (prerendered HTML stays stale until the next deploy)
 
 **Commit Message Overrides:**
 ```bash
@@ -232,15 +232,12 @@ git commit -m "Refactor [skip-deploy]"
 
 **With Dynamic Loading Enabled:**
 1. User edits markdown page via wiki editor
-2. Commit pushed to GitHub (no Cloudflare deploy triggered)
-3. Next page load fetches fresh content from GitHub API
+2. Commit pushed to GitHub (deploy hook fires - the build re-prerenders crawler HTML)
+3. Users see fresh content immediately via the GitHub API (no need to wait for the build)
 4. Content cached locally for 5 minutes
 5. Cache invalidated automatically on next edit
 
-**Cost Savings:**
-- Before: Every edit = 1 build (20 edits/day = 600 builds/month)
-- After: Only code changes = builds (typically 30-50/month)
-- Stays within Cloudflare Pages free tier (500 builds/month)
+**Build quota:** every push to main triggers a build (needed to keep `scripts/prerender.js` output in sync with content - see Conditional Deployments above). Use `[skip-deploy]` to batch several content commits into one build if quota pressure ever returns; the Cloudflare Pages free tier allows 500 builds/month.
 
 ### Cache Behavior
 

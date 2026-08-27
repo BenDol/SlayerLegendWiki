@@ -74,8 +74,15 @@ jobs:
               echo "deploy=true" >> $GITHUB_OUTPUT
               echo "✅ Non-content files changed - deploy needed"
             else
-              echo "deploy=false" >> $GITHUB_OUTPUT
-              echo "⏭️ Only content files changed - skipping deploy (pages load from GitHub)"
+              # NOTE: Content-only commits used to SKIP the deploy (users get fresh
+              # pages from GitHub via dynamic page loading). Crawler-visible HTML is
+              # now PRERENDERED at build time, so a skipped build would leave
+              # crawlers on stale content while users see fresh content (cloaking
+              # drift). Deploy on content-only commits too, so the prerendered
+              # crawler HTML stays in sync with the markdown. To skip a build
+              # manually, use [skip-deploy] or [no-deploy] in the commit message.
+              echo "deploy=true" >> $GITHUB_OUTPUT
+              echo "✅ Content-only change - deploying to refresh prerendered crawler HTML"
             fi
           else
             echo ""
@@ -103,5 +110,5 @@ jobs:
       - name: Skip Deploy (No-op)
         if: steps.check.outputs.deploy == 'false'
         run: |
-          echo "⏭️ Deploy skipped - no action needed"
-          echo "Pages will load fresh content from GitHub via dynamic page loading"
+          echo "⏭️ Deploy skipped via [skip-deploy]/[no-deploy] commit keyword"
+          echo "⚠️ Prerendered crawler HTML will be stale until the next deploy"
