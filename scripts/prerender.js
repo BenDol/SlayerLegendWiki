@@ -1,6 +1,9 @@
-#!/usr/bin/env node
 /**
  * Build-time prerenderer (AdSense acceptance plan - Phase 1)
+ *
+ * NOTE: no shebang line - vitest's module transform fails with a bare
+ * SyntaxError on a shebang followed by CRLF (Windows checkout), and the
+ * script is only ever invoked as `node scripts/prerender.js`.
  *
  * Emits real, crawler-readable HTML for every route so that a plain
  * (non-JS) fetch of any URL returns the article text, a unique <title>,
