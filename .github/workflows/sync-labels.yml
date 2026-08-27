@@ -24,6 +24,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          # PAT with read access to the private BenDol/GithubWiki submodule.
+          # actions/checkout copies it into the submodule git config; the default
+          # GITHUB_TOKEN is scoped to this repo alone and cannot read it.
+          token: ${{ secrets.FRAMEWORK_REPO_TOKEN || secrets.WIKI_BOT_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

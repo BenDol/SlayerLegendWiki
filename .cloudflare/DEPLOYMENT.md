@@ -1,29 +1,45 @@
 # Cloudflare Pages Deployment Configuration
 
-This guide explains how to deploy the Slayer Legend Wiki to Cloudflare Pages with automated testing.
+This guide explains how the Slayer Legend Wiki reaches Cloudflare Pages.
+
+> **Cloudflare does not build this project.** The `wiki-framework` submodule
+> (`BenDol/GithubWiki`) is private, and the Pages Git integration clones
+> submodules before any build command runs with no way to authenticate. The build
+> therefore happens in GitHub Actions and the artifact is shipped by Direct
+> Upload. See `.claude/cloudflare-pages-deployment.md` for the authoritative
+> guide - this file covers the Pages project side only.
 
 ## Build Configuration
 
-### Basic Settings
+### Project Settings
 
-In your Cloudflare Pages project settings, configure:
+The Pages project is a **Direct Upload** project, so it has no build command or
+output directory to configure. What it does need (Settings -> Runtime):
 
 ```yaml
-Build command: npm run build:cloudflare
-Build output directory: /dist
-Root directory: /
-Node version: 20
+Compatibility date: 2024-12-01
+Compatibility flags: nodejs_compat
+Production branch:   main
 ```
 
-### With Automated Testing
+`nodejs_compat` is required by `functions/_shared`. The deploy ships no Wrangler
+config, so these are not inherited from the repo.
 
-The `build:cloudflare` command automatically runs integration tests via the `prebuild:cloudflare` hook.
+### Where testing happens
+
+`.github/workflows/conditional-deploy.yml` runs `npm run build:cloudflare`, whose
+`prebuild:cloudflare` hook gates on `CF_PAGES_BRANCH`.
 
 **Build sequence:**
-1. `prebuild:cloudflare` → Runs integration tests (`npm run test:ci`)
+1. `prebuild:cloudflare` → runs `npm run test:ci` on `main`
+   (`test:framework` + `test:parent`; hermetic, no live API calls)
 2. Build fails if tests fail ❌
 3. If tests pass → continues to `build:cloudflare` ✅
-4. Vite builds the application
+4. Vite builds the application, then `scripts/prerender.js` runs
+5. `npx wrangler pages deploy dist` uploads `dist/` and `functions/`
+
+The live-API suite (`npm run test:integration`) is deliberately **not** part of
+this gate - see `.claude/cloudflare-pages-deployment.md`.
 
 ## Environment Variables
 
@@ -104,23 +120,12 @@ Integration tests run sequentially and take ~5-10 seconds:
 
 ### Disabling Tests
 
-If you want to deploy without running tests, you have two options:
+Add a skip marker to the commit message - `[skip tests]`, `[skip-tests]`,
+`[no tests]` or `[tests skip]`. `scripts/checkCommitForTests.js` picks it up and
+`prebuild:cloudflare` bypasses the suite for that deploy only.
 
-#### Option 1: Use Optional Tests
-Change the build command to:
-```bash
-npm run test:ci:optional && npm run build:cloudflare
-```
-
-This runs tests but continues even if they fail.
-
-#### Option 2: Skip Tests Entirely
-Change the build command to:
-```bash
-npm run build
-```
-
-This skips all tests and builds directly.
+To skip the deploy entirely, use `[skip-deploy]` or `[no-deploy]`. Note this
+leaves the prerendered crawler HTML stale until the next deploy.
 
 ## Local Testing Before Deploy
 
@@ -189,12 +194,12 @@ Cloudflare Pages automatically deploys:
 - **Production**: Pushes to `main` branch
 - **Preview**: Pull requests and other branches
 
-Each deployment:
-1. Clones the repository
-2. Installs dependencies (`npm install`)
-3. Runs integration tests (`npm run test:ci`)
-4. Builds the app (`npm run build:cloudflare`)
-5. Deploys to Cloudflare Pages
+Each deployment (in GitHub Actions, not on Cloudflare):
+1. Checks out the repo **and the private framework submodule** with a PAT
+2. Installs dependencies (`npm ci`)
+3. Runs the hermetic test suite (`npm run test:ci`)
+4. Builds the app (`npm run build:cloudflare`) and prerenders every route
+5. Uploads `dist/` + `functions/` with `npx wrangler pages deploy`
 
 ### Manual Deployments
 
