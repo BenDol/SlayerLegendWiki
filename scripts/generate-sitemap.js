@@ -104,27 +104,46 @@ function getSectionConfig(section) {
 }
 
 /**
- * Parse frontmatter to check if page should be indexed
+ * Normalize a frontmatter `date` value to sitemap lastmod format (YYYY-MM-DD).
+ * Handles the formats present in content frontmatter: YAML dates parsed to
+ * Date objects (`2026-08-16`, `2025-12-21T00:00:00.000Z`) and quoted strings
+ * (`'2026-08-26'`). Returns null for missing/invalid values - the <lastmod>
+ * tag is simply omitted then (it is optional per the sitemap protocol).
  */
-function shouldIndexPage(filePath) {
+function normalizeLastmod(value) {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString().split('T')[0];
+}
+
+/**
+ * Parse frontmatter once per page: whether to index it, and its lastmod.
+ *
+ * lastmod comes from the frontmatter `date`, NOT the file mtime: mtimes are
+ * checkout/clone times on CI and in fresh worktrees, which used to stamp
+ * every page "modified today" on every deploy. Google only uses lastmod
+ * when it's "consistently and verifiably accurate" and ignores it wholesale
+ * otherwise (no penalty - just a lost crawl-scheduling signal, which is the
+ * primary change signal since the sitemap ping endpoint was retired).
+ * Frontmatter dates are accurate and deterministic (same output in every
+ * environment), so the generated sitemap.xml also stops churning in git
+ * after unrelated builds.
+ */
+function getPageMeta(filePath) {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     const { data } = matter(content);
 
-    // Skip if explicitly marked as noindex
-    if (data.noindex === true || data.robots === 'noindex') {
-      return false;
-    }
+    const index =
+      data.noindex !== true &&
+      data.robots !== 'noindex' &&
+      data.draft !== true;
 
-    // Skip draft pages in production
-    if (data.draft === true) {
-      return false;
-    }
-
-    return true;
+    return { index, lastmod: normalizeLastmod(data.date) };
   } catch (error) {
     console.warn(`Warning: Could not parse ${filePath}:`, error.message);
-    return true; // Default to indexing if we can't parse
+    return { index: true, lastmod: null }; // Default to indexing if we can't parse
   }
 }
 
@@ -141,7 +160,10 @@ function generateSitemap() {
   STATIC_ROUTES.forEach(route => {
     urls.push({
       loc: `${SITE_URL}${route.url}`,
-      lastmod: new Date().toISOString().split('T')[0],
+      // No lastmod for app routes: a build-date stamp isn't a real content
+      // change and would erode Google's trust in the site's lastmod values;
+      // the element is optional, so omit it.
+      lastmod: null,
       changefreq: route.changefreq,
       priority: route.priority
     });
@@ -167,7 +189,8 @@ function generateSitemap() {
       return;
     }
 
-    if (!shouldIndexPage(file.fullPath)) {
+    const meta = getPageMeta(file.fullPath);
+    if (!meta.index) {
       console.log(`   ⏭️  Skipped: ${file.path} (noindex/draft)`);
       skipped++;
       return;
@@ -179,7 +202,7 @@ function generateSitemap() {
 
     urls.push({
       loc: `${SITE_URL}${url}`,
-      lastmod: file.modified.toISOString().split('T')[0],
+      lastmod: meta.lastmod,
       changefreq: config.changefreq,
       priority: config.priority
     });
@@ -200,8 +223,7 @@ function generateSitemap() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(url => `  <url>
     <loc>${url.loc}</loc>
-    <lastmod>${url.lastmod}</lastmod>
-    <changefreq>${url.changefreq}</changefreq>
+${url.lastmod ? `    <lastmod>${url.lastmod}</lastmod>\n` : ''}    <changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
   </url>`).join('\n')}
 </urlset>`;
@@ -216,10 +238,18 @@ ${urls.map(url => `  <url>
   console.log(`   Sitemap URL: ${SITE_URL}/sitemap.xml`);
 }
 
-// Run the generator
-try {
-  generateSitemap();
-} catch (error) {
-  console.error('❌ Error generating sitemap:', error);
-  process.exit(1);
+// Run only when executed directly (node scripts/generate-sitemap.js);
+// importing the module (e.g. from tests) must not regenerate the sitemap.
+const isDirectExecution =
+  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
+if (isDirectExecution) {
+  try {
+    generateSitemap();
+  } catch (error) {
+    console.error('❌ Error generating sitemap:', error);
+    process.exit(1);
+  }
 }
+
+// Pure helpers exported for unit tests.
+export { normalizeLastmod, pathToUrl };
