@@ -503,7 +503,11 @@ async function prerender() {
       html = injectIntoRoot(html, buildArticleShell({
         // Crawlers need an <h1> on the homepage; home.md's body has none
         // (the app's hero carries the visual title, and React replaces
-        // this prerendered shell on load anyway).
+        // this prerendered shell on load anyway). Deliberate divergence:
+        // home.md sets `hideHeader: true` to stop PageViewer stacking a
+        // second title above that hero, but the prerenderer ignores the
+        // flag - the crawler view has no hero component, so dropping the
+        // h1 here would leave the homepage headingless for Googlebot.
         title: SITE_TITLE,
         description: null,
         bodyHtml: page.bodyHtml,
