@@ -138,7 +138,14 @@ const markdownProcessor = unified()
  * client-side renderer registry and must not leak into crawler HTML.
  */
 function stripRendererTokens(markdown) {
-  return markdown.replace(/\{\{[^{}]*\}\}/g, '');
+  // Preserve tokens inside fenced code blocks and inline code spans: pages
+  // like meta/guidelines.md document the {{...}} syntax as code examples,
+  // and stripping there would gut the documentation in the crawler view.
+  // split() with a capture group returns code segments at odd indices.
+  const parts = markdown.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]*`)/);
+  return parts
+    .map((part, i) => (i % 2 === 1 ? part : part.replace(/\{\{[^{}]*\}\}/g, '')))
+    .join('');
 }
 
 async function renderMarkdown(markdown) {
@@ -493,7 +500,10 @@ async function prerender() {
       ];
       html = insertBeforeHeadClose(html, headParts.join('\n'));
       html = injectIntoRoot(html, buildArticleShell({
-        title: null, // template <h1> would duplicate the app's hero; body text carries the content
+        // Crawlers need an <h1> on the homepage; home.md's body has none
+        // (the app's hero carries the visual title, and React replaces
+        // this prerendered shell on load anyway).
+        title: SITE_TITLE,
         description: null,
         bodyHtml: page.bodyHtml,
       }));

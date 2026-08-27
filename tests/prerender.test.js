@@ -54,6 +54,16 @@ describe('stripRendererTokens', () => {
   it('leaves normal braces and text intact', () => {
     expect(stripRendererTokens('code { x: 1 } text')).toBe('code { x: 1 } text');
   });
+
+  it('preserves tokens inside fenced code blocks (documentation examples)', () => {
+    const md = 'Use tokens:\n```markdown\n{{data:spirits:1}}\n```\n{{AD:contentTop}} after';
+    expect(stripRendererTokens(md)).toBe('Use tokens:\n```markdown\n{{data:spirits:1}}\n```\n after');
+  });
+
+  it('preserves tokens inside inline code spans', () => {
+    expect(stripRendererTokens('Type `{{skill:Fire Slash}}` but not {{AD:inArticle}}'))
+      .toBe('Type `{{skill:Fire Slash}}` but not ');
+  });
 });
 
 describe('extractPlainText / truncateDescription', () => {
