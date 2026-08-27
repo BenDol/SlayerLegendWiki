@@ -150,8 +150,11 @@ cd wiki-framework && git pull origin main && cd ..
 git add wiki-framework && git commit -m "Update framework"
 
 # Tests & Deployment
-# Tests run automatically on production (main branch) Cloudflare deploys
-# Tests are skipped on preview deploys (other branches) for speed
+# The site is built in GitHub Actions and pushed to Cloudflare Pages via
+# Direct Upload (Cloudflare does NOT build this project - it cannot clone the
+# private wiki-framework submodule). See conditional-deploy.yml.
+# Tests run automatically on main-branch deploys
+# Tests are skipped on other branches for speed
 # To skip tests on main branch, use commit message markers:
 # [skip tests], [skip-tests], [no tests], [tests skip]
 git commit -m "Fix typo [skip tests]"
@@ -200,9 +203,11 @@ Enable in `wiki-config.json`:
 
 This ensures the best of both worlds: fresh content for users + SEO-friendly static pages for crawlers.
 
-### Conditional Deployments (GitHub Actions)
+### Deployments (GitHub Actions -> Cloudflare Direct Upload)
 
-Deploys are triggered by `.github/workflows/conditional-deploy.yml`. **Since the build now prerenders crawler-visible HTML for every route (`scripts/prerender.js`), all pushes to main trigger a deploy** - a skipped build would leave crawlers seeing stale prerendered content while users get fresh content from GitHub (cloaking drift). The only way to skip is the explicit commit-message override.
+`.github/workflows/conditional-deploy.yml` **builds and deploys** the site. Cloudflare does not build this project: `wiki-framework` (`BenDol/GithubWiki`) is a private submodule of this public repo, and Cloudflare Pages' Git integration clones submodules before any build command runs, with no way to authenticate a private one. GitHub Actions can, because `actions/checkout` copies its `token` input into the submodule git config. The finished `dist/` (plus `functions/`) is pushed with `wrangler pages deploy`.
+
+**Since the build prerenders crawler-visible HTML for every route (`scripts/prerender.js`), all pushes to main trigger a deploy** - a skipped build would leave crawlers seeing stale prerendered content while users get fresh content from GitHub (cloaking drift). The only way to skip is the explicit commit-message override.
 
 **Behavior:**
 - ✅ **Content-only commits** (`public/content/*.md` only) → Full deploy (keeps prerendered crawler HTML in sync)
@@ -220,24 +225,27 @@ git commit -m "Refactor [skip-deploy]"
 ```
 
 **Keywords:**
-- `[deploy-required]` or `[force-deploy]` - Force full deploy
 - `[skip-deploy]` or `[no-deploy]` - Skip deploy
+- `[deploy-required]` / `[force-deploy]` - accepted but now a no-op; every push to main deploys anyway
 
-**Setup Required:**
-1. Disable automatic Cloudflare deploys (Settings → Builds & deployments)
-2. Create deploy hook in Cloudflare Pages dashboard
-3. Add `CLOUDFLARE_DEPLOY_HOOK` secret to GitHub repo
+**Required secrets** (Settings → Secrets and variables → Actions):
+1. `FRAMEWORK_REPO_TOKEN` - PAT with read access to the private `BenDol/GithubWiki` (falls back to `WIKI_BOT_TOKEN`)
+2. `CLOUDFLARE_API_TOKEN` - token with **Cloudflare Pages: Edit**
+3. `CLOUDFLARE_ACCOUNT_ID`
+4. `RECAPTCHA_SITE_KEY` (and `PAYPAL_CLIENT_ID` if your Pages dashboard sets it) - Vite inlines `VITE_*` at build time, so dashboard-only values compile to `undefined`. See [Cloudflare Pages Deployment](.claude/cloudflare-pages-deployment.md)
+
+**`wrangler.toml` is local-dev only and the deploy step moves it aside.** `wrangler pages dev` rejects `--config`, so the file must keep that name at the repo root; but a root config present at deploy time becomes the source of truth and supersedes the Pages dashboard's runtime variables and secrets, breaking every Function. The deploy therefore runs `mv wrangler.toml wrangler.local.toml` first. Because no config ships, the Pages project itself must carry compatibility date `2024-12-01` and the `nodejs_compat` flag.
 
 ### How It Works
 
 **With Dynamic Loading Enabled:**
 1. User edits markdown page via wiki editor
-2. Commit pushed to GitHub (deploy hook fires - the build re-prerenders crawler HTML)
+2. Commit pushed to GitHub (the deploy workflow runs - the build re-prerenders crawler HTML)
 3. Users see fresh content immediately via the GitHub API (no need to wait for the build)
 4. Content cached locally for 5 minutes
 5. Cache invalidated automatically on next edit
 
-**Build quota:** every push to main triggers a build (needed to keep `scripts/prerender.js` output in sync with content - see Conditional Deployments above). Use `[skip-deploy]` to batch several content commits into one build if quota pressure ever returns; the Cloudflare Pages free tier allows 500 builds/month.
+**Build quota:** every push to main triggers a build (needed to keep `scripts/prerender.js` output in sync with content - see Deployments above). Builds now consume **GitHub Actions** minutes rather than the Cloudflare Pages free tier's 500 builds/month. Use `[skip-deploy]` to batch several content commits into one build if quota pressure returns.
 
 ### Cache Behavior
 

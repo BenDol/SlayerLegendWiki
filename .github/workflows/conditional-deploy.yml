@@ -1,114 +1,135 @@
-name: Conditional Cloudflare Deploy
+name: Build and Deploy to Cloudflare Pages
+
+# The wiki repo is public, but the `wiki-framework` submodule (BenDol/GithubWiki)
+# is private. Cloudflare Pages' Git integration clones submodules itself, before
+# any build command of ours runs, and offers no way to authenticate against a
+# private one. So the build happens here - where actions/checkout can authenticate
+# the submodule with a PAT - and the finished `dist/` is pushed to Pages via
+# Direct Upload instead of a deploy hook.
+#
+# See .claude/cloudflare-pages-deployment.md for the required secrets.
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CF_PAGES_PROJECT: slayer-legend-wiki
 
 jobs:
-  check-and-deploy:
+  build-and-deploy:
+    name: Build and deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out wiki and private framework submodule
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # Need at least 2 commits to compare
+          submodules: recursive
+          fetch-depth: 2 # prebuild scripts read the last commit message
+          # actions/checkout copies this token into each submodule's git config,
+          # which is what lets the private framework clone succeed. The default
+          # GITHUB_TOKEN is scoped to this repo alone and cannot read GithubWiki.
+          token: ${{ secrets.FRAMEWORK_REPO_TOKEN || secrets.WIKI_BOT_TOKEN }}
 
-      - name: Check if deploy is needed
+      - name: Check commit message for deploy skip markers
         id: check
         run: |
-          echo "=== Conditional Deploy Check ==="
-
-          # Get commit message
           COMMIT_MSG=$(git log -1 --pretty=%B)
           echo "Commit message: $COMMIT_MSG"
 
-          # Check for explicit deploy control keywords
-          if echo "$COMMIT_MSG" | grep -qiE '\[(deploy-required|force-deploy)\]'; then
-            echo "deploy=true" >> $GITHUB_OUTPUT
-            echo "✅ [deploy-required] keyword found - forcing deploy"
-            exit 0
-          fi
-
+          # Every push to main deploys, so that the prerendered crawler HTML
+          # produced by scripts/prerender.js stays in sync with the markdown.
+          # [skip-deploy] / [no-deploy] is the only way out, and it leaves that
+          # prerendered HTML stale until the next deploy.
           if echo "$COMMIT_MSG" | grep -qiE '\[(skip-deploy|no-deploy)\]'; then
             echo "deploy=false" >> $GITHUB_OUTPUT
-            echo "⏭️ [skip-deploy] keyword found - skipping deploy"
-            exit 0
-          fi
-
-          # Check if dynamic page loading is enabled in config
-          if [ -f "wiki-config.json" ]; then
-            DYNAMIC_ENABLED=$(node -pe "try { JSON.parse(require('fs').readFileSync('wiki-config.json', 'utf8')).features.dynamicPageLoading.enabled } catch(e) { false }")
-            echo "Dynamic page loading enabled: $DYNAMIC_ENABLED"
+            echo "Deploy skipped via commit keyword - prerendered crawler HTML will be stale."
           else
-            DYNAMIC_ENABLED="false"
-            echo "⚠️ wiki-config.json not found, assuming dynamic loading disabled"
-          fi
-
-          # Get changed files in last commit
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
-          echo ""
-          echo "Changed files:"
-          echo "$CHANGED_FILES"
-          echo ""
-
-          # Check if ANY non-content files changed
-          # This includes: code, config, submodules, assets, etc.
-          # Only markdown files in public/content/ are considered "content-only"
-          NON_CONTENT_CHANGED=false
-          if echo "$CHANGED_FILES" | grep -v '^public/content/.*\.md$' | grep -q .; then
-            NON_CONTENT_CHANGED=true
-
-            # Log what triggered the deploy (for debugging)
-            if echo "$CHANGED_FILES" | grep -q '^wiki-framework$'; then
-              echo "📦 Submodule change detected (wiki-framework)"
-            fi
-          fi
-
-          echo "Non-content files changed: $NON_CONTENT_CHANGED"
-
-          # Decision logic based on dynamic loading setting
-          if [ "$DYNAMIC_ENABLED" = "true" ]; then
-            echo ""
-            echo "🔄 Dynamic page loading is ENABLED"
-            if [ "$NON_CONTENT_CHANGED" = "true" ]; then
-              echo "deploy=true" >> $GITHUB_OUTPUT
-              echo "✅ Non-content files changed - deploy needed"
-            else
-              # NOTE: Content-only commits used to SKIP the deploy (users get fresh
-              # pages from GitHub via dynamic page loading). Crawler-visible HTML is
-              # now PRERENDERED at build time, so a skipped build would leave
-              # crawlers on stale content while users see fresh content (cloaking
-              # drift). Deploy on content-only commits too, so the prerendered
-              # crawler HTML stays in sync with the markdown. To skip a build
-              # manually, use [skip-deploy] or [no-deploy] in the commit message.
-              echo "deploy=true" >> $GITHUB_OUTPUT
-              echo "✅ Content-only change - deploying to refresh prerendered crawler HTML"
-            fi
-          else
-            echo ""
-            echo "📦 Dynamic page loading is DISABLED"
             echo "deploy=true" >> $GITHUB_OUTPUT
-            echo "✅ All changes require deploy - deploying"
           fi
 
-      - name: Trigger Cloudflare Deploy
+      - name: Verify framework submodule is populated
         if: steps.check.outputs.deploy == 'true'
         run: |
-          echo "🚀 Triggering Cloudflare Pages deploy..."
-          RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}")
-          echo "Response: $RESPONSE"
-
-          # Check if deploy was triggered successfully (flexible grep for JSON formatting)
-          if echo "$RESPONSE" | grep -q '"success"[[:space:]]*:[[:space:]]*true'; then
-            echo "✅ Deploy triggered successfully"
-          else
-            echo "❌ Deploy trigger failed"
-            echo "Expected success:true in response"
+          if [ ! -f wiki-framework/package.json ]; then
+            echo "::error::wiki-framework is empty - the checkout token cannot read BenDol/GithubWiki."
+            echo "Add a FRAMEWORK_REPO_TOKEN secret holding a PAT with read access to the private framework repo."
             exit 1
           fi
+          echo "Framework at $(git -C wiki-framework rev-parse --short HEAD)"
 
-      - name: Skip Deploy (No-op)
-        if: steps.check.outputs.deploy == 'false'
+      - name: Set up Node.js
+        if: steps.check.outputs.deploy == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.check.outputs.deploy == 'true'
+        run: npm ci
+
+      - name: Build site
+        if: steps.check.outputs.deploy == 'true'
+        run: npm run build:cloudflare
+        env:
+          # scripts/cloudflare-prebuild.cjs branches on this: "main" runs the
+          # test suite (unless the commit carries a [skip tests] marker).
+          CF_PAGES_BRANCH: ${{ github.ref_name }}
+          VITE_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          VITE_WIKI_REPO_OWNER: ${{ github.repository_owner }}
+          VITE_WIKI_REPO_NAME: ${{ github.event.repository.name }}
+          VITE_WIKI_BOT_USERNAME: ${{ secrets.WIKI_BOT_USERNAME }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
+          VITE_PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+          VITE_RELEASE_DATE: ${{ vars.VITE_RELEASE_DATE }}
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.check.outputs.deploy == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Indirected through env so a branch name can never break out of the
+          # shell command (${{ }} interpolates before the shell sees it).
+          DEPLOY_BRANCH: ${{ github.ref_name }}
+          DEPLOY_SHA: ${{ github.sha }}
         run: |
-          echo "⏭️ Deploy skipped via [skip-deploy]/[no-deploy] commit keyword"
-          echo "⚠️ Prerendered crawler HTML will be stale until the next deploy"
+          # wrangler.toml is the LOCAL DEV config. If a root config is present at
+          # deploy time it becomes the source of truth and the Pages dashboard's
+          # runtime vars and secrets stop applying - which would break every
+          # Function, since this repo is public and cannot hold those secrets.
+          mv wrangler.toml wrangler.local.toml
+
+          # npx uses the wrangler pinned in package.json (installed by npm ci),
+          # so CI deploys with the same version local dev and preview use.
+          # `functions/` is picked up from the working directory automatically.
+          npx wrangler pages deploy dist \
+            --project-name="$CF_PAGES_PROJECT" \
+            --branch="$DEPLOY_BRANCH" \
+            --commit-hash="$DEPLOY_SHA"
+
+      - name: Summary
+        if: always()
+        env:
+          DEPLOY_DECISION: ${{ steps.check.outputs.deploy }}
+          JOB_STATUS: ${{ job.status }}
+          DEPLOY_SHA: ${{ github.sha }}
+          DEPLOY_BRANCH: ${{ github.ref_name }}
+        run: |
+          if [ "$DEPLOY_DECISION" = "false" ]; then
+            echo "Deploy skipped via [skip-deploy]/[no-deploy]. Prerendered crawler HTML is now stale." >> $GITHUB_STEP_SUMMARY
+          elif [ "$JOB_STATUS" = "success" ]; then
+            echo "Deployed $DEPLOY_SHA to Cloudflare Pages project $CF_PAGES_PROJECT (branch $DEPLOY_BRANCH)." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Deploy FAILED for $DEPLOY_SHA - see the failing step above. Nothing was published." >> $GITHUB_STEP_SUMMARY
+          fi

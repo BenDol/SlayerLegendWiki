@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig, configDefaults } from 'vitest/config';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -28,6 +28,11 @@ export default defineConfig({
       statements: 100
     },
     include: ['tests/**/*.test.js'],
+    // tests/integration/** calls live SendGrid/OpenAI/GitHub APIs and throws
+    // in beforeAll() without real credentials, so it is not part of the
+    // default run or the deploy gate. Run it deliberately with
+    // `npm run test:integration`.
+    exclude: [...configDefaults.exclude, 'tests/integration/**'],
     setupFiles: ['./tests/setup.js'],
     testTimeout: 30000,
     hookTimeout: 30000
