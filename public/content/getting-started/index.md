@@ -13,6 +13,14 @@ Slayer Legend is a pixel-art idle RPG by GEAR2 where you grow a single sword-swi
 
 If you only read one thing here, read the roadmap. The early game is forgiving, but a few early habits (like where your diamonds go) pay off for months.
 
+# <span class="text-gray-900 dark:text-gray-100">Your First Week, Roughly</span>
+
+**Day one** is about setup and rhythm. Install, and [link your account](/getting-started/installation) before anything else - it costs a minute and protects everything after it. Then follow the guide quests: they chain you through each system as it unlocks and pay out diamonds along the way. Your only real decisions are automatic ones - gold into ATK, every new skill equipped, the Auto skill toggle on. Don't hoard gold; its value only falls as costs scale, so spend it the moment it lands.
+
+**The first few days** bring your first [promotions](/character/promotions) - Bronze is recommended around level 50, Iron around 90 - and each one permanently multiplies your ATK and HP. Take them the moment they're winnable; a promotion you're sitting on is free power going unused. If a promotion boss beats you, that's normal: level ATK a bit, check your HP isn't hopeless, come back. Somewhere in this stretch you'll also start banking diamonds, and here's the one piece of advice worth tattooing somewhere: **weapon summons first.** Not relics, not cosmetics. The [roadmap](/getting-started/early-game-roadmap) explains the reasoning, but the short version is that weapon summons pay out across your entire account and everything else is a worse rate.
+
+**By the end of the week** (faster or slower depending on how much you check in - it's an idle game, there's no falling behind) the habit loop should be forming: claim login rewards, run the free ad buffs during a farming session rather than idly, push stages until they stop being instant, park one or two below the wall before logging off so idle rewards accrue at height. Milestones like the [Class unlock](/character/class) (stage 120 and level 250) and eventually the [Training Diary](/character/training-diary) (level 400) arrive on their own schedule; you don't need to rush them, just recognize them when they land. The players who do well at this game aren't the ones grinding hardest in week one - they're the ones whose five-minute daily routine survived into week twenty.
+
 # <span class="text-gray-900 dark:text-gray-100">Pages in this Section</span>
 
 - **[Installation](/getting-started/installation)** - where to get the game (Android, iOS, PC via emulator), and why you should link your account before doing anything else.

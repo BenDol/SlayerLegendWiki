@@ -125,6 +125,7 @@ This site is supported by advertising through **Google AdSense**. As required by
 
 - Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites.
 - Google's use of advertising cookies enables it and its partners to serve ads to you based on your visit to this site and/or other sites on the internet.
+- For a full explanation of what data Google collects on partner sites like this one and how it is used, see [How Google uses data when you use our partners' sites or apps](https://policies.google.com/technologies/partner-sites).
 - You may opt out of personalised advertising by visiting [Google Ads Settings](https://www.google.com/settings/ads).
 - You can opt out of a third-party vendor's use of cookies for personalised advertising at [aboutads.info/choices](http://www.aboutads.info/choices/).
 

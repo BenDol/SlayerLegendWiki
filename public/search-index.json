@@ -2,7 +2,7 @@
   {
     "id": "andy/overview-introduction",
     "title": "Overview & Introduction",
-    "description": "This section offers a brief overview of the progression guide and includes a table of contents to support navigation through the remaining sections.",
+    "description": "Introduction to Andy's Slayer Legend progression guide - who it is for, the F2P-efficiency philosophy behind it, how to use it, and the full table of contents.",
     "content": "OVERVIEW Hello! Welcome to the Slayer Legend guide created by me (Andy). This guide is designed to break down how to progress efficiently in the game as a F2P player or a light spender (definitely not 🐳 status). While there are surely extreme min-max strategies out there, everything here comes from my own experience with characters on both Server 1 and Server 2. I’ve been playing Slayer Legend for about three years now, so I’d like to think I have a solid grasp of how things work. So without fu",
     "section": "andy",
     "sectionTitle": "Andy",
@@ -110,7 +110,7 @@
   {
     "id": "character/training-diary",
     "title": "Training Diary",
-    "description": "A brief overview of the training diary system.",
+    "description": "The Training Diary in Slayer Legend - daily sessions with Sepir, Over Points, raised stat caps, how to prioritize, and the mistakes that cost you progress.",
     "content": "<span class=\"text-gray-900 dark:text-gray-100\">Training Diary Overview</span> This content unlocks when your character reaches level 400 and allows you to gain additional growth points to level up your stats. This is done by obtaining<img src=\"/images/content/items/uiitemExpOverPoint1.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;\" data-inline=\"true\" /><span class=\"text-purple-600 dark:text-purple-400\">Over Poi",
     "section": "character",
     "sectionTitle": "Character",
@@ -238,8 +238,8 @@
   {
     "id": "companions/promotion-option",
     "title": "Promotion Option",
-    "description": "The player can use dice to produce random companion promotion options",
-    "content": "Recommended Rolls Typically the player will benefit from having companions with full pages of max roll for attack. If the player is lacking mana recovery (ie. running out of mana when using fulg) it would help to add one or two rolls of mana recovery. Options Extra ATK(%) : <span class=\"text-gray-400 dark:text-gray-400\">3</span> / <span class=\"text-green-600 dark:text-green-400\">4</span> / <span class=\"text-orange-600 dark:text-orange-400\">6</span> / <span class=\"text-purple-600 dark:text-purple",
+    "description": "How companion promotion options work in Slayer Legend - the dice system, every option's value tiers and probabilities, page multipliers, and the Ether max-roll unlock.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Promotion Options Overview</span> Promotion options are the dice-rolled half of companion power. Where enhancement levels what a companion does, promotion options are randomized stat lines - Extra ATK, crit damage, mana recovery, and so on - rolled onto each companion's option slots using<img src=\"/images/content/goods/GoodsDice1.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: ",
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "promotion-option",
@@ -561,6 +561,42 @@
     "category": "Guides",
     "date": "2026-08-16T00:00:00.000Z",
     "order": 0
+  },
+  {
+    "id": "meta/about",
+    "title": "About",
+    "description": "Who runs the Slayer Legend Wiki, where the data comes from, and how pages are reviewed and kept current.",
+    "content": "About This Wiki The Slayer Legend Wiki is a community-maintained reference and guide site for Slayer Legend: Idle RPG (슬레이어 키우기), GEAR2's idle action RPG for Android and iOS. The game runs deep and explains almost none of it - promotion stat gains, engraving mechanics, soul weapon souls, what actually deserves your gold in the first week. Players kept re-answering the same questions in chat, over and over. This site is where those answers get written down once, properly, and kept current. Who ru",
+    "section": "meta",
+    "sectionTitle": "Meta",
+    "pageId": "about",
+    "url": "/meta/about",
+    "tags": [
+      "meta",
+      "about",
+      "community"
+    ],
+    "category": "Meta",
+    "date": "2026-08-26",
+    "order": 1
+  },
+  {
+    "id": "meta/contact",
+    "title": "Contact",
+    "description": "How to reach the Slayer Legend Wiki maintainers - corrections, tool bugs, content concerns and contributions.",
+    "content": "Contact The wiki is maintained by players, and the channels below reach us directly. Pick whichever fits - there's no contact form here on purpose, since plain links work on every device and nothing gets lost in a form backend. Discord - fastest Join the community server: discord.gg/slayerlegendsna2 Maintainers and experienced players are active daily. Best for quick corrections (\"this table says X, the game shows Y\"), questions a page didn't answer, and anything you want a fast reply on. Most m",
+    "section": "meta",
+    "sectionTitle": "Meta",
+    "pageId": "contact",
+    "url": "/meta/contact",
+    "tags": [
+      "meta",
+      "contact",
+      "community"
+    ],
+    "category": "Meta",
+    "date": "2026-08-26",
+    "order": 2
   },
   {
     "id": "meta/contributing",

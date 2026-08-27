@@ -16,6 +16,14 @@
     },
     "footerLinks": [
       {
+        "title": "About",
+        "path": "/meta/about"
+      },
+      {
+        "title": "Contact",
+        "path": "/meta/contact"
+      },
+      {
         "title": "Privacy Policy",
         "path": "/meta/privacy-policy"
       }
