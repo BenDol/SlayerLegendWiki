@@ -1,7 +1,7 @@
 ---
 id: promotions
 title: Promotions
-description: A brief overview of the available character promotions and the stat boosts they grant upon completion.
+description: Every character promotion from Stone to Eldenwood with the ATK/HP multipliers each grants, plus advice on when to promote and why the boosts matter.
 tags:
   - character
   - promotion
@@ -11,6 +11,14 @@ date: 2025-12-21T00:00:00.000Z
 order: 0
 ---
 # <span class="text-gray-900 dark:text-gray-100">Promotion Overview</span>
+Promotions are the backbone of your slayer's raw power. Each one is cleared by beating its promotion battle, and each grants a permanent multiplier to your ATK and HP - starting at a modest x2 at Bronze and compounding all the way to x42,000,000 at Eldenwood. Because the multipliers apply to everything else you build (stats, equipment, class bonuses), clearing your next promotion is almost always worth more than any other single upgrade available at the same time.
+
+A few things worth knowing before you look at the table:
+
+- **Promotions gate other systems.** Several later mechanics key off your promotion rank rather than your level - most notably, [awakened latent power](/character/latent-power) unlocks once you achieve the **Dragonos** promotion, and [skill mastery](/skills/skill-mastery) opens after clearing **Ether**. That's why mid-game guides treat those ranks as milestones rather than just rows in this table.
+- **The jumps get dramatic.** From Ether onward each rank roughly doubles your multiplier, all the way to Eldenwood's x42,000,000. If a stage wall feels immovable, check whether a promotion battle is available before sinking more gold into incremental stat boosts - a stalled "comfortable stage" is nearly always a promotion you haven't taken yet.
+- **Promotion battles are timed boss fights**, so raw damage output matters more than survivability - this is exactly what the boss-focused spirit lineups on the [Spirit Information](/spirits/information) page are built for. If a battle refuses to go down, the [progression overview](/progression) has a diagnosis order for finding which system is lagging.
+
 Here are the current promotions and the boosts they provide upon completion.
 
 

@@ -1,7 +1,7 @@
 ---
 id: skills
-title: Skills
-description: A brief overview of the skill system.
+title: Skill List
+description: Every skill grade in Slayer Legend from Common through Immortal, with what each tier brings and how it fits into your build.
 tags:
   - skills
 category: Skills

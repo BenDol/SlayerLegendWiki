@@ -10,6 +10,7 @@ import {
   setTitle,
   setMetaContent,
   insertBeforeHeadClose,
+  buildArticleShell,
 } from '../scripts/prerender.js';
 
 describe('pathToRoute', () => {
@@ -53,6 +54,38 @@ describe('stripRendererTokens', () => {
 
   it('leaves normal braces and text intact', () => {
     expect(stripRendererTokens('code { x: 1 } text')).toBe('code { x: 1 } text');
+  });
+
+  it('preserves tokens inside fenced code blocks (documentation examples)', () => {
+    const md = 'Use tokens:\n```markdown\n{{data:spirits:1}}\n```\n{{AD:contentTop}} after';
+    expect(stripRendererTokens(md)).toBe('Use tokens:\n```markdown\n{{data:spirits:1}}\n```\n after');
+  });
+
+  it('preserves tokens inside inline code spans', () => {
+    expect(stripRendererTokens('Type `{{skill:Fire Slash}}` but not {{AD:inArticle}}'))
+      .toBe('Type `{{skill:Fire Slash}}` but not ');
+  });
+
+  it('preserves tokens inside double-backtick code spans', () => {
+    expect(stripRendererTokens('Quote ``{{data:spirits:1}}`` but not {{AD:inArticle}}'))
+      .toBe('Quote ``{{data:spirits:1}}`` but not ');
+  });
+});
+
+describe('buildArticleShell', () => {
+  it('adds an <h1> when a title is given and the body has none', () => {
+    const shell = buildArticleShell({ title: 'Slayer Legend Wiki', description: null, bodyHtml: '<p>intro</p>' });
+    expect(shell).toContain('<h1>Slayer Legend Wiki</h1>');
+    expect(shell).toContain('<p>intro</p>');
+  });
+
+  it('does not duplicate the h1 when the body already opens with it', () => {
+    const shell = buildArticleShell({
+      title: 'Leveling Guide',
+      description: null,
+      bodyHtml: '<h1 id="x"><span>Leveling Guide</span></h1><p>body</p>',
+    });
+    expect(shell.match(/<h1/g)).toHaveLength(1);
   });
 });
 

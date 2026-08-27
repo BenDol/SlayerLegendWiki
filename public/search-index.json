@@ -73,8 +73,8 @@
   {
     "id": "character/promotions",
     "title": "Promotions",
-    "description": "A brief overview of the available character promotions and the stat boosts they grant upon completion.",
-    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Promotion Overview</span> Here are the current promotions and the boosts they provide upon completion. | <span class=\"text-gray-900 dark:text-gray-100\">PROMOTION</span> | <span class=\"text-gray-900 dark:text-gray-100\">BOOST</span> |----------|----------| | <span class=\"text-gray-600 dark:text-gray-400\">STONE </span><img src=\"/images/content/promotions/0-stone.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width",
+    "description": "Every character promotion from Stone to Eldenwood with the ATK/HP multipliers each grants, plus advice on when to promote and why the boosts matter.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Promotion Overview</span> Promotions are the backbone of your slayer's raw power. Each one is cleared by beating its promotion battle, and each grants a permanent multiplier to your ATK and HP - starting at a modest x2 at Bronze and compounding all the way to x42,000,000 at Eldenwood. Because the multipliers apply to everything else you build (stats, equipment, class bonuses), clearing your next promotion is almost always worth more than any other s",
     "section": "character",
     "sectionTitle": "Character",
     "pageId": "promotions",
@@ -841,8 +841,8 @@
   },
   {
     "id": "skills/skills",
-    "title": "Skills",
-    "description": "A brief overview of the skill system.",
+    "title": "Skill List",
+    "description": "Every skill grade in Slayer Legend from Common through Immortal, with what each tier brings and how it fits into your build.",
     "content": "<span class=\"text-gray-900 dark:text-gray-100\">Skills Overview</span> Aside from your normal attacks, there are skills that deal more damage or help amplify combat and non-combat stats. <span class=\"text-gray-900 dark:text-gray-100\">Common Skills</span> Your starting toolkit, unlocking within the first few character levels: the four elemental attacks (Fire Slash, Ice Stone, Lightning Slash, Stone Strike) plus the first buffs - Fire Sword for ATK, Mana's Blessing for mana recovery, and Ground's B",
     "section": "skills",
     "sectionTitle": "Skills",
