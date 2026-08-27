@@ -260,3 +260,86 @@ li {
   margin-top: 0.2375rem !important; /* Reduced from ~0.25rem (5% reduction) */
   margin-bottom: 0.2375rem !important; /* Reduced from ~0.25rem (5% reduction) */
 }
+
+/* ===== Core Web Vitals: mobile layout stability (CLS) ===== */
+/*
+ * Search Console reported CLS > 0.25 on mobile for the site root. Measured on
+ * the live site at 412x915 with 4x CPU throttling, the largest session window
+ * was 0.354, made up of:
+ *
+ *   0.2022  <footer> shoved from y=730 down to y=6226 when content arrived
+ *   0.0821  first-visit tutorial popup jumping from (0,0) to its anchor
+ *   0.0694  <footer> first appearing at y=730, inside the viewport
+ *   0.0018  header title block reflowing (noise, left alone)
+ *
+ * The two rules below take that to 0.0018. Both target framework markup from
+ * here rather than editing the submodule, the same way the logo smoke effect
+ * above does.
+ */
+
+/*
+ * Keep the footer out of the first viewport at all times.
+ *
+ * The layout root is `min-h-screen` and the content container is `flex-1`, so
+ * while a page is loading (its placeholder reserves only 400px) the footer is
+ * parked exactly at the bottom edge of the viewport - visible. When the real
+ * content lands the footer is pushed a full viewport down; the CLS distance
+ * fraction pins at its 1.0 maximum and that single shift scores ~0.20.
+ *
+ * Giving the container a full viewport of min-height moves the footer just
+ * below the fold, where a shift has an impact fraction of zero. This has to be
+ * unconditional rather than only on the loading placeholder: reserving space
+ * *only* while loading makes short pages worse, because the footer then drops
+ * below the fold and jumps back up when content shorter than the reserve
+ * arrives (measured on /spirits: 0.047 -> 0.185). An always-on floor keeps the
+ * footer at the same offset in both states, so neither transition shifts.
+ *
+ * Cost is that pages shorter than a viewport need one small scroll to reach the
+ * footer. Scoped to the normal layout's content container, so the maintenance
+ * layout and any `min-h-[400px]` inside builder modals are untouched.
+ */
+main > div.container.py-8 {
+  min-height: 100vh;
+}
+
+/*
+ * FirstTimeTutorial renders its `position: fixed` popup at top:0/left:0 and
+ * hides it with `opacity: 0` until it has measured its anchor element. Its
+ * keyframes correctly animate `transform`, but opacity:0 elements still count
+ * for layout shift, so the jump to the measured position scores ~0.08.
+ * `visibility: hidden` is excluded from layout shift entirely, and the inline
+ * opacity:0 the component sets is a reliable signal that it has no position yet.
+ *
+ * Constraint: this is a substring match, so it also matches `opacity: 0.5` and
+ * friends. That is safe only because the component emits exactly 0 or 1. Do not
+ * give this popup a fractional fade without changing the selector first, or it
+ * becomes permanently invisible. tests/custom-css-contract.test.js pins the
+ * component side of that assumption.
+ */
+.tutorial-slide-in[style*='opacity: 0'],
+.tutorial-slide-out[style*='opacity: 0'] {
+  visibility: hidden;
+}
+
+/* ===== Core Web Vitals: decorative background payload ===== */
+/*
+ * /images/page-bg.jpg is 3.94 MB (2752x1536) and is painted at 2-6% opacity
+ * behind every page. On a throttled mobile connection it holds the connection
+ * for ~4.8s, delaying wiki-config.json, the lazy route chunks and the page
+ * content queued behind it - which is also what stretches the CLS window above.
+ *
+ * page-bg-lite.jpg is the same image at 1600px wide and 125 KB (32x smaller).
+ * At these opacities the two are indistinguishable. The original file is left
+ * in place: browsers only fetch the background-image of the winning
+ * declaration, so overriding it here means the 3.94 MB file is never requested,
+ * and reverting is a one-line change.
+ */
+/* Kept as two rules, not one selector list: a browser that does not recognise
+   :fullscreen would discard the whole list and silently pull the 3.94 MB file. */
+body::before {
+  background-image: url('/images/page-bg-lite.jpg');
+}
+
+.page-viewer-container:fullscreen::before {
+  background-image: url('/images/page-bg-lite.jpg');
+}
