@@ -323,6 +323,20 @@ Parent Project (this repo)       Framework Submodule
 2. Register in `main.jsx` if needed for markdown rendering
 3. Use Content Renderer Registry pattern (see `main.jsx` for examples)
 
+### Updating the Stage Pages
+
+**The stage block pages under `public/content/stages/stages-*.md` are GENERATED. Do not hand-edit them** - each carries `generated: true` in its frontmatter and the next regeneration overwrites any manual change. Their prose lives in `scripts/stage-pages.config.json`.
+
+```bash
+npm run extract:stage-atlas   # refresh region/area/zone names from an unpacked client
+npm run build:stage-pages     # regenerate the 8 block pages
+npm run build:search          # always follow a content change
+```
+
+- `extract:stage-atlas` reads the game client's own localization table out of an unpacked APK under `external/` (gitignored, so this is an offline maintenance step) and rewrites `public/data/stage-chapters.json` plus the name fields of `public/data/stages.json`. It exits cleanly with a notice when the assets are absent. Pass `--assets=<dir>` to point at a client outside this checkout, and `--dry-run` to preview.
+- `build:stage-pages` refuses to write anything unless the configured blocks tile the whole named road, and preserves each page's existing `date:` when the regenerated content is identical - the sitemap's `lastmod` comes from that field.
+- The per-stage numbers themselves come from a community datamined spreadsheet whose figures stop being genuine past `lastVerifiedStage` (recorded in `stage-chapters.json`); rows beyond it are flagged `statsVerified: false` and are not tabulated.
+
 ### Modifying Framework
 **DO NOT** edit `wiki-framework/` directly. Instead:
 1. Check if registries can solve your need

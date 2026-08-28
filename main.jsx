@@ -455,6 +455,39 @@ dataRegistry.register('drop-tables', {
   type: 'object'
 });
 
+dataRegistry.register('stages', {
+  file: '/data/stages.json',
+  label: 'Stages',
+  idField: 'stageNo',
+  display: {
+    primary: 'stageNo',
+    secondary: ['region', 'area', 'zone'],
+    badges: ['region']
+  },
+  dataPath: null,
+  searchFields: ['stageNo', 'region', 'area', 'zone', 'equipmentRarity'],
+  icon: '🗺️',
+  description: 'Per-stage enemy, boss and reward data for the main stage road',
+  type: 'array'
+});
+
+dataRegistry.register('stage-chapters', {
+  file: '/data/stage-chapters.json',
+  label: 'Stage Chapters',
+  idField: 'chapter',
+  display: {
+    // `label` rather than `name`: unreleased chapters carry an empty name by design.
+    primary: 'label',
+    secondary: ['firstStage', 'lastStage'],
+    badges: ['chapter']
+  },
+  dataPath: 'chapters',
+  searchFields: ['label', 'name', 'nameKo', 'chapter'],
+  icon: '📍',
+  description: 'The 20-stage chapters (regions) of the main stage road',
+  type: 'array'
+});
+
 // Register build types for build sharing system
 import { registerBuildTypes } from './wiki-framework/src/utils/buildTypeRegistry.js';
 
@@ -488,6 +521,7 @@ registerDataFiles([
   'companion-characters.json',
   'equipment-drops.json',
   'stages.json',
+  'stage-chapters.json',
   'spirit-characters.json',
   'spirit-upgrades.json',
   'familiars.json',

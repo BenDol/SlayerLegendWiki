@@ -27,6 +27,8 @@
     "preview": "vite preview",
     "preview:cloudflare": "npm run build && npx wrangler pages dev dist",
     "build:search": "node scripts/buildSearchIndex.js",
+    "build:stage-pages": "node scripts/generate-stage-pages.js",
+    "extract:stage-atlas": "node scripts/extract-stage-atlas.js",
     "migrate:cdn": "node scripts/migrate-images-to-cdn.js",
     "validate:html": "node wiki-framework/scripts/validateHtml.js",
     "test": "npm run test:framework && vitest run",

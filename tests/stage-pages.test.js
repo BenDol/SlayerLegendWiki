@@ -1,0 +1,97 @@
+import { describe, it, expect } from 'vitest';
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
+import {
+  buildBlocks,
+  assertBlocksTileTheRoad,
+  chaptersInRange,
+} from '../scripts/generate-stage-pages.js';
+
+const ROOT = path.join(__dirname, '..');
+const STAGES_DIR = path.join(ROOT, 'public/content/stages');
+const atlas = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data/stage-chapters.json'), 'utf8'));
+const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts/stage-pages.config.json'), 'utf8'));
+
+const namedChapters = atlas.chapters.filter((c) => c.name);
+
+describe('stage page block coverage', () => {
+  it('tiles every named chapter across the configured blocks', () => {
+    const blocks = buildBlocks(config, atlas.lastNamedStage);
+    expect(() => assertBlocksTileTheRoad(blocks, atlas.chapters, atlas.lastNamedStage)).not.toThrow();
+  });
+
+  it('assigns every named chapter to exactly one block', () => {
+    const blocks = buildBlocks(config, atlas.lastNamedStage);
+    const counts = new Map(namedChapters.map((c) => [c.chapter, 0]));
+    for (const block of blocks) {
+      for (const chapter of chaptersInRange(atlas.chapters, block.start, block.end)) {
+        counts.set(chapter.chapter, counts.get(chapter.chapter) + 1);
+      }
+    }
+    const wrong = [...counts.entries()].filter(([, n]) => n !== 1);
+    expect(wrong).toEqual([]);
+  });
+
+  // The failure this pins: a block boundary that misses the 20-stage chapter grid makes
+  // chaptersInRange drop the straddling chapter from every page, silently losing content.
+  it('refuses a block boundary that does not land on a chapter edge', () => {
+    const broken = {
+      ...config,
+      pages: config.pages.map((p, i) => (i === 1 ? { ...p, end: p.end - 10 } : p)),
+    };
+    const blocks = buildBlocks(broken, atlas.lastNamedStage);
+    expect(() => assertBlocksTileTheRoad(blocks, atlas.chapters, atlas.lastNamedStage)).toThrow(
+      /fall outside every configured block/
+    );
+  });
+
+  it('drops blocks that start beyond the end of the named road', () => {
+    const blocks = buildBlocks(config, config.pages[0].end);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0].end).toBeGreaterThanOrEqual(blocks[0].start);
+  });
+});
+
+describe('generated stage pages', () => {
+  const files = fs
+    .readdirSync(STAGES_DIR)
+    .filter((f) => f.startsWith('stages-') && f.endsWith('.md'));
+
+  it('emits one page per configured block', () => {
+    expect(files).toHaveLength(config.pages.length);
+  });
+
+  it('marks every generated page so hand edits are not lost silently', () => {
+    for (const file of files) {
+      const { data } = matter(fs.readFileSync(path.join(STAGES_DIR, file), 'utf8'));
+      expect(data.generated, `${file} is missing generated: true`).toBe(true);
+      expect(data.generatedBy).toBe('scripts/generate-stage-pages.js');
+    }
+  });
+
+  it('gives every named chapter a heading on exactly one page', () => {
+    const seen = new Map();
+    for (const file of files) {
+      const body = fs.readFileSync(path.join(STAGES_DIR, file), 'utf8');
+      for (const chapter of namedChapters) {
+        if (body.includes(`>${chapter.chapter}. ${chapter.name} `)) {
+          seen.set(chapter.chapter, (seen.get(chapter.chapter) ?? 0) + 1);
+        }
+      }
+    }
+    const missing = namedChapters.filter((c) => !seen.has(c.chapter)).map((c) => c.chapter);
+    const duplicated = [...seen.entries()].filter(([, n]) => n > 1).map(([c]) => c);
+    expect({ missing, duplicated }).toEqual({ missing: [], duplicated: [] });
+  });
+
+  it('never publishes a stage row past the verified boundary', () => {
+    const deepest = Math.max(
+      ...files.flatMap((file) => {
+        const body = fs.readFileSync(path.join(STAGES_DIR, file), 'utf8');
+        return [...body.matchAll(/^\| \*\*(\d+)\*\* \|/gm)].map((m) => Number(m[1]));
+      })
+    );
+    expect(deepest).toBeLessThanOrEqual(atlas.lastVerifiedStage);
+  });
+});
