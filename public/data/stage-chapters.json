@@ -1,0 +1,690 @@
+{
+  "source": "Slayer Legend client localization table (Unity sharedassets0), package com.gear2.growslayer",
+  "generatedBy": "scripts/extract-stage-atlas.js",
+  "stagesPerChapter": 20,
+  "lastNamedChapter": 83,
+  "lastNamedStage": 1660,
+  "lastVerifiedStage": 1376,
+  "chapters": [
+    {
+      "chapter": 1,
+      "name": "Beginning Forest",
+      "nameKo": "시작의 숲",
+      "label": "Beginning Forest",
+      "firstStage": 1,
+      "lastStage": 20
+    },
+    {
+      "chapter": 2,
+      "name": "Shadow Valley",
+      "nameKo": "그림자 계곡",
+      "label": "Shadow Valley",
+      "firstStage": 21,
+      "lastStage": 40
+    },
+    {
+      "chapter": 3,
+      "name": "Hill of Greed",
+      "nameKo": "탐욕의 언덕",
+      "label": "Hill of Greed",
+      "firstStage": 41,
+      "lastStage": 60
+    },
+    {
+      "chapter": 4,
+      "name": "Black Forest",
+      "nameKo": "검은 숲",
+      "label": "Black Forest",
+      "firstStage": 61,
+      "lastStage": 80
+    },
+    {
+      "chapter": 5,
+      "name": "Red Mountain",
+      "nameKo": "붉은 산맥",
+      "label": "Red Mountain",
+      "firstStage": 81,
+      "lastStage": 100
+    },
+    {
+      "chapter": 6,
+      "name": "Land of Desire",
+      "nameKo": "갈망의 땅",
+      "label": "Land of Desire",
+      "firstStage": 101,
+      "lastStage": 120
+    },
+    {
+      "chapter": 7,
+      "name": "Forgotten Castle",
+      "nameKo": "잊혀진 고성",
+      "label": "Forgotten Castle",
+      "firstStage": 121,
+      "lastStage": 140
+    },
+    {
+      "chapter": 8,
+      "name": "Frozen Wood",
+      "nameKo": "프로즌 우드",
+      "label": "Frozen Wood",
+      "firstStage": 141,
+      "lastStage": 160
+    },
+    {
+      "chapter": 9,
+      "name": "Land of Hate",
+      "nameKo": "증오의 땅",
+      "label": "Land of Hate",
+      "firstStage": 161,
+      "lastStage": 180
+    },
+    {
+      "chapter": 10,
+      "name": "Sand Plain",
+      "nameKo": "모래 평원",
+      "label": "Sand Plain",
+      "firstStage": 181,
+      "lastStage": 200
+    },
+    {
+      "chapter": 11,
+      "name": "Aslan North Coast",
+      "nameKo": "아슬란 북부 해안",
+      "label": "Aslan North Coast",
+      "firstStage": 201,
+      "lastStage": 220
+    },
+    {
+      "chapter": 12,
+      "name": "Unknown Forest",
+      "nameKo": "미지의 삼림",
+      "label": "Unknown Forest",
+      "firstStage": 221,
+      "lastStage": 240
+    },
+    {
+      "chapter": 13,
+      "name": "Canyon of Rage",
+      "nameKo": "분노의 협곡",
+      "label": "Canyon of Rage",
+      "firstStage": 241,
+      "lastStage": 260
+    },
+    {
+      "chapter": 14,
+      "name": "Wailing Forest",
+      "nameKo": "통곡의 숲",
+      "label": "Wailing Forest",
+      "firstStage": 261,
+      "lastStage": 280
+    },
+    {
+      "chapter": 15,
+      "name": "Wind Plateau",
+      "nameKo": "바람 고원",
+      "label": "Wind Plateau",
+      "firstStage": 281,
+      "lastStage": 300
+    },
+    {
+      "chapter": 16,
+      "name": "Lava Plateau",
+      "nameKo": "불타는 땅",
+      "label": "Lava Plateau",
+      "firstStage": 301,
+      "lastStage": 320
+    },
+    {
+      "chapter": 17,
+      "name": "Red Desert",
+      "nameKo": "붉은 사막",
+      "label": "Red Desert",
+      "firstStage": 321,
+      "lastStage": 340
+    },
+    {
+      "chapter": 18,
+      "name": "Plain of the White Night",
+      "nameKo": "백야의 초원",
+      "label": "Plain of the White Night",
+      "firstStage": 341,
+      "lastStage": 360
+    },
+    {
+      "chapter": 19,
+      "name": "Frozen Lake",
+      "nameKo": "얼어붙은 호수",
+      "label": "Frozen Lake",
+      "firstStage": 361,
+      "lastStage": 380
+    },
+    {
+      "chapter": 20,
+      "name": "Moon Shelter",
+      "nameKo": "달이 앉는 곳",
+      "label": "Moon Shelter",
+      "firstStage": 381,
+      "lastStage": 400
+    },
+    {
+      "chapter": 21,
+      "name": "Capricious Hill",
+      "nameKo": "변덕스러운 언덕",
+      "label": "Capricious Hill",
+      "firstStage": 401,
+      "lastStage": 420
+    },
+    {
+      "chapter": 22,
+      "name": "Empty Forest",
+      "nameKo": "텅 빈 숲",
+      "label": "Empty Forest",
+      "firstStage": 421,
+      "lastStage": 440
+    },
+    {
+      "chapter": 23,
+      "name": "Nephilim Wood",
+      "nameKo": "네필림 우드",
+      "label": "Nephilim Wood",
+      "firstStage": 441,
+      "lastStage": 460
+    },
+    {
+      "chapter": 24,
+      "name": "Ancient Altar",
+      "nameKo": "고대의 제단",
+      "label": "Ancient Altar",
+      "firstStage": 461,
+      "lastStage": 480
+    },
+    {
+      "chapter": 25,
+      "name": "Ruin of Ancient Kingdom",
+      "nameKo": "고대 왕국의 유적",
+      "label": "Ruin of Ancient Kingdom",
+      "firstStage": 481,
+      "lastStage": 500
+    },
+    {
+      "chapter": 26,
+      "name": "Delusion Forest",
+      "nameKo": "유혹의 숲",
+      "label": "Delusion Forest",
+      "firstStage": 501,
+      "lastStage": 520
+    },
+    {
+      "chapter": 27,
+      "name": "Fireflies Cave",
+      "nameKo": "반딧불 동굴",
+      "label": "Fireflies Cave",
+      "firstStage": 521,
+      "lastStage": 540
+    },
+    {
+      "chapter": 28,
+      "name": "Abandoned Pier",
+      "nameKo": "버려진 부두",
+      "label": "Abandoned Pier",
+      "firstStage": 541,
+      "lastStage": 560
+    },
+    {
+      "chapter": 29,
+      "name": "Sea of Star",
+      "nameKo": "별의 바다",
+      "label": "Sea of Star",
+      "firstStage": 561,
+      "lastStage": 580
+    },
+    {
+      "chapter": 30,
+      "name": "Land of the Dead",
+      "nameKo": "죽은자의 땅",
+      "label": "Land of the Dead",
+      "firstStage": 581,
+      "lastStage": 600
+    },
+    {
+      "chapter": 31,
+      "name": "Dark Wood",
+      "nameKo": "다크우드",
+      "label": "Dark Wood",
+      "firstStage": 601,
+      "lastStage": 620
+    },
+    {
+      "chapter": 32,
+      "name": "Ice Desert",
+      "nameKo": "얼음사막",
+      "label": "Ice Desert",
+      "firstStage": 621,
+      "lastStage": 640
+    },
+    {
+      "chapter": 33,
+      "name": "Mysterious Hill",
+      "nameKo": "수수께끼 언덕",
+      "label": "Mysterious Hill",
+      "firstStage": 641,
+      "lastStage": 660
+    },
+    {
+      "chapter": 34,
+      "name": "Primeval Forest",
+      "nameKo": "원시림",
+      "label": "Primeval Forest",
+      "firstStage": 661,
+      "lastStage": 680
+    },
+    {
+      "chapter": 35,
+      "name": "Upside-down Forest",
+      "nameKo": "거꾸로 숲",
+      "label": "Upside-down Forest",
+      "firstStage": 681,
+      "lastStage": 700
+    },
+    {
+      "chapter": 36,
+      "name": "Soul's Playground",
+      "nameKo": "혼백의 놀이터",
+      "label": "Soul's Playground",
+      "firstStage": 701,
+      "lastStage": 720
+    },
+    {
+      "chapter": 37,
+      "name": "Lost Forest",
+      "nameKo": "상실의 숲",
+      "label": "Lost Forest",
+      "firstStage": 721,
+      "lastStage": 740
+    },
+    {
+      "chapter": 38,
+      "name": "Underground Cave",
+      "nameKo": "지저 동굴",
+      "label": "Underground Cave",
+      "firstStage": 741,
+      "lastStage": 760
+    },
+    {
+      "chapter": 39,
+      "name": "Misty Road",
+      "nameKo": "안개길",
+      "label": "Misty Road",
+      "firstStage": 761,
+      "lastStage": 780
+    },
+    {
+      "chapter": 40,
+      "name": "Cliff Edge",
+      "nameKo": "벼랑끝",
+      "label": "Cliff Edge",
+      "firstStage": 781,
+      "lastStage": 800
+    },
+    {
+      "chapter": 41,
+      "name": "Underwater Cave",
+      "nameKo": "수중 동굴",
+      "label": "Underwater Cave",
+      "firstStage": 801,
+      "lastStage": 820
+    },
+    {
+      "chapter": 42,
+      "name": "Dragon Grave",
+      "nameKo": "용의 무덤",
+      "label": "Dragon Grave",
+      "firstStage": 821,
+      "lastStage": 840
+    },
+    {
+      "chapter": 43,
+      "name": "Forgotten Abyss",
+      "nameKo": "망각의 심연",
+      "label": "Forgotten Abyss",
+      "firstStage": 841,
+      "lastStage": 860
+    },
+    {
+      "chapter": 44,
+      "name": "Sky Island",
+      "nameKo": "하늘섬",
+      "label": "Sky Island",
+      "firstStage": 861,
+      "lastStage": 880
+    },
+    {
+      "chapter": 45,
+      "name": "Ancient Ruins",
+      "nameKo": "고대의 유적",
+      "label": "Ancient Ruins",
+      "firstStage": 881,
+      "lastStage": 900
+    },
+    {
+      "chapter": 46,
+      "name": "Giant's Glass",
+      "nameKo": "거인의 잔",
+      "label": "Giant's Glass",
+      "firstStage": 901,
+      "lastStage": 920
+    },
+    {
+      "chapter": 47,
+      "name": "Desert Gorge",
+      "nameKo": "사막 협곡",
+      "label": "Desert Gorge",
+      "firstStage": 921,
+      "lastStage": 940
+    },
+    {
+      "chapter": 48,
+      "name": "Vortex",
+      "nameKo": "땅 끝 소용돌이",
+      "label": "Vortex",
+      "firstStage": 941,
+      "lastStage": 960
+    },
+    {
+      "chapter": 49,
+      "name": "Land of Prophecy",
+      "nameKo": "예언의 땅",
+      "label": "Land of Prophecy",
+      "firstStage": 961,
+      "lastStage": 980
+    },
+    {
+      "chapter": 50,
+      "name": "Story of the Stars",
+      "nameKo": "별의 이야기",
+      "label": "Story of the Stars",
+      "firstStage": 981,
+      "lastStage": 1000
+    },
+    {
+      "chapter": 51,
+      "name": "Sea of Ashes",
+      "nameKo": "재의 바다",
+      "label": "Sea of Ashes",
+      "firstStage": 1001,
+      "lastStage": 1020
+    },
+    {
+      "chapter": 52,
+      "name": "Frozen Fog Forest",
+      "nameKo": "얼어붙은 안개숲",
+      "label": "Frozen Fog Forest",
+      "firstStage": 1021,
+      "lastStage": 1040
+    },
+    {
+      "chapter": 53,
+      "name": "Hill of Memory",
+      "nameKo": "기억의 언덕",
+      "label": "Hill of Memory",
+      "firstStage": 1041,
+      "lastStage": 1060
+    },
+    {
+      "chapter": 54,
+      "name": "Blood Cave",
+      "nameKo": "혈석굴",
+      "label": "Blood Cave",
+      "firstStage": 1061,
+      "lastStage": 1080
+    },
+    {
+      "chapter": 55,
+      "name": "Golden Meadow",
+      "nameKo": "황금빛 풀밭",
+      "label": "Golden Meadow",
+      "firstStage": 1081,
+      "lastStage": 1100
+    },
+    {
+      "chapter": 56,
+      "name": "Mushroom Colony",
+      "nameKo": "버섯 군락",
+      "label": "Mushroom Colony",
+      "firstStage": 1101,
+      "lastStage": 1120
+    },
+    {
+      "chapter": 57,
+      "name": "Rising Strata",
+      "nameKo": "솟아나는 지층",
+      "label": "Rising Strata",
+      "firstStage": 1121,
+      "lastStage": 1140
+    },
+    {
+      "chapter": 58,
+      "name": "Tightening Cave",
+      "nameKo": "조여오는 덩굴",
+      "label": "Tightening Cave",
+      "firstStage": 1141,
+      "lastStage": 1160
+    },
+    {
+      "chapter": 59,
+      "name": "Waterfall of Fate",
+      "nameKo": "운명의 폭포",
+      "label": "Waterfall of Fate",
+      "firstStage": 1161,
+      "lastStage": 1180
+    },
+    {
+      "chapter": 60,
+      "name": "Gray Area",
+      "nameKo": "개와 늑대의 시간",
+      "label": "Gray Area",
+      "firstStage": 1181,
+      "lastStage": 1200
+    },
+    {
+      "chapter": 61,
+      "name": "Awl Rock",
+      "nameKo": "송곳바위",
+      "label": "Awl Rock",
+      "firstStage": 1201,
+      "lastStage": 1220
+    },
+    {
+      "chapter": 62,
+      "name": "Dream Tree",
+      "nameKo": "꿈의 나무",
+      "label": "Dream Tree",
+      "firstStage": 1221,
+      "lastStage": 1240
+    },
+    {
+      "chapter": 63,
+      "name": "Valley of Judgement",
+      "nameKo": "심판의 협곡",
+      "label": "Valley of Judgement",
+      "firstStage": 1241,
+      "lastStage": 1260
+    },
+    {
+      "chapter": 64,
+      "name": "Thunder Highlands",
+      "nameKo": "천둥고원",
+      "label": "Thunder Highlands",
+      "firstStage": 1261,
+      "lastStage": 1280
+    },
+    {
+      "chapter": 65,
+      "name": "Forgotten Shrine",
+      "nameKo": "잊혀진 신전",
+      "label": "Forgotten Shrine",
+      "firstStage": 1281,
+      "lastStage": 1300
+    },
+    {
+      "chapter": 66,
+      "name": "Forest of Illusion",
+      "nameKo": "환상의 숲",
+      "label": "Forest of Illusion",
+      "firstStage": 1301,
+      "lastStage": 1320
+    },
+    {
+      "chapter": 67,
+      "name": "Fortress of Oblivion",
+      "nameKo": "망각의 성채",
+      "label": "Fortress of Oblivion",
+      "firstStage": 1321,
+      "lastStage": 1340
+    },
+    {
+      "chapter": 68,
+      "name": "Abyssal Rift",
+      "nameKo": "심연의 틈",
+      "label": "Abyssal Rift",
+      "firstStage": 1341,
+      "lastStage": 1360
+    },
+    {
+      "chapter": 69,
+      "name": "Foothills of the Crimson Roots",
+      "nameKo": "붉은 뿌리 기슭",
+      "label": "Foothills of the Crimson Roots",
+      "firstStage": 1361,
+      "lastStage": 1380
+    },
+    {
+      "chapter": 70,
+      "name": "Forgotten Paradise",
+      "nameKo": "잊혀진 낙원",
+      "label": "Forgotten Paradise",
+      "firstStage": 1381,
+      "lastStage": 1400
+    },
+    {
+      "chapter": 71,
+      "name": "Frozen Daybreak",
+      "nameKo": "얼어붙은 여명",
+      "label": "Frozen Daybreak",
+      "firstStage": 1401,
+      "lastStage": 1420
+    },
+    {
+      "chapter": 72,
+      "name": "Red twilight",
+      "nameKo": "붉은 노을",
+      "label": "Red twilight",
+      "firstStage": 1421,
+      "lastStage": 1440
+    },
+    {
+      "chapter": 73,
+      "name": "Valley of Ghosts",
+      "nameKo": "망령의 골짜기",
+      "label": "Valley of Ghosts",
+      "firstStage": 1441,
+      "lastStage": 1460
+    },
+    {
+      "chapter": 74,
+      "name": "Ocean Where the Moon Slumbers",
+      "nameKo": "달이 잠든 바다",
+      "label": "Ocean Where the Moon Slumbers",
+      "firstStage": 1461,
+      "lastStage": 1480
+    },
+    {
+      "chapter": 75,
+      "name": "Immortality Plain",
+      "nameKo": "불사의 평원",
+      "label": "Immortality Plain",
+      "firstStage": 1481,
+      "lastStage": 1500
+    },
+    {
+      "chapter": 76,
+      "name": "Verdure Sanctuary",
+      "nameKo": "신록의 안식처",
+      "label": "Verdure Sanctuary",
+      "firstStage": 1501,
+      "lastStage": 1520
+    },
+    {
+      "chapter": 77,
+      "name": "Eternity Garden",
+      "nameKo": "영원의 정원",
+      "label": "Eternity Garden",
+      "firstStage": 1521,
+      "lastStage": 1540
+    },
+    {
+      "chapter": 78,
+      "name": "Blooming Peach Garden",
+      "nameKo": "피어나는 도원",
+      "label": "Blooming Peach Garden",
+      "firstStage": 1541,
+      "lastStage": 1560
+    },
+    {
+      "chapter": 79,
+      "name": "Dwarf Village",
+      "nameKo": "난쟁이 마을",
+      "label": "Dwarf Village",
+      "firstStage": 1561,
+      "lastStage": 1580
+    },
+    {
+      "chapter": 80,
+      "name": "Silence Plain",
+      "nameKo": "침묵의 평원",
+      "label": "Silence Plain",
+      "firstStage": 1581,
+      "lastStage": 1600
+    },
+    {
+      "chapter": 81,
+      "name": "Sweet Garden Hill",
+      "nameKo": "달콤 동산",
+      "label": "Sweet Garden Hill",
+      "firstStage": 1601,
+      "lastStage": 1620
+    },
+    {
+      "chapter": 82,
+      "name": "Ethereal Fruit",
+      "nameKo": "풍류의 과실",
+      "label": "Ethereal Fruit",
+      "firstStage": 1621,
+      "lastStage": 1640
+    },
+    {
+      "chapter": 83,
+      "name": "Corridor of the Blue Boundary",
+      "nameKo": "푸른 경계의 회랑",
+      "label": "Corridor of the Blue Boundary",
+      "firstStage": 1641,
+      "lastStage": 1660
+    },
+    {
+      "chapter": 84,
+      "name": "",
+      "nameKo": "",
+      "label": "Chapter 84 (unreleased)",
+      "firstStage": 1661,
+      "lastStage": 1680
+    },
+    {
+      "chapter": 85,
+      "name": "",
+      "nameKo": "",
+      "label": "Chapter 85 (unreleased)",
+      "firstStage": 1681,
+      "lastStage": 1700
+    }
+  ]
+}

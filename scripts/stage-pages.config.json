@@ -1,0 +1,61 @@
+{
+  "_comment": "Prose for the generated stage block pages. Everything here survives regeneration - edit this file rather than the generated markdown under public/content/stages/.",
+  "tags": [
+    "stages",
+    "progression",
+    "reference"
+  ],
+  "firstBlockOrder": 10,
+  "unverifiedNotice": "> **Numbers stop at stage {{stage}}.** The chapters below without figures are named by the game client itself, so the regions and zones are correct - but the community stat dataset the tables are built from stops producing new combat values past stage {{stage}} and simply repeats its last twenty stages from there on. A chapter is only tabulated when all twenty of its stages are covered, so the tables end with chapter 68 at stage 1,360 and everything deeper is listed by name. See [Reading the stage data](/stages/mechanics) for the full explanation.",
+  "footer": "Something here wrong or missing? The stage tables are built from datamined game files - if the game has moved on, [tell us](/meta/contributing).",
+  "pages": [
+    {
+      "start": 1,
+      "end": 200,
+      "description": "Every stage from the Beginning Forest through the Sand Plain - the stretch that turns a tutorial into a game, with full enemy, boss and reward tables for stages 1-200.",
+      "intro": "The first two hundred stages are the steepest change the game ever asks of you, and almost none of it is about damage. Wave size climbs from a single monster on stage 1 to packs of up to eighteen by stage 186, and from there it varies from one stage to the next rather than simply growing. Equipment drops climb the *entire* rarity ladder here - Common 4 through Legendary 4, nineteen tiers in two hundred stages, a pace that never repeats. Boss health starts at five times a regular monster's and settles near twenty times for most of this stretch, so early bosses are a speed bump rather than a wall.\n\nThis is also where the game unlocks itself. Clearing stage 40 opens the Emergency Request chain, stage 80 unlocks [soul weapon](/equipment/soul-weapons) crafting, stage 100 opens the Cyclic Forest, and stage 120 - the one every new player is pointed at - unlocks the [class system](/character/class). Everything on this page is worth pushing through quickly; there is very little here worth parking on."
+    },
+    {
+      "start": 201,
+      "end": 400,
+      "description": "Stages 201-400, from the Aslan North Coast to the Moon Shelter - where drop rarity tops out and the game settles into its long exponential shape.",
+      "intro": "Two things end permanently in this stretch. At stage 221 equipment drops reach **Legendary 3** and stay there for the rest of the game - every drop table past this point is the same tier, so from here gear progress comes from [enhancement](/equipment/enhancement) and [fusion](/equipment/fusion), not from finding better base items. And boss health, which has been drifting upward relative to monster health since stage 141, finishes its climb here on the way to a flat 500× multiplier.\n\nWhat replaces them is a much flatter curve. Through stages 1-200 enemy health had been multiplying by roughly 1.27x every single stage; across this block that decelerates hard, to around 1.09x per stage by 300 and under 1.04x by 400. The game stops getting exponentially harder and starts getting merely steadily harder. Two more systems open along the way - [spirits](/spirits) at stage 300 and soul weapon engraving at stage 320."
+    },
+    {
+      "start": 401,
+      "end": 600,
+      "description": "Stages 401-600, Capricious Hill through the Land of the Dead - where the last stage-scaling dials lock and souls start to matter.",
+      "intro": "By stage 441 monster attack speed has bottomed out at 0.6 and stops changing. By stage 501 boss health locks at exactly 500× a regular monster's, and by stage 521 a stage clear pays the maximum twenty dice. From here to the end of the road the only things that genuinely move are raw numbers: health, attack, gold, cubes and souls.\n\nSouls are the story of this block. They first trickle in at stage 141, but across these two hundred stages idle soul income climbs from a few hundred to several thousand, which is what makes [soul weapons](/equipment/soul-weapons) a live system rather than a curiosity."
+    },
+    {
+      "start": 601,
+      "end": 800,
+      "description": "Stages 601-800, the Dark Wood through Cliff Edge - the first stretch past the old stage cap, and the point where progress becomes purely exponential.",
+      "intro": "Stage 640 was the game's hard ceiling for a long time, and crossing it still feels like leaving the map. Everything structural is now fixed - 0.6 attack speed, Legendary 3 drops, twenty dice a clear, boss health at a flat 500x - and the road becomes a clean exponential: about 1.06x more enemy health per stage - roughly 3.3x per twenty-stage chapter - held without a meaningful break from here to the end of the measured data.\n\nThe practical consequence is that pushing here is entirely a function of your own multipliers. Nothing about the stages themselves gets meaningfully harder in shape, only in size, so a wall on this page is always a [promotion](/character/promotions), class grade or [skill](/skills) problem."
+    },
+    {
+      "start": 801,
+      "end": 1000,
+      "description": "Stages 801-1000, Underwater Cave to the Story of the Stars - crossing into four-figure stage numbers, with soul income growing twenty-fold.",
+      "intro": "Attribute stone chance makes its last move in this stretch, capping at 1.725% around stage 827 and never rising again. After that, every per-stage dial except the raw numbers is frozen.\n\nWhat is still growing, dramatically, is soul income: idle souls run from roughly seventy-eight thousand at stage 801 to over 1.7 million by stage 1,000. Soul weapon progression is effectively gated on how deep you can park, which makes the highest stage you can *safely* idle at far more valuable than the highest one you can barely clear."
+    },
+    {
+      "start": 1001,
+      "end": 1200,
+      "description": "Stages 1001-1200, the Sea of Ashes through the Gray Area - the back half of the road, where the last reward dial locks and only scale remains.",
+      "intro": "Stage 1,001 freezes the final variable: equipment drop chance settles at 0.118% and holds for every remaining stage. From this point on the stage table is genuinely one-dimensional - the same drop tier, the same dice, the same diamonds, with health and attack multiplying steadily underneath and only wave size still shuffling between four and eighteen monsters.\n\nRewards do keep climbing, but not smoothly. Gold and EXP per kill sawtooth within each twenty-stage chapter rather than rising monotonically, so the best farming stage in a region is rarely its last one. The tables below are worth actually reading for that reason."
+    },
+    {
+      "start": 1201,
+      "end": 1360,
+      "description": "Stages 1201-1360, Awl Rock through the Abyssal Rift - the deepest stretch with verified per-stage numbers.",
+      "intro": "This is the last stretch of the road where the community dataset still produces genuinely new numbers for every stage, which makes it the deepest ground this wiki can document with confidence. Enemy health passes 10⁴⁷ and boss attack passes 10²⁸; idle soul income crosses a billion.\n\nThe game continues well past here - fifteen more named chapters, up to stage 1,660 - but the measured data does not. Everything beyond this page is covered on the [frontier page](/stages/stages-1361-1660)."
+    },
+    {
+      "start": 1361,
+      "end": 1660,
+      "description": "Stages 1361-1660, the Foothills of the Crimson Roots to the Corridor of the Blue Boundary - the fifteen deepest chapters, named from the game client but not yet measured.",
+      "intro": "The stage road does not end at 1,360. The game client defines fifteen more named chapters beyond it, running to stage 1,660 - and two further chapter slots after that which the client has created but not yet named, which is the clearest signal available that more road is planned.\n\nWhat this page cannot give you is numbers. The datamined stat table that every other page here is built from stops generating new combat values partway through this range and repeats its last twenty stages from then on, so publishing figures for these chapters would mean republishing recycled data as if it were measured. The region and zone names below come straight out of the game client and are correct; the statistics are simply not known yet.\n\nIf you are playing in this range and can screenshot stage details, that is genuinely the most valuable [contribution](/meta/contributing) anyone could make to this section right now."
+    }
+  ]
+}
