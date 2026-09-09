@@ -4,8 +4,64 @@
  */
 
 import { createLogger } from '../../../utils/logger';
+import { findIssues } from '../../github/issueLookup.js';
 
 const logger = createLogger('GameProgressDeciders');
+
+/**
+ * One achievement check runs many deciders that read the same handful of
+ * records. Lookups are memoised per Octokit instance (the server creates one
+ * per request, so this is request-scoped there) and expire quickly so a
+ * long-lived browser client sees fresh data soon after a save.
+ */
+const USER_DATA_LOOKUP_TTL_MS = 10 * 1000;
+const userDataLookupCaches = new WeakMap();
+
+function userDataLookupCache(octokit) {
+  let cache = userDataLookupCaches.get(octokit);
+  if (!cache) {
+    cache = new Map();
+    userDataLookupCaches.set(octokit, cache);
+  }
+  return cache;
+}
+
+/**
+ * Helper: Load every open record issue of `dataType` owned by the user.
+ * Pinned to the user-id label so the lookup never scans other users' records;
+ * a read, so a miss is never escalated into the absence-confirmation protocol.
+ * @param {Object} octokit - Octokit instance
+ * @param {string} owner - Repository owner
+ * @param {string} repo - Repository name
+ * @param {number} userId - User ID
+ * @param {string} dataType - Data type label (e.g., 'skill-builds', 'battle-loadouts')
+ * @returns {Promise<Array>} Issues (REST shape)
+ */
+function findUserDataIssues(octokit, owner, repo, userId, dataType) {
+  const cache = userDataLookupCache(octokit);
+  const key = `${owner}/${repo}/${userId}/${dataType}`;
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.at < USER_DATA_LOOKUP_TTL_MS) {
+    return cached.promise;
+  }
+
+  const userIdLabel = `user-id:${userId}`;
+  const promise = findIssues(octokit, {
+    owner,
+    repo,
+    labels: [dataType, userIdLabel],
+    selectorLabel: userIdLabel,
+    confirmAbsence: false,
+    logger,
+  }).then(({ issues }) => issues);
+
+  const entry = { promise, at: Date.now() };
+  cache.set(key, entry);
+  promise.catch(() => {
+    if (cache.get(key) === entry) cache.delete(key);
+  });
+  return promise;
+}
 
 /**
  * Helper: Check game data count from GitHub Issues
@@ -19,13 +75,7 @@ const logger = createLogger('GameProgressDeciders');
  */
 async function checkGameDataCount(octokit, owner, repo, userId, dataType, minCount) {
   try {
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: `${dataType},user-id:${userId}`,
-      state: 'open',
-      per_page: 100,
-    });
+    const issues = await findUserDataIssues(octokit, owner, repo, userId, dataType);
 
     let totalCount = 0;
     for (const issue of issues) {
@@ -93,13 +143,7 @@ export async function buildMaster(userData, context) {
  */
 async function getUserBuildsData(octokit, owner, repo, userId) {
   try {
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: `skill-builds,user-id:${userId}`,
-      state: 'open',
-      per_page: 100,
-    });
+    const issues = await findUserDataIssues(octokit, owner, repo, userId, 'skill-builds');
 
     const builds = [];
     for (const issue of issues) {
@@ -125,13 +169,7 @@ async function getUserBuildsData(octokit, owner, repo, userId) {
  */
 async function getUserLoadoutsData(octokit, owner, repo, userId) {
   try {
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: `battle-loadouts,user-id:${userId}`,
-      state: 'open',
-      per_page: 100,
-    });
+    const issues = await findUserDataIssues(octokit, owner, repo, userId, 'battle-loadouts');
 
     const loadouts = [];
     for (const issue of issues) {
@@ -157,13 +195,7 @@ async function getUserLoadoutsData(octokit, owner, repo, userId) {
  */
 async function getUserSpiritsData(octokit, owner, repo, userId) {
   try {
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: `my-spirits,user-id:${userId}`,
-      state: 'open',
-      per_page: 100,
-    });
+    const issues = await findUserDataIssues(octokit, owner, repo, userId, 'my-spirits');
 
     const spirits = [];
     for (const issue of issues) {

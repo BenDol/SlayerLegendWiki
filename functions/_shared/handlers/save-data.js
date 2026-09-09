@@ -1,4 +1,5 @@
 import { createLogger } from '../../../src/utils/logger.js';
+import { absenceUnconfirmedResponse, isAbsenceUnconfirmed } from '../utils.js';
 const logger = createLogger('SaveData');
 
 /**
@@ -313,6 +314,7 @@ async function handleGridSubmission(adapter, storage, config, data, username, re
     });
 
   } catch (error) {
+    if (isAbsenceUnconfirmed(error)) return absenceUnconfirmedResponse(adapter, error);
     console.error('[save-data] Grid submission error:', error);
     return adapter.createJsonResponse(500, {
       error: error.message || 'Failed to save grid submission'
@@ -386,6 +388,7 @@ async function handleUserCentricSave(adapter, storage, config, type, username, u
     return adapter.createJsonResponse(200, response);
 
   } catch (error) {
+    if (isAbsenceUnconfirmed(error)) return absenceUnconfirmedResponse(adapter, error);
     console.error('[save-data] User-centric save error:', error);
     return adapter.createJsonResponse(500, {
       error: error.message || 'Failed to save data'

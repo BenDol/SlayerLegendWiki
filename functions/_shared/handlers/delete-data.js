@@ -1,4 +1,5 @@
 import { createLogger } from '../../../src/utils/logger.js';
+import { absenceUnconfirmedResponse, isAbsenceUnconfirmed } from '../utils.js';
 
 /**
  * Delete Data Handler (Platform-Agnostic)
@@ -126,6 +127,7 @@ export async function handleDeleteData(adapter, configAdapter) {
     return adapter.createJsonResponse(200, response);
 
   } catch (error) {
+    if (isAbsenceUnconfirmed(error)) return absenceUnconfirmedResponse(adapter, error);
     console.error('[delete-data] Error:', error);
     return adapter.createJsonResponse(500, {
       error: error.message || 'Internal server error'

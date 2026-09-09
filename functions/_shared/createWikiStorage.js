@@ -38,6 +38,7 @@ export function createWikiStorage(storageConfig, environment) {
 
     return new WikiGitHubStorage({
       botToken,
+      botLogin: environment.WIKI_BOT_USERNAME || environment.VITE_WIKI_BOT_USERNAME || null,
       owner,
       repo,
       version: storageConfig.version || 'v1',
