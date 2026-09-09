@@ -379,6 +379,7 @@ Many framework features can be toggled in `wiki-config.json` under `features`:
 5. **Restart dev server** after configuration changes (config watcher should pick up changes automatically)
 6. **Use frontmatter** on all markdown files for proper indexing
 7. **Never bypass HTML sanitization** - Don't use `dangerouslySetInnerHTML`
+8. **Issue-backed records are looked up through `src/services/github/issueLookup.js`** - never call `issues.listForRepo` (or the Search API) to decide whether a record such as `[Content Creator Index]`, `[Achievements] <user>` or a storage issue exists. GitHub's REST issue list is eventually consistent: measured on 2026-09-09, it returned an empty page for existing labelled issues in 12-32 % of calls, and every create-on-empty caller produced duplicates. The module reads through GraphQL filtered by the most selective label, cross-checks absence with the REST list, treats the lowest open issue number as canonical, merges and closes duplicates, and only `getOrCreateIssue` may create. Reads never create.
 
 ## Security
 

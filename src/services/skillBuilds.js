@@ -3,6 +3,7 @@ import { createUserIdLabel } from '../../wiki-framework/src/utils/githubLabelUti
 import { createLogger } from '../utils/logger';
 import { eventBus, EventNames } from '../../wiki-framework/src/services/eventBus.js';
 import { queueAchievementCheck } from '../../wiki-framework/src/services/achievements/achievementQueue.js';
+import { findRecordIssue, getOrCreateIssue } from './github/issueLookup.js';
 
 const logger = createLogger('SkillBuilds');
 
@@ -38,6 +39,26 @@ const BUILDS_TITLE_PREFIX = '[Skill Build]';
 const MAX_BUILDS_PER_USER = 10; // Limit to prevent issue size bloat
 
 /**
+ * Locate the user's builds issue.
+ * The user-id label pins the lookup to the user's own records; the title is
+ * consulted when that misses so legacy issues (created before the label
+ * existed) are still found and can be relabelled.
+ * @private
+ * @param {{confirmAbsence: boolean}} options - Reads pass false (a miss then costs one call); saves pass true
+ */
+function findUserBuildsIssue(octokit, owner, repo, username, userId, { confirmAbsence }) {
+  return findRecordIssue(octokit, {
+    owner,
+    repo,
+    labels: [BUILDS_LABEL],
+    identityLabel: userId ? createUserIdLabel(userId) : null,
+    fallbackTitle: `${BUILDS_TITLE_PREFIX} ${username}`,
+    confirmAbsence,
+    logger,
+  });
+}
+
+/**
  * Get all builds for a specific user
  * @param {string} owner - Repository owner
  * @param {string} repo - Repository name
@@ -49,40 +70,14 @@ export async function getUserBuilds(owner, repo, username, userId = null) {
   try {
     const octokit = getOctokit();
 
-    // Search for the user's builds issue
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: BUILDS_LABEL,
-      state: 'open',
-      per_page: 100,
-    });
+    const { issue: buildsIssue } = await findUserBuildsIssue(octokit, owner, repo, username, userId, { confirmAbsence: false });
 
-    let buildsIssue = null;
-
-    // First try: Search by user ID label (permanent identifier, preferred)
-    if (userId) {
-      buildsIssue = issues.find(issue =>
-        issue.labels.some(label =>
-          (typeof label === 'string' && label === `user-id:${userId}`) ||
-          (typeof label === 'object' && label.name === `user-id:${userId}`)
-        )
+    if (buildsIssue) {
+      logger.debug(
+        userId
+          ? `Found builds for user ${username} by ID: ${userId}`
+          : `Found legacy builds for ${username} by title`
       );
-
-      if (buildsIssue) {
-        logger.debug(`Found builds for user ${username} by ID: ${userId}`);
-      }
-    }
-
-    // Second try: Search by username in title (legacy or no user ID provided)
-    if (!buildsIssue) {
-      buildsIssue = issues.find(
-        issue => issue.title === `${BUILDS_TITLE_PREFIX} ${username}`
-      );
-
-      if (buildsIssue) {
-        logger.debug(`Found legacy builds for ${username} by title`);
-      }
     }
 
     if (!buildsIssue) {
@@ -128,101 +123,74 @@ export async function saveUserBuilds(owner, repo, username, userId, builds) {
       throw new Error(`Maximum ${MAX_BUILDS_PER_USER} builds allowed per user`);
     }
 
-    // Search for existing builds issue
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: BUILDS_LABEL,
-      state: 'open',
-      per_page: 100,
-    });
-
-    let existingIssue = null;
-
-    // First try: Search by user ID label
-    if (userId) {
-      existingIssue = issues.find(issue =>
-        issue.labels.some(label =>
-          (typeof label === 'string' && label === `user-id:${userId}`) ||
-          (typeof label === 'object' && label.name === `user-id:${userId}`)
-        )
-      );
-    }
-
-    // Second try: Search by username in title
-    if (!existingIssue) {
-      existingIssue = issues.find(
-        issue => issue.title === `${BUILDS_TITLE_PREFIX} ${username}`
-      );
-    }
-
     const issueTitle = `${BUILDS_TITLE_PREFIX} ${username}`;
     const issueBody = JSON.stringify(builds, null, 2);
     const userIdLabel = userId ? createUserIdLabel(userId) : null;
+    const labels = userIdLabel ? [BUILDS_LABEL, userIdLabel] : [BUILDS_LABEL];
 
-    if (existingIssue) {
-      // Update existing builds
-      logger.debug(`Updating builds for ${username}`, { issueNumber: existingIssue.number });
+    // One lookup decides update-vs-create. A legacy title-only issue is adopted
+    // and relabelled; a new issue is created only once absence is confirmed.
+    // Browser code never reconciles duplicates: that is the server's job, and
+    // doing it here would let a stale client snapshot overwrite merged data.
+    const lookup = await findUserBuildsIssue(octokit, owner, repo, username, userId, { confirmAbsence: true });
+
+    if (lookup.issue) {
+      logger.debug(`Updating builds for ${username}`, { issueNumber: lookup.issue.number });
 
       const { data: updatedIssue } = await octokit.rest.issues.update({
         owner,
         repo,
-        issue_number: existingIssue.number,
+        issue_number: lookup.issue.number,
         title: issueTitle,
         body: issueBody,
       });
 
-      // Add user ID label if missing (migration for legacy)
-      if (userIdLabel) {
-        const hasUserIdLabel = existingIssue.labels.some(label =>
-          (typeof label === 'string' && label.startsWith('user-id:')) ||
-          (typeof label === 'object' && label.name?.startsWith('user-id:'))
-        );
-
-        if (!hasUserIdLabel) {
-          logger.debug(`Adding user-id label to legacy builds for ${username}`);
-          await octokit.rest.issues.addLabels({
-            owner,
-            repo,
-            issue_number: existingIssue.number,
-            labels: [userIdLabel],
-          });
-        }
+      if (lookup.legacy && userIdLabel) {
+        logger.debug(`Adding user-id label to legacy builds for ${username}`);
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: lookup.issue.number,
+          labels: [userIdLabel],
+        });
       }
 
       return updatedIssue;
-    } else {
-      // Create new builds issue
-      logger.debug(`Creating new builds issue for ${username}${userIdLabel ? ` (ID: ${userId})` : ''}`);
-
-      const labels = [BUILDS_LABEL];
-      if (userIdLabel) {
-        labels.push(userIdLabel);
-      }
-
-      const { data: newIssue } = await octokit.rest.issues.create({
-        owner,
-        repo,
-        title: issueTitle,
-        body: issueBody,
-        labels,
-      });
-
-      // Lock the issue to prevent unwanted comments
-      try {
-        await octokit.rest.issues.lock({
-          owner,
-          repo,
-          issue_number: newIssue.number,
-          lock_reason: 'off-topic',
-        });
-        logger.debug(`Locked builds issue for ${username} to collaborators only`);
-      } catch (lockError) {
-        logger.warn(`Failed to lock issue for ${username}`, { error: lockError.message });
-      }
-
-      return newIssue;
     }
+
+    const { issue, created } = await getOrCreateIssue(octokit, {
+      owner,
+      repo,
+      labels,
+      ...(userIdLabel ? { selectorLabel: userIdLabel } : { matchTitle: issueTitle }),
+      title: issueTitle,
+      body: issueBody,
+      lock: true,
+      lockReason: 'off-topic',
+      precomputed: lookup,
+      reconcile: false,
+      logger,
+    });
+
+    if (created) {
+      logger.debug(`Created new builds issue for ${username}${userIdLabel ? ` (ID: ${userId})` : ''}`, {
+        issueNumber: issue.number,
+      });
+      return issue;
+    }
+
+    // A concurrent save created the issue first; this snapshot is the latest write
+    logger.debug(`Updating builds for ${username}`, { issueNumber: issue.number });
+
+    const { data: updatedIssue } = await octokit.rest.issues.update({
+      owner,
+      repo,
+      issue_number: issue.number,
+      title: issueTitle,
+      body: issueBody,
+    });
+
+    return updatedIssue;
   } catch (error) {
     logger.error(`Failed to save builds for ${username}`, { error });
     throw error;

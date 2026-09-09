@@ -6,6 +6,7 @@ import {
   updateUserLoadout,
   deleteUserLoadout
 } from '../../src/services/battleLoadouts.js';
+import { graphQlIssuesPage, mirrorListForRepoAsGraphql } from '../helpers/githubIssueMocks.js';
 
 // Mock the framework dependencies
 vi.mock('../../wiki-framework/src/services/github/api.js', () => ({
@@ -18,12 +19,15 @@ vi.mock('../../wiki-framework/src/utils/githubLabelUtils.js', () => ({
 
 import { getOctokit } from '../../wiki-framework/src/services/github/api.js';
 
+const LOADOUTS_LABELS = [{ name: 'battle-loadouts' }, { name: 'user-id:12345' }];
+
 describe('battleLoadouts', () => {
   let mockOctokit;
   let consoleSpy;
 
   beforeEach(() => {
-    // Mock Octokit instance
+    // Mock Octokit instance. Repository state is described once through
+    // listForRepo; the GraphQL mirror answers the lookup module from it.
     mockOctokit = {
       rest: {
         issues: {
@@ -31,10 +35,12 @@ describe('battleLoadouts', () => {
           create: vi.fn(),
           update: vi.fn(),
           addLabels: vi.fn(),
-          lock: vi.fn()
+          lock: vi.fn(),
+          createComment: vi.fn()
         }
       }
     };
+    mirrorListForRepoAsGraphql(mockOctokit);
 
     getOctokit.mockReturnValue(mockOctokit);
 
@@ -77,7 +83,7 @@ describe('battleLoadouts', () => {
           { id: 'loadout-1', name: 'Test Loadout 1' },
           { id: 'loadout-2', name: 'Test Loadout 2' }
         ]),
-        labels: [{ name: 'battle-loadouts' }, { name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -92,6 +98,32 @@ describe('battleLoadouts', () => {
       expect(consoleSpy.log).toHaveBeenCalledWith(
         expect.stringContaining('Found loadouts for user testuser by ID: 12345')
       );
+    });
+
+    it('should query GitHub by the user-id label first and only scan the type label on a miss', async () => {
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: [] });
+
+      await getUserLoadouts('owner', 'repo', 'testuser', 12345);
+
+      expect(mockOctokit.graphql.mock.calls[0][1]).toMatchObject({
+        owner: 'owner',
+        repo: 'repo',
+        labels: ['user-id:12345'],
+        states: ['OPEN']
+      });
+      // The legacy title fallback runs only because the user-id lookup missed
+      expect(mockOctokit.graphql.mock.calls[1][1]).toMatchObject({ labels: ['battle-loadouts'] });
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not scan the type label when the user-id lookup hits', async () => {
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({
+        data: [{ number: 1, title: '[Battle Loadout] testuser', body: '[]', labels: LOADOUTS_LABELS }]
+      });
+
+      await getUserLoadouts('owner', 'repo', 'testuser', 12345);
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(1);
     });
 
     it('should find loadouts by username in title (fallback)', async () => {
@@ -137,7 +169,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: 'invalid json',
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -172,7 +204,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: '',
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -196,7 +228,7 @@ describe('battleLoadouts', () => {
           number: 2,
           title: '[Battle Loadout] testuser',
           body: JSON.stringify([{ id: 'new', name: 'Current' }]),
-          labels: [{ name: 'battle-loadouts' }, { name: 'user-id:12345' }]
+          labels: LOADOUTS_LABELS
         }
       ];
 
@@ -207,6 +239,31 @@ describe('battleLoadouts', () => {
       const loadouts = await getUserLoadouts('owner', 'repo', 'testuser', 12345);
 
       expect(loadouts[0].id).toBe('new'); // Should get the one with user-id label
+    });
+
+    it('should read the oldest issue when duplicates exist', async () => {
+      const mockIssues = [
+        {
+          number: 20,
+          title: '[Battle Loadout] testuser',
+          body: JSON.stringify([{ id: 'newer', name: 'Newer' }]),
+          labels: LOADOUTS_LABELS
+        },
+        {
+          number: 10,
+          title: '[Battle Loadout] testuser',
+          body: JSON.stringify([{ id: 'older', name: 'Older' }]),
+          labels: LOADOUTS_LABELS
+        }
+      ];
+
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({
+        data: mockIssues
+      });
+
+      const loadouts = await getUserLoadouts('owner', 'repo', 'testuser', 12345);
+
+      expect(loadouts[0].id).toBe('older');
     });
   });
 
@@ -243,12 +300,37 @@ describe('battleLoadouts', () => {
       expect(result.number).toBe(123);
     });
 
+    it('should confirm absence with the REST list before creating', async () => {
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: [] });
+      mockOctokit.rest.issues.create.mockResolvedValue({ data: { number: 123 } });
+      mockOctokit.rest.issues.lock.mockResolvedValue({});
+
+      await saveUserLoadouts('owner', 'repo', 'testuser', 12345, [{ id: 'loadout-1', name: 'Loadout' }]);
+
+      // GraphQL said "nothing"; the REST list must agree before create runs
+      expect(mockOctokit.rest.issues.listForRepo).toHaveBeenCalledWith(
+        expect.objectContaining({ labels: 'battle-loadouts,user-id:12345', state: 'open' })
+      );
+      expect(mockOctokit.rest.issues.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('should refuse to create when GitHub cannot confirm the issue is absent', async () => {
+      mockOctokit.graphql = vi.fn().mockResolvedValue(graphQlIssuesPage([]));
+      mockOctokit.rest.issues.listForRepo.mockRejectedValue(new Error('rate limited'));
+
+      await expect(
+        saveUserLoadouts('owner', 'repo', 'testuser', 12345, [{ id: 'loadout-1', name: 'Loadout' }])
+      ).rejects.toThrow(/could not confirm/);
+
+      expect(mockOctokit.rest.issues.create).not.toHaveBeenCalled();
+    });
+
     it('should update existing loadouts issue', async () => {
       const existingIssue = {
         number: 456,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify([{ id: 'old', name: 'Old Loadout' }]),
-        labels: [{ name: 'battle-loadouts' }, { name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -271,9 +353,10 @@ describe('battleLoadouts', () => {
       });
 
       expect(mockOctokit.rest.issues.lock).not.toHaveBeenCalled();
+      expect(result.number).toBe(456);
     });
 
-    it('should add user-id label to legacy issues', async () => {
+    it('should adopt and relabel a legacy issue that lacks the user-id label', async () => {
       const legacyIssue = {
         number: 789,
         title: '[Battle Loadout] testuser',
@@ -281,26 +364,60 @@ describe('battleLoadouts', () => {
         labels: [{ name: 'battle-loadouts' }] // No user-id label
       };
 
-      mockOctokit.rest.issues.listForRepo.mockResolvedValue({
-        data: [legacyIssue]
-      });
-
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: [legacyIssue] });
       mockOctokit.rest.issues.update.mockResolvedValue({ data: legacyIssue });
       mockOctokit.rest.issues.addLabels.mockResolvedValue({});
 
       const loadouts = [{ id: 'loadout-1', name: 'Loadout' }];
-      await saveUserLoadouts('owner', 'repo', 'testuser', 12345, loadouts);
+      const result = await saveUserLoadouts('owner', 'repo', 'testuser', 12345, loadouts);
 
+      expect(mockOctokit.rest.issues.create).not.toHaveBeenCalled();
+      expect(mockOctokit.rest.issues.update).toHaveBeenCalledWith({
+        owner: 'owner',
+        repo: 'repo',
+        issue_number: 789,
+        title: '[Battle Loadout] testuser',
+        body: JSON.stringify(loadouts, null, 2)
+      });
       expect(mockOctokit.rest.issues.addLabels).toHaveBeenCalledWith({
         owner: 'owner',
         repo: 'repo',
         issue_number: 789,
         labels: ['user-id:12345']
       });
-
       expect(consoleSpy.log).toHaveBeenCalledWith(
         expect.stringContaining('Adding user-id label to legacy loadouts')
       );
+      expect(result.number).toBe(789);
+    });
+
+    it('should write to the oldest issue and leave duplicates open for the server to reconcile', async () => {
+      const older = {
+        number: 10,
+        title: '[Battle Loadout] testuser',
+        body: JSON.stringify([{ id: 'a', name: 'A' }]),
+        labels: LOADOUTS_LABELS,
+        user: { login: 'testuser' }
+      };
+      const newer = {
+        number: 20,
+        title: '[Battle Loadout] testuser',
+        body: JSON.stringify([{ id: 'b', name: 'B' }]),
+        labels: LOADOUTS_LABELS,
+        user: { login: 'testuser' }
+      };
+
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: [newer, older] });
+      mockOctokit.rest.issues.update.mockResolvedValue({ data: older });
+
+      const loadouts = [{ id: 'a', name: 'A' }, { id: 'c', name: 'C' }];
+      await saveUserLoadouts('owner', 'repo', 'testuser', 12345, loadouts);
+
+      // Exactly one write, to the canonical (oldest) issue; nothing closed or merged from the browser
+      expect(mockOctokit.rest.issues.update).toHaveBeenCalledTimes(1);
+      expect(mockOctokit.rest.issues.update.mock.calls[0][0]).toMatchObject({ issue_number: 10, body: JSON.stringify(loadouts, null, 2) });
+      expect(mockOctokit.rest.issues.createComment).not.toHaveBeenCalled();
+      expect(mockOctokit.rest.issues.create).not.toHaveBeenCalled();
     });
 
     it('should reject non-array loadouts', async () => {
@@ -329,7 +446,7 @@ describe('battleLoadouts', () => {
 
       expect(result.number).toBe(123);
       expect(consoleSpy.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to lock issue'),
+        expect.stringContaining('Failed to lock newly created issue'),
         expect.objectContaining({ error: expect.any(String) })
       );
     });
@@ -391,7 +508,7 @@ describe('battleLoadouts', () => {
     });
 
     it('should preserve provided ID', async () => {
-      const loadout = { id: 'custom-id', name: 'My Loadout', skillBuild: {} };
+      const loadout = { id: 'custom-id', name: 'My Loadout', skillBuild: {}, spirit: {} };
       const result = await addUserLoadout('owner', 'repo', 'testuser', 12345, loadout);
 
       expect(result[0].id).toBe('custom-id');
@@ -407,7 +524,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify(existingLoadouts),
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -422,7 +539,7 @@ describe('battleLoadouts', () => {
     });
 
     it('should log loadout addition', async () => {
-      const loadout = { name: 'My Loadout', skillBuild: {} };
+      const loadout = { name: 'My Loadout', skillBuild: {}, spirit: {} };
       await addUserLoadout('owner', 'repo', 'testuser', 12345, loadout);
 
       expect(consoleSpy.info).toHaveBeenCalledWith(
@@ -441,7 +558,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify(existingLoadouts),
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -466,7 +583,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify(existingLoadouts),
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -487,7 +604,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify(existingLoadouts),
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -506,7 +623,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify(existingLoadouts),
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -533,7 +650,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify(existingLoadouts),
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -555,7 +672,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify(existingLoadouts),
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -573,7 +690,7 @@ describe('battleLoadouts', () => {
         number: 1,
         title: '[Battle Loadout] testuser',
         body: JSON.stringify(existingLoadouts),
-        labels: [{ name: 'user-id:12345' }]
+        labels: LOADOUTS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({

@@ -51,6 +51,19 @@ jobs:
             const fs = require('fs');
             const path = require('path');
             const crypto = require('crypto');
+            const { pathToFileURL } = require('url');
+            // Shared issue lookup: GraphQL first, REST list only as the absence cross-check,
+            // oldest open issue canonical. See src/services/github/issueLookup.js.
+            const issueLookup = await import(pathToFileURL(`${process.env.GITHUB_WORKSPACE}/src/services/github/issueLookup.js`).href);
+            // Route the lookup module's logging through the Actions core logger
+            const lookupLogger = {
+              debug: (message, data) => core.debug(`${message} ${JSON.stringify(data ?? {})}`),
+              info: (message, data) => core.info(`${message} ${JSON.stringify(data ?? {})}`),
+              warn: (message, data) => core.warning(`${message} ${JSON.stringify(data ?? {})}`),
+              error: (message, data) => core.error(`${message} ${JSON.stringify(data ?? {})}`),
+            };
+            // Records created here are authored by the Actions token; only its issues may be closed as duplicates
+            const RECORD_OWNER_LOGIN = 'github-actions[bot]';
 
             const CACHE_ISSUE_TITLE = '[Cache] Contributor Highscore';
             const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
@@ -1146,113 +1159,38 @@ jobs:
 
             console.log('🔍 Looking for cache issue...');
 
-            // Find existing cache issue
-            const { data: issues } = await github.rest.issues.listForRepo({
+            // Find the cache issue, creating it only once both GitHub backends
+            // confirm it is absent (the REST list alone is eventually consistent).
+            // The oldest open issue is canonical; duplicates left by concurrent
+            // runs are closed since the body is rewritten on every run.
+            const { issue: cacheIssue, created } = await issueLookup.getOrCreateIssue(github, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              state: 'open',
-              labels: 'highscore-cache',
-              per_page: 100
+              labels: ['highscore-cache'],
+              createLabels: ['highscore-cache', 'automated'],
+              matchTitle: CACHE_ISSUE_TITLE,
+              title: CACHE_ISSUE_TITLE,
+              body: JSON.stringify(cacheData, null, 2),
+              lock: true,
+              lockReason: 'off-topic',
+              // The body is recomputed in full on every run, so a duplicate holds nothing unique
+              isEmpty: () => true,
+              botLogin: RECORD_OWNER_LOGIN,
+              logger: lookupLogger,
             });
 
-            // Find issue with exact title match
-            const existingIssue = issues.find(issue => issue.title === CACHE_ISSUE_TITLE);
+            const issueNumber = cacheIssue.number;
 
-            let issueNumber;
-
-            if (existingIssue) {
-              // Update existing issue
-              issueNumber = existingIssue.number;
+            if (created) {
+              console.log(`📝 Created and locked cache issue #${issueNumber}`);
+            } else {
               console.log(`📝 Updating existing cache issue #${issueNumber}...`);
-
               await github.rest.issues.update({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueNumber,
                 body: JSON.stringify(cacheData, null, 2)
               });
-            } else {
-              // Create new issue
-              console.log('📝 Creating new cache issue...');
-
-              const { data: newIssue } = await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: CACHE_ISSUE_TITLE,
-                body: JSON.stringify(cacheData, null, 2),
-                labels: ['highscore-cache', 'automated']
-              });
-
-              issueNumber = newIssue.number;
-
-              // CRITICAL: Check for duplicate issues created by race condition
-              console.log('🔍 Verifying no duplicate issues...');
-              const { data: verifyIssues } = await github.rest.issues.listForRepo({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: 'open',
-                labels: 'highscore-cache',
-                per_page: 100
-              });
-
-              const duplicates = verifyIssues.filter(issue => issue.title === CACHE_ISSUE_TITLE);
-
-              if (duplicates.length > 1) {
-                console.warn('⚠️ Multiple cache issues detected! Closing newer duplicates...');
-                console.log('   Found issues:', duplicates.map(i => `#${i.number}`).join(', '));
-
-                // Sort by issue number (oldest first)
-                duplicates.sort((a, b) => a.number - b.number);
-                const primaryIssue = duplicates[0];
-                const duplicatesToClose = duplicates.slice(1);
-
-                console.log(`   Primary issue: #${primaryIssue.number}`);
-                console.log(`   Duplicates to close: ${duplicatesToClose.map(i => `#${i.number}`).join(', ')}`);
-
-                // Close duplicate issues
-                for (const duplicate of duplicatesToClose) {
-                  try {
-                    await github.rest.issues.update({
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      issue_number: duplicate.number,
-                      state: 'closed',
-                      state_reason: 'not_planned'
-                    });
-
-                    // Add comment explaining why it was closed
-                    await github.rest.issues.createComment({
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      issue_number: duplicate.number,
-                      body: '🤖 This issue was automatically closed because it is a duplicate. The primary cache issue is #' + primaryIssue.number + '.\n\nThis can happen when multiple workflow runs execute simultaneously.'
-                    });
-
-                    console.log(`   ✓ Closed duplicate issue #${duplicate.number}`);
-                  } catch (closeError) {
-                    console.error(`   ✗ Failed to close duplicate issue #${duplicate.number}:`, closeError.message);
-                  }
-                }
-
-                // Use the primary (oldest) issue
-                issueNumber = primaryIssue.number;
-                console.log(`✅ Using primary issue #${issueNumber}`);
-              } else {
-                console.log('✓ No duplicates found');
-              }
-
-              // Lock the issue to prevent unwanted comments
-              try {
-                await github.rest.issues.lock({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issueNumber,
-                  lock_reason: 'off-topic'
-                });
-                console.log('🔒 Locked cache issue to collaborators only');
-              } catch (lockError) {
-                console.warn('⚠️ Failed to lock issue:', lockError.message);
-              }
             }
 
             console.log(`✅ Cache updated successfully!`);

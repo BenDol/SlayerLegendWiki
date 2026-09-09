@@ -13,7 +13,6 @@ functions/_shared/            # ← Shared business logic (platform-agnostic)
 ├── validation.js             # Request validation
 ├── WikiGitHubStorage.js      # Storage implementation
 ├── createWikiStorage.js      # Storage factory
-├── githubBot.js              # GitHub bot operations
 ├── oauth.js                  # OAuth operations
 └── jwt.js                    # JWT utilities
 
@@ -30,10 +29,12 @@ All functions in `api/` directory:
 
 | Function | Method | Purpose | Environment Variables |
 |----------|--------|---------|----------------------|
-| `github-bot.js` | POST | Bot-authenticated GitHub operations | `WIKI_BOT_TOKEN`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
-| `save-data.js` | POST | Save user data (builds, loadouts, spirits, grids) | `WIKI_BOT_TOKEN`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
-| `load-data.js` | GET | Load user data | `WIKI_BOT_TOKEN`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
-| `delete-data.js` | POST | Delete user data | `WIKI_BOT_TOKEN`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
+| `github-bot.js` | POST | Bot-authenticated GitHub operations | `WIKI_BOT_TOKEN`, `WIKI_BOT_USERNAME`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
+| `save-data.js` | POST | Save user data (builds, loadouts, spirits, grids) | `WIKI_BOT_TOKEN`, `WIKI_BOT_USERNAME`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
+| `load-data.js` | GET | Load user data | `WIKI_BOT_TOKEN`, `WIKI_BOT_USERNAME`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
+| `delete-data.js` | POST | Delete user data | `WIKI_BOT_TOKEN`, `WIKI_BOT_USERNAME`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
+
+`WIKI_BOT_USERNAME` names the account that owns issue-backed records. Duplicate records are only ever closed when they were authored by that account; without it, duplicates are left open and reported in the logs.
 | `access-token.js` | POST | OAuth access token proxy (CORS bypass) | None |
 | `device-code.js` | POST | OAuth device code proxy (CORS bypass) | None |
 

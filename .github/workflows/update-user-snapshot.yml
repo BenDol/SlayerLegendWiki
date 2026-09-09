@@ -84,6 +84,19 @@ jobs:
             const SNAPSHOT_LABEL = 'user-snapshot';
             const SNAPSHOT_TITLE_PREFIX = '[User Snapshot]';
             const BOT_USERNAME = process.env.WIKI_BOT_USERNAME || 'slayer-wiki-bot';
+            const { pathToFileURL } = require('url');
+            // Shared issue lookup: GraphQL first, REST list only as the absence cross-check,
+            // oldest open issue canonical. See src/services/github/issueLookup.js.
+            const issueLookup = await import(pathToFileURL(`${process.env.GITHUB_WORKSPACE}/src/services/github/issueLookup.js`).href);
+            // Route the lookup module's logging through the Actions core logger
+            const lookupLogger = {
+              debug: (message, data) => core.debug(`${message} ${JSON.stringify(data ?? {})}`),
+              info: (message, data) => core.info(`${message} ${JSON.stringify(data ?? {})}`),
+              warn: (message, data) => core.warning(`${message} ${JSON.stringify(data ?? {})}`),
+              error: (message, data) => core.error(`${message} ${JSON.stringify(data ?? {})}`),
+            };
+            // Records created here are authored by the Actions token; only its issues may be closed as duplicates
+            const RECORD_OWNER_LOGIN = 'github-actions[bot]';
 
             // Read release date from environment variable
             let releaseDate = null; // null = no filtering
@@ -314,19 +327,21 @@ jobs:
               // Get wiki join date from achievements issue (created on first login)
               let joinedAt = null;
               try {
-                const { data: achievementIssues } = await github.rest.issues.listForRepo({
+                const { issue: achievementsIssue, confirmedAbsent } = await issueLookup.findCanonicalIssue(github, {
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  labels: `achievements,user-id:${userData.id}`,
-                  state: 'open',
-                  per_page: 1,
+                  labels: ['achievements', `user-id:${userData.id}`],
+                  selectorLabel: `user-id:${userData.id}`,
+                  logger: lookupLogger,
                 });
 
-                if (achievementIssues.length > 0) {
-                  joinedAt = achievementIssues[0].created_at;
+                if (achievementsIssue) {
+                  joinedAt = achievementsIssue.created_at;
                   console.log(`✅ User joined wiki: ${new Date(joinedAt).toLocaleDateString()}`);
-                } else {
+                } else if (confirmedAbsent) {
                   console.log('⚠️ No achievements issue found (user may have just joined)');
+                } else {
+                  console.warn('⚠️ Could not confirm whether an achievements issue exists; joinedAt left unset');
                 }
               } catch (error) {
                 console.warn('⚠️ Failed to fetch achievements issue:', error.message);
@@ -389,30 +404,40 @@ jobs:
                   body: issueBody,
                 });
               } else {
-                // Create new snapshot with user ID label
+                // Create the snapshot only once both GitHub backends confirm it is
+                // absent (the REST list alone is eventually consistent). If a
+                // concurrent run created one first, this fresher body replaces it.
                 console.log('📝 Creating new snapshot issue...');
 
-                const { data: newIssue } = await github.rest.issues.create({
+                const { issue, created } = await issueLookup.getOrCreateIssue(github, {
                   owner: context.repo.owner,
                   repo: context.repo.repo,
+                  labels: [SNAPSHOT_LABEL, userIdLabel],
+                  createLabels: [SNAPSHOT_LABEL, userIdLabel, 'automated'],
+                  selectorLabel: userIdLabel,
                   title: issueTitle,
                   body: issueBody,
-                  labels: [SNAPSHOT_LABEL, userIdLabel, 'automated'],
+                  lock: true,
+                  lockReason: 'off-topic',
+                  // The body is recomputed in full on every run, so a duplicate holds nothing unique
+                  isEmpty: () => true,
+                  botLogin: RECORD_OWNER_LOGIN,
+                  logger: lookupLogger,
                 });
 
-                issueNumber = newIssue.number;
+                issueNumber = issue.number;
 
-                // Lock the issue to prevent unwanted comments
-                try {
-                  await github.rest.issues.lock({
+                if (created) {
+                  console.log(`🔒 Created and locked snapshot issue #${issueNumber} for @${snapshot.username}`);
+                } else {
+                  console.log(`📝 Snapshot issue #${issueNumber} was created concurrently; updating it...`);
+                  await github.rest.issues.update({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: issueNumber,
-                    lock_reason: 'off-topic'
+                    title: issueTitle,
+                    body: issueBody,
                   });
-                  console.log(`🔒 Locked snapshot issue for @${snapshot.username} to collaborators only`);
-                } catch (lockError) {
-                  console.warn('⚠️ Failed to lock issue:', lockError.message);
                 }
               }
 
@@ -432,41 +457,33 @@ jobs:
               console.log('🔍 Fetching existing snapshots...');
               const snapshots = new Map();
 
-              let page = 1;
-              let hasMore = true;
+              // GraphQL-first, every page; the REST list alone is eventually consistent
+              const { issues } = await issueLookup.findIssues(github, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: [SNAPSHOT_LABEL],
+                confirmAbsence: false,
+                logger: lookupLogger,
+              });
 
-              while (hasMore) {
-                const { data: issues } = await github.rest.issues.listForRepo({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  labels: SNAPSHOT_LABEL,
-                  state: 'open',
-                  per_page: 100,
-                  page: page,
-                });
+              for (const issue of issues) {
+                // Extract user ID from label "user-id:12345"
+                const userIdLabel = issue.labels.find(label =>
+                  typeof label === 'string' ? label.startsWith('user-id:') : label.name?.startsWith('user-id:')
+                );
 
-                for (const issue of issues) {
-                  // Extract user ID from label "user-id:12345"
-                  const userIdLabel = issue.labels.find(label =>
-                    typeof label === 'string' ? label.startsWith('user-id:') : label.name?.startsWith('user-id:')
-                  );
-
-                  if (userIdLabel) {
-                    const labelName = typeof userIdLabel === 'string' ? userIdLabel : userIdLabel.name;
-                    const userId = labelName.replace('user-id:', '');
-                    snapshots.set(userId, issue);
-                  } else {
-                    // Legacy snapshot without user ID label - parse from title for backwards compatibility
-                    const match = issue.title.match(/\[User Snapshot\]\s+(.+)/);
-                    if (match) {
-                      // Store by username for legacy snapshots (will be migrated on next update)
-                      snapshots.set(`legacy:${match[1]}`, issue);
-                    }
+                if (userIdLabel) {
+                  const labelName = typeof userIdLabel === 'string' ? userIdLabel : userIdLabel.name;
+                  const userId = labelName.replace('user-id:', '');
+                  snapshots.set(userId, issue);
+                } else {
+                  // Legacy snapshot without user ID label - parse from title for backwards compatibility
+                  const match = issue.title.match(/\[User Snapshot\]\s+(.+)/);
+                  if (match) {
+                    // Store by username for legacy snapshots (will be migrated on next update)
+                    snapshots.set(`legacy:${match[1]}`, issue);
                   }
                 }
-
-                hasMore = issues.length === 100;
-                page++;
               }
 
               console.log(`✅ Found ${snapshots.size} existing snapshots`);

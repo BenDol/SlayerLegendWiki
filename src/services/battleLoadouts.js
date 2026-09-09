@@ -4,6 +4,7 @@ import { createLogger } from '../utils/logger';
 import { eventBus, EventNames } from '../../wiki-framework/src/services/eventBus.js';
 import { queueAchievementCheck } from '../../wiki-framework/src/services/achievements/achievementQueue.js';
 import { deserializeSoulWeaponBuild } from '../utils/battleLoadoutSerializer.js';
+import { findRecordIssue, getOrCreateIssue } from './github/issueLookup.js';
 
 const logger = createLogger('BattleLoadouts');
 
@@ -42,6 +43,26 @@ const LOADOUTS_TITLE_PREFIX = '[Battle Loadout]';
 const MAX_LOADOUTS_PER_USER = 10; // Limit to prevent issue size bloat
 
 /**
+ * Locate the user's loadouts issue.
+ * The user-id label pins the lookup to the user's own records; the title is
+ * consulted when that misses so legacy issues (created before the label
+ * existed) are still found and can be relabelled.
+ * @private
+ * @param {{confirmAbsence: boolean}} options - Reads pass false (a miss then costs one call); saves pass true
+ */
+function findUserLoadoutsIssue(octokit, owner, repo, username, userId, { confirmAbsence }) {
+  return findRecordIssue(octokit, {
+    owner,
+    repo,
+    labels: [LOADOUTS_LABEL],
+    identityLabel: userId ? createUserIdLabel(userId) : null,
+    fallbackTitle: `${LOADOUTS_TITLE_PREFIX} ${username}`,
+    confirmAbsence,
+    logger,
+  });
+}
+
+/**
  * Get all loadouts for a specific user
  * @param {string} owner - Repository owner
  * @param {string} repo - Repository name
@@ -53,40 +74,14 @@ export async function getUserLoadouts(owner, repo, username, userId = null) {
   try {
     const octokit = getOctokit();
 
-    // Search for the user's loadouts issue
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: LOADOUTS_LABEL,
-      state: 'open',
-      per_page: 100,
-    });
+    const { issue: loadoutsIssue } = await findUserLoadoutsIssue(octokit, owner, repo, username, userId, { confirmAbsence: false });
 
-    let loadoutsIssue = null;
-
-    // First try: Search by user ID label (permanent identifier, preferred)
-    if (userId) {
-      loadoutsIssue = issues.find(issue =>
-        issue.labels.some(label =>
-          (typeof label === 'string' && label === `user-id:${userId}`) ||
-          (typeof label === 'object' && label.name === `user-id:${userId}`)
-        )
+    if (loadoutsIssue) {
+      logger.debug(
+        userId
+          ? `Found loadouts for user ${username} by ID: ${userId}`
+          : `Found legacy loadouts for ${username} by title`
       );
-
-      if (loadoutsIssue) {
-        logger.debug(`Found loadouts for user ${username} by ID: ${userId}`);
-      }
-    }
-
-    // Second try: Search by username in title (legacy or no user ID provided)
-    if (!loadoutsIssue) {
-      loadoutsIssue = issues.find(
-        issue => issue.title === `${LOADOUTS_TITLE_PREFIX} ${username}`
-      );
-
-      if (loadoutsIssue) {
-        logger.debug(`Found legacy loadouts for ${username} by title`);
-      }
     }
 
     if (!loadoutsIssue) {
@@ -162,101 +157,74 @@ export async function saveUserLoadouts(owner, repo, username, userId, loadouts) 
       throw new Error(`Maximum ${MAX_LOADOUTS_PER_USER} loadouts allowed per user`);
     }
 
-    // Search for existing loadouts issue
-    const { data: issues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: LOADOUTS_LABEL,
-      state: 'open',
-      per_page: 100,
-    });
-
-    let existingIssue = null;
-
-    // First try: Search by user ID label
-    if (userId) {
-      existingIssue = issues.find(issue =>
-        issue.labels.some(label =>
-          (typeof label === 'string' && label === `user-id:${userId}`) ||
-          (typeof label === 'object' && label.name === `user-id:${userId}`)
-        )
-      );
-    }
-
-    // Second try: Search by username in title
-    if (!existingIssue) {
-      existingIssue = issues.find(
-        issue => issue.title === `${LOADOUTS_TITLE_PREFIX} ${username}`
-      );
-    }
-
     const issueTitle = `${LOADOUTS_TITLE_PREFIX} ${username}`;
     const issueBody = JSON.stringify(loadouts, null, 2);
     const userIdLabel = userId ? createUserIdLabel(userId) : null;
+    const labels = userIdLabel ? [LOADOUTS_LABEL, userIdLabel] : [LOADOUTS_LABEL];
 
-    if (existingIssue) {
-      // Update existing loadouts
-      logger.debug(`Updating loadouts for ${username}`, { issueNumber: existingIssue.number });
+    // One lookup decides update-vs-create. A legacy title-only issue is adopted
+    // and relabelled; a new issue is created only once absence is confirmed.
+    // Browser code never reconciles duplicates: that is the server's job, and
+    // doing it here would let a stale client snapshot overwrite merged data.
+    const lookup = await findUserLoadoutsIssue(octokit, owner, repo, username, userId, { confirmAbsence: true });
+
+    if (lookup.issue) {
+      logger.debug(`Updating loadouts for ${username}`, { issueNumber: lookup.issue.number });
 
       const { data: updatedIssue } = await octokit.rest.issues.update({
         owner,
         repo,
-        issue_number: existingIssue.number,
+        issue_number: lookup.issue.number,
         title: issueTitle,
         body: issueBody,
       });
 
-      // Add user ID label if missing (migration for legacy)
-      if (userIdLabel) {
-        const hasUserIdLabel = existingIssue.labels.some(label =>
-          (typeof label === 'string' && label.startsWith('user-id:')) ||
-          (typeof label === 'object' && label.name?.startsWith('user-id:'))
-        );
-
-        if (!hasUserIdLabel) {
-          logger.debug(`Adding user-id label to legacy loadouts for ${username}`);
-          await octokit.rest.issues.addLabels({
-            owner,
-            repo,
-            issue_number: existingIssue.number,
-            labels: [userIdLabel],
-          });
-        }
+      if (lookup.legacy && userIdLabel) {
+        logger.debug(`Adding user-id label to legacy loadouts for ${username}`);
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: lookup.issue.number,
+          labels: [userIdLabel],
+        });
       }
 
       return updatedIssue;
-    } else {
-      // Create new loadouts issue
-      logger.debug(`Creating new loadouts issue for ${username}${userIdLabel ? ` (ID: ${userId})` : ''}`);
-
-      const labels = [LOADOUTS_LABEL];
-      if (userIdLabel) {
-        labels.push(userIdLabel);
-      }
-
-      const { data: newIssue } = await octokit.rest.issues.create({
-        owner,
-        repo,
-        title: issueTitle,
-        body: issueBody,
-        labels,
-      });
-
-      // Lock the issue to prevent unwanted comments
-      try {
-        await octokit.rest.issues.lock({
-          owner,
-          repo,
-          issue_number: newIssue.number,
-          lock_reason: 'off-topic',
-        });
-        logger.debug(`Locked loadouts issue for ${username} to collaborators only`);
-      } catch (lockError) {
-        logger.warn(`Failed to lock issue for ${username}`, { error: lockError.message });
-      }
-
-      return newIssue;
     }
+
+    const { issue, created } = await getOrCreateIssue(octokit, {
+      owner,
+      repo,
+      labels,
+      ...(userIdLabel ? { selectorLabel: userIdLabel } : { matchTitle: issueTitle }),
+      title: issueTitle,
+      body: issueBody,
+      lock: true,
+      lockReason: 'off-topic',
+      precomputed: lookup,
+      reconcile: false,
+      logger,
+    });
+
+    if (created) {
+      logger.debug(`Created new loadouts issue for ${username}${userIdLabel ? ` (ID: ${userId})` : ''}`, {
+        issueNumber: issue.number,
+      });
+      return issue;
+    }
+
+    // A concurrent save created the issue first; this snapshot is the latest write
+    logger.debug(`Updating loadouts for ${username}`, { issueNumber: issue.number });
+
+    const { data: updatedIssue } = await octokit.rest.issues.update({
+      owner,
+      repo,
+      issue_number: issue.number,
+      title: issueTitle,
+      body: issueBody,
+    });
+
+    return updatedIssue;
   } catch (error) {
     logger.error(`Failed to save loadouts for ${username}`, { error });
     throw error;

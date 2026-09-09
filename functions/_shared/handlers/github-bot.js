@@ -1,5 +1,229 @@
 import { createLogger } from '../../../src/utils/logger.js';
+import {
+  findCanonicalIssue,
+  findIssues,
+  findRecordIssue,
+  getIssue,
+  getOrCreateIssue,
+  normalizeLabels,
+  reconcileDuplicates,
+} from '../../../src/services/github/issueLookup.js';
+import { DATA_TYPE_CONFIGS, absenceUnconfirmedResponse, isAbsenceUnconfirmed } from '../utils.js';
 const logger = createLogger('GithubBot');
+const lookupLogger = logger.child('IssueLookup');
+
+// ============================================================================
+// Issue-backed record lookups
+//
+// Every read of an issue that acts as a database record goes through
+// src/services/github/issueLookup.js: GraphQL first, the REST list only as
+// the absence cross-check, lowest issue number wins, and reads never create.
+// The REST list alone returned [] for existing records in 12-32 % of calls
+// (measured 2026-09-09), which is how the duplicate index issues were born.
+// ============================================================================
+
+const ACHIEVEMENTS_LABEL = 'achievements';
+const USER_SNAPSHOT_LABEL = 'user-snapshot';
+const AUTOMATED_LABEL = 'automated';
+const RECORD_LOCK_REASON = 'off-topic';
+
+/** Login of the bot account; reconciliation only ever closes the bot's own issues. */
+function getBotLogin(adapter) {
+  return adapter.getEnv('WIKI_BOT_USERNAME') || adapter.getEnv('VITE_WIKI_BOT_USERNAME') || null;
+}
+
+/**
+ * Labels that identify bot-managed records. `create-comment-issue` is an
+ * unauthenticated action, so it must never mint an issue that the record
+ * lookups would adopt or merge.
+ */
+const RESERVED_RECORD_LABELS = Object.freeze(
+  new Set(
+    [
+      'content-creator-index',
+      ACHIEVEMENTS_LABEL,
+      USER_SNAPSHOT_LABEL,
+      'highscore-cache',
+      'top-contributor',
+      'email-verification',
+      'soul-weapon-grids',
+      ...Object.values(DATA_TYPE_CONFIGS).map((config) => config?.label).filter(Boolean),
+    ].map((label) => label.toLowerCase())
+  )
+);
+const RESERVED_RECORD_LABEL_PREFIXES = Object.freeze(['user-id:', 'data-version:', 'wiki-admin:', 'weapon-id:']);
+
+/** The first label that would let an anonymous caller forge a bot-managed record, or null. */
+function findReservedLabel(labels) {
+  return (
+    normalizeLabels(labels).find((label) => {
+      const lower = label.toLowerCase();
+      return RESERVED_RECORD_LABELS.has(lower) || RESERVED_RECORD_LABEL_PREFIXES.some((prefix) => lower.startsWith(prefix));
+    }) ?? null
+  );
+}
+
+/** Issue states the public list action accepts. */
+const LISTABLE_ISSUE_STATES = Object.freeze(new Set(['open', 'closed', 'all']));
+
+/** Pages the public list action may walk per request (300 issues); it is a read, so no absence protocol either. */
+const LIST_ISSUES_MAX_PAGES = 3;
+
+function parseJsonObject(text) {
+  try {
+    const value = JSON.parse(text || '{}');
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Union achievement lists by id, keeping the earliest unlock of each. */
+function unionAchievements(...lists) {
+  const byId = new Map();
+  for (const item of lists.flat()) {
+    if (!item?.id) continue;
+    const previous = byId.get(item.id);
+    if (!previous || (item.unlockedAt && previous.unlockedAt && item.unlockedAt < previous.unlockedAt)) {
+      byId.set(item.id, item);
+    }
+  }
+  return [...byId.values()];
+}
+
+/** Merge strategy for duplicate "[Achievements] user" issues: fold the newer issue's unlocks into the oldest. */
+function createAchievementMerge(octokit, owner, repo) {
+  return async (canonical, duplicate) => {
+    const base = parseJsonObject(canonical.body);
+    const extra = parseJsonObject(duplicate.body);
+    const merged = unionAchievements(base.achievements ?? [], extra.achievements ?? []);
+    if (JSON.stringify(merged) === JSON.stringify(base.achievements ?? [])) return;
+
+    const body = JSON.stringify({ ...base, achievements: merged, lastUpdated: new Date().toISOString() }, null, 2);
+    await octokit.rest.issues.update({ owner, repo, issue_number: canonical.number, body });
+    canonical.body = body;
+  };
+}
+
+/** Merge strategy for duplicate "[User Snapshot] user" issues: the most recently updated snapshot wins. */
+function createSnapshotMerge(octokit, owner, repo) {
+  return async (canonical, duplicate) => {
+    const base = parseJsonObject(canonical.body);
+    const extra = parseJsonObject(duplicate.body);
+    if (!extra.lastUpdated || (base.lastUpdated && extra.lastUpdated <= base.lastUpdated)) return;
+
+    await octokit.rest.issues.update({ owner, repo, issue_number: canonical.number, body: duplicate.body });
+    canonical.body = duplicate.body;
+  };
+}
+
+/**
+ * Find a user's record issue by its user-id label, falling back to the exact
+ * title for legacy records that predate the label (`legacy: true` in the
+ * result). Duplicates left behind by earlier races are merged into the oldest
+ * issue and closed.
+ * @returns {Promise<{issue: Object|null, duplicates: Object[], legacy: boolean, confirmedAbsent: boolean}>}
+ */
+async function findUserRecordIssue(octokit, { owner, repo, typeLabel, userIdLabel, fallbackTitle = null, merge, botLogin }) {
+  const result = await findRecordIssue(octokit, {
+    owner,
+    repo,
+    labels: [typeLabel],
+    identityLabel: userIdLabel,
+    fallbackTitle,
+    logger: lookupLogger,
+  });
+
+  if (result.issue && result.duplicates.length > 0) {
+    await reconcileDuplicates(octokit, {
+      owner,
+      repo,
+      canonical: result.issue,
+      duplicates: result.duplicates,
+      merge,
+      botLogin,
+      logger: lookupLogger,
+    });
+  }
+
+  return result;
+}
+
+const findUserAchievementsIssue = (octokit, { owner, repo, userIdLabel, fallbackTitle = null, botLogin }) =>
+  findUserRecordIssue(octokit, {
+    owner,
+    repo,
+    typeLabel: ACHIEVEMENTS_LABEL,
+    userIdLabel,
+    fallbackTitle,
+    merge: createAchievementMerge(octokit, owner, repo),
+    botLogin,
+  });
+
+const findUserSnapshotIssue = (octokit, { owner, repo, userIdLabel, fallbackTitle = null, botLogin }) =>
+  findUserRecordIssue(octokit, {
+    owner,
+    repo,
+    typeLabel: USER_SNAPSHOT_LABEL,
+    userIdLabel,
+    fallbackTitle,
+    merge: createSnapshotMerge(octokit, owner, repo),
+    botLogin,
+  });
+
+/**
+ * Persist a user's achievements: update the existing issue (relabelling a
+ * legacy one so the next lookup is direct), or create one once its absence
+ * is confirmed. Losing a creation race folds the new unlocks into the winner
+ * instead of leaving a second issue behind.
+ * @returns {Promise<{issueNumber: number, created: boolean}>}
+ */
+async function saveUserAchievements(octokit, { owner, repo, username, userIdLabel, existingIssue, legacy = false, issueData, botLogin }) {
+  const body = JSON.stringify(issueData, null, 2);
+
+  if (existingIssue) {
+    await octokit.rest.issues.update({ owner, repo, issue_number: existingIssue.number, body });
+    if (legacy) {
+      try {
+        await octokit.rest.issues.addLabels({ owner, repo, issue_number: existingIssue.number, labels: [userIdLabel] });
+      } catch (error) {
+        logger.warn('Failed to add user-id label to legacy achievements issue', { number: existingIssue.number, error: error.message });
+      }
+    }
+    return { issueNumber: existingIssue.number, created: false };
+  }
+
+  const { issue, created } = await getOrCreateIssue(octokit, {
+    owner,
+    repo,
+    labels: [ACHIEVEMENTS_LABEL, userIdLabel],
+    createLabels: [ACHIEVEMENTS_LABEL, userIdLabel, AUTOMATED_LABEL],
+    selectorLabel: userIdLabel,
+    title: `[Achievements] ${username}`,
+    body,
+    lock: true,
+    lockReason: RECORD_LOCK_REASON,
+    merge: createAchievementMerge(octokit, owner, repo),
+    botLogin,
+    logger: lookupLogger,
+  });
+
+  if (!created) {
+    const winner = parseJsonObject(issue.body);
+    await octokit.rest.issues.update({
+      owner,
+      repo,
+      issue_number: issue.number,
+      body: JSON.stringify(
+        { ...issueData, achievements: unionAchievements(winner.achievements ?? [], issueData.achievements ?? []) },
+        null,
+        2
+      ),
+    });
+  }
+
+  return { issueNumber: issue.number, created };
+}
 
 // Lazy-load donator registry to avoid top-level await issues
 let donatorRegistryModule = null;
@@ -448,19 +672,38 @@ async function handleUpdateIssue(adapter, octokit, { owner, repo, issueNumber, b
 /**
  * List issues by label
  * Required: labels (string or array)
- * Optional: state, per_page
+ * Optional: state
+ * Every page is walked (bounded by the lookup module's ceiling); a `per_page`
+ * sent by older clients is accepted and ignored.
  */
-async function handleListIssues(adapter, octokit, { owner, repo, labels, state = 'open', per_page = 100 }) {
+async function handleListIssues(adapter, octokit, { owner, repo, labels, state = 'open' }) {
   if (!labels) {
     return adapter.createJsonResponse(400, { error: 'Missing required field: labels' });
   }
 
-  const { data: issues } = await octokit.rest.issues.listForRepo({
+  const labelsResult = validateLabels(labels);
+  if (!labelsResult.valid) {
+    return adapter.createJsonResponse(400, { error: labelsResult.error });
+  }
+
+  const labelList = normalizeLabels(labels);
+  if (labelList.length === 0) {
+    return adapter.createJsonResponse(400, { error: 'Missing required field: labels' });
+  }
+
+  const wantedState = String(state).toLowerCase();
+  if (!LISTABLE_ISSUE_STATES.has(wantedState)) {
+    return adapter.createJsonResponse(400, { error: `Invalid state "${state}" (expected open, closed or all)` });
+  }
+
+  const { issues } = await findIssues(octokit, {
     owner,
     repo,
-    labels: Array.isArray(labels) ? labels.join(',') : labels,
-    state,
-    per_page,
+    labels: labelList,
+    state: wantedState,
+    maxPages: LIST_ISSUES_MAX_PAGES,
+    confirmAbsence: false,
+    logger: lookupLogger,
   });
 
   // Security: Filter to only bot-created issues
@@ -521,22 +764,36 @@ async function handleCreateCommentIssue(adapter, octokit, { owner, repo, title, 
     return adapter.createJsonResponse(400, { error: labelsResult.error });
   }
 
+  // This action is unauthenticated: never let it mint a bot-managed record
+  const reservedLabel = findReservedLabel(labels);
+  if (reservedLabel) {
+    return adapter.createJsonResponse(400, { error: `Label "${reservedLabel}" is reserved for bot-managed records` });
+  }
+
   // Check for existing issue if preventDuplicates is enabled
   if (preventDuplicates) {
     const botUsername = adapter.getEnv('WIKI_BOT_USERNAME');
     const labelsArray = Array.isArray(labels) ? labels : [labels];
 
-    // Search for existing issue with the same labels
-    const { data: existingIssues } = await octokit.rest.issues.listForRepo({
+    // Search for existing issues with the same labels (oldest first)
+    const { issues: existingIssues, confirmedAbsent } = await findIssues(octokit, {
       owner,
       repo,
-      labels: labelsArray.join(','),
+      labels: labelsArray,
       state: 'open',
-      per_page: 100,
+      logger: lookupLogger,
     });
 
     // Filter to only bot-created issues
     const botIssues = existingIssues.filter(issue => issue.user.login === botUsername);
+
+    // Creating on an unconfirmed miss is exactly how duplicate index issues were born
+    if (existingIssues.length === 0 && !confirmedAbsent) {
+      return absenceUnconfirmedResponse(
+        adapter,
+        new Error(`No open issue with labels ${labelsArray.join(', ')} was visible, but GitHub did not confirm its absence`)
+      );
+    }
 
     // If issue already exists, return it instead of creating duplicate
     if (botIssues.length > 0) {
@@ -2108,18 +2365,19 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
 
     // 5. Fetch user snapshot from GitHub Issues
     const userIdLabel = `user-id:${userId}`;
-    const { data: snapshotIssues } = await octokit.rest.issues.listForRepo({
+    const botLogin = getBotLogin(adapter);
+    const { issue: snapshotIssue } = await findUserSnapshotIssue(octokit, {
       owner,
       repo,
-      labels: `user-snapshot,${userIdLabel}`,
-      state: 'open',
-      per_page: 1,
+      userIdLabel,
+      fallbackTitle: `[User Snapshot] ${username}`,
+      botLogin,
     });
 
     let userSnapshot = null;
-    if (snapshotIssues.length > 0) {
+    if (snapshotIssue) {
       try {
-        userSnapshot = JSON.parse(snapshotIssues[0].body);
+        userSnapshot = JSON.parse(snapshotIssue.body);
       } catch (error) {
         logger.error('Failed to parse user snapshot', { error });
       }
@@ -2162,20 +2420,18 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
     }
 
     // 6. Get existing achievements
-    const { data: achievementIssues } = await octokit.rest.issues.listForRepo({
+    const { issue: achievementsIssue, legacy: legacyAchievements } = await findUserAchievementsIssue(octokit, {
       owner,
       repo,
-      labels: `achievements,${userIdLabel}`,
-      state: 'open',
-      per_page: 1,
+      userIdLabel,
+      fallbackTitle: `[Achievements] ${username}`,
+      botLogin,
     });
 
     let existingAchievements = [];
-    let existingIssueNumber = null;
-    if (achievementIssues.length > 0) {
-      existingIssueNumber = achievementIssues[0].number;
+    if (achievementsIssue) {
       try {
-        const existingData = JSON.parse(achievementIssues[0].body);
+        const existingData = JSON.parse(achievementsIssue.body);
         existingAchievements = existingData.achievements || [];
       } catch (error) {
         logger.error('Failed to parse existing achievements', { error });
@@ -2221,64 +2477,17 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
         version: '1.0',
       };
 
-      const body = JSON.stringify(issueData, null, 2);
-      const title = `[Achievements] ${username}`;
-      const labels = ['achievements', userIdLabel, 'automated'];
-
-      if (existingIssueNumber) {
-        // Update existing issue
-        await octokit.rest.issues.update({
-          owner,
-          repo,
-          issue_number: existingIssueNumber,
-          body,
-        });
-        logger.info('Updated achievements', { username, newCount: newlyUnlocked.length });
-      } else {
-        // Double-check before creating (race condition prevention)
-        // If multiple requests run simultaneously, one might have just created the issue
-        const { data: recheckIssues } = await octokit.rest.issues.listForRepo({
-          owner,
-          repo,
-          labels: `achievements,${userIdLabel}`,
-          state: 'open',
-          per_page: 1,
-        });
-
-        if (recheckIssues.length > 0) {
-          // Issue was just created by another request, update it instead
-          await octokit.rest.issues.update({
-            owner,
-            repo,
-            issue_number: recheckIssues[0].number,
-            body,
-          });
-          logger.info('Updated achievements (race condition avoided)', { username, newCount: newlyUnlocked.length });
-        } else {
-          // Create new issue
-          const { data: newIssue } = await octokit.rest.issues.create({
-            owner,
-            repo,
-            title,
-            body,
-            labels,
-          });
-
-          // Lock the issue
-          try {
-            await octokit.rest.issues.lock({
-              owner,
-              repo,
-              issue_number: newIssue.number,
-              lock_reason: 'off-topic',
-            });
-          } catch (lockError) {
-            logger.warn('Failed to lock achievement issue', { error: lockError.message });
-          }
-
-          logger.info('Created achievements', { username, count: newlyUnlocked.length });
-        }
-      }
+      const { created } = await saveUserAchievements(octokit, {
+        owner,
+        repo,
+        username,
+        userIdLabel,
+        existingIssue: achievementsIssue,
+        legacy: legacyAchievements,
+        issueData,
+        botLogin,
+      });
+      logger.info(created ? 'Created achievements' : 'Updated achievements', { username, newCount: newlyUnlocked.length });
     }
 
     return adapter.createJsonResponse(200, {
@@ -2287,6 +2496,7 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
       totalAchievements: existingAchievements.length + newlyUnlocked.length,
     });
   } catch (error) {
+    if (isAbsenceUnconfirmed(error)) return absenceUnconfirmedResponse(adapter, error);
     console.error('[CF] Failed to check achievements - caught error', {
       error: error.message,
       stack: error.stack,
@@ -2398,18 +2608,19 @@ async function handleCheckSingleAchievement(adapter, octokit, { owner, repo, ach
 
     // 3. Get user snapshot
     const userIdLabel = `user-id:${userId}`;
-    const { data: snapshotIssues } = await octokit.rest.issues.listForRepo({
+    const botLogin = getBotLogin(adapter);
+    const { issue: snapshotIssue } = await findUserSnapshotIssue(octokit, {
       owner,
       repo,
-      labels: `user-snapshot,${userIdLabel}`,
-      state: 'open',
-      per_page: 1,
+      userIdLabel,
+      fallbackTitle: `[User Snapshot] ${username}`,
+      botLogin,
     });
 
     let userSnapshot = null;
-    if (snapshotIssues.length > 0) {
+    if (snapshotIssue) {
       try {
-        userSnapshot = JSON.parse(snapshotIssues[0].body);
+        userSnapshot = JSON.parse(snapshotIssue.body);
       } catch (error) {
         console.error('[CF] Failed to parse user snapshot', error);
       }
@@ -2426,21 +2637,19 @@ async function handleCheckSingleAchievement(adapter, octokit, { owner, repo, ach
     }
 
     // 4. Check if already unlocked
-    const { data: achievementIssues } = await octokit.rest.issues.listForRepo({
+    const { issue: achievementsIssue, legacy: legacyAchievements } = await findUserAchievementsIssue(octokit, {
       owner,
       repo,
-      labels: `achievements,${userIdLabel}`,
-      state: 'open',
-      per_page: 1,
+      userIdLabel,
+      fallbackTitle: `[Achievements] ${username}`,
+      botLogin,
     });
 
     let existingAchievements = [];
-    let existingIssueNumber = null;
 
-    if (achievementIssues.length > 0) {
-      existingIssueNumber = achievementIssues[0].number;
+    if (achievementsIssue) {
       try {
-        const data = JSON.parse(achievementIssues[0].body);
+        const data = JSON.parse(achievementsIssue.body);
         existingAchievements = data.achievements || [];
       } catch (error) {
         console.error('[CF] Failed to parse achievements', error);
@@ -2504,41 +2713,17 @@ async function handleCheckSingleAchievement(adapter, octokit, { owner, repo, ach
       version: '1.0',
     };
 
-    const body = JSON.stringify(issueData, null, 2);
-    const title = `[Achievements] ${username}`;
-    const labels = ['achievements', userIdLabel, 'automated'];
-
-    if (existingIssueNumber) {
-      await octokit.rest.issues.update({
-        owner,
-        repo,
-        issue_number: existingIssueNumber,
-        body,
-      });
-      console.log('[CF] Updated achievements', { username, achievementId });
-    } else {
-      const { data: newIssue } = await octokit.rest.issues.create({
-        owner,
-        repo,
-        title,
-        body,
-        labels,
-      });
-
-      // Lock the issue
-      try {
-        await octokit.rest.issues.lock({
-          owner,
-          repo,
-          issue_number: newIssue.number,
-          lock_reason: 'off-topic',
-        });
-      } catch (lockError) {
-        logger.warn('Failed to lock achievement issue', { error: lockError.message });
-      }
-
-      console.log('[CF] Created achievements', { username, achievementId });
-    }
+    const { created } = await saveUserAchievements(octokit, {
+      owner,
+      repo,
+      username,
+      userIdLabel,
+      existingIssue: achievementsIssue,
+      legacy: legacyAchievements,
+      issueData,
+      botLogin,
+    });
+    logger.info(created ? 'Created achievements' : 'Updated achievements', { username, achievementId });
 
     // Return the full achievement data for client
     return adapter.createJsonResponse(200, {
@@ -2550,6 +2735,7 @@ async function handleCheckSingleAchievement(adapter, octokit, { owner, repo, ach
     });
 
   } catch (error) {
+    if (isAbsenceUnconfirmed(error)) return absenceUnconfirmedResponse(adapter, error);
     console.error('[CF] Failed to check single achievement', {
       error: error.message,
       stack: error.stack,
@@ -2593,12 +2779,24 @@ const CREATOR_INDEX_LABEL = 'content-creator-index';
 const CREATOR_INDEX_TITLE = '[Content Creator Index]';
 const CREATOR_INDEX_HEADER = '# Content Creator Index\n\n## Approved Creators\n';
 const PENDING_APPROVALS_HEADER = '\n## Pending Approvals\n';
+const CREATOR_INDEX_FOOTER = '\n---\n\n🤖 Managed by wiki bot';
+const CREATOR_INDEX_INITIAL_BODY = CREATOR_INDEX_HEADER + PENDING_APPROVALS_HEADER + CREATOR_INDEX_FOOTER;
+const CREATOR_INDEX_LOCK_REASON = 'resolved';
+/** How long a finished index lookup keeps answering reads in this isolate; writes always look up afresh. */
+const CREATOR_INDEX_CACHE_TTL_MS = 5000;
 
 /**
- * In-flight request tracking to prevent race conditions
- * Key: "owner/repo", Value: Promise
+ * Coalesced index lookups, keyed by "owner/repo" (creation uses its own key).
+ * Each entry records when it started, so freshness is judged on read and
+ * nothing depends on a timer firing after the response has been sent, which
+ * Cloudflare Workers do not guarantee.
  */
-const pendingCreatorIndexRequests = new Map();
+const creatorIndexLookups = new Map();
+
+/** GitHub stores bodies edited in the web UI with CRLF; the parsers below anchor on LF. */
+function normalizeIndexBody(body) {
+  return String(body ?? '').replace(/\r\n?/g, '\n');
+}
 
 /**
  * Parse creator index map from issue body
@@ -2606,10 +2804,11 @@ const pendingCreatorIndexRequests = new Map();
  */
 function parseCreatorIndex(body) {
   const map = new Map();
-  if (!body) return map;
+  const text = normalizeIndexBody(body);
+  if (!text) return map;
 
   // Find the Approved Creators section
-  const approvedSection = body.match(/## Approved Creators\n([\s\S]*?)(?=\n##|\n---|\n🤖|$)/);
+  const approvedSection = text.match(/## Approved Creators\n([\s\S]*?)(?=\n##|\n---|\n🤖|$)/);
   if (!approvedSection) return map;
 
   // Match lines like: [creator-id]=comment-id
@@ -2631,10 +2830,11 @@ function parseCreatorIndex(body) {
  */
 function parsePendingApprovals(body) {
   const pending = [];
-  if (!body) return pending;
+  const text = normalizeIndexBody(body);
+  if (!text) return pending;
 
   // Find the Pending Approvals section
-  const pendingSection = body.match(/## Pending Approvals\n([\s\S]*?)(?=\n---|\n🤖|$)/);
+  const pendingSection = text.match(/## Pending Approvals\n([\s\S]*?)(?=\n---|\n🤖|$)/);
   if (!pendingSection) return pending;
 
   // Match lines like: - [ ] [Name](URL#comment-123) - Platform - submitted by @user
@@ -2681,12 +2881,206 @@ function serializeCreatorIndex(approvedMap, pendingList) {
     body += `- [${checkbox}] [${pending.channelName}](${pending.commentUrl}) - ${pending.platform} - submitted by @${pending.submittedBy}\n`;
   }
 
-  body += '\n---\n\n🤖 Managed by wiki bot';
+  body += CREATOR_INDEX_FOOTER;
   return body;
 }
 
+/** The index is "empty" when it has never received a submission: template body, no comments. */
+function isCreatorIndexEmpty(issue) {
+  return (issue.comments ?? 0) === 0
+    && parseCreatorIndex(issue.body).size === 0
+    && parsePendingApprovals(issue.body).length === 0;
+}
+
 /**
- * Get or create content creator index issue
+ * Merge strategy for duplicate index issues: union the approved map and the
+ * pending list into the canonical (oldest) issue. Comment IDs stay valid on
+ * closed issues, so submissions themselves never move.
+ */
+function createCreatorIndexMerge(octokit, owner, repo) {
+  return async (canonical, duplicate) => {
+    if (isCreatorIndexEmpty(duplicate)) return;
+
+    const approved = parseCreatorIndex(canonical.body);
+    const pending = parsePendingApprovals(canonical.body);
+    let changed = false;
+
+    for (const [creatorId, commentId] of parseCreatorIndex(duplicate.body)) {
+      if (!approved.has(creatorId)) {
+        approved.set(creatorId, commentId);
+        changed = true;
+      }
+    }
+
+    const knownComments = new Set(pending.map(entry => entry.commentId));
+    for (const entry of parsePendingApprovals(duplicate.body)) {
+      if (!knownComments.has(entry.commentId)) {
+        pending.push(entry);
+        changed = true;
+      }
+    }
+
+    if (!changed) return;
+    const body = serializeCreatorIndex(approved, pending);
+    await updateCreatorIndexBody(octokit, { owner, repo, issueNumber: canonical.number, body });
+    canonical.body = body;
+    logger.info('Merged duplicate content creator index', { canonical: canonical.number, duplicate: duplicate.number });
+  };
+}
+
+function toCreatorIndexData(issue) {
+  return { issueNumber: issue.number, issueUrl: issue.html_url, body: issue.body || '' };
+}
+
+/**
+ * Load the JSON submissions stored as comments, concurrently. Comments that
+ * cannot be read or parsed are logged and skipped.
+ * @param {Array<{creatorId?: string, commentId: number}>} entries
+ * @returns {Promise<Object[]>}
+ */
+async function fetchCreatorComments(octokit, { owner, repo }, entries) {
+  const results = await Promise.all(entries.map(async ({ creatorId, commentId }) => {
+    try {
+      const { data: comment } = await octokit.rest.issues.getComment({ owner, repo, comment_id: commentId });
+      return JSON.parse(comment.body);
+    } catch (error) {
+      logger.warn('Failed to fetch creator comment', { creatorId, commentId, error: error.message });
+      return null;
+    }
+  }));
+  return results.filter(Boolean);
+}
+
+const creatorIndexCacheKey = (owner, repo) => `${owner}/${repo}`;
+
+/** Drop cached lookups for a repository; every write to the index must call this. */
+function forgetCreatorIndex(owner, repo) {
+  const key = creatorIndexCacheKey(owner, repo);
+  creatorIndexLookups.delete(key);
+  creatorIndexLookups.delete(`${key}#create`);
+}
+
+/** Rewrite the index body and make sure no cached copy of the old body survives. */
+async function updateCreatorIndexBody(octokit, { owner, repo, issueNumber, body }) {
+  try {
+    await octokit.rest.issues.update({ owner, repo, issue_number: issueNumber, body });
+  } finally {
+    forgetCreatorIndex(owner, repo);
+  }
+}
+
+/** Share one in-flight lookup with concurrent callers; a failure is evicted at once so nobody inherits it. */
+function rememberCreatorIndexLookup(key, promise) {
+  const entry = { promise, at: Date.now() };
+  creatorIndexLookups.set(key, entry);
+  promise.catch(() => {
+    if (creatorIndexLookups.get(key) === entry) creatorIndexLookups.delete(key);
+  });
+  return promise;
+}
+
+/** A cached lookup that is still fresh, or null. */
+function cachedCreatorIndexLookup(key) {
+  const entry = creatorIndexLookups.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.at > CREATOR_INDEX_CACHE_TTL_MS) {
+    creatorIndexLookups.delete(key);
+    return null;
+  }
+  return entry.promise;
+}
+
+/**
+ * Find the canonical content creator index WITHOUT creating it.
+ *
+ * Reads share a short-lived cached lookup and never write. Write and admin
+ * paths pass `fresh` (skip the cache, so the body they rewrite is current)
+ * and `reconcile` (merge and close duplicates left behind by earlier races).
+ * @returns {Promise<{issue: Object|null, confirmedAbsent: boolean}>}
+ */
+function findCreatorIndex(octokit, { owner, repo, botLogin, fresh = false, reconcile = false }) {
+  const key = creatorIndexCacheKey(owner, repo);
+
+  if (!fresh) {
+    const cached = cachedCreatorIndexLookup(key);
+    if (cached) {
+      logger.debug('Reusing recent creator index lookup', { key });
+      return cached;
+    }
+  }
+
+  const request = (async () => {
+    const result = await findCanonicalIssue(octokit, {
+      owner,
+      repo,
+      labels: [CREATOR_INDEX_LABEL],
+      title: CREATOR_INDEX_TITLE,
+      logger: lookupLogger,
+    });
+
+    if (reconcile && result.issue && result.duplicates.length > 0) {
+      const reconciled = await reconcileDuplicates(octokit, {
+        owner,
+        repo,
+        canonical: result.issue,
+        duplicates: result.duplicates,
+        merge: createCreatorIndexMerge(octokit, owner, repo),
+        botLogin,
+        logger: lookupLogger,
+      });
+      logger.warn('Duplicate content creator index issues reconciled', { canonical: result.issue.number, ...reconciled });
+    }
+
+    return { issue: result.issue, confirmedAbsent: result.confirmedAbsent };
+  })();
+
+  return rememberCreatorIndexLookup(key, request);
+}
+
+/**
+ * Get the canonical index, creating it only once its absence is confirmed.
+ * Only submissions (writes) may call this; reads use findCreatorIndex. The
+ * body returned is always current: the lookup is fresh, and a coalesced
+ * creation is re-read by number before it is handed out.
+ * @returns {Promise<{issueNumber: number, issueUrl: string, body: string}>}
+ */
+async function getOrCreateCreatorIndex(octokit, { owner, repo, botLogin }) {
+  const found = await findCreatorIndex(octokit, { owner, repo, botLogin, fresh: true, reconcile: true });
+  if (found.issue) {
+    return toCreatorIndexData(found.issue);
+  }
+
+  // Concurrent submissions in this isolate share one creation
+  const createKey = `${creatorIndexCacheKey(owner, repo)}#create`;
+  const creating = cachedCreatorIndexLookup(createKey) ?? rememberCreatorIndexLookup(createKey, (async () => {
+    const { issue, created } = await getOrCreateIssue(octokit, {
+      owner,
+      repo,
+      labels: [CREATOR_INDEX_LABEL],
+      matchTitle: CREATOR_INDEX_TITLE,
+      title: CREATOR_INDEX_TITLE,
+      body: CREATOR_INDEX_INITIAL_BODY,
+      lock: true,
+      lockReason: CREATOR_INDEX_LOCK_REASON,
+      merge: createCreatorIndexMerge(octokit, owner, repo),
+      botLogin,
+      logger: lookupLogger,
+    });
+    if (created) {
+      logger.info('Created content creator index issue', { issueNumber: issue.number });
+    }
+    creatorIndexLookups.delete(creatorIndexCacheKey(owner, repo));
+    return { issue, confirmedAbsent: false };
+  })());
+
+  const { issue } = await creating;
+  // Another caller may have written to the index since it was created
+  const current = await getIssue(octokit, { owner, repo, number: issue.number });
+  return toCreatorIndexData(current ?? issue);
+}
+
+/**
+ * Get or create content creator index issue (a write: creates when confirmed absent)
  * Required: owner, repo
  */
 async function handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo }) {
@@ -2694,86 +3088,14 @@ async function handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo }) 
     return adapter.createJsonResponse(400, { error: 'Missing required fields: owner, repo' });
   }
 
-  const cacheKey = `${owner}/${repo}`;
-
-  // Check if there's already a request in-flight for this key
-  if (pendingCreatorIndexRequests.has(cacheKey)) {
-    logger.debug('Waiting for in-flight creator index request', { cacheKey });
-    return await pendingCreatorIndexRequests.get(cacheKey);
+  try {
+    const data = await getOrCreateCreatorIndex(octokit, { owner, repo, botLogin: getBotLogin(adapter) });
+    return adapter.createJsonResponse(200, data);
+  } catch (error) {
+    if (isAbsenceUnconfirmed(error)) return absenceUnconfirmedResponse(adapter, error);
+    logger.error('Failed to get/create creator index', { error: error.message });
+    return adapter.createJsonResponse(500, { error: error.message });
   }
-
-  // Create promise placeholder and track it IMMEDIATELY (before any async work)
-  // This prevents race condition where multiple calls check pendingCreatorIndexRequests
-  // at the same time before any of them set it
-  let resolvePromise, rejectPromise;
-  const requestPromise = new Promise((resolve, reject) => {
-    resolvePromise = resolve;
-    rejectPromise = reject;
-  });
-
-  // Set in map IMMEDIATELY
-  pendingCreatorIndexRequests.set(cacheKey, requestPromise);
-
-  // Now do the actual async work
-  (async () => {
-    try {
-      // Search for existing index issue
-      const { data: issues } = await octokit.rest.issues.listForRepo({
-        owner,
-        repo,
-        labels: CREATOR_INDEX_LABEL,
-        state: 'open',
-        per_page: 1,
-      });
-
-      if (issues.length > 0) {
-        const issue = issues[0];
-        resolvePromise({
-          issueNumber: issue.number,
-          issueUrl: issue.html_url,
-          body: issue.body || ''
-        });
-        return;
-      }
-
-      // Create new index issue
-      const initialBody = CREATOR_INDEX_HEADER + PENDING_APPROVALS_HEADER + '\n---\n\n🤖 Managed by wiki bot';
-      const { data: newIssue } = await octokit.rest.issues.create({
-        owner,
-        repo,
-        title: CREATOR_INDEX_TITLE,
-        body: initialBody,
-        labels: [CREATOR_INDEX_LABEL],
-      });
-
-      // Lock issue to prevent tampering
-      await octokit.rest.issues.lock({
-        owner,
-        repo,
-        issue_number: newIssue.number,
-        lock_reason: 'resolved',
-      });
-
-      logger.info('Created content creator index issue', { issueNumber: newIssue.number });
-
-      resolvePromise({
-        issueNumber: newIssue.number,
-        issueUrl: newIssue.html_url,
-        body: newIssue.body || ''
-      });
-    } catch (error) {
-      logger.error('Failed to get/create creator index', { error: error.message });
-      rejectPromise(error);
-    } finally {
-      // Keep in-flight entry for 5 seconds after completion to prevent race conditions during GitHub's eventual consistency
-      setTimeout(() => {
-        pendingCreatorIndexRequests.delete(cacheKey);
-      }, 5000);
-    }
-  })();
-
-  // Promise already tracked above (line 2479) - return it
-  return requestPromise;
 }
 
 /**
@@ -2788,8 +3110,8 @@ async function handleSubmitContentCreator(adapter, octokit, { owner, repo, creat
   }
 
   try {
-    // Get index issue
-    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
+    // Submission is the only creator-index path allowed to create the index
+    const indexData = await getOrCreateCreatorIndex(octokit, { owner, repo, botLogin: getBotLogin(adapter) });
     const issueNumber = indexData.issueNumber;
     const currentBody = indexData.body;
 
@@ -2835,12 +3157,7 @@ async function handleSubmitContentCreator(adapter, octokit, { owner, repo, creat
 
     // Update issue body with new pending entry
     const updatedBody = serializeCreatorIndex(indexMap, pendingList);
-    await octokit.rest.issues.update({
-      owner,
-      repo,
-      issue_number: issueNumber,
-      body: updatedBody
-    });
+    await updateCreatorIndexBody(octokit, { owner, repo, issueNumber, body: updatedBody });
 
     logger.info('Created content creator submission', { creatorId, commentId: comment.id });
 
@@ -2851,6 +3168,7 @@ async function handleSubmitContentCreator(adapter, octokit, { owner, repo, creat
       issueUrl: `https://github.com/${owner}/${repo}/issues/${issueNumber}`
     });
   } catch (error) {
+    if (isAbsenceUnconfirmed(error)) return absenceUnconfirmedResponse(adapter, error);
     logger.error('Failed to submit content creator', { error: error.message, creatorId });
     return adapter.createJsonResponse(500, { error: error.message });
   }
@@ -2866,34 +3184,20 @@ async function handleGetApprovedCreators(adapter, octokit, { owner, repo }) {
   }
 
   try {
-    // Get index issue
-    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const issueNumber = indexData.issueNumber;
-    const body = indexData.body;
+    // Reads never create the index; no index simply means no creators yet
+    const { issue: indexIssue } = await findCreatorIndex(octokit, { owner, repo, botLogin: getBotLogin(adapter) });
 
     // Parse index map
-    const indexMap = parseCreatorIndex(body);
+    const indexMap = parseCreatorIndex(indexIssue?.body);
 
     if (indexMap.size === 0) {
       return adapter.createJsonResponse(200, { creators: [] });
     }
 
     // Fetch all approved creator comments
-    const creators = [];
-    for (const [creatorId, commentId] of indexMap.entries()) {
-      try {
-        const { data: comment } = await octokit.rest.issues.getComment({
-          owner,
-          repo,
-          comment_id: commentId
-        });
-
-        const creatorData = JSON.parse(comment.body);
-        creators.push(creatorData);
-      } catch (error) {
-        logger.warn('Failed to fetch creator comment', { creatorId, commentId, error: error.message });
-      }
-    }
+    const creators = await fetchCreatorComments(octokit, { owner, repo }, [...indexMap.entries()].map(
+      ([creatorId, commentId]) => ({ creatorId, commentId })
+    ));
 
     return adapter.createJsonResponse(200, { creators });
   } catch (error) {
@@ -2912,47 +3216,19 @@ async function handleGetAllCreatorSubmissions(adapter, octokit, { owner, repo })
   }
 
   try {
-    // Get index issue
-    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const issueNumber = indexData.issueNumber;
-    const body = indexData.body;
+    // Reads never create the index; no index simply means no submissions yet
+    const { issue: indexIssue } = await findCreatorIndex(octokit, { owner, repo, botLogin: getBotLogin(adapter) });
+    const body = indexIssue?.body ?? '';
 
     // Parse both approved and pending
     const indexMap = parseCreatorIndex(body);
     const pendingList = parsePendingApprovals(body);
 
-    // Fetch all comments (approved)
-    const submissions = [];
-    for (const [creatorId, commentId] of indexMap.entries()) {
-      try {
-        const { data: comment } = await octokit.rest.issues.getComment({
-          owner,
-          repo,
-          comment_id: commentId
-        });
-
-        const creatorData = JSON.parse(comment.body);
-        submissions.push(creatorData);
-      } catch (error) {
-        logger.warn('Failed to fetch creator comment', { creatorId, commentId, error: error.message });
-      }
-    }
-
-    // Fetch pending comments
-    for (const pending of pendingList) {
-      try {
-        const { data: comment } = await octokit.rest.issues.getComment({
-          owner,
-          repo,
-          comment_id: pending.commentId
-        });
-
-        const creatorData = JSON.parse(comment.body);
-        submissions.push(creatorData);
-      } catch (error) {
-        logger.warn('Failed to fetch pending creator comment', { commentId: pending.commentId, error: error.message });
-      }
-    }
+    // Fetch approved and pending comments together
+    const submissions = await fetchCreatorComments(octokit, { owner, repo }, [
+      ...[...indexMap.entries()].map(([creatorId, commentId]) => ({ creatorId, commentId })),
+      ...pendingList.map((pending) => ({ commentId: pending.commentId })),
+    ]);
 
     return adapter.createJsonResponse(200, { submissions });
   } catch (error) {
@@ -2999,10 +3275,19 @@ async function handleSyncCreatorApprovals(adapter, octokit, { owner, repo, admin
   }
 
   try {
-    // Get index issue
-    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const issueNumber = indexData.issueNumber;
-    const body = indexData.body;
+    // Admin actions operate on the existing index only; there is nothing to act on without one
+    const { issue: indexIssue } = await findCreatorIndex(octokit, {
+      owner,
+      repo,
+      botLogin: getBotLogin(adapter),
+      fresh: true,
+      reconcile: true,
+    });
+    if (!indexIssue) {
+      return adapter.createJsonResponse(404, { error: 'No content creator index exists yet' });
+    }
+    const issueNumber = indexIssue.number;
+    const body = indexIssue.body || '';
 
     // Parse current state
     const indexMap = parseCreatorIndex(body);
@@ -3036,7 +3321,8 @@ async function handleSyncCreatorApprovals(adapter, octokit, { owner, repo, admin
             body: JSON.stringify(creatorData, null, 2)
           });
 
-          // Add to index
+          // Add to index (remember the creatorId so the pending entry is retired below)
+          pending.creatorId = creatorData.creatorId;
           indexMap.set(creatorData.creatorId, pending.commentId);
           updatesCount++;
 
@@ -3052,12 +3338,7 @@ async function handleSyncCreatorApprovals(adapter, octokit, { owner, repo, admin
 
     // Update issue body
     const updatedBody = serializeCreatorIndex(indexMap, updatedPendingList);
-    await octokit.rest.issues.update({
-      owner,
-      repo,
-      issue_number: issueNumber,
-      body: updatedBody
-    });
+    await updateCreatorIndexBody(octokit, { owner, repo, issueNumber, body: updatedBody });
 
     return adapter.createJsonResponse(200, {
       updatesCount,
@@ -3107,10 +3388,19 @@ async function handleApproveCreator(adapter, octokit, { owner, repo, creatorId, 
   }
 
   try {
-    // Get index issue
-    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const issueNumber = indexData.issueNumber;
-    const body = indexData.body;
+    // Admin actions operate on the existing index only; there is nothing to act on without one
+    const { issue: indexIssue } = await findCreatorIndex(octokit, {
+      owner,
+      repo,
+      botLogin: getBotLogin(adapter),
+      fresh: true,
+      reconcile: true,
+    });
+    if (!indexIssue) {
+      return adapter.createJsonResponse(404, { error: 'No content creator index exists yet' });
+    }
+    const issueNumber = indexIssue.number;
+    const body = indexIssue.body || '';
 
     // Parse current state
     const indexMap = parseCreatorIndex(body);
@@ -3180,12 +3470,7 @@ async function handleApproveCreator(adapter, octokit, { owner, repo, creatorId, 
 
     // Update issue body
     const updatedBody = serializeCreatorIndex(indexMap, updatedPendingList);
-    await octokit.rest.issues.update({
-      owner,
-      repo,
-      issue_number: issueNumber,
-      body: updatedBody
-    });
+    await updateCreatorIndexBody(octokit, { owner, repo, issueNumber, body: updatedBody });
 
     logger.info('Approved creator manually', { creatorId, adminUsername });
 
@@ -3237,10 +3522,19 @@ async function handleDeleteCreatorSubmission(adapter, octokit, { owner, repo, cr
   }
 
   try {
-    // Get index issue
-    const indexData = await handleGetOrCreateCreatorIndex(adapter, octokit, { owner, repo });
-    const issueNumber = indexData.issueNumber;
-    const body = indexData.body;
+    // Admin actions operate on the existing index only; there is nothing to act on without one
+    const { issue: indexIssue } = await findCreatorIndex(octokit, {
+      owner,
+      repo,
+      botLogin: getBotLogin(adapter),
+      fresh: true,
+      reconcile: true,
+    });
+    if (!indexIssue) {
+      return adapter.createJsonResponse(404, { error: 'No content creator index exists yet' });
+    }
+    const issueNumber = indexIssue.number;
+    const body = indexIssue.body || '';
 
     // Parse current state
     const indexMap = parseCreatorIndex(body);
@@ -3289,12 +3583,7 @@ async function handleDeleteCreatorSubmission(adapter, octokit, { owner, repo, cr
 
     // Update issue body
     const updatedBody = serializeCreatorIndex(indexMap, updatedPendingList);
-    await octokit.rest.issues.update({
-      owner,
-      repo,
-      issue_number: issueNumber,
-      body: updatedBody
-    });
+    await updateCreatorIndexBody(octokit, { owner, repo, issueNumber, body: updatedBody });
 
     logger.info('Deleted creator submission', { creatorId, adminUsername });
 
@@ -3895,7 +4184,8 @@ async function handleRemoveDonatorBadge(adapter, octokit, { owner, repo, usernam
  * Create user snapshot automatically (no authentication required)
  * Builds snapshot from scratch by fetching all user PRs and stats
  * Required: username
- * Optional: userId (for faster lookup)
+ * Optional: userId (informational only; the permanent ID is always resolved from
+ *   GitHub so a caller can never point one user's snapshot at another's label)
  */
 async function handleCreateUserSnapshot(adapter, octokit, body) {
   const { owner, repo, username, userId } = body;
@@ -3904,7 +4194,6 @@ async function handleCreateUserSnapshot(adapter, octokit, body) {
     return adapter.createJsonResponse(400, { error: 'Missing required field: username' });
   }
 
-  const SNAPSHOT_LABEL = 'user-snapshot';
   const SNAPSHOT_TITLE_PREFIX = '[User Snapshot]';
   const MAX_PRS_IN_SNAPSHOT = 100;
   const BOT_USERNAME = adapter.getEnv('WIKI_BOT_USERNAME') || adapter.getEnv('VITE_WIKI_BOT_USERNAME') || 'slayer-wiki-bot';
@@ -3922,33 +4211,24 @@ async function handleCreateUserSnapshot(adapter, octokit, body) {
       });
     }
 
-    // Check if snapshot already exists
-    const { data: existingIssues } = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      labels: SNAPSHOT_LABEL,
-      state: 'open',
-      per_page: 100,
+    // Resolve the permanent user ID first: snapshots are keyed by their user-id label
+    const { data: userData } = await octokit.rest.users.getByUsername({
+      username,
     });
 
-    let existingSnapshot = null;
+    logger.info('Fetched user data', { username, userId: userData.id });
 
-    // Search by user ID first (permanent identifier)
-    if (userId) {
-      existingSnapshot = existingIssues.find(issue =>
-        issue.labels.some(label =>
-          (typeof label === 'string' && label === `user-id:${userId}`) ||
-          (typeof label === 'object' && label.name === `user-id:${userId}`)
-        )
-      );
-    }
-
-    // Fallback: search by username in title
-    if (!existingSnapshot) {
-      existingSnapshot = existingIssues.find(
-        issue => issue.title === `${SNAPSHOT_TITLE_PREFIX} ${username}`
-      );
-    }
+    // Check if snapshot already exists. Duplicates are merged into the oldest
+    // issue; a legacy title-only snapshot is adopted and relabelled on update.
+    const botLogin = getBotLogin(adapter);
+    const userIdLabel = `user-id:${userData.id}`;
+    const { issue: existingSnapshot } = await findUserSnapshotIssue(octokit, {
+      owner,
+      repo,
+      userIdLabel,
+      fallbackTitle: `${SNAPSHOT_TITLE_PREFIX} ${username}`,
+      botLogin,
+    });
 
     // If snapshot exists and is recent (< 1 hour), return it
     if (existingSnapshot) {
@@ -3971,13 +4251,6 @@ async function handleCreateUserSnapshot(adapter, octokit, body) {
         logger.warn('Failed to parse existing snapshot', { error: err.message });
       }
     }
-
-    // Fetch user data to get permanent user ID
-    const { data: userData } = await octokit.rest.users.getByUsername({
-      username,
-    });
-
-    logger.info('Fetched user data', { username, userId: userData.id });
 
     // Fetch all PRs by this user (direct PRs + linked anonymous edits)
     logger.info('Fetching pull requests', { username });
@@ -4144,9 +4417,9 @@ async function handleCreateUserSnapshot(adapter, octokit, body) {
     // Save snapshot to issue
     const issueTitle = `${SNAPSHOT_TITLE_PREFIX} ${username}`;
     const issueBody = JSON.stringify(snapshot, null, 2);
-    const userIdLabel = `user-id:${userData.id}`;
 
     let issue;
+    let createdSnapshot = false;
 
     if (existingSnapshot) {
       // Update existing snapshot
@@ -4173,41 +4446,52 @@ async function handleCreateUserSnapshot(adapter, octokit, body) {
       issue = updatedIssue;
       logger.info('Updated user snapshot', { username, issueNumber: existingSnapshot.number });
     } else {
-      // Create new snapshot
-      const { data: newIssue } = await octokit.rest.issues.create({
+      // Create the snapshot only once its absence is confirmed. If a concurrent
+      // run created one first, this fresher snapshot replaces its body instead.
+      const { issue: canonical, created } = await getOrCreateIssue(octokit, {
         owner,
         repo,
+        labels: [USER_SNAPSHOT_LABEL, userIdLabel],
+        createLabels: [USER_SNAPSHOT_LABEL, userIdLabel, AUTOMATED_LABEL],
+        selectorLabel: userIdLabel,
         title: issueTitle,
         body: issueBody,
-        labels: [SNAPSHOT_LABEL, userIdLabel, 'automated'],
+        lock: true,
+        lockReason: RECORD_LOCK_REASON,
+        merge: createSnapshotMerge(octokit, owner, repo),
+        botLogin,
+        logger: lookupLogger,
       });
 
-      // Lock the issue to prevent comments
-      try {
-        await octokit.rest.issues.lock({
+      if (!created) {
+        await octokit.rest.issues.update({
           owner,
           repo,
-          issue_number: newIssue.number,
-          lock_reason: 'off-topic',
+          issue_number: canonical.number,
+          title: issueTitle,
+          body: issueBody,
         });
-      } catch (lockError) {
-        logger.warn('Failed to lock snapshot issue', { error: lockError.message });
       }
 
-      issue = newIssue;
-      logger.info('Created user snapshot', { username, issueNumber: newIssue.number });
+      issue = canonical;
+      createdSnapshot = created;
+      logger.info(created ? 'Created user snapshot' : 'Updated user snapshot created concurrently', {
+        username,
+        issueNumber: canonical.number,
+      });
     }
 
     return adapter.createJsonResponse(200, {
       success: true,
-      created: !existingSnapshot,
-      updated: !!existingSnapshot,
+      created: createdSnapshot,
+      updated: !createdSnapshot,
       snapshot,
       issueNumber: issue.number,
       issueUrl: issue.html_url
     });
 
   } catch (error) {
+    if (isAbsenceUnconfirmed(error)) return absenceUnconfirmedResponse(adapter, error);
     logger.error('Failed to create user snapshot', { username, error: error.message, stack: error.stack });
     return adapter.createJsonResponse(500, { error: error.message || 'Failed to create user snapshot' });
   }

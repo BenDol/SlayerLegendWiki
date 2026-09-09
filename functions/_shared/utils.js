@@ -3,6 +3,8 @@
  * Used by both Netlify and Cloudflare implementations
  */
 
+import { ABSENCE_UNCONFIRMED } from '../../src/services/github/issueLookup.js';
+
 /**
  * Valid data types supported by the system
  */
@@ -11,6 +13,30 @@ export const VALID_DATA_TYPES = ['skill-builds', 'battle-loadouts', 'my-spirits'
 /**
  * Configuration for each data type
  */
+/**
+ * True for the one lookup failure a client should simply retry: GitHub would
+ * not confirm whether the record exists, so nothing was created. Works for the
+ * module's own IssueLookupError and for wrapped errors that kept its `code`.
+ * @param {Error} error
+ * @returns {boolean}
+ */
+export function isAbsenceUnconfirmed(error) {
+  return error?.code === ABSENCE_UNCONFIRMED;
+}
+
+/**
+ * 503 response for an unconfirmed-absence failure.
+ * @param {Object} adapter - Platform adapter
+ * @param {Error} error
+ */
+export function absenceUnconfirmedResponse(adapter, error) {
+  return adapter.createJsonResponse(503, {
+    error: 'GitHub could not confirm whether this record already exists. Nothing was created; please retry in a moment.',
+    code: ABSENCE_UNCONFIRMED,
+    details: error.message,
+  });
+}
+
 export const DATA_TYPE_CONFIGS = {
   'skill-builds': {
     label: 'skill-builds',

@@ -6,6 +6,7 @@ import {
   updateUserBuild,
   deleteUserBuild
 } from '../../src/services/skillBuilds.js';
+import { graphQlIssuesPage, mirrorListForRepoAsGraphql } from '../helpers/githubIssueMocks.js';
 
 // Mock the framework dependencies
 vi.mock('../../wiki-framework/src/services/github/api.js', () => ({
@@ -18,12 +19,15 @@ vi.mock('../../wiki-framework/src/utils/githubLabelUtils.js', () => ({
 
 import { getOctokit } from '../../wiki-framework/src/services/github/api.js';
 
+const BUILDS_LABELS = [{ name: 'skill-builds' }, { name: 'user-id:12345' }];
+
 describe('skillBuilds', () => {
   let mockOctokit;
   let consoleSpy;
 
   beforeEach(() => {
-    // Mock Octokit instance
+    // Mock Octokit instance. Repository state is described once through
+    // listForRepo; the GraphQL mirror answers the lookup module from it.
     mockOctokit = {
       rest: {
         issues: {
@@ -31,10 +35,12 @@ describe('skillBuilds', () => {
           create: vi.fn(),
           update: vi.fn(),
           addLabels: vi.fn(),
-          lock: vi.fn()
+          lock: vi.fn(),
+          createComment: vi.fn()
         }
       }
     };
+    mirrorListForRepoAsGraphql(mockOctokit);
 
     getOctokit.mockReturnValue(mockOctokit);
 
@@ -77,7 +83,7 @@ describe('skillBuilds', () => {
           { id: 'build-1', name: 'Test Build 1' },
           { id: 'build-2', name: 'Test Build 2' }
         ]),
-        labels: [{ name: 'skill-builds' }, { name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -92,6 +98,32 @@ describe('skillBuilds', () => {
       expect(consoleSpy.log).toHaveBeenCalledWith(
         expect.stringContaining('Found builds for user testuser by ID: 12345')
       );
+    });
+
+    it('should query GitHub by the user-id label first and only scan the type label on a miss', async () => {
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: [] });
+
+      await getUserBuilds('owner', 'repo', 'testuser', 12345);
+
+      expect(mockOctokit.graphql.mock.calls[0][1]).toMatchObject({
+        owner: 'owner',
+        repo: 'repo',
+        labels: ['user-id:12345'],
+        states: ['OPEN']
+      });
+      // The legacy title fallback runs only because the user-id lookup missed
+      expect(mockOctokit.graphql.mock.calls[1][1]).toMatchObject({ labels: ['skill-builds'] });
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not scan the type label when the user-id lookup hits', async () => {
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({
+        data: [{ number: 1, title: '[Skill Build] testuser', body: '[]', labels: BUILDS_LABELS }]
+      });
+
+      await getUserBuilds('owner', 'repo', 'testuser', 12345);
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(1);
     });
 
     it('should find builds by username in title (fallback)', async () => {
@@ -137,7 +169,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: 'invalid json',
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -172,7 +204,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: '',
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -196,7 +228,7 @@ describe('skillBuilds', () => {
           number: 2,
           title: '[Skill Build] testuser',
           body: JSON.stringify([{ id: 'new', name: 'Current' }]),
-          labels: [{ name: 'skill-builds' }, { name: 'user-id:12345' }]
+          labels: BUILDS_LABELS
         }
       ];
 
@@ -207,6 +239,31 @@ describe('skillBuilds', () => {
       const builds = await getUserBuilds('owner', 'repo', 'testuser', 12345);
 
       expect(builds[0].id).toBe('new'); // Should get the one with user-id label
+    });
+
+    it('should read the oldest issue when duplicates exist', async () => {
+      const mockIssues = [
+        {
+          number: 20,
+          title: '[Skill Build] testuser',
+          body: JSON.stringify([{ id: 'newer', name: 'Newer' }]),
+          labels: BUILDS_LABELS
+        },
+        {
+          number: 10,
+          title: '[Skill Build] testuser',
+          body: JSON.stringify([{ id: 'older', name: 'Older' }]),
+          labels: BUILDS_LABELS
+        }
+      ];
+
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({
+        data: mockIssues
+      });
+
+      const builds = await getUserBuilds('owner', 'repo', 'testuser', 12345);
+
+      expect(builds[0].id).toBe('older');
     });
   });
 
@@ -243,12 +300,37 @@ describe('skillBuilds', () => {
       expect(result.number).toBe(123);
     });
 
+    it('should confirm absence with the REST list before creating', async () => {
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: [] });
+      mockOctokit.rest.issues.create.mockResolvedValue({ data: { number: 123 } });
+      mockOctokit.rest.issues.lock.mockResolvedValue({});
+
+      await saveUserBuilds('owner', 'repo', 'testuser', 12345, [{ id: 'build-1', name: 'Build' }]);
+
+      // GraphQL said "nothing"; the REST list must agree before create runs
+      expect(mockOctokit.rest.issues.listForRepo).toHaveBeenCalledWith(
+        expect.objectContaining({ labels: 'skill-builds,user-id:12345', state: 'open' })
+      );
+      expect(mockOctokit.rest.issues.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('should refuse to create when GitHub cannot confirm the issue is absent', async () => {
+      mockOctokit.graphql = vi.fn().mockResolvedValue(graphQlIssuesPage([]));
+      mockOctokit.rest.issues.listForRepo.mockRejectedValue(new Error('rate limited'));
+
+      await expect(
+        saveUserBuilds('owner', 'repo', 'testuser', 12345, [{ id: 'build-1', name: 'Build' }])
+      ).rejects.toThrow(/could not confirm/);
+
+      expect(mockOctokit.rest.issues.create).not.toHaveBeenCalled();
+    });
+
     it('should update existing builds issue', async () => {
       const existingIssue = {
         number: 456,
         title: '[Skill Build] testuser',
         body: JSON.stringify([{ id: 'old', name: 'Old Build' }]),
-        labels: [{ name: 'skill-builds' }, { name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -271,9 +353,10 @@ describe('skillBuilds', () => {
       });
 
       expect(mockOctokit.rest.issues.lock).not.toHaveBeenCalled();
+      expect(result.number).toBe(456);
     });
 
-    it('should add user-id label to legacy issues', async () => {
+    it('should adopt and relabel a legacy issue that lacks the user-id label', async () => {
       const legacyIssue = {
         number: 789,
         title: '[Skill Build] testuser',
@@ -281,26 +364,60 @@ describe('skillBuilds', () => {
         labels: [{ name: 'skill-builds' }] // No user-id label
       };
 
-      mockOctokit.rest.issues.listForRepo.mockResolvedValue({
-        data: [legacyIssue]
-      });
-
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: [legacyIssue] });
       mockOctokit.rest.issues.update.mockResolvedValue({ data: legacyIssue });
       mockOctokit.rest.issues.addLabels.mockResolvedValue({});
 
       const builds = [{ id: 'build-1', name: 'Build' }];
-      await saveUserBuilds('owner', 'repo', 'testuser', 12345, builds);
+      const result = await saveUserBuilds('owner', 'repo', 'testuser', 12345, builds);
 
+      expect(mockOctokit.rest.issues.create).not.toHaveBeenCalled();
+      expect(mockOctokit.rest.issues.update).toHaveBeenCalledWith({
+        owner: 'owner',
+        repo: 'repo',
+        issue_number: 789,
+        title: '[Skill Build] testuser',
+        body: JSON.stringify(builds, null, 2)
+      });
       expect(mockOctokit.rest.issues.addLabels).toHaveBeenCalledWith({
         owner: 'owner',
         repo: 'repo',
         issue_number: 789,
         labels: ['user-id:12345']
       });
-
       expect(consoleSpy.log).toHaveBeenCalledWith(
         expect.stringContaining('Adding user-id label to legacy builds')
       );
+      expect(result.number).toBe(789);
+    });
+
+    it('should write to the oldest issue and leave duplicates open for the server to reconcile', async () => {
+      const older = {
+        number: 10,
+        title: '[Skill Build] testuser',
+        body: JSON.stringify([{ id: 'a', name: 'A' }]),
+        labels: BUILDS_LABELS,
+        user: { login: 'testuser' }
+      };
+      const newer = {
+        number: 20,
+        title: '[Skill Build] testuser',
+        body: JSON.stringify([{ id: 'b', name: 'B' }]),
+        labels: BUILDS_LABELS,
+        user: { login: 'testuser' }
+      };
+
+      mockOctokit.rest.issues.listForRepo.mockResolvedValue({ data: [newer, older] });
+      mockOctokit.rest.issues.update.mockResolvedValue({ data: older });
+
+      const builds = [{ id: 'a', name: 'A' }, { id: 'c', name: 'C' }];
+      await saveUserBuilds('owner', 'repo', 'testuser', 12345, builds);
+
+      // Exactly one write, to the canonical (oldest) issue; nothing closed or merged from the browser
+      expect(mockOctokit.rest.issues.update).toHaveBeenCalledTimes(1);
+      expect(mockOctokit.rest.issues.update.mock.calls[0][0]).toMatchObject({ issue_number: 10, body: JSON.stringify(builds, null, 2) });
+      expect(mockOctokit.rest.issues.createComment).not.toHaveBeenCalled();
+      expect(mockOctokit.rest.issues.create).not.toHaveBeenCalled();
     });
 
     it('should reject non-array builds', async () => {
@@ -329,7 +446,7 @@ describe('skillBuilds', () => {
 
       expect(result.number).toBe(123);
       expect(consoleSpy.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to lock issue'),
+        expect.stringContaining('Failed to lock newly created issue'),
         expect.objectContaining({ error: expect.any(String) })
       );
     });
@@ -407,7 +524,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: JSON.stringify(existingBuilds),
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -441,7 +558,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: JSON.stringify(existingBuilds),
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -466,7 +583,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: JSON.stringify(existingBuilds),
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -487,7 +604,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: JSON.stringify(existingBuilds),
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -506,7 +623,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: JSON.stringify(existingBuilds),
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -533,7 +650,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: JSON.stringify(existingBuilds),
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -555,7 +672,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: JSON.stringify(existingBuilds),
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
@@ -573,7 +690,7 @@ describe('skillBuilds', () => {
         number: 1,
         title: '[Skill Build] testuser',
         body: JSON.stringify(existingBuilds),
-        labels: [{ name: 'user-id:12345' }]
+        labels: BUILDS_LABELS
       };
 
       mockOctokit.rest.issues.listForRepo.mockResolvedValue({
