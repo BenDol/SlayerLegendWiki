@@ -152,9 +152,11 @@ below.
 `CLOUDFLARE_DEPLOY_HOOK` is no longer used and can be deleted once the new
 pipeline is verified.
 
-> **Never** add `VITE_WIKI_BOT_TOKEN` here. It is a client-side dev-only
-> fallback; in production the bot token is held server-side by the Pages
-> Functions, via the dashboard secret below.
+> **Never** add `VITE_WIKI_BOT_TOKEN` here or anywhere. A `VITE_`-prefixed
+> variable is inlined into the client bundle; the bot token is a server-only
+> secret named `WIKI_BOT_TOKEN` (dashboard secret below / `.dev.vars` locally).
+> The former client-side dev fallback was removed, and `postbuild` runs
+> `scripts/checkBundleSecrets.cjs`, which fails the build if a token reaches `dist/`.
 
 ---
 

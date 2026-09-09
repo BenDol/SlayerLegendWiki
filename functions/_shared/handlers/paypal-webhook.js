@@ -36,6 +36,26 @@ const logger = createLogger('PayPalWebhook');
  * @param {string} authAlgo - Auth algorithm (e.g., 'SHA256withRSA')
  * @returns {Promise<boolean>} True if signature is valid
  */
+/**
+ * Only PayPal's own hosts may supply the verification certificate. Without this
+ * check a caller can point `paypal-cert-url` at a certificate they control, sign
+ * a forged webhook with the matching private key, and pass verification - which
+ * would let anyone grant themselves donator status. It is also a blind SSRF sink
+ * (the server fetches whatever URL the header names).
+ * @param {string} certUrl
+ * @returns {boolean} True only for an https URL on paypal.com or a subdomain.
+ */
+function isTrustedPayPalCertUrl(certUrl) {
+  try {
+    const url = new URL(certUrl);
+    if (url.protocol !== 'https:') return false;
+    const host = url.hostname.toLowerCase();
+    return host === 'paypal.com' || host.endsWith('.paypal.com');
+  } catch {
+    return false;
+  }
+}
+
 async function verifyPayPalSignature(
   transmissionId,
   transmissionTime,
@@ -46,6 +66,12 @@ async function verifyPayPalSignature(
   authAlgo
 ) {
   try {
+    // SECURITY: never fetch a certificate from a host the caller chose.
+    if (!isTrustedPayPalCertUrl(certUrl)) {
+      logger.error('Refusing PayPal certificate from untrusted host', { certUrl });
+      return false;
+    }
+
     // Hash event body using Web Crypto API
     const bodyEncoder = new TextEncoder();
     const bodyData = bodyEncoder.encode(eventBody);
@@ -266,7 +292,7 @@ export async function handlePayPalWebhook(adapter, configAdapter) {
     const skipVerification = adapter.getEnv('PAYPAL_SKIP_SIGNATURE_VERIFICATION') === 'true';
 
     if (skipVerification) {
-      logger.warn('⚠️ PayPal signature verification SKIPPED (development mode)', { transmissionId });
+      logger.error('⚠️ PayPal signature verification SKIPPED via PAYPAL_SKIP_SIGNATURE_VERIFICATION - never set this in production; any caller can grant donator status', { transmissionId });
     } else {
       // Verify PayPal signature (SECURITY: Critical to prevent fake webhooks)
       const isValid = await verifyPayPalSignature(

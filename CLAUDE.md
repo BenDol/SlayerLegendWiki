@@ -368,6 +368,7 @@ Many framework features can be toggled in `wiki-config.json` under `features`:
 - `editor.previewHighlight` - Real-time preview highlighting while editing ([docs](wiki-framework/docs/editor-cursor-highlight.md))
 - `dynamicPageLoading` - Load pages from GitHub instead of bundled files
 - `sidebarTreeLines` - Visual tree lines in sidebar navigation
+- `botSecurity.requireIdentity` - When `true`, `/api/github-bot`'s `create-comment`, `update-issue` and `create-comment-issue` require a verified GitHub user token (401 otherwise). **Default `false`**; keep it off until every client caller of those verbs is login-gated and forwards the user's token (build sharing is not yet). On platforms where the config falls back to defaults (Cloudflare), enable it with the `BOT_REQUIRE_IDENTITY=true` env var instead.
 - See `wiki-config.json` for full list
 
 ## Important Constraints
@@ -569,6 +570,8 @@ if (loading) return <LoadingSpinner />;
 - `CDN_REPO_TOKEN` - Used for CDN repository video uploads (same as WIKI_BOT_TOKEN or separate)
 - Stored in GitHub Secrets and deployment platform environment variables
 - Never stored in workflow GITHUB_TOKEN
+- **Server-only, never `VITE_`-prefixed.** Vite inlines every `VITE_` variable into the client bundle, so a `VITE_WIKI_BOT_TOKEN` publishes the token to every visitor. Local dev reads the token from `.dev.vars` (Wrangler), and all bot actions - dev and production - go through the serverless endpoint; the client never holds it.
+- **Enforced by the build.** `postbuild` runs `scripts/checkBundleSecrets.cjs`, which scans `dist/` for token material and inlined secret variables and fails the build if any are found.
 
 **Branch Protection (main branch):**
 - Require 1 PR approval before merging

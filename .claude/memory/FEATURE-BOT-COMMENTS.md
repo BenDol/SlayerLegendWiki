@@ -1,5 +1,10 @@
 # Feature: Bot-Created Comment Issues
 
+> **Superseded (2026-09-09):** the client-side `VITE_WIKI_BOT_TOKEN` design described
+> below was removed - it inlined the bot token into the built bundle. The bot token is now
+> a server-side secret (`WIKI_BOT_TOKEN`) and every bot action goes through the serverless
+> endpoint. See `.claude/bot-security-remediation-plan.md`. Kept for history only.
+
 ## Overview
 
 Implemented a bot account system for creating comment issues, preventing regular users from closing comment threads.

@@ -11,8 +11,14 @@
 import { createLogger } from '../../../src/utils/logger.js';
 import { createWikiStorage } from '../createWikiStorage.js';
 import { Octokit } from '@octokit/rest';
+import * as LeoProfanity from 'leo-profanity';
+import { createTtlCache, REGISTRY_CACHE_TTL_MS, registryKey as registryCacheKey } from '../utils/registryCache.js';
 
 const logger = createLogger('DisplayName');
+
+// Read-path cache for the parsed registry (see registryCache.js). Write paths
+// load fresh and invalidate after committing.
+const registryCache = createTtlCache(REGISTRY_CACHE_TTL_MS);
 
 // Display name constants
 const DISPLAY_NAME_MAX_LENGTH = 30;
@@ -126,10 +132,20 @@ async function handlePostDisplayName(adapter, configAdapter) {
 async function handleDeleteDisplayName(adapter, configAdapter) {
   try {
     const params = adapter.getQueryParams();
-    const { userId, adminToken } = params;
+    const { userId } = params;
+
+    // SECURITY: the admin token belongs in the Authorization header, never a
+    // query string (URLs land in access logs, browser history and Referer).
+    // The legacy `adminToken` query parameter is still honoured for one
+    // release so older clients keep working, but is logged as deprecated.
+    let adminToken = adapter.getAuthToken();
+    if (!adminToken && params.adminToken) {
+      logger.warn('Deprecated: adminToken supplied in query string; send it as Authorization: Bearer');
+      adminToken = params.adminToken;
+    }
 
     if (!userId || !adminToken) {
-      return adapter.createJsonResponse(400, { error: 'Missing userId or adminToken' });
+      return adapter.createJsonResponse(400, { error: 'Missing userId or admin authorization' });
     }
 
     // Get configuration
@@ -155,6 +171,7 @@ async function handleDeleteDisplayName(adapter, configAdapter) {
 
     // Delete display name data
     await deleteDisplayNameData(storage, owner, repo, userId);
+    registryCache.invalidate(registryCacheKey(owner, repo));
 
     logger.info('Display name reset by admin', { userId });
     return adapter.createJsonResponse(200, { success: true });
@@ -168,7 +185,10 @@ async function handleDeleteDisplayName(adapter, configAdapter) {
  * Set display name for a user
  */
 async function handleSetDisplayName(adapter, configAdapter, data) {
-  const { userId, username, displayName, token } = data;
+  const { userId, username, displayName } = data;
+  // Prefer the Authorization header; the body `token` remains a fallback so
+  // existing clients keep working.
+  const token = adapter.getAuthToken() || data.token;
 
   // Validate required fields
   if (!userId || !username || !displayName || !token) {
@@ -202,8 +222,9 @@ async function handleSetDisplayName(adapter, configAdapter, data) {
   const storageConfig = configAdapter.getStorageConfig(adapter);
   const storage = createWikiStorage(storageConfig, { WIKI_BOT_TOKEN: botToken });
 
-  // Load registry
-  const registry = await loadDisplayNameRegistry(storage, owner, repo);
+  // Load registry (fresh: this is a write path - cooldown, ban and uniqueness
+  // checks must see current data, not the read cache)
+  const registry = await loadDisplayNameRegistry(storage, owner, repo, { fresh: true });
 
   // Check cooldown
   const userData = registry[userId];
@@ -271,6 +292,7 @@ async function handleSetDisplayName(adapter, configAdapter, data) {
 
   // Save display name data
   await saveDisplayNameData(storage, owner, repo, userId, displayNameData);
+  registryCache.invalidate(registryCacheKey(owner, repo));
 
   logger.info('Display name set successfully', { userId, displayName });
   return adapter.createJsonResponse(200, {
@@ -340,7 +362,9 @@ async function handleValidateDisplayName(adapter, configAdapter, data) {
  * Ban display name for a user (admin only)
  */
 async function handleBanDisplayName(adapter, configAdapter, data) {
-  const { userId, displayName, adminToken } = data;
+  const { userId, displayName } = data;
+  // Prefer the Authorization header; body `adminToken` remains a fallback.
+  const adminToken = adapter.getAuthToken() || data.adminToken;
 
   if (!userId || !displayName || !adminToken) {
     return adapter.createJsonResponse(400, { error: 'Missing required fields: userId, displayName, adminToken' });
@@ -367,8 +391,8 @@ async function handleBanDisplayName(adapter, configAdapter, data) {
   const storageConfig = configAdapter.getStorageConfig(adapter);
   const storage = createWikiStorage(storageConfig, { WIKI_BOT_TOKEN: botToken });
 
-  // Load registry
-  const registry = await loadDisplayNameRegistry(storage, owner, repo);
+  // Load registry (fresh: this is a write path)
+  const registry = await loadDisplayNameRegistry(storage, owner, repo, { fresh: true });
 
   // Add to user's banned names list
   if (!registry[userId]) {
@@ -395,6 +419,7 @@ async function handleBanDisplayName(adapter, configAdapter, data) {
 
   // Save updated user data
   await saveDisplayNameData(storage, owner, repo, userId, registry[userId]);
+  registryCache.invalidate(registryCacheKey(owner, repo));
 
   logger.info('Display name banned by admin', { userId, displayName });
   return adapter.createJsonResponse(200, { success: true });
@@ -475,45 +500,67 @@ async function getOrCreateRegistryIssue(storage, owner, repo) {
 }
 
 /**
- * Load display name registry from GitHub Issues
- * Returns object keyed by userId with display name data
+ * Load the display-name registry from GitHub Issues.
+ * @param {Object} storage - Wiki storage adapter (exposes .octokit)
+ * @param {string} owner - Repository owner
+ * @param {string} repo - Repository name
+ * @param {Object} [options]
+ * @param {boolean} [options.fresh=false] - When true, bypass the read cache AND
+ *   surface load failures by throwing. Write paths (set/ban) pass this so the
+ *   cooldown / uniqueness / ban checks always run against complete, current data
+ *   instead of validating against a silently-partial registry.
+ * @returns {Promise<Object>} registry keyed by userId
  */
-async function loadDisplayNameRegistry(storage, owner, repo) {
-  try {
-    // Get registry issue
-    const registryIssue = await getOrCreateRegistryIssue(storage, owner, repo);
+async function loadDisplayNameRegistry(storage, owner, repo, { fresh = false } = {}) {
+  if (!fresh) {
+    const cached = registryCache.get(registryCacheKey(owner, repo));
+    if (cached) {
+      logger.debug('Serving display name registry from cache', { count: Object.keys(cached).length });
+      return cached;
+    }
+  }
 
-    // Parse index map
+  try {
+    const registryIssue = await getOrCreateRegistryIssue(storage, owner, repo);
     const indexMap = parseIndexMap(registryIssue.body);
 
-    if (indexMap.size === 0) {
-      logger.debug('No display names in registry');
-      return {};
-    }
-
-    // Load all comments with display name data
     const registry = {};
 
-    for (const [userId, commentId] of indexMap.entries()) {
+    // Fetch the per-user comments concurrently rather than one serial round-trip
+    // per registered user (the old N+1). On the fresh (write) path a single
+    // failed fetch must abort the load so the caller never validates against a
+    // registry that is missing a user (which would free their name / bypass a ban).
+    const entries = [...indexMap.entries()];
+    const results = await Promise.all(entries.map(async ([userId, commentId]) => {
       try {
         const { data: comment } = await storage.octokit.rest.issues.getComment({
           owner,
           repo,
-          comment_id: commentId
+          comment_id: commentId,
         });
-
-        const data = JSON.parse(comment.body);
-        registry[userId] = data;
+        return [userId, JSON.parse(comment.body)];
       } catch (error) {
+        if (fresh) throw error;
         logger.warn('Failed to load comment for user', { userId, commentId, error: error.message });
-        // Skip this user if comment can't be loaded
+        return null; // read path: skip this user
       }
+    }));
+    for (const entry of results) {
+      if (entry) registry[entry[0]] = entry[1];
     }
 
     logger.debug('Loaded display name registry', { count: Object.keys(registry).length });
+    // Cache only for read paths; a write-path snapshot must never be published
+    // to concurrent readers (the caller may mutate it before its save commits).
+    if (!fresh) {
+      registryCache.set(registryCacheKey(owner, repo), registry);
+    }
     return registry;
   } catch (error) {
-    logger.error('Failed to load display name registry', { error });
+    logger.error('Failed to load display name registry', { error: error.message });
+    // Read paths degrade to empty; write paths must not validate against partial
+    // data, so surface the failure to the handler (returns 500).
+    if (fresh) throw error;
     return {};
   }
 }
@@ -701,7 +748,11 @@ async function validateUserToken(token, expectedUserId) {
   try {
     const octokit = new Octokit({ auth: token });
     const { data: user } = await octokit.rest.users.getAuthenticated();
-    return user.id === Number(expectedUserId);
+    // SECURITY: compare the canonical decimal form, not Number(). Number()
+    // accepted aliases like "0123", " 123" or "0x7b" for user 123, each of
+    // which then indexed the registry under a distinct key and bypassed the
+    // per-user cooldown and ban list.
+    return String(expectedUserId) === String(user.id);
   } catch (error) {
     logger.error('Token validation failed', { error });
     return false;
@@ -776,7 +827,11 @@ async function checkProfanity(adapter, text) {
     }
   }
 
-  // No moderation configured or API failed - allow content
-  logger.debug('No moderation configured, allowing content');
-  return { containsProfanity: false };
+  // Fail closed: when the moderation API is unavailable or not configured, fall
+  // back to the local word list rather than allowing the name unchecked. An
+  // attacker could previously drain the OpenAI rate limit with anonymous
+  // `validate` calls and then set a profane name through the resulting allow.
+  const containsProfanity = LeoProfanity.check(text);
+  logger.debug('Moderation API unavailable; used local word list', { containsProfanity });
+  return { containsProfanity, method: 'leo-profanity' };
 }

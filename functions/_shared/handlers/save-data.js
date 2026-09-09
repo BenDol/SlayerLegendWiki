@@ -2,6 +2,9 @@ import { createLogger } from '../../../src/utils/logger.js';
 import { absenceUnconfirmedResponse, isAbsenceUnconfirmed } from '../utils.js';
 const logger = createLogger('SaveData');
 
+// Allowed shape of a client-supplied grid-submission id (authenticated callers only).
+const GRID_ID_PATTERN = /^[A-Za-z0-9_-]{1,100}$/;
+
 /**
  * Save Data Handler (Platform-Agnostic)
  * Handles saving skill builds, battle loadouts, engraving builds, spirit collection, and grid submissions
@@ -95,6 +98,24 @@ export async function handleSaveData(adapter, configAdapter) {
         logger.error('Token verification failed', { error: error.message });
         return adapter.createJsonResponse(401, { error: 'Invalid authentication token' });
       }
+    } else {
+      // Grid submissions may be anonymous. When a token IS supplied, bind the
+      // verified identity so the submission is attributable and can later be
+      // edited only by its owner (see the replace handling below). An invalid
+      // token is rejected rather than silently downgraded to anonymous.
+      const token = adapter.getAuthToken();
+      if (token) {
+        try {
+          const octokit = new Octokit({ auth: token });
+          const { data: user } = await octokit.rest.users.getAuthenticated();
+          username = user.login;
+          userId = user.id;
+          logger.debug('Authenticated user for grid submission', { username, userId });
+        } catch (error) {
+          logger.warn('Grid submission token verification failed', { error: error.message });
+          return adapter.createJsonResponse(401, { error: 'Invalid authentication token' });
+        }
+      }
     }
 
     // Get configuration
@@ -156,7 +177,7 @@ export async function handleSaveData(adapter, configAdapter) {
 
     // Handle grid submissions (weapon-centric)
     if (type === 'grid-submission') {
-      return await handleGridSubmission(adapter, storage, config, data, username, replace);
+      return await handleGridSubmission(adapter, storage, config, data, username, userId, replace);
     }
 
     // Handle user-centric data
@@ -243,7 +264,7 @@ async function checkProfanity(adapter, text) {
  * Handle grid submission (weapon-centric)
  * Grid submissions are stored per weapon, not per user
  */
-async function handleGridSubmission(adapter, storage, config, data, username, replace) {
+async function handleGridSubmission(adapter, storage, config, data, username, userId, replace) {
   try {
     // Check weapon name override for profanity (if provided)
     if (data.weaponNameOverride) {
@@ -262,48 +283,64 @@ async function handleGridSubmission(adapter, storage, config, data, username, re
 
     const weaponId = data.weaponId;
 
-    // For replace mode, we need to load existing submissions and update the first one
+    // Replace (overwrite an existing shared submission) requires a signed-in
+    // owner. Previously an anonymous caller could overwrite the first submission
+    // for any weapon (the primary layout shown to everyone).
     if (replace) {
+      if (!username || !userId) {
+        return adapter.createJsonResponse(401, {
+          error: 'Sign in to update an existing grid layout',
+        });
+      }
+
       const existingSubmissions = await storage.loadGridSubmissions(weaponId);
 
-      if (existingSubmissions.length > 0) {
-        // Find the user's existing submission or use the first one
-        const targetSubmission = existingSubmissions.find(s => s.username === username) || existingSubmissions[0];
+      // Only the caller's OWN submission may be replaced - never fall back to
+      // someone else's. Match on the verified numeric userId.
+      const targetSubmission = existingSubmissions.find(
+        (s) => s.userId !== undefined && s.userId !== null && String(s.userId) === String(userId)
+      );
 
+      if (targetSubmission) {
         // Update with new data, preserving ID and createdAt
         const updatedSubmission = {
           ...data,
           id: targetSubmission.id,
           createdAt: targetSubmission.createdAt,
-          submittedBy: username || 'Anonymous',
+          submittedBy: username,
           submittedAt: new Date().toISOString(),
         };
 
-        await storage.saveGridSubmission(
-          username || 'Anonymous',
-          targetSubmission.userId || 0,
-          weaponId,
-          updatedSubmission
-        );
+        await storage.saveGridSubmission(username, userId, weaponId, updatedSubmission);
 
         return adapter.createJsonResponse(200, {
           success: true,
           submission: updatedSubmission,
         });
       }
+      // The caller has no submission of their own to replace - fall through and
+      // create a new one rather than overwriting another user's.
     }
 
-    // New submission or no existing submissions
+    // New submission. Only an authenticated caller may reuse a client-supplied id
+    // (storage keys grid updates on userId + id, and all anonymous submissions
+    // share userId 0 with publicly-readable ids). An anonymous caller therefore
+    // ALWAYS gets a freshly generated id, so it can never target - and overwrite -
+    // an existing submission via replace:false.
+    const submissionId = (username && userId && typeof data.id === 'string' && GRID_ID_PATTERN.test(data.id))
+      ? data.id
+      : `grid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     const newSubmission = {
       ...data,
-      id: data.id || `grid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: submissionId,
       submittedBy: username || 'Anonymous',
       submittedAt: new Date().toISOString(),
     };
 
     await storage.saveGridSubmission(
       username || 'Anonymous',
-      0, // Anonymous userId
+      userId || 0, // real userId when authenticated, else 0 (anonymous)
       weaponId,
       newSubmission
     );

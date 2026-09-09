@@ -27,6 +27,14 @@ const USER_SNAPSHOT_LABEL = 'user-snapshot';
 const AUTOMATED_LABEL = 'automated';
 const RECORD_LOCK_REASON = 'off-topic';
 
+// Labels of the trusted account/role records (mirrors admin.js, donatorRegistry.js
+// and prestige.js). Declared once so the reserved-label denylist and the ban-list
+// lookup cannot drift apart.
+const ADMIN_LIST_LABEL = 'wiki-admin-list';
+const BAN_LIST_LABEL = 'wiki-ban-list';
+const DONATOR_LABEL = 'donator';
+const PRESTIGE_CACHE_LABEL = 'prestige-cache';
+
 /** Login of the bot account; reconciliation only ever closes the bot's own issues. */
 function getBotLogin(adapter) {
   return adapter.getEnv('WIKI_BOT_USERNAME') || adapter.getEnv('VITE_WIKI_BOT_USERNAME') || null;
@@ -47,6 +55,13 @@ const RESERVED_RECORD_LABELS = Object.freeze(
       'top-contributor',
       'email-verification',
       'soul-weapon-grids',
+      // Trusted account/role records: the admin & ban lists, donator badges and
+      // the prestige cache. Blocking these labels stops create-comment-issue from
+      // minting an issue that admin.js / donatorRegistry.js / prestige.js trust.
+      ADMIN_LIST_LABEL,
+      BAN_LIST_LABEL,
+      DONATOR_LABEL,
+      PRESTIGE_CACHE_LABEL,
       ...Object.values(DATA_TYPE_CONFIGS).map((config) => config?.label).filter(Boolean),
     ].map((label) => label.toLowerCase())
   )
@@ -61,6 +76,227 @@ function findReservedLabel(labels) {
       return RESERVED_RECORD_LABELS.has(lower) || RESERVED_RECORD_LABEL_PREFIXES.some((prefix) => lower.startsWith(prefix));
     }) ?? null
   );
+}
+
+/**
+ * Title prefixes of bot-managed records. Defence in depth on top of the label
+ * denylist: even with a permitted label, `create-comment-issue` must not forge an
+ * issue whose title matches a trusted record (some records fall back to a
+ * title-match lookup). Compared case-insensitively against the trimmed title.
+ */
+const RESERVED_RECORD_TITLE_PREFIXES = Object.freeze([
+  '[admin list',
+  '[ban list',
+  '[banned users',
+  '[donator]',
+  '[user snapshot]',
+  '[achievements]',
+  '[top contributor]',
+  '[content creator index',
+  '[prestige',
+]);
+
+/** The reserved title prefix a title starts with, or null. */
+function findReservedTitle(title) {
+  const lower = String(title || '').trim().toLowerCase();
+  return RESERVED_RECORD_TITLE_PREFIXES.find((prefix) => lower.startsWith(prefix)) ?? null;
+}
+
+/**
+ * Labels that mark an issue as a bot-managed comment/index container that the
+ * generic `update-issue` / `create-comment` verbs are allowed to modify. These
+ * are the only issues those verbs legitimately touch (build-share index and page
+ * comment issues); everything else - admin list, donator, snapshots, etc. - is
+ * off limits to the public endpoint.
+ */
+const MANAGED_ISSUE_LABELS = Object.freeze(new Set(['build-share-index', 'wiki-comments']));
+
+/**
+ * Authorize a write to an existing issue by the generic bot verbs.
+ *
+ * The bot token can write to every issue in the repo, so `update-issue` and
+ * `create-comment` must not accept an arbitrary issue number from the client
+ * (that path let anyone rewrite the admin-list issue). An issue may be modified
+ * only when it was authored by the bot AND carries a managed container label.
+ *
+ * @returns {Promise<object|null>} an error response to return, or null when authorized.
+ */
+async function assertBotManagedIssue(adapter, octokit, owner, repo, issueNumber, verb) {
+  const botLogin = getBotLogin(adapter);
+  if (!botLogin) {
+    logger.error(`${verb}: WIKI_BOT_USERNAME not configured - refusing to write without an author check`);
+    return adapter.createJsonResponse(503, { error: 'Bot username not configured' });
+  }
+
+  let issue;
+  try {
+    ({ data: issue } = await octokit.rest.issues.get({ owner, repo, issue_number: issueNumber }));
+  } catch (error) {
+    if (error.status === 404) {
+      return adapter.createJsonResponse(404, { error: `Issue #${issueNumber} not found` });
+    }
+    throw error;
+  }
+
+  if (!issue.user || issue.user.login !== botLogin) {
+    logger.warn(`${verb}: refused - issue #${issueNumber} authored by ${issue.user?.login ?? 'unknown'}, not the bot`);
+    return adapter.createJsonResponse(403, {
+      error: 'This issue is not a bot-managed record and cannot be modified through this endpoint',
+    });
+  }
+
+  const labelNames = (issue.labels || [])
+    .map((label) => (typeof label === 'string' ? label : label?.name))
+    .filter(Boolean)
+    .map((name) => name.toLowerCase());
+  const isManaged = labelNames.some((name) => MANAGED_ISSUE_LABELS.has(name));
+  if (!isManaged) {
+    logger.warn(`${verb}: refused - issue #${issueNumber} carries no managed label (${labelNames.join(', ') || 'none'})`);
+    return adapter.createJsonResponse(403, {
+      error: 'This issue is not a bot-managed record and cannot be modified through this endpoint',
+    });
+  }
+
+  return null; // authorized
+}
+
+// ============================================================================
+// Layer B - caller identity for the verbs that write through the bot on a
+// caller's behalf. Layer A above constrains WHAT those verbs may touch; this
+// establishes WHO is asking, so bans and abuse controls can apply.
+// ============================================================================
+
+/** Actions that create/modify content through the bot on behalf of the caller. */
+const IDENTITY_SCOPED_ACTIONS = Object.freeze(new Set(['create-comment', 'update-issue', 'create-comment-issue']));
+
+/** Pages of ban-list issues to walk (there is normally one per branch). */
+const BAN_LIST_MAX_PAGES = 2;
+/** How long a parsed ban list is reused before it is re-read from GitHub. */
+const BAN_LIST_CACHE_TTL_MS = 60 * 1000;
+/** Parsed ban entries per `owner/repo`; the last good read is kept for fallback. */
+const banListCache = createTtlCache(BAN_LIST_CACHE_TTL_MS);
+const lastKnownBanEntries = new Map();
+
+/** Test seam: clear the per-isolate identity caches so tests do not leak state. */
+export function __resetIdentityCachesForTests() {
+  banListCache.clear();
+  lastKnownBanEntries.clear();
+}
+
+/**
+ * Load the merged entries of every bot-managed ban list. Matched by the reserved
+ * `wiki-ban-list` label plus bot authorship - never by title, which the framework
+ * owns (it currently writes "[Ban List]"). Uses the shared record parser so the
+ * ban format has a single source of truth.
+ * @returns {Promise<Array<Object>>} ban entries ({ username, userId, ... })
+ */
+async function loadBanEntries(adapter, octokit, owner, repo) {
+  const key = `${owner}/${repo}`;
+  const cached = banListCache.get(key);
+  if (cached) return cached;
+
+  const botLogin = getBotLogin(adapter);
+  const { issues } = await findIssues(octokit, {
+    owner,
+    repo,
+    labels: [BAN_LIST_LABEL],
+    state: 'open',
+    maxPages: BAN_LIST_MAX_PAGES,
+    confirmAbsence: false,
+    logger: lookupLogger,
+  });
+  const entries = issues
+    .filter((issue) => !botLogin || issue.user?.login === botLogin)
+    .flatMap((issue) => parseUserListFromIssue(issue.body || ''));
+
+  banListCache.set(key, entries);
+  lastKnownBanEntries.set(key, entries);
+  return entries;
+}
+
+/**
+ * Whether the identified caller appears on any bot-managed ban list.
+ *
+ * On a read failure the last successfully loaded list is used; only when no list
+ * has ever been read does the check fail OPEN (logged), so a transient GitHub
+ * error cannot lock every signed-in user out of commenting - and Layer A still
+ * bounds what an unbanned-by-mistake caller can do.
+ */
+async function isCallerBanned(adapter, octokit, owner, repo, user) {
+  let entries;
+  try {
+    entries = await loadBanEntries(adapter, octokit, owner, repo);
+  } catch (error) {
+    entries = lastKnownBanEntries.get(`${owner}/${repo}`);
+    if (!entries) {
+      logger.warn('Ban-list check failed with no cached list; allowing the request', { error: error.message });
+      return false;
+    }
+    logger.warn('Ban-list refresh failed; using the last known list', { error: error.message });
+  }
+
+  const login = String(user.login || '').toLowerCase();
+  const userId = user.id != null ? Number(user.id) : null;
+  return entries.some((entry) => {
+    if (userId != null && entry.userId != null && Number(entry.userId) === userId) return true;
+    return entry.username != null && String(entry.username).toLowerCase() === login;
+  });
+}
+
+/**
+ * Resolve and validate the caller for an identity-scoped action.
+ *
+ * Verify-if-present: when an Authorization header is supplied it must be a
+ * valid GitHub token and the user must not be banned. A missing header is
+ * accepted (the legacy anonymous path, still bounded by Layer A) unless
+ * `features.botSecurity.requireIdentity` is enabled in wiki-config.json.
+ * That flag must stay off until every client caller of these verbs is
+ * login-gated and forwards the user's token.
+ *
+ * @returns {Promise<object|null>} an error response to return, or null to proceed.
+ */
+async function enforceCallerIdentity(adapter, configAdapter, headers, octokit, owner, repo, action) {
+  const authHeader = headers?.authorization || headers?.Authorization;
+  // The flag comes from wiki-config.json or, because the Cloudflare default-config
+  // fallback carries no `features`, from the environment (BOT_REQUIRE_IDENTITY=true).
+  const requireIdentity =
+    adapter.getEnv('BOT_REQUIRE_IDENTITY') === 'true' ||
+    configAdapter?.getWikiConfig?.()?.features?.botSecurity?.requireIdentity === true;
+
+  if (!authHeader) {
+    if (requireIdentity) {
+      logger.warn(`${action}: refused - identity required but no Authorization header`);
+      return adapter.createJsonResponse(401, { error: 'Authentication required' });
+    }
+    return null;
+  }
+
+  // Same case-insensitive "Bearer <token>" parsing as every other handler.
+  const userToken = adapter.getAuthToken();
+  if (!userToken) {
+    return adapter.createJsonResponse(401, { error: 'Invalid Authorization header format. Use "Bearer {token}"' });
+  }
+
+  // Verify the token with GitHub and resolve the caller.
+  const userResponse = await fetch('https://api.github.com/user', {
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'GitHub-Wiki-Bot/1.0',
+    },
+  });
+  if (!userResponse.ok) {
+    logger.warn(`${action}: refused - invalid user token (${userResponse.status})`);
+    return adapter.createJsonResponse(401, { error: 'Invalid authentication token' });
+  }
+  const user = await userResponse.json();
+
+  if (await isCallerBanned(adapter, octokit, owner, repo, user)) {
+    logger.warn(`${action}: refused - ${user.login} is banned`);
+    return adapter.createJsonResponse(403, { error: 'You are not permitted to perform this action' });
+  }
+
+  return null;
 }
 
 /** Issue states the public list action accepts. */
@@ -294,6 +530,12 @@ import { sendEmail } from '../sendgrid.js';
 import * as jwt from '../jwt.js';
 import StorageFactory from 'github-wiki-framework/src/services/storage/StorageFactory.js';
 import { createUserIdLabel, createNameLabel, createEmailLabel } from 'github-wiki-framework/src/utils/githubLabelUtils.js';
+// Relative path on purpose: in a git worktree the `github-wiki-framework` package
+// alias resolves up-tree to the MAIN checkout's submodule (a worktree has no
+// node_modules of its own), so only the relative path guarantees the checked-out
+// submodule is the one under test.
+import { parseUserListFromIssue } from '../../../wiki-framework/src/utils/userListRecords.js';
+import { createTtlCache } from '../utils/registryCache.js';
 import {
   validateIssueTitle,
   validateIssueBody,
@@ -504,12 +746,25 @@ export async function handleGithubBot(adapter, configAdapter, cryptoAdapter) {
   try {
     // Parse request body
     const body = await adapter.getJsonBody();
-    const { action, owner, repo } = body;
+    const { action } = body;
 
-    // Validate required fields
-    if (!action || !owner || !repo) {
-      return adapter.createJsonResponse(400, { error: 'Missing required fields: action, owner, repo' });
+    if (!action) {
+      return adapter.createJsonResponse(400, { error: 'Missing required field: action' });
     }
+
+    // SECURITY: the bot only ever operates on the wiki's own repository. Pin
+    // owner/repo to the server configuration and ignore whatever the request
+    // body claims, so a caller cannot aim the bot token at another repository.
+    // No body fallback: an unconfigured deployment fails closed (like the other
+    // handlers) instead of silently trusting the request.
+    const owner = adapter.getEnv('WIKI_REPO_OWNER') || adapter.getEnv('VITE_WIKI_REPO_OWNER');
+    const repo = adapter.getEnv('WIKI_REPO_NAME') || adapter.getEnv('VITE_WIKI_REPO_NAME');
+    if (!owner || !repo) {
+      console.error('[github-bot] WIKI_REPO_OWNER / WIKI_REPO_NAME not configured');
+      return adapter.createJsonResponse(503, { error: 'Repository is not configured' });
+    }
+    body.owner = owner;
+    body.repo = repo;
 
     // Get bot token from environment
     const botToken = adapter.getEnv('WIKI_BOT_TOKEN');
@@ -526,6 +781,12 @@ export async function handleGithubBot(adapter, configAdapter, cryptoAdapter) {
 
     // Get headers for authenticated endpoints
     const headers = adapter.getHeaders();
+
+    // Layer B (identity) for the verbs that write through the bot on a caller's behalf
+    if (IDENTITY_SCOPED_ACTIONS.has(action)) {
+      const identityGuard = await enforceCallerIdentity(adapter, configAdapter, headers, octokit, owner, repo, action);
+      if (identityGuard) return identityGuard;
+    }
 
     // Route to action handler
     switch (action) {
@@ -613,6 +874,10 @@ async function handleCreateComment(adapter, octokit, { owner, repo, issueNumber,
     return adapter.createJsonResponse(400, { error: bodyResult.error });
   }
 
+  // SECURITY: only comment on bot-managed container issues, never an arbitrary issue.
+  const guard = await assertBotManagedIssue(adapter, octokit, owner, repo, issueNumber, 'create-comment');
+  if (guard) return guard;
+
   const { data: comment } = await octokit.rest.issues.createComment({
     owner,
     repo,
@@ -646,6 +911,11 @@ async function handleUpdateIssue(adapter, octokit, { owner, repo, issueNumber, b
   if (!bodyResult.valid) {
     return adapter.createJsonResponse(400, { error: bodyResult.error });
   }
+
+  // SECURITY: only update bot-managed container issues. This is what stopped the
+  // admin-list takeover: an arbitrary issue number can no longer be rewritten.
+  const guard = await assertBotManagedIssue(adapter, octokit, owner, repo, issueNumber, 'update-issue');
+  if (guard) return guard;
 
   const { data: issue } = await octokit.rest.issues.update({
     owner,
@@ -764,10 +1034,22 @@ async function handleCreateCommentIssue(adapter, octokit, { owner, repo, title, 
     return adapter.createJsonResponse(400, { error: labelsResult.error });
   }
 
-  // This action is unauthenticated: never let it mint a bot-managed record
+  // This action is unauthenticated: never let it mint a bot-managed record,
+  // whether identified by a reserved label or by a reserved title.
   const reservedLabel = findReservedLabel(labels);
   if (reservedLabel) {
     return adapter.createJsonResponse(400, { error: `Label "${reservedLabel}" is reserved for bot-managed records` });
+  }
+  const reservedTitle = findReservedTitle(title);
+  if (reservedTitle) {
+    return adapter.createJsonResponse(400, { error: `Title "${title}" is reserved for bot-managed records` });
+  }
+
+  // Managed containers (page comment threads, the build-share index) must stay
+  // unique: always de-duplicate them regardless of what the caller asked for, so
+  // an anonymous call cannot mint a competing bot-authored container.
+  if (normalizeLabels(labels).some((label) => MANAGED_ISSUE_LABELS.has(label.toLowerCase()))) {
+    preventDuplicates = true;
   }
 
   // Check for existing issue if preventDuplicates is enabled
@@ -815,8 +1097,8 @@ async function handleCreateCommentIssue(adapter, octokit, { owner, repo, title, 
     }
   }
 
-  // TODO: Add ban checking here if requestedBy/requestedByUserId provided
-  // For now, just create the issue
+  // Caller identity and the ban check run in enforceCallerIdentity() before
+  // dispatch; requestedBy / requestedByUserId are advisory audit fields only.
 
   const { data: issue } = await octokit.rest.issues.create({
     owner,
@@ -2164,10 +2446,7 @@ async function handleCheckAchievements(adapter, octokit, { owner, repo }, header
 
   try {
     // 1. Validate token and fetch authenticated user
-    logger.debug('Validating user token for achievement checking', {
-      tokenLength: userToken?.length || 0,
-      tokenPrefix: userToken?.substring(0, 4) || 'none'
-    });
+    logger.debug('Validating user token for achievement checking');
 
     const userResponse = await fetch('https://api.github.com/user', {
       headers: {

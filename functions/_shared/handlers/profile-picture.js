@@ -12,12 +12,17 @@ import { createLogger } from '../../../wiki-framework/src/utils/logger.js';
 import { createWikiStorage } from '../createWikiStorage.js';
 import { Octokit } from '@octokit/rest';
 import {
-  validateImageFile,
+  detectImageFormat,
   validateProcessedImage,
   checkImageModeration,
 } from '../image-utils.js';
+import { createTtlCache, REGISTRY_CACHE_TTL_MS, registryKey as registryCacheKey } from '../utils/registryCache.js';
 
 const logger = createLogger('ProfilePicture');
+
+// Read-path cache for the parsed registry (see registryCache.js). Writers
+// invalidate after committing.
+const registryCache = createTtlCache(REGISTRY_CACHE_TTL_MS);
 
 // Profile picture constants
 const PROFILE_PICTURE_MAX_SIZE_MB = 3;
@@ -30,6 +35,7 @@ const ERROR_MESSAGES = {
   INVALID_FORMAT: `Invalid format. Must be WebP`,
   UPLOAD_FAILED: 'Upload failed. Please try again',
   MODERATION_FAILED: 'Image rejected by moderation',
+  MODERATION_UNAVAILABLE: 'Image moderation is temporarily unavailable. Please try again shortly.',
   UNAUTHORIZED: 'Unauthorized',
   ADMIN_REQUIRED: 'Admin access required',
   INVALID_REQUEST: 'Invalid request',
@@ -169,11 +175,11 @@ async function handlePostProfilePicture(adapter, configAdapter) {
       return adapter.createJsonResponse(413, { error: ERROR_MESSAGES.TOO_LARGE });
     }
 
-    // Validate file type (magic bytes check)
-    // Client should have already processed to WebP, but validate anyway
-    const isValidType = validateImageFile(imageFile.buffer, imageFile.mimetype);
-    if (!isValidType) {
-      logger.warn('Invalid image type', { mimetype: imageFile.mimetype });
+    // Validate by real magic bytes, not the client-declared MIME type: the file
+    // is stored as <userId>.webp, so it must genuinely be a WebP image.
+    const detected = detectImageFormat(imageFile.buffer);
+    if (!detected || detected.ext !== 'webp') {
+      logger.warn('Invalid image type', { mimetype: imageFile.mimetype, detected: detected?.ext });
       return adapter.createJsonResponse(400, { error: ERROR_MESSAGES.INVALID_FORMAT });
     }
 
@@ -187,6 +193,11 @@ async function handlePostProfilePicture(adapter, configAdapter) {
       logger.debug('Checking image moderation');
       const moderationResult = await checkImageModeration(processed.base64, openaiApiKey);
 
+      if (moderationResult.moderationUnavailable) {
+        // Fail closed, but tell the user it is an outage, not a rejection.
+        logger.warn('Image moderation unavailable', { userId });
+        return adapter.createJsonResponse(503, { error: ERROR_MESSAGES.MODERATION_UNAVAILABLE });
+      }
       if (moderationResult.flagged) {
         logger.warn('Image flagged by moderation', { userId });
         return adapter.createJsonResponse(422, { error: ERROR_MESSAGES.MODERATION_FAILED });
@@ -246,6 +257,7 @@ async function handlePostProfilePicture(adapter, configAdapter) {
     };
 
     await saveProfilePictureData(storage, owner, repo, userId, metadata);
+    registryCache.invalidate(registryCacheKey(owner, repo));
 
     // Note: We use GitHub raw URLs (not jsDelivr) for profile pictures
     // This avoids jsDelivr's aggressive caching and provides immediate updates
@@ -268,7 +280,26 @@ async function handlePostProfilePicture(adapter, configAdapter) {
 async function handleDeleteProfilePicture(adapter, configAdapter) {
   try {
     const params = adapter.getQueryParams();
-    const { userId, token } = params;
+
+    // The client sends userId (and historically the token) in a JSON body on
+    // DELETE; older callers used the query string. Accept userId from either.
+    let body = {};
+    try {
+      body = (await adapter.getJsonBody()) || {};
+    } catch (error) {
+      logger.debug('DELETE body was not JSON; relying on query params', { error: error.message });
+      body = {};
+    }
+    const userId = params.userId || body.userId;
+
+    // SECURITY: the token belongs in the Authorization header, never a query
+    // string or body. Legacy locations are still honoured for one release so
+    // older clients keep working, but are logged as deprecated.
+    let token = adapter.getAuthToken();
+    if (!token && (body.token || params.token)) {
+      logger.warn('Deprecated: token supplied in body/query; send it as Authorization: Bearer');
+      token = body.token || params.token;
+    }
 
     if (!userId || !token) {
       return adapter.createJsonResponse(400, { error: ERROR_MESSAGES.INVALID_REQUEST });
@@ -285,9 +316,10 @@ async function handleDeleteProfilePicture(adapter, configAdapter) {
       return adapter.createJsonResponse(500, { error: ERROR_MESSAGES.MISSING_CONFIG });
     }
 
-    // Validate user token or admin status
+    // The owner deleting their own picture is the common case; only pay for the
+    // admin permission lookup when the token is not the owner's.
     const isUserValid = await validateUserToken(token, userId);
-    const isAdmin = await checkAdminStatus(token, owner, repo);
+    const isAdmin = isUserValid ? false : await checkAdminStatus(token, owner, repo);
 
     if (!isUserValid && !isAdmin) {
       logger.warn('Unauthorized delete attempt', { userId });
@@ -307,6 +339,7 @@ async function handleDeleteProfilePicture(adapter, configAdapter) {
     const storage = createWikiStorage(storageConfig, { WIKI_BOT_TOKEN: botToken });
 
     await deleteProfilePictureData(storage, owner, repo, userId);
+    registryCache.invalidate(registryCacheKey(owner, repo));
 
     logger.info('Profile picture deleted', { userId, isAdmin });
 
@@ -320,7 +353,16 @@ async function handleDeleteProfilePicture(adapter, configAdapter) {
 /**
  * Load profile pictures registry from GitHub Issues
  */
-async function loadProfilePictureRegistry(storage, owner, repo) {
+async function loadProfilePictureRegistry(storage, owner, repo, { fresh = false } = {}) {
+  // Read paths may serve from the short-lived cache; writers invalidate it.
+  if (!fresh) {
+    const cached = registryCache.get(registryCacheKey(owner, repo));
+    if (cached) {
+      logger.debug('Serving profile picture registry from cache', { count: Object.keys(cached).length });
+      return cached;
+    }
+  }
+
   try {
     logger.debug('Loading profile pictures registry');
 
@@ -363,6 +405,11 @@ async function loadProfilePictureRegistry(storage, owner, repo) {
     }
 
     logger.debug('Loaded profile pictures registry', { count: Object.keys(registry).length });
+    // Cache only for read paths (see display-name.js); never publish a write-path
+    // snapshot to concurrent readers.
+    if (!fresh) {
+      registryCache.set(registryCacheKey(owner, repo), registry);
+    }
     return registry;
   } catch (error) {
     logger.error('Failed to load profile pictures registry', { error });
@@ -627,7 +674,10 @@ async function validateUserToken(token, expectedUserId) {
   try {
     const octokit = new Octokit({ auth: token });
     const { data: user } = await octokit.rest.users.getAuthenticated();
-    return user.id === Number(expectedUserId);
+    // SECURITY: compare the canonical decimal form, not Number(). Number()
+    // accepted aliases like "0123" or "0x7b" for user 123, which then wrote a
+    // separate avatars/<alias>.webp file and registry entry per alias.
+    return String(expectedUserId) === String(user.id);
   } catch (error) {
     logger.warn('Token validation failed', { error: error.message });
     return false;

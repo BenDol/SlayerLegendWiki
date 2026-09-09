@@ -5,6 +5,9 @@
  */
 
 import { getOctokit } from '../../../wiki-framework/src/services/github/api.js';
+import { createLogger } from '../../../wiki-framework/src/utils/logger.js';
+
+const logger = createLogger('AdminActions');
 
 // Lazy-load admin module to avoid top-level await issues (admin.js imports botService.js)
 let adminModule = null;
@@ -47,21 +50,28 @@ export async function handleAdminAction(adapter, configAdapter) {
 
   // Authentication check
   const token = adapter.getAuthToken();
-  console.log('[Admin Actions] Token check:', { hasToken: !!token, tokenLength: token?.length });
+  logger.debug('Token check', { hasToken: !!token });
   if (!token) {
-    console.error('[Admin Actions] No auth token provided');
+    logger.warn('No auth token provided');
     return adapter.createJsonResponse(401, { error: 'Authentication required' });
   }
 
-  // Set token for this request
-  process.env.GITHUB_TOKEN = token;
+  // SECURITY: the caller's token is passed explicitly per request (see
+  // getOctokit(token) / getCurrentUserAdminStatus(..., token) below) rather than
+  // written to the shared process.env.GITHUB_TOKEN global, which could bleed
+  // between concurrent requests in the same runtime.
 
   // Get bot username and token from environment
   const botUsername = adapter.getEnv('WIKI_BOT_USERNAME') || adapter.getEnv('VITE_WIKI_BOT_USERNAME');
-  const botToken = adapter.getEnv('WIKI_BOT_TOKEN') || adapter.getEnv('VITE_WIKI_BOT_TOKEN');
+  const botToken = adapter.getEnv('WIKI_BOT_TOKEN');
 
-  // Set bot token in process.env so botService can access it
-  if (botToken) {
+  // Bridge the (constant) bot token to botService and the framework's server-side
+  // read fallback, which read it from process.env deep inside the admin helpers.
+  // Set it ONCE if absent and never delete it: the value is identical for every
+  // request, and deleting it in a warm runtime would strip the platform-provided
+  // secret from every concurrent/subsequent request (on Netlify getEnv IS
+  // process.env), leaving later reads unauthenticated.
+  if (botToken && !process.env.WIKI_BOT_TOKEN) {
     process.env.WIKI_BOT_TOKEN = botToken;
   }
 
@@ -87,17 +97,10 @@ export async function handleAdminAction(adapter, configAdapter) {
           return adapter.createJsonResponse(200, { bannedUsers });
 
         case 'get-admin-status':
-          console.log('[Admin Actions] Checking current user admin status');
-          console.log('[Admin Actions] Environment check:', {
-            hasGithubToken: !!process.env.GITHUB_TOKEN,
-            tokenLength: process.env.GITHUB_TOKEN?.length,
-            owner,
-            repo,
-            botUsername
-          });
+          logger.debug('Checking current user admin status', { owner, repo, botUsername });
           const { getCurrentUserAdminStatus } = await getAdminModule();
-          const status = await getCurrentUserAdminStatus(owner, repo, config, botUsername);
-          console.log('[Admin Actions] Status result:', status);
+          const status = await getCurrentUserAdminStatus(owner, repo, config, botUsername, token);
+          logger.debug('Status result', status);
           return adapter.createJsonResponse(200, status);
 
         case 'get-all-donators':
@@ -116,12 +119,26 @@ export async function handleAdminAction(adapter, configAdapter) {
       const body = await adapter.getJsonBody();
       const { action, username, reason, amount, addedBy, removedBy, bannedBy, unbannedBy } = body;
 
-      // Verify authenticated user
-      const octokit = getOctokit();
+      // Verify authenticated user (token passed explicitly, not via process.env)
+      const octokit = getOctokit(token);
       const { data: user } = await octokit.rest.users.getAuthenticated();
       const currentUsername = user.login;
 
-      console.log(`[Admin Actions] Action: ${action}, User: ${currentUsername}`);
+      logger.info(`Admin action ${action} by ${currentUsername}`);
+
+      // SECURITY: the donator-badge actions perform bot writes but had no
+      // authorization check - only add/remove-admin and ban/unban are gated
+      // (inside their services). Without this, any authenticated GitHub user
+      // could self-assign a donator badge. Require admin/owner for both.
+      const DONATOR_ACTIONS = new Set(['assign-donator-badge', 'remove-donator-badge']);
+      if (DONATOR_ACTIONS.has(action)) {
+        const { isAdmin } = await getAdminModule();
+        const callerIsAdmin = await isAdmin(currentUsername, owner, repo, config, botUsername);
+        if (!callerIsAdmin) {
+          logger.warn(`Denied ${action}: ${currentUsername} is not an admin`);
+          return adapter.createJsonResponse(403, { error: 'Admin privileges required' });
+        }
+      }
 
       switch (action) {
         case 'add-admin':
@@ -206,7 +223,7 @@ export async function handleAdminAction(adapter, configAdapter) {
           const { saveDonatorStatus } = await getDonatorRegistry();
 
           // Get bot token from environment
-          const botToken = adapter.getEnv('WIKI_BOT_TOKEN') || adapter.getEnv('VITE_WIKI_BOT_TOKEN');
+          const botToken = adapter.getEnv('WIKI_BOT_TOKEN');
           if (!botToken) {
             return adapter.createJsonResponse(500, { error: 'Bot token not configured' });
           }
@@ -237,7 +254,7 @@ export async function handleAdminAction(adapter, configAdapter) {
           const { removeDonatorStatus } = await getDonatorRegistry();
 
           // Get bot token from environment
-          const botTokenForRemoval = adapter.getEnv('WIKI_BOT_TOKEN') || adapter.getEnv('VITE_WIKI_BOT_TOKEN');
+          const botTokenForRemoval = adapter.getEnv('WIKI_BOT_TOKEN');
           if (!botTokenForRemoval) {
             return adapter.createJsonResponse(500, { error: 'Bot token not configured' });
           }
@@ -261,9 +278,5 @@ export async function handleAdminAction(adapter, configAdapter) {
     return adapter.createJsonResponse(500, {
       error: error.message || 'Internal server error'
     });
-  } finally {
-    // Clean up tokens
-    delete process.env.GITHUB_TOKEN;
-    delete process.env.WIKI_BOT_TOKEN;
   }
 }

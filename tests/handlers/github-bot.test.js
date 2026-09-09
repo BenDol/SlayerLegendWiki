@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { handleGithubBot } from '../../functions/_shared/handlers/github-bot.js';
+import { handleGithubBot, __resetIdentityCachesForTests } from '../../functions/_shared/handlers/github-bot.js';
 import { NetlifyAdapter, CloudflareAdapter } from '../../wiki-framework/serverless/shared/adapters/PlatformAdapter.js';
 import { CryptoAdapter } from '../../functions/_shared/adapters/CryptoAdapter.js';
 import {
@@ -60,6 +60,7 @@ const github = vi.hoisted(() => {
     state.restEmpty = false;
     state.failGraphql = false;
     state.graphqlEmpty = false;
+    state.writes = []; // { op, owner, repo, ... } recorded by create/update/createComment
   };
 
   reset();
@@ -105,6 +106,7 @@ vi.mock('@octokit/rest', () => {
         this.rest = {
           issues: {
             create: async (params) => {
+              state.writes.push({ op: 'create', owner: params.owner, repo: params.repo, title: params.title });
               const created = github.issue(state.nextNumber++, {
                 title: params.title,
                 body: params.body || '',
@@ -124,6 +126,7 @@ vi.mock('@octokit/rest', () => {
               return { data: target ?? { id: 1, number: params.issue_number } };
             },
             createComment: async (params) => {
+              state.writes.push({ op: 'createComment', owner: params.owner, repo: params.repo, issue_number: params.issue_number });
               const target = state.issues.find((issue) => issue.number === params.issue_number);
               if (target) target.comments += 1;
               return { data: { id: 1, body: 'test' } };
@@ -188,6 +191,7 @@ describe('handleGithubBot', () => {
 
   beforeEach(() => {
     github.reset();
+    __resetIdentityCachesForTests();
     configAdapter = createMockConfigAdapter();
     cryptoAdapter = new CryptoAdapter('netlify');
     cleanupMocks = setupAPIMocks();
@@ -217,13 +221,15 @@ describe('handleGithubBot', () => {
 
   describe('Action: create-comment', () => {
     it('should create comment successfully', async () => {
+      // create-comment is only allowed on a bot-authored, managed container issue.
+      github.state.issues.push(github.issue(2000, { title: '[Build Share Index]', labels: ['build-share-index'], login: 'test-wiki-bot' }));
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         body: JSON.stringify({
           action: 'create-comment',
           owner: 'test-owner',
           repo: 'test-repo',
-          issueNumber: 1,
+          issueNumber: 2000,
           body: 'Test comment'
         })
       });
@@ -257,13 +263,15 @@ describe('handleGithubBot', () => {
 
   describe('Action: update-issue', () => {
     it('should update issue successfully', async () => {
+      // update-issue is only allowed on a bot-authored, managed container issue.
+      github.state.issues.push(github.issue(2000, { title: '[Build Share Index]', labels: ['build-share-index'], login: 'test-wiki-bot' }));
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
         body: JSON.stringify({
           action: 'update-issue',
           owner: 'test-owner',
           repo: 'test-repo',
-          issueNumber: 1,
+          issueNumber: 2000,
           body: 'Updated body'
         })
       });
@@ -272,6 +280,175 @@ describe('handleGithubBot', () => {
       const response = await handleGithubBot(adapter, configAdapter, cryptoAdapter);
 
       expect(response.statusCode).toBe(200);
+    });
+  });
+
+  // Layer A of the bot-security remediation: the generic bot verbs must not let a
+  // caller aim the bot token at an arbitrary issue, and create-comment-issue must
+  // never mint a trusted record. See .claude/bot-security-remediation-plan.md.
+  describe('Security: bot-managed write scoping', () => {
+    const seedManaged = (number, labels = ['build-share-index'], login = 'test-wiki-bot') =>
+      github.state.issues.push(github.issue(number, { title: 'Managed', labels, login }));
+
+    it('rejects update-issue on an issue without a managed label', async () => {
+      // Issue #1 is bot-authored but labelled 'bug' (e.g. the admin-list issue).
+      const { status } = await post({ action: 'update-issue', owner: 'test-owner', repo: 'test-repo', issueNumber: 1, body: 'x' });
+      expect(status).toBe(403);
+    });
+
+    it('rejects update-issue on an issue not authored by the bot', async () => {
+      seedManaged(2100, ['build-share-index'], 'attacker');
+      const { status } = await post({ action: 'update-issue', owner: 'test-owner', repo: 'test-repo', issueNumber: 2100, body: 'x' });
+      expect(status).toBe(403);
+    });
+
+    it('returns 404 for update-issue on a missing issue', async () => {
+      const { status } = await post({ action: 'update-issue', owner: 'test-owner', repo: 'test-repo', issueNumber: 999999, body: 'x' });
+      expect(status).toBe(404);
+    });
+
+    it('rejects create-comment on a non-managed issue', async () => {
+      const { status } = await post({ action: 'create-comment', owner: 'test-owner', repo: 'test-repo', issueNumber: 1, body: 'Body content here' });
+      expect(status).toBe(403);
+    });
+
+    it('allows create-comment on a managed bot-authored issue', async () => {
+      seedManaged(2200, ['wiki-comments']);
+      const { status } = await post({ action: 'create-comment', owner: 'test-owner', repo: 'test-repo', issueNumber: 2200, body: 'Body content here' });
+      expect(status).toBe(200);
+    });
+
+    it.each(['donator', 'wiki-admin-list', 'wiki-ban-list', 'prestige-cache'])(
+      'rejects create-comment-issue with the reserved label %s',
+      async (label) => {
+        const { status, body } = await post({ action: 'create-comment-issue', owner: 'test-owner', repo: 'test-repo', title: 'Community Thread', body: 'Body content here', labels: [label] });
+        expect(status).toBe(400);
+        expect(body.error).toContain('reserved');
+      }
+    );
+
+    it.each(['[Admin List]', '[Donator] someone', '[User Snapshot] someone'])(
+      'rejects create-comment-issue with the reserved title %s',
+      async (title) => {
+        const { status, body } = await post({ action: 'create-comment-issue', owner: 'test-owner', repo: 'test-repo', title, body: 'Body content here', labels: ['wiki-comments'] });
+        expect(status).toBe(400);
+        expect(body.error).toContain('reserved');
+      }
+    );
+
+    it('allows create-comment-issue for a normal comment container', async () => {
+      const { status, body } = await post({ action: 'create-comment-issue', owner: 'test-owner', repo: 'test-repo', title: '[Comments] Some Page', body: 'Container body', labels: ['wiki-comments', 'page:some-page'] });
+      expect(status).toBe(200);
+      expect(body).toHaveProperty('issue');
+    });
+  });
+
+  // Layer B of the bot-security remediation: identity for the bot-writing verbs.
+  // Verify-if-present by default; hard-required only behind the config flag.
+  describe('Security: caller identity (Layer B)', () => {
+    const MANAGED = 2000;
+    const seedManagedIssue = () =>
+      github.state.issues.push(github.issue(MANAGED, { title: '[Build Share Index]', labels: ['build-share-index'], login: 'test-wiki-bot' }));
+
+    /** POST with an Authorization header. */
+    async function postWithAuth(body, token) {
+      const event = createMockNetlifyEvent({
+        httpMethod: 'POST',
+        headers: { authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+      const response = await handleGithubBot(new NetlifyAdapter(event), configAdapter, cryptoAdapter);
+      return { status: response.statusCode, body: JSON.parse(response.body) };
+    }
+
+    /** Stub GitHub's /user endpoint for the token verification call. */
+    function stubGithubUser(result) {
+      return vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+        if (String(url).includes('api.github.com/user')) {
+          return result.ok
+            ? { ok: true, status: 200, json: async () => result.user }
+            : { ok: false, status: 401, json: async () => ({ message: 'Bad credentials' }) };
+        }
+        return { ok: false, status: 404, json: async () => ({}) };
+      });
+    }
+
+    it('rejects an invalid user token with 401', async () => {
+      seedManagedIssue();
+      stubGithubUser({ ok: false });
+      const { status } = await postWithAuth(
+        { action: 'create-comment', owner: 'test-owner', repo: 'test-repo', issueNumber: MANAGED, body: 'hello' },
+        'bad-token'
+      );
+      expect(status).toBe(401);
+    });
+
+    it('allows a valid, unbanned user through to the managed write', async () => {
+      seedManagedIssue();
+      stubGithubUser({ ok: true, user: { id: 777, login: 'gooduser' } });
+      const { status } = await postWithAuth(
+        { action: 'create-comment', owner: 'test-owner', repo: 'test-repo', issueNumber: MANAGED, body: 'hello' },
+        'good-token'
+      );
+      expect(status).toBe(200);
+    });
+
+    it('rejects a banned user with 403', async () => {
+      seedManagedIssue();
+      // A bot-authored ban list naming the caller by userId. Matching is by the
+      // wiki-ban-list label + bot authorship, not the title (the framework writes
+      // "[Ban List]"), so the real title is used here to guard against a regression
+      // back to title matching.
+      github.state.issues.push(github.issue(3000, {
+        title: '[Ban List]',
+        labels: ['wiki-ban-list', 'branch:main'],
+        body: 'Banned users\n\n```json\n[{"username":"badguy","userId":42,"reason":"spam"}]\n```\n',
+        login: 'test-wiki-bot',
+      }));
+      stubGithubUser({ ok: true, user: { id: 42, login: 'badguy' } });
+      const { status } = await postWithAuth(
+        { action: 'create-comment', owner: 'test-owner', repo: 'test-repo', issueNumber: MANAGED, body: 'spam' },
+        'banned-token'
+      );
+      expect(status).toBe(403);
+    });
+
+    it('still allows anonymous calls while requireIdentity is off (default)', async () => {
+      seedManagedIssue();
+      const { status } = await post({ action: 'create-comment', owner: 'test-owner', repo: 'test-repo', issueNumber: MANAGED, body: 'hello' });
+      expect(status).toBe(200);
+    });
+
+    it('requires a token when features.botSecurity.requireIdentity is enabled', async () => {
+      seedManagedIssue();
+      configAdapter.getWikiConfig.mockReturnValue({
+        repo: { owner: 'test-owner', name: 'test-repo' },
+        features: { botSecurity: { requireIdentity: true } },
+      });
+      const { status } = await post({ action: 'create-comment', owner: 'test-owner', repo: 'test-repo', issueNumber: MANAGED, body: 'hello' });
+      expect(status).toBe(401);
+    });
+  });
+
+  // Layer A: owner/repo are pinned to the server env, never taken from the body.
+  describe('Security: owner/repo pinning', () => {
+    it('ignores body owner/repo and writes to the configured repository', async () => {
+      // A managed container to write onto; the mock ignores owner/repo when
+      // locating it, so the pin is proven by what the bot WRITE received.
+      github.state.issues.push(github.issue(2000, { title: '[Build Share Index]', labels: ['build-share-index'], login: 'test-wiki-bot' }));
+
+      const { status } = await post({
+        action: 'create-comment',
+        owner: 'attacker', repo: 'evil-repo',
+        issueNumber: 2000, body: 'hi',
+      });
+
+      expect(status).toBe(200);
+      const commentWrite = github.state.writes.find((w) => w.op === 'createComment');
+      expect(commentWrite).toBeTruthy();
+      // tests/setup.js sets WIKI_REPO_OWNER=test-owner / WIKI_REPO_NAME=test-repo.
+      expect(commentWrite.owner).toBe('test-owner');
+      expect(commentWrite.repo).toBe('test-repo');
     });
   });
 
@@ -800,13 +977,17 @@ describe('handleGithubBot', () => {
 
   describe('Cross-Platform Compatibility', () => {
     it('should work identically on both platforms', async () => {
+      // Target a managed, bot-authored container so both platforms take the
+      // success path. The Cloudflare context reads env from its own object, so
+      // give it the same bot/repo config the Netlify adapter gets from process.env.
+      github.state.issues.push(github.issue(2000, { title: '[Build Share Index]', labels: ['build-share-index'], login: 'test-wiki-bot' }));
       const netlifyEvent = createMockNetlifyEvent({
         httpMethod: 'POST',
         body: JSON.stringify({
           action: 'create-comment',
           owner: 'test-owner',
           repo: 'test-repo',
-          issueNumber: 1,
+          issueNumber: 2000,
           body: 'Test comment'
         })
       });
@@ -818,11 +999,14 @@ describe('handleGithubBot', () => {
           action: 'create-comment',
           owner: 'test-owner',
           repo: 'test-repo',
-          issueNumber: 1,
+          issueNumber: 2000,
           body: 'Test comment'
         }),
         env: {
-          WIKI_BOT_TOKEN: process.env.WIKI_BOT_TOKEN
+          WIKI_BOT_TOKEN: process.env.WIKI_BOT_TOKEN,
+          WIKI_BOT_USERNAME: process.env.WIKI_BOT_USERNAME,
+          WIKI_REPO_OWNER: process.env.WIKI_REPO_OWNER,
+          WIKI_REPO_NAME: process.env.WIKI_REPO_NAME
         }
       });
       const cloudflareAdapter = new CloudflareAdapter(cloudflareContext);

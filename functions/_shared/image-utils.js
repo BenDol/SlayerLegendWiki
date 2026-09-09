@@ -12,16 +12,60 @@ const logger = createLogger('ImageUtils');
 const MAGIC_BYTES = {
   'image/jpeg': [0xFF, 0xD8, 0xFF],
   'image/png': [0x89, 0x50, 0x4E, 0x47],
-  'image/webp': [0x52, 0x49, 0x46, 0x46], // RIFF header
+  'image/webp': [0x52, 0x49, 0x46, 0x46], // RIFF header (WEBP fourCC checked separately at offset 8)
   'image/gif': [0x47, 0x49, 0x46, 0x38],
 };
 
+// Canonical extension for each detectable format. jpeg -> jpg for storage.
+const MIME_TO_EXT = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+};
+
 /**
- * Validate image file format using magic bytes
- * Prevents extension spoofing attacks
+ * Detect an image's true format from its magic bytes (never from a filename or a
+ * client-supplied Content-Type). WebP requires both the RIFF header and the
+ * `WEBP` fourCC at offset 8, so a plain RIFF container (wav/avi) is not accepted.
+ * @param {Buffer} buffer - Image file buffer
+ * @returns {{ mime: string, ext: string } | null} the detected format, or null.
+ */
+export function detectImageFormat(buffer) {
+  try {
+    if (!buffer || buffer.length < 12) return null;
+
+    // WebP: "RIFF" (0..3) + "WEBP" (8..11)
+    if (
+      buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+      buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50
+    ) {
+      return { mime: 'image/webp', ext: 'webp' };
+    }
+
+    for (const [mime, magic] of Object.entries(MAGIC_BYTES)) {
+      if (mime === 'image/webp') continue; // handled above
+      let matches = true;
+      for (let i = 0; i < magic.length; i++) {
+        if (buffer[i] !== magic[i]) { matches = false; break; }
+      }
+      if (matches) return { mime, ext: MIME_TO_EXT[mime] };
+    }
+
+    return null;
+  } catch (error) {
+    logger.error('Failed to detect image format', { error });
+    return null;
+  }
+}
+
+/**
+ * Validate image file format using magic bytes.
+ * Prevents extension/Content-Type spoofing attacks. For WebP this also verifies
+ * the `WEBP` fourCC at offset 8, not just the RIFF header.
  * @param {Buffer} buffer - Image file buffer
  * @param {string} mimeType - Expected MIME type
- * @returns {boolean} True if valid, false otherwise
+ * @returns {boolean} True if the content matches the claimed MIME type.
  */
 export function validateImageFile(buffer, mimeType) {
   try {
@@ -31,12 +75,17 @@ export function validateImageFile(buffer, mimeType) {
       return false;
     }
 
-    // Check if buffer starts with expected magic bytes
-    for (let i = 0; i < expected.length; i++) {
-      if (buffer[i] !== expected[i]) {
-        logger.warn('Magic bytes mismatch', { mimeType, expected, actual: buffer.slice(0, expected.length) });
-        return false;
-      }
+    const detected = detectImageFormat(buffer);
+    if (!detected) {
+      logger.warn('Image content did not match any known format', { mimeType });
+      return false;
+    }
+
+    // The detected format must match the claimed MIME type (webp<->webp, etc.).
+    // jpeg is claimed as image/jpeg while detect maps it to ext 'jpg'.
+    if (detected.mime !== mimeType) {
+      logger.warn('Magic bytes do not match claimed MIME type', { mimeType, detected: detected.mime });
+      return false;
     }
 
     return true;
@@ -72,10 +121,16 @@ export function validateProcessedImage(imageBuffer) {
 }
 
 /**
- * Check image for inappropriate content using OpenAI Vision API
+ * Check image for inappropriate content using OpenAI Vision API.
+ * Fails CLOSED: if the API errors or is unreachable it returns
+ * `{ flagged: true, moderationUnavailable: true }` rather than allowing the
+ * image. Callers should branch on `moderationUnavailable` to tell the user it
+ * is a temporary outage (503) rather than a content rejection. When no API key
+ * is configured, moderation is skipped entirely by the callers (returns
+ * `{ flagged: false }` here).
  * @param {string} imageBase64 - Base64-encoded image
  * @param {string} openaiApiKey - OpenAI API key
- * @returns {Promise<Object>} Moderation result { flagged: boolean }
+ * @returns {Promise<{flagged: boolean, moderationUnavailable?: boolean}>} Moderation result
  */
 export async function checkImageModeration(imageBase64, openaiApiKey) {
   if (!openaiApiKey) {
@@ -118,8 +173,9 @@ export async function checkImageModeration(imageBase64, openaiApiKey) {
     if (!response.ok) {
       const errorText = await response.text();
       logger.error('OpenAI Vision API error', { status: response.status, error: errorText });
-      // Fail open: Allow upload if moderation fails
-      return { flagged: false };
+      // Fail closed: when moderation cannot run, reject rather than publish an
+      // unreviewed image to the public CDN. There is no local fallback for images.
+      return { flagged: true, moderationUnavailable: true };
     }
 
     const data = await response.json();
@@ -131,8 +187,8 @@ export async function checkImageModeration(imageBase64, openaiApiKey) {
     return { flagged };
   } catch (error) {
     logger.error('OpenAI Vision API failed', { error: error.message });
-    // Fail open: Allow upload if moderation fails
-    return { flagged: false };
+    // Fail closed: reject when moderation cannot run (see above).
+    return { flagged: true, moderationUnavailable: true };
   }
 }
 

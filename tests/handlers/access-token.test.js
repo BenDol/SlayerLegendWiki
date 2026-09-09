@@ -45,6 +45,30 @@ describe('handleAccessToken', () => {
       expect(body.token_type).toBe('bearer');
     });
 
+    it('pins client_id to the server configuration and ignores the request value', async () => {
+      // SECURITY: the token-exchange proxy must use the wiki's own OAuth app, not
+      // whatever client_id the caller sends (it must also match the device-code step).
+      const configured = process.env.GITHUB_CLIENT_ID || process.env.VITE_GITHUB_CLIENT_ID;
+      expect(configured).toBeTruthy(); // tests/setup.js guarantees one is set
+
+      const event = createMockNetlifyEvent({
+        httpMethod: 'POST',
+        body: JSON.stringify({
+          client_id: 'attacker-client-id',
+          device_code: 'test-device-code-12345',
+          grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
+        })
+      });
+      const response = await handleAccessToken(new NetlifyAdapter(event));
+      expect(response.statusCode).toBe(200);
+
+      const call = global.fetch.mock.calls.find(([url]) => String(url).includes('oauth/access_token'));
+      expect(call).toBeTruthy();
+      const sent = JSON.parse(call[1].body);
+      expect(sent.client_id).toBe(configured);
+      expect(sent.client_id).not.toBe('attacker-client-id');
+    });
+
     it('should reject non-POST requests', async () => {
       const event = createMockNetlifyEvent({
         httpMethod: 'GET'

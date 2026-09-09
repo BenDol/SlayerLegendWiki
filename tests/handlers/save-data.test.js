@@ -15,6 +15,7 @@ import {
 import { createMockStorage } from '../mocks/storage.js';
 import { mockSkillBuild, mockGridSubmission, mockSpiritBuild, mockEngravingBuild } from '../fixtures/testData.js';
 import { createMockOctokit } from '../mocks/octokit.js';
+import { createWikiStorage } from '../../functions/_shared/createWikiStorage.js'; // mocked above
 
 // Mock createWikiStorage - use factory to avoid hoisting issues
 vi.mock('../../functions/_shared/createWikiStorage.js', async () => {
@@ -39,6 +40,9 @@ describe('handleSaveData', () => {
 
   beforeEach(() => {
     configAdapter = createMockConfigAdapter();
+    // Reset the storage-factory mock so a queued mockReturnValueOnce from a prior
+    // test can never leak into the next, then restore the default implementation.
+    vi.mocked(createWikiStorage).mockReset().mockImplementation(() => createMockStorage());
   });
 
   describe('Netlify Platform', () => {
@@ -156,12 +160,11 @@ describe('handleSaveData', () => {
         expect(body).toHaveProperty('submission');
       });
 
-      it('should replace existing grid submission in replace mode', async () => {
+      it('should reject an anonymous replace with 401', async () => {
         const event = createMockNetlifyEvent({
           httpMethod: 'POST',
           body: JSON.stringify({
             type: 'grid-submission',
-            username: 'testuser',
             data: mockGridSubmission,
             replace: true
           })
@@ -170,7 +173,77 @@ describe('handleSaveData', () => {
 
         const response = await handleSaveData(adapter, configAdapter);
 
+        // Overwriting a shared submission requires a signed-in owner.
+        expect(response.statusCode).toBe(401);
+      });
+
+      it('should attribute an authenticated grid submission to the verified user', async () => {
+        // No existing submission owned by the caller, so this takes the create
+        // path; assert it is stored under the verified userId (12345), not 0.
+        const store = {
+          loadGridSubmissions: vi.fn().mockResolvedValue([]),
+          saveGridSubmission: vi.fn().mockResolvedValue({})
+        };
+        vi.mocked(createWikiStorage).mockReturnValueOnce(store);
+
+        const event = createMockNetlifyEvent({
+          httpMethod: 'POST',
+          headers: { authorization: 'Bearer github-token-123' },
+          body: JSON.stringify({ type: 'grid-submission', data: mockGridSubmission, replace: true })
+        });
+
+        const response = await handleSaveData(new NetlifyAdapter(event), configAdapter);
+
         expect(response.statusCode).toBe(200);
+        expect(store.saveGridSubmission).toHaveBeenCalledWith('testuser', 12345, '56', expect.any(Object));
+      });
+
+      it('should replace only the caller\'s own submission', async () => {
+        // Storage already holds THIS user's submission (mock auth id = 12345).
+        const ownStorage = {
+          loadGridSubmissions: vi.fn().mockResolvedValue([
+            { userId: 12345, id: 'own-existing', createdAt: '2026-01-01T00:00:00Z', weaponId: '56' }
+          ]),
+          saveGridSubmission: vi.fn().mockResolvedValue({})
+        };
+        vi.mocked(createWikiStorage).mockReturnValueOnce(ownStorage);
+
+        const event = createMockNetlifyEvent({
+          httpMethod: 'POST',
+          headers: { authorization: 'Bearer github-token-123' },
+          body: JSON.stringify({ type: 'grid-submission', data: mockGridSubmission, replace: true })
+        });
+        const response = await handleSaveData(new NetlifyAdapter(event), configAdapter);
+
+        expect(response.statusCode).toBe(200);
+        // The existing submission was updated in place (same id), by the owner.
+        expect(ownStorage.saveGridSubmission).toHaveBeenCalledWith(
+          'testuser', 12345, '56', expect.objectContaining({ id: 'own-existing' })
+        );
+      });
+
+      it('should NOT overwrite another user\'s submission when replacing', async () => {
+        // Storage holds only a DIFFERENT user's submission.
+        const otherStorage = {
+          loadGridSubmissions: vi.fn().mockResolvedValue([
+            { userId: 99999, id: 'other-user-submission', createdAt: '2026-01-01T00:00:00Z', weaponId: '56' }
+          ]),
+          saveGridSubmission: vi.fn().mockResolvedValue({})
+        };
+        vi.mocked(createWikiStorage).mockReturnValueOnce(otherStorage);
+
+        const event = createMockNetlifyEvent({
+          httpMethod: 'POST',
+          headers: { authorization: 'Bearer github-token-123' },
+          body: JSON.stringify({ type: 'grid-submission', data: mockGridSubmission, replace: true })
+        });
+        const response = await handleSaveData(new NetlifyAdapter(event), configAdapter);
+
+        expect(response.statusCode).toBe(200);
+        // A NEW submission is created for this user; the other user's id is untouched.
+        const call = otherStorage.saveGridSubmission.mock.calls[0];
+        expect(call[1]).toBe(12345); // userId = caller
+        expect(call[3].id).not.toBe('other-user-submission');
       });
 
       it('should validate grid submission structure', async () => {

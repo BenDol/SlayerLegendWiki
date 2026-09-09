@@ -59,21 +59,50 @@ describe('handleDeviceCode', () => {
       expect(body.error).toBe('Method not allowed');
     });
 
-    it('should validate required client_id field', async () => {
+    it('returns 400 when no client_id is configured anywhere', async () => {
+      // The server pins client_id to its own configuration; a 400 is only
+      // possible when neither the server nor the request supplies one.
+      const saved = { g: process.env.GITHUB_CLIENT_ID, v: process.env.VITE_GITHUB_CLIENT_ID };
+      delete process.env.GITHUB_CLIENT_ID;
+      delete process.env.VITE_GITHUB_CLIENT_ID;
+      try {
+        const event = createMockNetlifyEvent({
+          httpMethod: 'POST',
+          body: JSON.stringify({
+            scope: 'repo'
+            // missing client_id
+          })
+        });
+        const adapter = new NetlifyAdapter(event);
+
+        const response = await handleDeviceCode(adapter);
+
+        expect(response.statusCode).toBe(400);
+        const body = JSON.parse(response.body);
+        expect(body.error).toBeTruthy();
+      } finally {
+        if (saved.g !== undefined) process.env.GITHUB_CLIENT_ID = saved.g;
+        if (saved.v !== undefined) process.env.VITE_GITHUB_CLIENT_ID = saved.v;
+      }
+    });
+
+    it('pins client_id to the server configuration and ignores the request value', async () => {
+      // SECURITY: the proxy must not be an open relay for arbitrary OAuth apps.
+      const configured = process.env.GITHUB_CLIENT_ID || process.env.VITE_GITHUB_CLIENT_ID;
+      expect(configured).toBeTruthy(); // tests/setup.js guarantees one is set
+
       const event = createMockNetlifyEvent({
         httpMethod: 'POST',
-        body: JSON.stringify({
-          scope: 'repo'
-          // missing client_id
-        })
+        body: JSON.stringify({ client_id: 'attacker-client-id', scope: 'repo' })
       });
-      const adapter = new NetlifyAdapter(event);
+      const response = await handleDeviceCode(new NetlifyAdapter(event));
+      expect(response.statusCode).toBe(200);
 
-      const response = await handleDeviceCode(adapter);
-
-      expect(response.statusCode).toBe(400);
-      const body = JSON.parse(response.body);
-      expect(body.error).toBeTruthy();
+      const deviceCall = global.fetch.mock.calls.find(([url]) => String(url).includes('login/device/code'));
+      expect(deviceCall).toBeTruthy();
+      const sent = JSON.parse(deviceCall[1].body);
+      expect(sent.client_id).toBe(configured);
+      expect(sent.client_id).not.toBe('attacker-client-id');
     });
 
     it('should handle GitHub API errors gracefully', async () => {
