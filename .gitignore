@@ -82,6 +82,9 @@ nul
 .codex/hooks.json
 .grok/hooks/agent-cohort.json
 .linked-*
+.cursor/agent-cohort/
+.cursor/hooks.json
+.wrenix/
 .claude/settings.local.json
 .claude/settings.local.json
 .claude/content-fill-plan.md

@@ -3,7 +3,7 @@
     "agent-cohort": {
       "command": "node",
       "args": [
-        ".cohort/cohort-mcp.cjs"
+        ".wrenix/cohort-mcp.cjs"
       ]
     }
   }
