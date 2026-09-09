@@ -99,61 +99,47 @@ This guide explains how to set up a GitHub bot account for your wiki's comment s
 
 ### Step 4: Configure Bot Token in Your Wiki
 
-#### For Local Development (.env.local)
+#### For Local Development (.dev.vars)
 
-1. **Create or edit `.env.local` file** in your wiki root:
+The bot token is **server-side only**. Locally it is read by the Cloudflare
+Functions dev server (Wrangler) from `.dev.vars`; the browser never sees it.
+
+1. **Create or edit `.dev.vars`** in your wiki root:
    ```bash
-   # Copy from example if it doesn't exist
-   cp .env.example .env.local
+   cp .dev.vars.example .dev.vars
    ```
 
 2. **Add the bot token:**
    ```env
-   VITE_WIKI_BOT_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   WIKI_BOT_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   WIKI_BOT_USERNAME=your-wiki-bot
    ```
 
-   **Note:** Use `VITE_WIKI_BOT_TOKEN` (not `VITE_GITHUB_BOT_TOKEN`) - GitHub reserves the `GITHUB_*` prefix for its own use.
+   > **Never** name it `VITE_WIKI_BOT_TOKEN` or put it in `.env.local`. Vite
+   > inlines every `VITE_`-prefixed variable into the client bundle, which
+   > publishes the token to every visitor. `scripts/checkBundleSecrets.cjs`
+   > runs after every build and fails it if a token reaches `dist/`.
 
-3. **Verify it's gitignored:**
-   - Check `.gitignore` includes `.env.local`
-   - This prevents accidentally committing the token
+3. **Verify it's gitignored:** `.gitignore` includes `.dev.vars`.
 
-4. **Restart your dev server:**
-   ```bash
-   npm run dev
-   ```
+4. **Start the dev server:** `npm run dev` (runs Wrangler + Vite). All bot
+   actions - in development and production - go through the serverless
+   endpoint, which holds the token.
 
-5. **Verify bot is working:**
-   - Check console logs when app starts
-   - Should see: `[Bot] ✓ Bot Octokit initialized successfully`
-   - If you see warning, the token isn't configured properly
+#### For Deployment (platform secret)
 
-#### For GitHub Pages Deployment (GitHub Secrets)
+1. **GitHub Actions / Cloudflare Pages:** add a **secret** named `WIKI_BOT_TOKEN`
+   (Settings → Secrets and variables → Actions; and the Pages project's
+   runtime secrets). Use `WIKI_BOT_TOKEN`, not `GITHUB_BOT_TOKEN` - GitHub
+   reserves the `GITHUB_*` prefix.
 
-1. **Go to your repository on GitHub**
+2. **Do NOT pass the token to the build step.** The build only needs public
+   `VITE_*` values (client id, repo owner/name, bot *username*). Adding
+   `VITE_WIKI_BOT_TOKEN` to a build `env:` block would inline the secret into
+   the published JavaScript.
 
-2. **Navigate to Settings → Secrets and variables → Actions**
-
-3. **Add repository secret:**
-   - Click "New repository secret"
-   - Name: `WIKI_BOT_TOKEN`
-   - Value: Paste your bot token
-   - Click "Add secret"
-
-   **Note:** Use `WIKI_BOT_TOKEN` (not `GITHUB_BOT_TOKEN`) - GitHub reserves the `GITHUB_*` prefix and won't allow it.
-
-4. **Update GitHub Actions workflow** (`.github/workflows/deploy.yml`):
-   ```yaml
-   - name: Build
-     env:
-       VITE_GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-       VITE_WIKI_BOT_TOKEN: ${{ secrets.WIKI_BOT_TOKEN }}  # Add this line
-     run: npm run build
-   ```
-
-5. **Commit and push:**
-   - The next deployment will use the bot token
-   - Comment issues will be created by the bot
+3. **Commit and push:** the next deployment's Functions read the secret at
+   runtime; comment issues will be created by the bot.
 
 ### Step 5: Test the Bot
 
@@ -184,9 +170,9 @@ After setup, verify everything works:
 - [ ] Bot accepted the invitation
 - [ ] Personal access token generated for bot
 - [ ] Token has `repo` scope
-- [ ] Token added to `.env.local` (local dev)
+- [ ] Token added to `.dev.vars` (local dev)
 - [ ] Token added to GitHub Secrets (deployment)
-- [ ] Console shows bot initialized successfully
+- [ ] A test comment is created by the bot account (the bot runs server-side; check `.wrangler/server.log`, not the browser console)
 - [ ] New comment issues created by bot account
 - [ ] Regular users cannot close bot-created issues
 
@@ -200,7 +186,7 @@ After setup, verify everything works:
 - Warning about bot token in console
 
 **Solutions:**
-1. Check `.env.local` file exists and has `VITE_WIKI_BOT_TOKEN`
+1. Check `.dev.vars` file exists and has `WIKI_BOT_TOKEN`
 2. Restart dev server after adding token
 3. Verify token format starts with `ghp_`
 4. Ensure token has `repo` scope
@@ -217,7 +203,7 @@ Bot token not configured properly.
 
 **Solution:**
 1. Check console for bot initialization message
-2. Verify token in `.env.local`
+2. Verify token in `.dev.vars`
 3. Restart dev server
 4. Clear browser cache and hard refresh
 
@@ -243,7 +229,7 @@ Bot token not configured properly.
 **Solution:**
 1. Check token expiration date
 2. Generate new token
-3. Update `.env.local` and GitHub Secrets
+3. Update `.dev.vars` and GitHub Secrets
 4. Restart services
 
 ## Security Best Practices
@@ -251,7 +237,7 @@ Bot token not configured properly.
 ### Token Security
 
 1. **Never commit tokens to git**
-   - Always use `.env.local` (gitignored)
+   - Always use `.dev.vars` (gitignored)
    - Use GitHub Secrets for deployment
 
 2. **Use minimal permissions**
@@ -312,7 +298,7 @@ bot.updateWorkflow('deploy.yml', newConfig);
 ### How to Upgrade Scope
 
 1. **Generate new token** with both `repo` + `workflow` scopes
-2. **Update `.env.local`** with new token
+2. **Update `.dev.vars`** with new token
 3. **Update GitHub Secrets** with new token
 4. **Test locally**
 5. **Delete old token**
@@ -325,7 +311,7 @@ When it's time to rotate the bot token:
 
 1. **Generate new token** (follow Step 3 above)
    - Use same scopes as before (or upgrade if needed)
-2. **Update `.env.local`** with new token
+2. **Update `.dev.vars`** with new token
 3. **Update GitHub Secrets** with new token
 4. **Test locally** to verify it works
 5. **Deploy** to update production
@@ -370,7 +356,7 @@ Not covered in this guide. See [GitHub Apps Documentation](https://docs.github.c
 ### Q: Can I use my personal token instead of creating a bot?
 
 **A:** No, personal tokens won't work:
-- The system requires a bot token specifically configured via `VITE_WIKI_BOT_TOKEN`
+- The bot token is a **server-side secret** named `WIKI_BOT_TOKEN`; the client never holds it
 - Personal tokens would create issues under your name (users could close them)
 - Bot accounts provide proper separation and permission control
 - This is a security and user experience requirement
@@ -421,7 +407,7 @@ If you encounter issues:
 1. ✅ Create bot GitHub account
 2. ✅ Add bot as collaborator (Write access)
 3. ✅ Generate bot Personal Access Token (`repo` scope)
-4. ✅ Add token to `.env.local` and GitHub Secrets
+4. ✅ Add token to `.dev.vars` and GitHub Secrets
 5. ✅ Test by posting a comment
 6. ✅ Verify issue created by bot account
 

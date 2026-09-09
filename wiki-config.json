@@ -325,6 +325,9 @@
     }
   },
   "features": {
+    "botSecurity": {
+      "requireIdentity": false
+    },
     "search": true,
     "tableOfContents": true,
     "pageHistory": true,

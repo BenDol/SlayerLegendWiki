@@ -12,6 +12,8 @@ WIKI_REPO_NAME=SlayerLegendWiki
 
 # GitHub OAuth Client ID (required for user authentication)
 VITE_GITHUB_CLIENT_ID=your_github_oauth_client_id
+# Server-side name the OAuth device-flow proxy pins to (falls back to VITE_ value):
+GITHUB_CLIENT_ID=your_github_oauth_client_id
 
 # Optional: Override repository configuration for Vite (if different from above)
 VITE_WIKI_REPO_OWNER=your_github_username

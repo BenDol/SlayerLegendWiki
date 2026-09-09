@@ -24,7 +24,24 @@ export async function handleDeviceCode(adapter) {
 
   try {
     // Parse request body
-    const { client_id, scope } = await adapter.getJsonBody();
+    const { client_id: requestedClientId } = await adapter.getJsonBody();
+
+    // SECURITY: pin the OAuth client to the server's configured app so this
+    // proxy cannot be used as an open relay to GitHub's device endpoints for
+    // arbitrary client_ids. The request value is used only when the server has
+    // no client id configured (keeps local setups working) - logged so that
+    // fallback is visible.
+    const configuredClientId = adapter.getEnv('GITHUB_CLIENT_ID') || adapter.getEnv('VITE_GITHUB_CLIENT_ID');
+    if (!configuredClientId) {
+      console.warn('[device-code] No server GITHUB_CLIENT_ID configured; using the request-supplied client_id');
+    }
+    const client_id = configuredClientId || requestedClientId;
+
+    // SECURITY: pin the scope too. Forwarding a client-supplied scope would let
+    // an attacker start a device flow for THIS app with an over-broad scope
+    // (repo, workflow, ...) and phish a user into approving it. The wiki only
+    // needs read access plus the user's public identity.
+    const scope = adapter.getEnv('GITHUB_OAUTH_SCOPE') || 'public_repo read:user user:email';
 
     // Initiate device flow
     const result = await initiateDeviceFlow({

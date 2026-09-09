@@ -10,13 +10,16 @@ import { createLogger } from '../../../wiki-framework/src/utils/logger.js';
 const logger = createLogger('ImageUploadHandler');
 
 import { Octokit } from 'octokit';
-import { validateImageFile, checkImageModeration } from '../image-utils.js';
+import { checkImageModeration, detectImageFormat } from '../image-utils.js';
+
+// Default allowed formats when wiki-config does not specify them. 'jpg' and
+// 'jpeg' are both listed because detectImageFormat maps JPEG content to 'jpg'.
+const DEFAULT_ALLOWED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
 import { validateEmail } from '../validation.js';
 import {
   generateImageId,
   buildMetadata,
   validateMetadata,
-  getFileExtension,
   getUploadPath
 } from '../utils/image-metadata.js';
 
@@ -91,8 +94,23 @@ export async function handleImageUpload(params) {
     // Step 3: Validate metadata
     validateMetadata(name, category, description, tags, config);
 
-    // Step 4: Validate original image file (magic bytes check)
-    validateImageFile(originalFile, originalMimeType, config);
+    // Step 4: Validate the ORIGINAL file by its real magic bytes (never the
+    // client-supplied filename or Content-Type) and confirm the detected format
+    // is an allowed image type. The stored extension is derived from this below,
+    // so a file named "x.html" can never be committed to the CDN as HTML.
+    const detectedFormat = detectImageFormat(originalFile);
+    const allowedFormats = (config?.features?.imageUploads?.allowedFormats || DEFAULT_ALLOWED_IMAGE_FORMATS)
+      .map((f) => String(f).toLowerCase())
+      // 'jpeg' in config accepts JPEG content, which detectImageFormat reports as 'jpg'.
+      .map((f) => (f === 'jpeg' ? 'jpg' : f));
+    if (!detectedFormat || !allowedFormats.includes(detectedFormat.ext)) {
+      throw new Error('Unsupported image format: file content is not an allowed image type');
+    }
+    // The WebP the client sends for display must genuinely be a WebP image.
+    const webpFormat = detectImageFormat(webpFile);
+    if (!webpFormat || webpFormat.ext !== 'webp') {
+      throw new Error('Processed image must be a valid WebP file');
+    }
 
     // Step 5: Check file sizes
     const maxSizeMB = config?.features?.imageUploads?.maxFileSizeMB || 10;
@@ -191,18 +209,20 @@ export async function handleImageUpload(params) {
         logger.debug('Running content moderation for anonymous upload');
         const openaiApiKey = adapter.getEnv('OPENAI_API_KEY');
         if (openaiApiKey) {
-          try {
-            const imageBase64 = originalFile.toString('base64');
-            const moderationResult = await checkImageModeration(imageBase64, openaiApiKey);
-            if (moderationResult.flagged) {
-              logger.warn('Image flagged by moderation (anonymous)', { userEmail });
-              throw new Error('Image failed content moderation check');
-            }
-            logger.debug('Content moderation passed');
-          } catch (error) {
-            logger.warn('Content moderation failed', { error: error.message });
-            throw new Error(`Content moderation failed: ${error.message}`);
+          const imageBase64 = originalFile.toString('base64');
+          const moderationResult = await checkImageModeration(imageBase64, openaiApiKey);
+          if (moderationResult.moderationUnavailable) {
+            // Fail closed, but signal an outage rather than a content rejection.
+            logger.warn('Content moderation unavailable (anonymous)', { userEmail });
+            const err = new Error('Image moderation is temporarily unavailable. Please try again shortly.');
+            err.statusCode = 503;
+            throw err;
           }
+          if (moderationResult.flagged) {
+            logger.warn('Image flagged by moderation (anonymous)', { userEmail });
+            throw new Error('Image failed content moderation check');
+          }
+          logger.debug('Content moderation passed');
         } else {
           logger.debug('OpenAI API key not configured, skipping moderation');
         }
@@ -226,25 +246,26 @@ export async function handleImageUpload(params) {
       logger.debug('Running content moderation for authenticated upload');
       const openaiApiKey = adapter.getEnv('OPENAI_API_KEY');
       if (openaiApiKey) {
-        try {
-          const imageBase64 = originalFile.toString('base64');
-          const moderationResult = await checkImageModeration(imageBase64, openaiApiKey);
-          if (moderationResult.flagged) {
-            logger.warn('Image flagged by moderation (authenticated)', { username: auth.user.login });
-            throw new Error('Image failed content moderation check');
-          }
-          logger.debug('Content moderation passed');
-        } catch (error) {
-          logger.warn('Content moderation failed', { error: error.message });
-          throw new Error(`Content moderation failed: ${error.message}`);
+        const imageBase64 = originalFile.toString('base64');
+        const moderationResult = await checkImageModeration(imageBase64, openaiApiKey);
+        if (moderationResult.moderationUnavailable) {
+          logger.warn('Content moderation unavailable (authenticated)', { username: auth.user.login });
+          const err = new Error('Image moderation is temporarily unavailable. Please try again shortly.');
+          err.statusCode = 503;
+          throw err;
         }
+        if (moderationResult.flagged) {
+          logger.warn('Image flagged by moderation (authenticated)', { username: auth.user.login });
+          throw new Error('Image failed content moderation check');
+        }
+        logger.debug('Content moderation passed');
       } else {
         logger.debug('OpenAI API key not configured, skipping moderation');
       }
     }
 
     // Step 8: Build metadata
-    const format = getFileExtension(originalFilename);
+    const format = detectedFormat.ext;
     const uploadedBy = auth.user?.login || 'anonymous';
     const uploadedAt = new Date().toISOString();
 
@@ -288,7 +309,7 @@ export async function handleImageUpload(params) {
       };
     }
 
-    const botToken = auth.botToken || adapter.getEnv('WIKI_BOT_TOKEN') || adapter.getEnv('VITE_WIKI_BOT_TOKEN');
+    const botToken = auth.botToken || adapter.getEnv('WIKI_BOT_TOKEN');
 
     if (!botToken) {
       throw new Error('Bot token not configured');
@@ -299,7 +320,7 @@ export async function handleImageUpload(params) {
       imageId,
       category,
       originalFile,
-      originalFilename,
+      detectedFormat.ext,
       webpFile,
       metadata,
       botToken,
@@ -341,7 +362,7 @@ export async function handleImageUpload(params) {
  * @param {Object} cdnConfig - CDN configuration
  * @returns {Promise<Object>} CDN URLs
  */
-async function uploadImagesToCDN(imageId, category, originalFile, originalFilename, webpFile, metadata, botToken, cdnConfig) {
+async function uploadImagesToCDN(imageId, category, originalFile, originalExt, webpFile, metadata, botToken, cdnConfig) {
   try {
     const octokit = new Octokit({ auth: botToken });
 
@@ -349,10 +370,10 @@ async function uploadImagesToCDN(imageId, category, originalFile, originalFilena
     const { year, month } = getUploadPath(category);
     const basePath = `${cdnConfig.basePath}/${category}/${year}/${month}`;
 
-    // Get original file extension
-    const originalExt = getFileExtension(originalFilename);
+    // originalExt is the caller-validated format (from detectImageFormat), never
+    // the client filename.
     if (!originalExt) {
-      throw new Error('Could not determine file extension');
+      throw new Error('Could not determine image format from file content');
     }
 
     const paths = {

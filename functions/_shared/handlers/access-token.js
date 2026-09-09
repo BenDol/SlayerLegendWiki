@@ -25,7 +25,15 @@ export async function handleAccessToken(adapter) {
 
   try {
     // Parse request body
-    const { client_id, device_code, grant_type } = await adapter.getJsonBody();
+    const { client_id: requestedClientId, device_code, grant_type } = await adapter.getJsonBody();
+
+    // SECURITY: pin the OAuth client to the server's configured app (must match
+    // the device-code step). See device-code.js for rationale.
+    const configuredClientId = adapter.getEnv('GITHUB_CLIENT_ID') || adapter.getEnv('VITE_GITHUB_CLIENT_ID');
+    if (!configuredClientId) {
+      console.warn('[access-token] No server GITHUB_CLIENT_ID configured; using the request-supplied client_id');
+    }
+    const client_id = configuredClientId || requestedClientId;
 
     // Poll for access token
     const result = await pollAccessToken({

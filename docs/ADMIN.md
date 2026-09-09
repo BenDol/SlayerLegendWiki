@@ -23,9 +23,9 @@ The admin system uses **GitHub Issues** as a database for storing admin and bann
 
 ### Bot Token Requirement
 
-**IMPORTANT**: The admin system requires the bot token (`VITE_WIKI_BOT_TOKEN`) to be configured. The bot creates and manages the admin/banned user issues.
+**IMPORTANT**: The admin system requires the bot token (`WIKI_BOT_TOKEN` (server-side secret)) to be configured. The bot creates and manages the admin/banned user issues.
 
-See `BOT-SETUP.md` for bot token configuration.
+See `BOT.md` for bot token configuration.
 
 ## User Roles
 
@@ -335,7 +335,7 @@ Both admin and banned user issues are **automatically locked** when created to p
 
 ### Bot Account Security
 
-- Bot token stored securely in `.env.local` and GitHub Secrets
+- Bot token stored as a server-only secret (`.dev.vars` locally, the `WIKI_BOT_TOKEN` platform secret in CI/production)
 - Bot has Write access (NOT Admin)
 - Admin/banned issues are locked to prevent tampering
 - All actions logged in issue history
@@ -390,7 +390,7 @@ For repository owners, GitHub's audit log shows all API calls made by the bot ac
 - Solution: Only the repo owner can manage admins. Admins cannot add other admins.
 
 **"Bot token not configured"**
-- Solution: Configure `VITE_WIKI_BOT_TOKEN` following `BOT-SETUP.md`
+- Solution: Configure `WIKI_BOT_TOKEN` (server-side secret) following `BOT.md`
 
 **"Cannot ban the repository owner"**
 - Solution: The owner cannot be banned. This is by design.
@@ -411,7 +411,7 @@ If a regular user tries to access the admin panel:
 
 ### Initial Setup
 
-1. **Configure bot token** (see `BOT-SETUP.md`)
+1. **Configure bot token** (see `BOT.md`)
 2. **Navigate to Admin Panel** as repository owner
 3. Admin/banned user issues are automatically created
 4. Start managing users!
@@ -533,7 +533,7 @@ When you first access the admin panel:
 
 ### Q: What if the bot token expires?
 
-**A:** The admin system will stop working. Generate a new bot token and update `.env.local` and GitHub Secrets. See `BOT-SETUP.md` for token rotation.
+**A:** The admin system will stop working. Generate a new bot token and update `.dev.vars` (local) and the `WIKI_BOT_TOKEN` platform secret. See `BOT.md` for token rotation.
 
 ### Q: Are admin actions reversible?
 
@@ -560,6 +560,6 @@ The wiki's admin system provides:
 
 **Access:** `/#/admin` (owner and admins only)
 
-**Requirements:** Bot token configured (see `BOT-SETUP.md`)
+**Requirements:** Bot token configured (see `BOT.md`)
 
 **Support:** Check console logs and GitHub issue history for debugging

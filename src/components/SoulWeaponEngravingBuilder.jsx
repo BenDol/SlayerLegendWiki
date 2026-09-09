@@ -5611,7 +5611,10 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
                 )}
               </button>
 
-              {existingSubmissions.length > 0 && (
+              {/* Replace only updates the caller's OWN submission (the server
+                  enforces this); show it only when they actually have one, so
+                  it never silently creates a duplicate. */}
+              {isAuthenticated && existingSubmissions.some(s => String(s.userId) === String(user?.id)) && (
                 <button
                   onClick={() => submitGridLayout(true)}
                   disabled={submitting || loadingSubmissions}
@@ -5635,7 +5638,7 @@ const SoulWeaponEngravingBuilder = forwardRef(({ isModal = false, initialBuild =
 
           {!isAuthenticated && (
             <div className="mt-2 p-2 bg-blue-100 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 rounded text-sm text-blue-800 dark:text-blue-200">
-              ℹ️ You can submit anonymously, or sign in to attach your username
+              ℹ️ You can submit anonymously. Sign in to attach your username and to update (replace) a layout you submitted.
             </div>
           )}
 

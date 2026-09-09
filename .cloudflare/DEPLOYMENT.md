@@ -62,7 +62,9 @@ WIKI_REPO_NAME=your_repo_name
 VITE_WIKI_REPO_OWNER=your_github_username
 VITE_WIKI_REPO_NAME=your_repo_name
 VITE_WIKI_BOT_USERNAME=your_github_bot_username
-VITE_WIKI_BOT_TOKEN=your_github_bot_token
+# SECURITY: never set VITE_WIKI_BOT_TOKEN. A VITE_ variable is inlined into the
+# client bundle. The bot token is server-only: set WIKI_BOT_TOKEN (above) as a
+# runtime secret, never a VITE_ build variable.
 ```
 
 #### SendGrid Email (Required for email verification)

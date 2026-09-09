@@ -238,7 +238,7 @@ export async function handleImageUploadRequest(adapter, configAdapter) {
       stack: error.stack,
     });
 
-    return adapter.createJsonResponse(500, {
+    return adapter.createJsonResponse(error.statusCode || 500, {
       error: error.message || 'Internal server error',
     });
   }
@@ -252,7 +252,7 @@ export async function handleImageUploadRequest(adapter, configAdapter) {
 async function getAuthInfo(adapter, config) {
   const headers = adapter.getHeaders();
   const authHeader = headers.authorization || headers.Authorization;
-  const botToken = adapter.getEnv('WIKI_BOT_TOKEN') || adapter.getEnv('VITE_WIKI_BOT_TOKEN');
+  const botToken = adapter.getEnv('WIKI_BOT_TOKEN');
 
   if (!botToken) {
     throw new Error('Bot token not configured');
@@ -262,10 +262,7 @@ async function getAuthInfo(adapter, config) {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const userToken = authHeader.substring(7);
 
-    logger.debug('Attempting to validate user token', {
-      tokenLength: userToken.length,
-      tokenPrefix: userToken.substring(0, 7) + '...'
-    });
+    logger.debug('Attempting to validate user token');
 
     // Validate token by fetching user info
     try {

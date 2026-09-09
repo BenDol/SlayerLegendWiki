@@ -35,8 +35,8 @@ All functions in `api/` directory:
 | `delete-data.js` | POST | Delete user data | `WIKI_BOT_TOKEN`, `WIKI_BOT_USERNAME`, `WIKI_REPO_OWNER`, `WIKI_REPO_NAME` |
 
 `WIKI_BOT_USERNAME` names the account that owns issue-backed records. Duplicate records are only ever closed when they were authored by that account; without it, duplicates are left open and reported in the logs.
-| `access-token.js` | POST | OAuth access token proxy (CORS bypass) | None |
-| `device-code.js` | POST | OAuth device code proxy (CORS bypass) | None |
+| `access-token.js` | POST | OAuth access token proxy (CORS bypass) | `GITHUB_CLIENT_ID` (or `VITE_GITHUB_CLIENT_ID`) |
+| `device-code.js` | POST | OAuth device code proxy (CORS bypass) | `GITHUB_CLIENT_ID` (or `VITE_GITHUB_CLIENT_ID`), `GITHUB_OAUTH_SCOPE` (optional) |
 
 ## Function Signature
 
@@ -123,9 +123,11 @@ Cloudflare Pages automatically deploys functions from this directory when you pu
 Set these in Cloudflare Pages dashboard:
 
 ```bash
-WIKI_BOT_TOKEN=<your_bot_token>
+WIKI_BOT_TOKEN=<your_bot_token>            # server-only secret, never VITE_-prefixed
+WIKI_BOT_USERNAME=<your_bot_account_login> # required: comment/index writes 503 without it
 WIKI_REPO_OWNER=<your_github_username>
 WIKI_REPO_NAME=<your_repo_name>
+GITHUB_CLIENT_ID=<your_github_client_id>   # pins the OAuth device-flow proxy
 VITE_GITHUB_CLIENT_ID=<your_github_client_id>
 VITE_PLATFORM=cloudflare
 VITE_CF_PAGES=1
