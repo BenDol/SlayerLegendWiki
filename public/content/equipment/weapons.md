@@ -26,7 +26,7 @@ Five copies of the same grade [fuse](/equipment/fusion) into one weapon of the n
 
 # <span class="text-gray-900 dark:text-gray-100">Leveling Your Weapon</span>
 
-Weapons are [enhanced](/equipment/enhancement) with<img src="/images/content/goods/EnchantCube 1_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhance Cubes** up to level 200 - with the exception of the final weapon, which can push beyond that cap. Enhancement multiplies the weapon's ATK contribution, and promotion checks generally assume your weapon is enhanced, not just held. Cubes come primarily from stage farming, idle rewards, and the Closed Mine dungeon, so weapon leveling is more about routine than luck.
+Weapons are [enhanced](/equipment/enhancement) with<img src="/images/content/goods/EnchantCube%201_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhance Cubes** up to level 200 - with the exception of the final weapon, which can push beyond that cap. Enhancement multiplies the weapon's ATK contribution, and promotion checks generally assume your weapon is enhanced, not just held. Cubes come primarily from stage farming, idle rewards, and the Closed Mine dungeon, so weapon leveling is more about routine than luck.
 
 # <span class="text-gray-900 dark:text-gray-100">What About Soul Weapons?</span>
 

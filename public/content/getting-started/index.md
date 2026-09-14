@@ -37,6 +37,6 @@ Once you have your footing, the rest of the wiki goes deep on every system:
 - [Skills](/skills) - the full skill system, from your first Fire Slash to skill mastery.
 - [Equipment](/equipment) - weapons, accessories, enhancement, fusion, soul weapons, and relics.
 - [Companions](/companions) and [Spirits](/spirits) - the allies that fight (and farm) alongside you.
-- [Andy's Progression Guide](/andy/overview-introduction) - a veteran player's walkthrough of mid and late game, written from three years of experience.
+- [Andy's Progression Guide](/andy/overview-introduction) - a veteran player's introduction to efficient mid-game play, written from three years of experience, with a map of where each stage band is covered.
 
 And when you start planning builds, the wiki's free tools - the [Skill Builder](/skill-builder), [Spirit Builder](/spirit-builder), and [Battle Loadouts](/battle-loadouts) - let you plan and share setups with other players. Good hunting.

@@ -24,7 +24,7 @@ Your combat stats are divided into two categories: main stats and critical stats
 
 
 ## <span class="text-red-700 dark:text-red-300">Main Stats</span>
-| **Attack (ATK)** <img src="/images/content/icons/icon_growth01_powerup 2_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 45px; height: 45px; margin: 0 0.25em;" data-inline="true" /> | **Health Points (HP)** <img src="/images/content/icons/icon_growth02_hpup_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 45px; height: 45px; margin: 0 0.25em;" data-inline="true" /> | **HP Recovery** <img src="/images/content/icons/icon_growth03_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 45px; height: 45px; margin: 0 0.25em;" data-inline="true" /> |
+| **Attack (ATK)** <img src="/images/content/icons/icon_growth01_powerup%202_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 45px; height: 45px; margin: 0 0.25em;" data-inline="true" /> | **Health Points (HP)** <img src="/images/content/icons/icon_growth02_hpup_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 45px; height: 45px; margin: 0 0.25em;" data-inline="true" /> | **HP Recovery** <img src="/images/content/icons/icon_growth03_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 45px; height: 45px; margin: 0 0.25em;" data-inline="true" /> |
 |----------|----------|----------|
 |This attribute determines how much damage you deal.|This attribute determines your maximum health.|This attribute determines your health regeneration rate.|
 

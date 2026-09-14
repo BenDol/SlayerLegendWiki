@@ -19,6 +19,14 @@ A few things worth knowing before you look at the table:
 - **The jumps get dramatic.** From Ether onward each rank roughly doubles your multiplier, all the way to Eldenwood's x42,000,000. If a stage wall feels immovable, check whether a promotion battle is available before sinking more gold into incremental stat boosts - a stalled "comfortable stage" is nearly always a promotion you haven't taken yet.
 - **Promotion battles are timed boss fights**, so raw damage output matters more than survivability - this is exactly what the boss-focused spirit lineups on the [Spirit Information](/spirits/information) page are built for. If a battle refuses to go down, the [progression overview](/progression) has a diagnosis order for finding which system is lagging.
 
+## <span class="text-gray-900 dark:text-gray-100">Reading the Ladder</span>
+
+The table below reads as three distinct phases. **Stone to Adamant** (x1 to x1,000) is the early game: the promotions arrive every few dozen levels, the battles are rarely a wall, and the right move is simply to take each one the moment it unlocks. **Ether to Dark Nox** (x2,000 to x160,000) is the mid game Andy's guide picks up at - each rank doubles the previous one, the battles start demanding a proper boss loadout, and this is where most players first stall. **Blue Abyss to Eldenwood** (x320,000 to x42,000,000) is the late game, where the multiplier keeps doubling but the fights are gated as much by the systems that unlocked along the way - awakened latent power, soul weapons, relics - as by raw stats.
+
+## <span class="text-gray-900 dark:text-gray-100">When a Promotion Battle Won't Fall</span>
+
+Because the battle is timed, you lose to the clock far more often than to the boss's damage. Work through the levers in order: swap to your boss [spirit lineup](/spirits/information) (Noah, Loar, Sala), equip a burst-focused skill bar with your timed buffs overlapping, check that your [class](/character/class) and [latent power](/character/latent-power) are not lagging behind your level, and only then go back to leveling ATK. If the fight is close, a few hundred more levels of ATK usually settles it; if you are not clearing half the boss's bar, the bottleneck is elsewhere and more gold won't fix it.
+
 Here are the current promotions and the boosts they provide upon completion.
 
 

@@ -26,31 +26,11 @@ import { resolveImagePath } from '../../wiki-framework/src/utils/imageResolver';
 
 const logger = createLogger('Emoticon');
 
-// Emoticon ID to name mapping
-export const EMOTICON_MAP = {
-  1: 'Hello',
-  2: 'Yep',
-  3: 'Laugh',
-  4: 'Okay',
-  5: 'Cheer',
-  6: 'Cool',
-  7: 'Exhausted',
-  8: 'Congrats',
-  1001: 'Ok',
-  1002: 'No',
-  1003: 'Hm',
-  1004: 'Love',
-  1005: 'Question',
-  1006: 'Sleep',
-  1007: 'Sad',
-  1008: 'Happy',
-};
+// The catalogue lives in src/data/emoticons.js (pure data) so the build-time
+// prerenderer can render the same emoticons without importing React.
+import { EMOTICON_MAP, EMOTICON_NAME_TO_ID, emoticonImagePath } from '../data/emoticons.js';
 
-// Reverse mapping (name to ID)
-export const EMOTICON_NAME_TO_ID = Object.entries(EMOTICON_MAP).reduce((acc, [id, name]) => {
-  acc[name.toLowerCase()] = parseInt(id, 10);
-  return acc;
-}, {});
+export { EMOTICON_MAP, EMOTICON_NAME_TO_ID };
 
 // Size presets
 const SIZE_MAP = {
@@ -84,7 +64,7 @@ const Emoticon = ({ id, name, size = 'large', alt, className = '', style = {} })
 
   // Get emoticon name for alt text
   const emoticonName = EMOTICON_MAP[emoticonId];
-  const imagePath = resolveImagePath(`emoticons/Emoticon_${emoticonId}.png`);
+  const imagePath = resolveImagePath(emoticonImagePath(emoticonId));
   const altText = alt || emoticonName;
 
   // Determine size

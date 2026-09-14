@@ -6,7 +6,7 @@
     "reference"
   ],
   "firstBlockOrder": 10,
-  "unverifiedNotice": "> **Numbers stop at stage {{stage}}.** The chapters below without figures are named by the game client itself, so the regions and zones are correct - but the community stat dataset the tables are built from stops producing new combat values past stage {{stage}} and simply repeats its last twenty stages from there on. A chapter is only tabulated when all twenty of its stages are covered, so the tables end with chapter 68 at stage 1,360 and everything deeper is listed by name. See [Reading the stage data](/stages/mechanics) for the full explanation.",
+  "unverifiedNotice": "> **Numbers stop at stage {{stage}}.** The chapters in the table above that carry no figures are named by the game client itself, so the regions and zones are correct - but the community stat dataset the tables are built from stops producing new combat values past stage {{stage}} and simply repeats its last twenty stages from there on. A chapter is only tabulated when all twenty of its stages are covered, so the tables end with chapter 68 at stage 1,360 and everything deeper is listed by name. See [Reading the stage data](/stages/mechanics) for the full explanation.",
   "footer": "Something here wrong or missing? The stage tables are built from datamined game files - if the game has moved on, [tell us](/meta/contributing).",
   "pages": [
     {

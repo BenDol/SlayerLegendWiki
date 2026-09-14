@@ -23,10 +23,16 @@
  *     replaces that DOM on load, so users still get the full app -
  *     the injected article is only the pre-JS paint / crawler view.
  *  4. Also emits static/tool routes described by
- *     scripts/prerender-data/routes/*.md (frontmatter contract:
- *     route, title, description, robots) plus noindexed minimal stubs
- *     for pure-app utility routes (/search, /profile, ...).
- *  5. The homepage is patched in place: home.md's rendered article is
+ *     src/content/tool-pages/*.md (frontmatter contract: route, title,
+ *     description, robots) - the same files the app renders below each
+ *     tool - plus noindexed minimal stubs for pure-app utility routes
+ *     (/search, /profile, ...) and for every editor/history/new route the
+ *     content pages link to, so those never fall through to the SPA
+ *     catch-all and get indexed as copies of the homepage.
+ *  5. Content image paths (/images/content/...) are rewritten to the CDN
+ *     URL the app resolves them to, so crawlers and non-JS fetches get real
+ *     images instead of the catch-all's HTML.
+ *  6. The homepage is patched in place: home.md's rendered article is
  *     injected into dist/index.html's root div while all existing meta,
  *     scripts and asset links are preserved.
  *
@@ -50,6 +56,8 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
 import rehypeStringify from 'rehype-stringify';
+import { buildCdnImageUrl, CONTENT_IMAGE_PREFIX } from '../functions/_shared/utils/imageCdn.js';
+import { resolveEmoticon, emoticonImagePath } from '../src/data/emoticons.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,9 +71,19 @@ const SITE_TITLE = 'Slayer Legend Wiki';
 const CONTENT_DIR = path.join(__dirname, '../public/content');
 const DIST_DIR = path.join(__dirname, '../dist');
 const TEMPLATE_FILE = path.join(DIST_DIR, 'index.html');
-const PRERENDER_DATA_DIR = path.join(__dirname, 'prerender-data/routes');
+const ROOT_CONFIG_FILE = path.join(__dirname, '../wiki-config.json');
+// Tool/static route copy. Lives under src/ so the app can import the same
+// files (see src/components/ToolIntro.jsx) - one source of truth for what
+// crawlers and users read about each tool.
+const PRERENDER_DATA_DIR = path.join(__dirname, '../src/content/tool-pages');
 
 const DESCRIPTION_MAX_LENGTH = 155;
+
+// Crawler HTML points images at raw.githubusercontent.com rather than
+// jsDelivr: the CDN repo exceeds jsDelivr's package size limit, so files not
+// already in its cache are refused (403) - the app works around that with a
+// runtime fallback (src/utils/cdnFallback.js), crawlers cannot.
+const CRAWLER_IMAGE_SERVING_MODE = 'raw';
 
 // Pure-app utility routes: always emitted as minimal noindex stubs so the
 // AdSense/Google reviewers never sample a completely empty screen, and so
@@ -75,11 +93,25 @@ const UTILITY_STUB_ROUTES = [
   { route: '/profile', title: 'Profile', description: 'Your Slayer Legend Wiki profile.' },
   { route: '/my-collections', title: 'My Collections', description: 'Your saved collections on the Slayer Legend Wiki.' },
   { route: '/my-spirits', title: 'My Spirits', description: 'Your saved spirit setups on the Slayer Legend Wiki.' },
+  { route: '/my-familiars', title: 'My Familiars', description: 'Your saved familiar builds on the Slayer Legend Wiki.' },
   { route: '/my-edits', title: 'My Edits', description: 'Your page edits on the Slayer Legend Wiki.' },
+  { route: '/build', title: 'Shared Build', description: 'A build shared by another player on the Slayer Legend Wiki.' },
   { route: '/donation-success', title: 'Donation Complete', description: 'Thank you for supporting the Slayer Legend Wiki.' },
   { route: '/admin', title: 'Admin', description: 'Slayer Legend Wiki administration.' },
   { route: '/dev-tools', title: 'Developer Tools', description: 'Slayer Legend Wiki developer tools.' },
+  // Legacy alias the app redirects client-side; crawlers get the canonical target.
+  { route: '/characters', title: 'Character', description: 'This address has moved to the Character section.', canonical: '/character' },
 ];
+
+// Legacy section paths the app redirects client-side (old path -> current
+// path). Every content page under the current section also gets a noindex
+// stub at the old address, so deep links such as /characters/stats never
+// fall through to the SPA catch-all (homepage HTML, canonical "/").
+const LEGACY_SECTION_ALIASES = Object.freeze({ characters: 'character' });
+
+// Tool-copy frontmatter `route` values are joined into dist/; only plain
+// slash-separated slugs are acceptable there.
+const SAFE_ROUTE_PATTERN = /^\/(?:[a-z0-9][a-z0-9-]*)(?:\/[a-z0-9][a-z0-9-]*)*$/i;
 
 // Fallback publisher if the template's WebSite JSON-LD cannot be parsed.
 const FALLBACK_PUBLISHER = {
@@ -133,9 +165,26 @@ const markdownProcessor = unified()
   .use(rehypeStringify);
 
 /**
+ * Static HTML for an {{emoticon:...}} token: the same image the app's
+ * <Emoticon> component shows, so the emoticon gallery keeps its previews in
+ * the crawler HTML instead of degrading to empty table cells. Unknown
+ * emoticons render nothing (mirrors the component's "unknown" branch).
+ *
+ * @param {string} ref - id or name from the token
+ * @returns {string} <img> markup or ''
+ */
+function renderEmoticonToken(ref) {
+  const emoticon = resolveEmoticon(ref);
+  if (!emoticon) return '';
+  const src = `${CONTENT_IMAGE_PREFIX}${emoticonImagePath(emoticon.id)}`;
+  return `<img src="${escapeHtml(src)}" alt="${escapeHtml(emoticon.name)} emoticon" class="inline-image" width="32" height="32" style="display:inline-block;vertical-align:middle" />`;
+}
+
+/**
  * Strip custom renderer tokens like {{AD:contentTop}}, {{home:hero}},
- * {{data:spirits:6}}, {{emoticon:Happy}} - these only mean something to the
- * client-side renderer registry and must not leak into crawler HTML.
+ * {{data:spirits:6}} - these only mean something to the client-side renderer
+ * registry and must not leak into crawler HTML. {{emoticon:...}} tokens are
+ * the exception: they become the same <img> the app renders.
  */
 function stripRendererTokens(markdown) {
   // Preserve tokens inside fenced code blocks and inline code spans: pages
@@ -145,7 +194,15 @@ function stripRendererTokens(markdown) {
   // with a capture group returns the code segments at odd indices.
   const parts = markdown.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|``(?:(?!``)[^\n])*``|`[^`\n]*`)/);
   return parts
-    .map((part, i) => (i % 2 === 1 ? part : part.replace(/\{\{[^{}]*\}\}/g, '')))
+    .map((part, i) => {
+      if (i % 2 === 1) return part;
+      return part
+        // Same shape the app's content processor accepts: optional whitespace
+        // and an optional ":size" suffix ({{emoticon:Cheer:medium}}); only the
+        // id/name reaches the resolver.
+        .replace(/\{\{\s*emoticon:\s*([^:}]+?)\s*(?::\s*[^}]*?)?\s*\}\}/gi, (_m, ref) => renderEmoticonToken(ref))
+        .replace(/\{\{[^{}]*\}\}/g, '');
+    })
     .join('');
 }
 
@@ -153,6 +210,42 @@ async function renderMarkdown(markdown) {
   const cleaned = stripRendererTokens(markdown);
   const file = await markdownProcessor.process(cleaned);
   return String(file);
+}
+
+/**
+ * Rewrite `<img src="/images/content/...">` to the CDN URL the running app
+ * resolves the same path to. Without the app there is nothing at
+ * /images/content/* except the SPA catch-all, so every image in the crawler
+ * HTML would be an HTML document.
+ *
+ * @param {string} html - Rendered article HTML
+ * @param {Object|null} gameAssets - `features.gameAssets` from wiki-config.json
+ * @param {string} [servingMode] - 'raw' (default) or 'jsdelivr'
+ */
+function rewriteContentImageUrls(html, gameAssets, servingMode = CRAWLER_IMAGE_SERVING_MODE) {
+  if (!html || !gameAssets?.enabled) return html;
+  return html.replace(/(<img\b[^>]*?\bsrc=)(["'])([^"']*)\2/gi, (match, prefix, quote, src) => {
+    if (!src.startsWith(CONTENT_IMAGE_PREFIX)) return match;
+    const cdnUrl = buildCdnImageUrl(src, gameAssets, servingMode);
+    return cdnUrl ? `${prefix}${quote}${cdnUrl}${quote}` : match;
+  });
+}
+
+/**
+ * Read the root wiki-config.json (the source of truth; public/ is a copy).
+ *
+ * Fatal when missing or unparseable: without it no image is rewritten to the
+ * CDN and no editor/history stub is emitted, which is a broken crawler build
+ * that must not ship with a green exit code.
+ *
+ * @param {string} [file=ROOT_CONFIG_FILE] - Injectable for tests
+ */
+function loadWikiConfig(file = ROOT_CONFIG_FILE) {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (error) {
+    throw new Error(`Could not read ${path.relative(path.join(__dirname, '..'), file)} (${error.message}) - the prerender cannot rewrite images to the CDN or emit editor/history stubs without it.`);
+  }
 }
 
 /**
@@ -357,8 +450,15 @@ function injectIntoRoot(html, articleShell) {
  * Produce a full prerendered document for one route from the pristine template.
  */
 function buildRouteHtml(template, publisher, page) {
-  const { route, title, description, bodyHtml, noindex, keywords } = page;
-  const canonicalUrl = route === '/' ? `${SITE_URL}/` : `${SITE_URL}${route}`;
+  const { route, title, description, bodyHtml, noindex, keywords, canonical } = page;
+  const toUrl = (r) => (r === '/' ? `${SITE_URL}/` : `${SITE_URL}${r}`);
+  // og:url names the route's own address. The canonical link is only emitted
+  // on indexable documents: a noindex stub with a canonical elsewhere (its
+  // content page, the section it belongs to) sends two contradictory
+  // signals, so the stub's `canonical` field documents the relationship for
+  // the build report and nothing else.
+  const pageUrl = toUrl(route);
+  const canonicalUrl = toUrl(canonical || route);
   const fullTitle = title ? `${title} | ${SITE_TITLE}` : SITE_TITLE;
 
   let html = template;
@@ -366,16 +466,20 @@ function buildRouteHtml(template, publisher, page) {
   html = setMetaContent(html, 'name', 'description', description);
   html = setMetaContent(html, 'property', 'og:title', fullTitle);
   html = setMetaContent(html, 'property', 'og:description', description);
-  html = setMetaContent(html, 'property', 'og:url', canonicalUrl);
+  html = setMetaContent(html, 'property', 'og:url', pageUrl);
   html = setMetaContent(html, 'name', 'twitter:title', fullTitle);
   html = setMetaContent(html, 'name', 'twitter:description', description);
   if (keywords && keywords.length > 0) {
     html = setMetaContent(html, 'name', 'keywords', keywords.join(', '));
   }
 
-  const headParts = [`    <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />`];
-  if (noindex) headParts.push('    <meta name="robots" content="noindex" />');
-  headParts.push(`    ${buildArticleJsonLd({ title: fullTitle, description, canonicalUrl, publisher })}`);
+  const headParts = [];
+  if (noindex) {
+    headParts.push('    <meta name="robots" content="noindex" />');
+  } else {
+    headParts.push(`    <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />`);
+  }
+  headParts.push(`    ${buildArticleJsonLd({ title: fullTitle, description, canonicalUrl: noindex ? pageUrl : canonicalUrl, publisher })}`);
   headParts.push(`    ${PRERENDER_STYLE}`);
   html = insertBeforeHeadClose(html, headParts.join('\n'));
 
@@ -388,7 +492,7 @@ function buildRouteHtml(template, publisher, page) {
 // Page collection
 // ---------------------------------------------------------------------------
 
-async function collectContentPages() {
+async function collectContentPages(gameAssets = null) {
   const pages = [];
   const mdFiles = getMdFiles(CONTENT_DIR);
   for (const file of mdFiles) {
@@ -401,13 +505,59 @@ async function collectContentPages() {
       : truncateDescription(extractPlainText(content));
     const noindex = data.noindex === true || data.robots === 'noindex' || data.draft === true;
     const keywords = Array.isArray(data.tags) ? data.tags.map(String) : null;
-    const bodyHtml = await renderMarkdown(content);
+    const bodyHtml = rewriteContentImageUrls(await renderMarkdown(content), gameAssets);
     pages.push({ route, title, description, bodyHtml, noindex, keywords, kind: 'content' });
   }
   return pages;
 }
 
-async function collectPrerenderDataPages() {
+/**
+ * Noindex stubs for the app screens every content page links to - its
+ * editor and its history - and for each section's "new page" route. Without
+ * a file at these routes the SPA catch-all answers them with the homepage
+ * HTML (200, canonical "/"), and crawlers that follow the links index them
+ * as copies of the homepage.
+ *
+ * @param {Array} contentPages - from collectContentPages()
+ * @param {Array<{path: string, title?: string}>} sections - wiki-config sections
+ */
+function collectUtilityRouteStubs(contentPages, sections) {
+  const stubs = [];
+  const stub = (route, title, description, canonical) => ({
+    route,
+    title,
+    description,
+    bodyHtml: `<p>${escapeHtml(description)} This screen is interactive and requires JavaScript to use.</p>`,
+    noindex: true,
+    keywords: null,
+    kind: 'stub',
+    canonical,
+  });
+
+  for (const page of contentPages) {
+    // Only /<section>/<page> routes have editor and history screens.
+    const segments = page.route.split('/').filter(Boolean);
+    if (segments.length !== 2) continue;
+    stubs.push(stub(`${page.route}/edit`, `Edit: ${page.title}`, `Edit the "${page.title}" page in the wiki editor.`, page.route));
+    stubs.push(stub(`${page.route}/history`, `History: ${page.title}`, `Revision history of the "${page.title}" page.`, page.route));
+
+    // Old deep links (/characters/stats) get a stub pointing at the current page.
+    for (const [legacyPath, currentPath] of Object.entries(LEGACY_SECTION_ALIASES)) {
+      if (segments[0] !== currentPath) continue;
+      stubs.push(stub(`/${legacyPath}/${segments[1]}`, page.title, `This address has moved to "${page.title}".`, page.route));
+    }
+  }
+
+  for (const section of sections || []) {
+    if (!section?.path) continue;
+    const sectionTitle = section.title || section.path;
+    stubs.push(stub(`/${section.path}/new`, `New page in ${sectionTitle}`, `Create a new page in the ${sectionTitle} section.`, `/${section.path}`));
+  }
+
+  return stubs;
+}
+
+async function collectPrerenderDataPages(gameAssets = null) {
   if (!fs.existsSync(PRERENDER_DATA_DIR)) {
     console.warn(`⚠️  ${path.relative(path.join(__dirname, '..'), PRERENDER_DATA_DIR)} not found - skipping static/tool route prerendering (utility stubs are still emitted).`);
     return [];
@@ -422,10 +572,14 @@ async function collectPrerenderDataPages() {
       console.warn(`⚠️  ${file}: missing required frontmatter (route, title) - skipped`);
       continue;
     }
+    if (!SAFE_ROUTE_PATTERN.test(String(data.route))) {
+      console.warn(`⚠️  ${file}: route "${data.route}" is not a plain /slug[/slug] path - skipped`);
+      continue;
+    }
     const description = data.description
       ? truncateDescription(String(data.description).trim(), 300)
       : truncateDescription(extractPlainText(content));
-    const bodyHtml = await renderMarkdown(content);
+    const bodyHtml = rewriteContentImageUrls(await renderMarkdown(content), gameAssets);
     pages.push({
       route: String(data.route),
       title: String(data.title),
@@ -440,7 +594,7 @@ async function collectPrerenderDataPages() {
 }
 
 function collectUtilityStubs() {
-  return UTILITY_STUB_ROUTES.map(({ route, title, description }) => ({
+  return UTILITY_STUB_ROUTES.map(({ route, title, description, canonical }) => ({
     route,
     title,
     description,
@@ -448,6 +602,7 @@ function collectUtilityStubs() {
     noindex: true,
     keywords: null,
     kind: 'stub',
+    canonical: canonical || null,
   }));
 }
 
@@ -472,10 +627,15 @@ async function prerender() {
     process.exit(1);
   }
   const publisher = extractPublisher(template);
+  const wikiConfig = loadWikiConfig();
+  const gameAssets = wikiConfig?.features?.gameAssets || null;
 
-  const contentPages = await collectContentPages();
-  const staticPages = await collectPrerenderDataPages();
-  const stubPages = collectUtilityStubs();
+  const contentPages = await collectContentPages(gameAssets);
+  const staticPages = await collectPrerenderDataPages(gameAssets);
+  const stubPages = [
+    ...collectUtilityStubs(),
+    ...collectUtilityRouteStubs(contentPages, wikiConfig?.sections || []),
+  ];
 
   const emitted = [];
   const seenRoutes = new Set();
@@ -560,6 +720,9 @@ if (isDirectExecution) {
 
 // Pure helpers exported for unit tests.
 export {
+  loadWikiConfig,
+  LEGACY_SECTION_ALIASES,
+  SAFE_ROUTE_PATTERN,
   pathToRoute,
   routeToOutputFile,
   stripRendererTokens,
@@ -570,4 +733,11 @@ export {
   setMetaContent,
   insertBeforeHeadClose,
   buildArticleShell,
+  buildRouteHtml,
+  rewriteContentImageUrls,
+  collectUtilityRouteStubs,
+  collectUtilityStubs,
+  renderEmoticonToken,
+  CRAWLER_IMAGE_SERVING_MODE,
+  PRERENDER_DATA_DIR,
 };

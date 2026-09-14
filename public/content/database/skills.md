@@ -96,4 +96,14 @@ For icons and a visual browse, see the [Skills Gallery](/skills/skills); for how
 
 A note on the two Immortals, because they break the usual rules: **Rave** records the damage you deal in a 5-second window and releases a percentage of it back as bonus damage, which makes it multiply with every buff you can stack into that window (the community pairs it with Wrath of Gods and Warrior Burn for exactly this reason). And **Mantra** applies its effect *without being equipped in a slot* - a straight account power bump once leveled.
 
+# <span class="text-gray-900 dark:text-gray-100">Reading the Numbers</span>
+
+Three columns do most of the work. **MP and cooldown together** decide how often a skill actually fires: Fulgurous costs 10 MP on a half-second cooldown, so it drains a bar faster than any Legendary nuke, while a 0-MP passive like Iron Will or Wind Sword is simply always on. **Max level** tells you what kind of skill you're holding - damage actives climb to 130 and keep scaling, buffs stop at 20 (Meditation at 10, the Immortals at 5), so a buff reaches its ceiling early and cheaply while a damage skill is a long-term investment. And the **effect line's base and per-level values** are linear: a skill with "Base 400% (+40%/Lv)" is worth 400% + 40% × (level − 1), which is why two skills with similar bases but different growth diverge sharply by level 100.
+
+Grades are not a straight power ranking, either. A maxed Common active is a real contributor for hundreds of stages, several Rare and Epic passives (Earth's Will, Iron Will, Curved Blade) stay on end-game bars because always-on ATK and attack speed never stop mattering, and the highest-grade actives earn their slots through burst rather than sustained damage. What changes with grade is mostly *ceiling*: bigger bases, wider ranges, more targets.
+
+# <span class="text-gray-900 dark:text-gray-100">Turning the Table Into a Build</span>
+
+Start from what limits you. If your bar sits idle waiting for MP, you need cheaper actives or Luna-style [mana support](/companions/luna), not a bigger nuke; if your damage comes in short windows, stack the timed buffs - Fire Sword, Warrior Burn, Wrath of Gods - so they overlap those windows and the boss fight ends inside them. Farming bars want wide-range, many-target skills (Lightning Stroke, Ice Shower, Fulgurous) that clear eight-monster waves fast; promotion fights want single-window burst with Rage and Meditation to reset it. Build both in the [Skill Builder](/skill-builder), keep them as separate saves, and read [Skill Mastery](/skills/skill-mastery) and [Skill Refinement](/skills/skill-refinement) for the systems that multiply whatever you pick.
+
 Spotted a value that changed in a patch? This table is community-maintained - [edit the page](/meta/contributing) and keep it honest.

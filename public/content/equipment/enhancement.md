@@ -12,7 +12,7 @@ date: 2026-08-16
 ---
 # <span class="text-gray-900 dark:text-gray-100">Enhancement Overview</span>
 
-Owning good gear is half the job; the other half is leveling it. Enhancement pumps<img src="/images/content/goods/EnchantCube 1_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhance Cubes** into a piece of equipment to raise its level and multiply its stat contribution. It applies across the board - [weapons](/equipment/weapons), [accessories](/equipment/accessories), and your [class](/character/class) all drink from the same cube supply, which makes cubes one of the most quietly contested resources in the game. There is never a point where you have enough of them. Plan accordingly.
+Owning good gear is half the job; the other half is leveling it. Enhancement pumps<img src="/images/content/goods/EnchantCube%201_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhance Cubes** into a piece of equipment to raise its level and multiply its stat contribution. It applies across the board - [weapons](/equipment/weapons), [accessories](/equipment/accessories), and your [class](/character/class) all drink from the same cube supply, which makes cubes one of the most quietly contested resources in the game. There is never a point where you have enough of them. Plan accordingly.
 
 # <span class="text-gray-900 dark:text-gray-100">The Level 200 Cap</span>
 

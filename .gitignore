@@ -69,6 +69,9 @@ nul
 .wrangler-dev/
 /tmpclaude-*-cwd
 
+# scripts/audit-adsense.mjs output
+audit-report.json
+
 # agent-cohort: managed dock runtime paths (auto-added)
 .claude/agent-cohort/
 .codex/agent-cohort/

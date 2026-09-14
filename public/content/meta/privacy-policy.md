@@ -129,7 +129,7 @@ This site is supported by advertising through **Google AdSense**. As required by
 - You may opt out of personalised advertising by visiting [Google Ads Settings](https://www.google.com/settings/ads).
 - You can opt out of a third-party vendor's use of cookies for personalised advertising at [aboutads.info/choices](http://www.aboutads.info/choices/).
 
-If you are in the European Economic Area, the United Kingdom or Switzerland, you will be shown a consent message before any advertising cookies are set, and you can decline. If you decline, you will still see ads, but they will be non-personalised. You can change your choice at any time through the privacy settings link in the consent message.
+If you are in the European Economic Area, the United Kingdom or Switzerland, you will be shown a consent message before any advertising cookies are set, and you can decline. If you decline, ads may still be shown, but Google will not use cookies to personalise them (Google calls these limited or non-personalised ads); exactly what is stored in that case depends on the choices you make in the consent message, which explains each of them. You can change your choice at any time through the privacy settings link in the consent message.
 
 Ads are not shown to supporters who have donated, or on the page editor.
 

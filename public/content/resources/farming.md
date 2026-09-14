@@ -21,7 +21,7 @@ Strip away the systems and Slayer Legend is a farming game: everything - [gold](
 
 # <span class="text-gray-900 dark:text-gray-100">Decision Two: When to Farm Actively</span>
 
-Offline income is real but reduced - fine for<img src="/images/content/goods/EnchantCube 1_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" />**cubes** and white souls, weak for gold. Active play with buffs stacked is where the real numbers happen, so the skill is *concentrating* your active time:
+Offline income is real but reduced - fine for<img src="/images/content/goods/EnchantCube%201_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" />**cubes** and white souls, weak for gold. Active play with buffs stacked is where the real numbers happen, so the skill is *concentrating* your active time:
 
 - **Ad scrolls** - two per day, one hour each, a 300% drop-rate buff. These are your prime farming windows; don't burn them while doing dailies, burn them parked and killing.
 - **Gold ads** - several per day, scaling rewards. Free income for a few seconds of ad tolerance.

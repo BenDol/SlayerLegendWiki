@@ -2,6 +2,7 @@ import React from 'react';
 import SkillStoneBuilder from '../components/SkillStoneBuilder';
 import MetaTags from '../components/MetaTags';
 import ToolPageAd from '../components/ads/ToolPageAd';
+import ToolIntro from '../components/ToolIntro';
 
 /**
  * SkillStonesPage Component
@@ -25,6 +26,7 @@ const SkillStonesPage = () => {
         onSave={null}
         allowSavingBuilds={true}
       />
+      <ToolIntro route="skill-stone-builder" />
     </>
   );
 };

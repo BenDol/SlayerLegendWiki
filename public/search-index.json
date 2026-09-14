@@ -1,9 +1,27 @@
 [
   {
+    "id": "andy/index",
+    "title": "Andy's Progression Guide",
+    "description": "The section for Andy's Slayer Legend progression guide - who wrote it, what it covers, how it fits with the wiki's own guides, and where each stage band is documented.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Andy's Progression Guide</span> This section holds the wiki's longest-running piece of community strategy writing: a progression guide by Andy, a player with three years in Slayer Legend across two servers and one of the wiki's most active contributors. The Overview & Introduction is his own text - the philosophy of playing efficiently as a free or light-spending player, and the point in the game (the Ether promotion, around stage 340) where a guide",
+    "section": "andy",
+    "sectionTitle": "Andy",
+    "pageId": "index",
+    "url": "/andy",
+    "tags": [
+      "guide",
+      "progression",
+      "strategy"
+    ],
+    "category": "Progression",
+    "date": "2026-09-14T00:00:00.000Z",
+    "order": 0
+  },
+  {
     "id": "andy/overview-introduction",
     "title": "Overview & Introduction",
-    "description": "Introduction to Andy's Slayer Legend progression guide - who it is for, the F2P-efficiency philosophy behind it, how to use it, and the full table of contents.",
-    "content": "OVERVIEW Hello! Welcome to the Slayer Legend guide created by me (Andy). This guide is designed to break down how to progress efficiently in the game as a F2P player or a light spender (definitely not 🐳 status). While there are surely extreme min-max strategies out there, everything here comes from my own experience with characters on both Server 1 and Server 2. I’ve been playing Slayer Legend for about three years now, so I’d like to think I have a solid grasp of how things work. So without fu",
+    "description": "Introduction to Andy's Slayer Legend progression guide - who it is for, the F2P-efficiency philosophy behind it, how to use it, and where each stage band is covered on the wiki.",
+    "content": "OVERVIEW Hello! Welcome to the Slayer Legend guide created by me (Andy). This guide is designed to break down how to progress efficiently in the game as a F2P player or a light spender (definitely not 🐳 status). While there are surely extreme min-max strategies out there, everything here comes from my own experience with characters on both Server 1 and Server 2. I've been playing Slayer Legend for about three years now, so I'd like to think I have a solid grasp of how things work. So without fu",
     "section": "andy",
     "sectionTitle": "Andy",
     "pageId": "overview-introduction",
@@ -40,7 +58,7 @@
     "section": "character",
     "sectionTitle": "Character",
     "pageId": "index",
-    "url": "/character/index",
+    "url": "/character",
     "tags": [
       "character",
       "progression",
@@ -126,6 +144,24 @@
     "order": 0
   },
   {
+    "id": "community/index",
+    "title": "Community",
+    "description": "The Slayer Legend community around the wiki - the Discord, page comments, the content creators page, contributor recognition, and how to take part.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">The Community</span> The wiki is one part of a larger Slayer Legend community, and most of the knowledge on these pages was worked out in conversation before anyone wrote it down. This section collects the places that conversation happens and the ways the wiki feeds back into it. <span class=\"text-gray-900 dark:text-gray-100\">Discord</span> The community Discord is where players compare builds, report what changed in a patch, and answer the question",
+    "section": "community",
+    "sectionTitle": "Community",
+    "pageId": "index",
+    "url": "/community",
+    "tags": [
+      "community",
+      "discord",
+      "contributing"
+    ],
+    "category": "Community",
+    "date": "2026-09-14T00:00:00.000Z",
+    "order": 0
+  },
+  {
     "id": "companions/companion-builds",
     "title": "Companion Builds",
     "description": "How to build the four companions in Slayer Legend - roll priorities, leveling order by playstyle, and how companions slot into farming and bossing setups.",
@@ -189,7 +225,7 @@
     "section": "companions",
     "sectionTitle": "Companions",
     "pageId": "index",
-    "url": "/companions/index",
+    "url": "/companions",
     "tags": [
       "companions",
       "characters",
@@ -270,6 +306,24 @@
     "order": 0
   },
   {
+    "id": "database/index",
+    "title": "Database",
+    "description": "The wiki's reference data for Slayer Legend - the Skill Database today, the game data files behind every builder, where the numbers come from, and how to correct them.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">The Database Section</span> Most of the wiki explains systems. This section publishes the raw numbers behind them, laid out as tables you can scan and compare rather than prose you have to read. The first and largest entry is the Skill Database: all 46 skills with element, MP cost, cooldown, level cap, and the base value and per-level growth of every effect, grouped by grade from Common to Immortal, with notes on the skills that break the usual rule",
+    "section": "database",
+    "sectionTitle": "Database",
+    "pageId": "index",
+    "url": "/database",
+    "tags": [
+      "database",
+      "reference",
+      "data"
+    ],
+    "category": "Database",
+    "date": "2026-09-14T00:00:00.000Z",
+    "order": 0
+  },
+  {
     "id": "database/skills",
     "title": "Skill Database",
     "description": "Complete data reference for all 46 skills in Slayer Legend - element, MP cost, cooldown, max level, base values and per-level scaling for every grade.",
@@ -290,7 +344,7 @@
     "id": "equipment/accessories",
     "title": "Accessories",
     "description": "The accessory equipment slot in Slayer Legend - rarity grades, equip and owned effects, drops and summons, and why accessory investment can wait.",
-    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Accessories Overview</span> Accessories are your second equipment slot, running on the same machinery as weapons: the same Common through Immortal rarity ladder with Grade 4 to Grade 1 sub-grades, the same dual equip effect / owned effect structure, the same enhancement to level 200 with<img src=\"/images/content/goods/EnchantCube 11.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margi",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Accessories Overview</span> Accessories are your second equipment slot, running on the same machinery as weapons: the same Common through Immortal rarity ladder with Grade 4 to Grade 1 sub-grades, the same dual equip effect / owned effect structure, the same enhancement to level 200 with<img src=\"/images/content/goods/EnchantCube%2011.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; mar",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "accessories",
@@ -328,7 +382,7 @@
     "id": "equipment/enhancement",
     "title": "Equipment Enhancement",
     "description": "How enhancement works in Slayer Legend - Enhance Cubes, the level 200 cap, what to level first, and where cubes actually come from.",
-    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Enhancement Overview</span> Owning good gear is half the job; the other half is leveling it. Enhancement pumps<img src=\"/images/content/goods/EnchantCube 11.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;\" data-inline=\"true\" />Enhance Cubes into a piece of equipment to raise its level and multiply its stat contribution. It applies across the board - weapons, accesso",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Enhancement Overview</span> Owning good gear is half the job; the other half is leveling it. Enhancement pumps<img src=\"/images/content/goods/EnchantCube%2011.png\" alt=\"\" class=\"inline-image\" style=\"display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;\" data-inline=\"true\" />Enhance Cubes into a piece of equipment to raise its level and multiply its stat contribution. It applies across the board - weapons, acces",
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "enhancement",
@@ -370,7 +424,7 @@
     "section": "equipment",
     "sectionTitle": "Equipment",
     "pageId": "index",
-    "url": "/equipment/index",
+    "url": "/equipment",
     "tags": [
       "equipment",
       "gear",
@@ -439,7 +493,7 @@
     "id": "getting-started/core-mechanics",
     "title": "Core Mechanics",
     "description": "How Slayer Legend actually works - combat and stages, stats, mana and skills, the four elements, promotions, and idle rewards.",
-    "content": "<span class=\"text-gray-900 dark:text-gray-100\">The Combat Loop</span> Your Slayer walks right and kills what's in front of them. Each stage sends waves of monsters and ends with a boss challenge - beat the boss, advance to the next stage, repeat across 2,000 stages and 30+ regions (see the stage list). If a boss is too strong you stay on the current stage and keep farming it, which is not a failure state: everything the stage drops - gold, EXP, cubes, stones, equipment - keeps flowing while you ",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">The Combat Loop</span> Your Slayer walks right and kills what's in front of them. Each stage sends waves of monsters and ends with a boss challenge - beat the boss, advance to the next stage, repeat across the game's 2,000 stages - the stage pages document every stage to 1,360 in full and the named chapters beyond it. If a boss is too strong you stay on the current stage and keep farming it, which is not a failure state: everything the stage drops -",
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "core-mechanics",
@@ -497,7 +551,7 @@
     "section": "getting-started",
     "sectionTitle": "Getting Started",
     "pageId": "index",
-    "url": "/getting-started/index",
+    "url": "/getting-started",
     "tags": [
       "beginner",
       "tutorial",
@@ -547,12 +601,12 @@
   {
     "id": "guides/index",
     "title": "Guides",
-    "description": "Strategy guides for Slayer Legend - Andy's full progression walkthrough, the wiki's system guides, video guides, and how to contribute your own.",
-    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Guides</span> Reference pages tell you what a system is; guides tell you what to do with it. This section collects the strategy side of the wiki - the opinionated, experience-tested material - and points to the reference pages that back it up. <span class=\"text-gray-900 dark:text-gray-100\">The Big One: Andy's Progression Guide</span> Andy's Progression Guide is the wiki's flagship walkthrough - a full progression path written by a player with three ",
+    "description": "Strategy guides for Slayer Legend - Andy's progression guide, the wiki's system guides, where community video guides are collected, and how to contribute your own.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">Guides</span> Reference pages tell you what a system is; guides tell you what to do with it. This section collects the strategy side of the wiki - the opinionated, experience-tested material - and points to the reference pages that back it up. <span class=\"text-gray-900 dark:text-gray-100\">The Big One: Andy's Progression Guide</span> Andy's Progression Guide is the wiki's veteran-player perspective on efficient play, written by a player with three y",
     "section": "guides",
     "sectionTitle": "Guides",
     "pageId": "index",
-    "url": "/guides/index",
+    "url": "/guides",
     "tags": [
       "guides",
       "strategy",
@@ -652,6 +706,24 @@
     "order": 0
   },
   {
+    "id": "meta/index",
+    "title": "Wiki Meta",
+    "description": "How the Slayer Legend Wiki works - who runs it, how to contact the maintainers, how to contribute and what the editing guidelines are, the emoticon set, and the privacy policy.",
+    "content": "<span class=\"text-gray-900 dark:text-gray-100\">About the Wiki Itself</span> Everything in this section is about the wiki rather than the game: who maintains it, how to reach them, how editing works, and what the site does with your data. If you are here to learn Slayer Legend, the Getting Started section is the place; if you are here to help run the wiki, or want to know who is behind it before you trust a number, read on. <span class=\"text-gray-900 dark:text-gray-100\">The Pages</span> About exp",
+    "section": "meta",
+    "sectionTitle": "Meta",
+    "pageId": "index",
+    "url": "/meta",
+    "tags": [
+      "meta",
+      "wiki",
+      "contributing"
+    ],
+    "category": "Meta",
+    "date": "2026-09-14T00:00:00.000Z",
+    "order": 0
+  },
+  {
     "id": "meta/privacy-policy",
     "title": "Privacy Policy",
     "description": "How the Slayer Legend Wiki collects, uses, stores and shares your data, including cookies and advertising.",
@@ -679,7 +751,7 @@
     "section": "progression",
     "sectionTitle": "Progression",
     "pageId": "index",
-    "url": "/progression/index",
+    "url": "/progression",
     "tags": [
       "progression",
       "leveling",
@@ -754,7 +826,7 @@
     "section": "resources",
     "sectionTitle": "Resources",
     "pageId": "index",
-    "url": "/resources/index",
+    "url": "/resources",
     "tags": [
       "resources",
       "farming",
@@ -792,7 +864,7 @@
     "section": "skills",
     "sectionTitle": "Skills",
     "pageId": "index",
-    "url": "/skills/index",
+    "url": "/skills",
     "tags": [
       "skills",
       "combat",
@@ -863,7 +935,7 @@
     "section": "spirits",
     "sectionTitle": "Spirits",
     "pageId": "index",
-    "url": "/spirits/index",
+    "url": "/spirits",
     "tags": [
       "spirits",
       "companions",
@@ -937,7 +1009,7 @@
     "section": "stages",
     "sectionTitle": "Stages",
     "pageId": "index",
-    "url": "/stages/index",
+    "url": "/stages",
     "tags": [
       "stages",
       "dungeons",
@@ -1071,7 +1143,7 @@
       "reference"
     ],
     "category": "Stages",
-    "date": "2026-08-28T00:00:00.000Z",
+    "date": "2026-09-14T00:00:00.000Z",
     "order": 17
   },
   {
@@ -1154,7 +1226,7 @@
     "section": "tools",
     "sectionTitle": "Tools",
     "pageId": "index",
-    "url": "/tools/index",
+    "url": "/tools",
     "tags": [
       "tools",
       "calculators",

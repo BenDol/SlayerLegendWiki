@@ -66,7 +66,7 @@ Epic grade is where farming builds are born: Fulgurous - the half-second-cooldow
 
 <img src="/images/content/skills/icons/05_BlazeWave.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
-<img src="/images/content/skills/icons/09_IceAge 1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
+<img src="/images/content/skills/icons/09_IceAge%201.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 
 <img src="/images/content/skills/icons/05_Swiftness.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle; width: 128px; height: 128px; margin: 0 0.25em;" data-inline="true" />
 

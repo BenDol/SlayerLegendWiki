@@ -5,38 +5,13 @@ import {
   BreadcrumbStructuredData,
 } from '../../wiki-framework/src/components/common/StructuredData';
 import { useWikiConfig } from '../../wiki-framework/src/hooks/useWikiConfig';
+import { usePathname } from '../hooks/usePathname';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('SeoManager');
 
-/** Mirrors the pathname-polling backstop AppWrapper already uses for page tracking. */
-const PATHNAME_POLL_INTERVAL_MS = 500;
-
 /** Google truncates description snippets around this length. */
 const DESCRIPTION_EXCERPT_LENGTH = 155;
-
-/**
- * Current pathname, reactive to SPA navigation. SeoManager mounts outside the
- * router (AppWrapper wraps the RouterProvider), so useLocation is unavailable;
- * popstate plus a light poll covers pushState navigations instead.
- */
-function usePathname() {
-  const [pathname, setPathname] = useState(() =>
-    typeof window !== 'undefined' ? window.location.pathname : '/'
-  );
-
-  useEffect(() => {
-    const update = () => setPathname(window.location.pathname);
-    window.addEventListener('popstate', update);
-    const poll = setInterval(update, PATHNAME_POLL_INTERVAL_MS);
-    return () => {
-      window.removeEventListener('popstate', update);
-      clearInterval(poll);
-    };
-  }, []);
-
-  return pathname;
-}
 
 /** Decode and strip the trailing slash so paths match search-index URLs. */
 function normalizePath(pathname) {
@@ -105,7 +80,35 @@ const SeoManager = () => {
     return <MetaTags url="/" twitterCard="summary" />;
   }
 
-  const page = pageIndex?.get(path);
+  // Until the page index has loaded, the prerendered <title> and description
+  // already in the document are the right ones; emitting a generic section
+  // or page fallback first would swap the title twice (crawlers compare the
+  // rendered title against the prerendered one).
+  if (pageIndex === null) return null;
+
+  // Section routes come first: the search index stores a section's index.md
+  // under the section root, and that entry must not be treated as an article.
+  const section = config.sections?.find(s => `/${s.path}` === path);
+  if (section) {
+    // Use the index page's frontmatter so the rendered <title> and description
+    // match what the prerenderer emitted for the same URL (crawlers compare the
+    // two). The legacy "<section>/index" key is kept for older search indexes.
+    const indexPage = pageIndex.get(path) || pageIndex.get(`${path}/index`);
+    const description = indexPage
+      ? indexPage.description || excerpt(indexPage.content)
+      : `Browse ${section.title} guides and pages on ${config.wiki?.title || 'the wiki'}.`;
+    return (
+      <MetaTags
+        title={indexPage?.title || section.title}
+        description={description}
+        url={path}
+        twitterCard="summary"
+        keywords={indexPage?.tags || []}
+      />
+    );
+  }
+
+  const page = pageIndex.get(path);
   if (page) {
     const description = page.description || excerpt(page.content);
     return (
@@ -135,18 +138,6 @@ const SeoManager = () => {
           ]}
         />
       </>
-    );
-  }
-
-  const section = config.sections?.find(s => `/${s.path}` === path);
-  if (section) {
-    return (
-      <MetaTags
-        title={section.title}
-        description={`Browse ${section.title} guides and pages on ${config.wiki?.title || 'the wiki'}.`}
-        url={path}
-        twitterCard="summary"
-      />
     );
   }
 

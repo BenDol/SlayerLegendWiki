@@ -79,28 +79,62 @@ describe('generated stage pages', () => {
     }
   });
 
-  it('gives every named chapter a heading on exactly one page', () => {
-    const seen = new Map();
-    for (const file of files) {
-      const body = fs.readFileSync(path.join(STAGES_DIR, file), 'utf8');
-      for (const chapter of namedChapters) {
-        if (body.includes(`>${chapter.chapter}. ${chapter.name} `)) {
-          seen.set(chapter.chapter, (seen.get(chapter.chapter) ?? 0) + 1);
-        }
+  // A chapter is tabulated (its own heading plus stage tables) only when all
+  // twenty of its stages are at or below the verified boundary; deeper
+  // chapters are listed by name in the page's "Chapters In This Stretch"
+  // table only, under one notice, so the page never repeats "no figures".
+  const bodies = new Map(files.map((file) => [file, fs.readFileSync(path.join(STAGES_DIR, file), 'utf8')]));
+  const isVerified = (chapter) => chapter.lastStage <= atlas.lastVerifiedStage;
+  const headingIn = (body, chapter) => body.includes(`>${chapter.chapter}. ${chapter.name} `);
+  const tableRowIn = (body, chapter) => body.includes(`| ${chapter.chapter} | **${chapter.name}** |`);
+
+  it('splits the named chapters at the verified boundary', () => {
+    expect(namedChapters.some(isVerified)).toBe(true);
+    expect(namedChapters.some((c) => !isVerified(c))).toBe(true);
+  });
+
+  it('gives every verified chapter a heading on exactly one page', () => {
+    const counts = new Map();
+    for (const body of bodies.values()) {
+      for (const chapter of namedChapters.filter(isVerified)) {
+        if (headingIn(body, chapter)) counts.set(chapter.chapter, (counts.get(chapter.chapter) ?? 0) + 1);
       }
     }
-    const missing = namedChapters.filter((c) => !seen.has(c.chapter)).map((c) => c.chapter);
-    const duplicated = [...seen.entries()].filter(([, n]) => n > 1).map(([c]) => c);
+    const missing = namedChapters.filter(isVerified).filter((c) => !counts.has(c.chapter)).map((c) => c.chapter);
+    const duplicated = [...counts.entries()].filter(([, n]) => n > 1).map(([c]) => c);
     expect({ missing, duplicated }).toEqual({ missing: [], duplicated: [] });
   });
 
+  it('lists every unverified chapter by name on exactly one page, with no heading and no stage rows', () => {
+    const rows = new Map();
+    for (const [file, body] of bodies) {
+      for (const chapter of namedChapters.filter((c) => !isVerified(c))) {
+        expect(headingIn(body, chapter), `${file} tabulates unverified chapter ${chapter.chapter}`).toBe(false);
+        if (tableRowIn(body, chapter)) rows.set(chapter.chapter, (rows.get(chapter.chapter) ?? 0) + 1);
+      }
+    }
+    const missing = namedChapters.filter((c) => !isVerified(c)).filter((c) => !rows.has(c.chapter)).map((c) => c.chapter);
+    const duplicated = [...rows.entries()].filter(([, n]) => n > 1).map(([c]) => c);
+    expect({ missing, duplicated }).toEqual({ missing: [], duplicated: [] });
+  });
+
+  it('explains the missing figures once per page that lists unverified chapters, and nowhere else', () => {
+    for (const [file, body] of bodies) {
+      const listsUnverified = namedChapters.some((c) => !isVerified(c) && tableRowIn(body, c));
+      const notices = (body.match(/\*\*Numbers stop at stage [\d,]+\.\*\*/g) || []).length;
+      expect(notices, file).toBe(listsUnverified ? 1 : 0);
+    }
+  });
+
   it('never publishes a stage row past the verified boundary', () => {
-    const deepest = Math.max(
-      ...files.flatMap((file) => {
-        const body = fs.readFileSync(path.join(STAGES_DIR, file), 'utf8');
-        return [...body.matchAll(/^\| \*\*(\d+)\*\* \|/gm)].map((m) => Number(m[1]));
-      })
+    const stageRows = [...bodies.values()].flatMap((body) =>
+      [...body.matchAll(/^\| \*\*(\d+)\*\* \|/gm)].map((m) => Number(m[1]))
     );
+    expect(stageRows.length).toBeGreaterThan(0);
+    const deepest = Math.max(...stageRows);
+    expect(Number.isFinite(deepest)).toBe(true);
     expect(deepest).toBeLessThanOrEqual(atlas.lastVerifiedStage);
+    // The tables really do reach the boundary rather than stopping early.
+    expect(deepest).toBeGreaterThan(atlas.lastVerifiedStage - 20);
   });
 });

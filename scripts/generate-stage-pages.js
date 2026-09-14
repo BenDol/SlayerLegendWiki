@@ -336,8 +336,12 @@ function resolveDate(file, body) {
   const previousDate = existing.match(/^date: (.+)$/m)?.[1]?.trim();
   if (!previousDate) return today;
 
-  const normalised = existing.replace(/^date: .+$/m, `date: ${DATE_PLACEHOLDER}`);
-  return normalised === body ? previousDate : today;
+  // Compare with line endings normalised: a Windows checkout (autocrlf) holds
+  // the file as CRLF while the generator writes LF, and without this every
+  // regeneration looked like a content change and re-dated all eight pages -
+  // which the sitemap then reported as fresh edits.
+  const normalised = existing.replace(/\r\n/g, '\n').replace(/^date: .+$/m, `date: ${DATE_PLACEHOLDER}`);
+  return normalised === body.replace(/\r\n/g, '\n') ? previousDate : today;
 }
 
 function buildPage({ block, index, blocks, chapters, byStage, namesByStage, config }) {
@@ -368,26 +372,24 @@ function buildPage({ block, index, blocks, chapters, byStage, namesByStage, conf
   }
 
   for (const chapter of blockChapters) {
-    parts.push(SUBHEADING(`${chapter.chapter}. ${chapter.name} <span class="text-gray-500 dark:text-gray-400 text-base font-normal">(${chapter.firstStage}-${chapter.lastStage})</span>`));
     const rows = rowsFor(chapter, byStage);
     if (!hasVerifiedStats(chapter) || rows.length === 0) {
+      // Unverified chapters are fully described by the summary table above
+      // (chapter, region, stages, areas) and the notice. A per-chapter section
+      // would only repeat "no figures yet" under fifteen headings - the same
+      // paragraph over and over is exactly the kind of padding reviewers
+      // read as thin content. Only a chapter with real internal structure
+      // (several areas) earns its own section: a table of its areas and zones.
       const names = namesFor(chapter, namesByStage);
       const areas = uniq(names.map((r) => r.area));
-      const zones = names.map((r) => r.zone).filter(Boolean);
-      // A single-area chapter is just zones I-XX of the region, which a table would
-      // spell out twenty times without adding anything. Only tabulate real structure.
       if (areas.length > 1) {
+        parts.push(SUBHEADING(`${chapter.chapter}. ${chapter.name} <span class="text-gray-500 dark:text-gray-400 text-base font-normal">(${chapter.firstStage}-${chapter.lastStage})</span>`));
         parts.push(`**${chapter.name}** spans ${areas.length} areas. Per-stage numbers are not published yet - see the note above.`);
         parts.push(chapterNameTable(names));
-      } else {
-        parts.push(
-          `All twenty stages sit in **${chapter.name}** itself` +
-            `${zones.length ? `, zones ${zones[0]} through ${zones[zones.length - 1]}` : ''}. ` +
-            'Per-stage numbers are not published yet - see the note above.'
-        );
       }
       continue;
     }
+    parts.push(SUBHEADING(`${chapter.chapter}. ${chapter.name} <span class="text-gray-500 dark:text-gray-400 text-base font-normal">(${chapter.firstStage}-${chapter.lastStage})</span>`));
     parts.push(chapterGlance(rows, chapter));
     parts.push(chapterTable(rows));
   }

@@ -53,4 +53,8 @@ Notice how cleanly the twelve sort into jobs. The **economy trio** - Todd, Luga,
 
 The standard advice follows directly: run the farming set (Mum, Radon, Zappy, Luga, Todd rotating through your slots) for daily play, swap to Noah/Loar/Sala for promotion attempts, and consider Herh if your build leans on long-cooldown skills. Since only equipped spirits function and you'll have three slots at most, the swap itself is the skill - build both lineups in the [Spirit Builder](/spirit-builder) and change with the content, not out of habit.
 
+# <span class="text-gray-900 dark:text-gray-100">Development and the Effect Ranges</span>
+
+The low end of every range is what a spirit does when you first get it; the high end is what it does fully developed - higher tier, higher level, later evolution stage. That gap is large (Mum's skill damage runs from +10% to +80%), so a spirit's value is less about *which* spirit and more about *how far you've taken it*. Two consequences follow. Develop the spirits your lineups actually use rather than spreading upgrades across all twelve, and when comparing two spirits for a slot, compare them at the development you can realistically reach, not at their maximums. The [Spirits overview](/spirits) explains tiers, combining and upgrades; the [Spirit Viewer](/spirits/viewer) shows each spirit at every evolution stage.
+
 Values shift with patches and community measurement - if your in-game numbers disagree with a range here, [edit this page](/meta/contributing) and set the record straight.

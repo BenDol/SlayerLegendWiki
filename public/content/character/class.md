@@ -40,7 +40,7 @@ This content is unlocked at stage 120 and level 250, granting additional bonuses
 **Legend: | <span class="text-gray-400 dark:text-gray-300">Common</span> | <span class="text-green-800 dark:text-green-600">Great</span> | <span class="text-orange-800 dark:text-orange-600">Rare</span> | <span class="text-purple-600 dark:text-purple-400">Epic</span> | <span class="text-red-600 dark:text-red-400">Legendary</span>**
 
 
-Your class can be enhanced using<img src="/images/content/goods/EnchantCube 1_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhancement Cubes**. The base maximum level is 200. Once you start awakening your class, each awakening raises the level cap by +50.
+Your class can be enhanced using<img src="/images/content/goods/EnchantCube%201_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhancement Cubes**. The base maximum level is 200. Once you start awakening your class, each awakening raises the level cap by +50.
 
 
 # <span class="text-gray-900 dark:text-gray-100">Class Awakening</span>
@@ -102,5 +102,7 @@ To progress through the memory tree, you must unlock memory nodes using<img src=
 |Level 5|100% Promotion ATK, 20% Promotion HP, and raises the level cap to 25|
 
 
-# <span class="text-gray-900 dark:text-gray-100">Constellations</span>
-This part of the guide is still a work in progress - if you have reached constellation content in-game, your knowledge is exactly what this section is missing. [Become a contributor](/meta/contributing) and help document it for the community.
+# <span class="text-gray-900 dark:text-gray-100">Where the Class System Leads</span>
+Classes, awakenings and the Memory Tree are one multiplier among several, and they compound with the others rather than replacing them. Each [promotion](/character/promotions) multiplies the ATK and HP the class bonuses are applied to; [latent power](/character/latent-power) and its awakening add their own layer from the Dragonos promotion onward; and the resource buffs from Memory Tree nodes feed straight back into [farming](/resources/farming). When you're deciding where the next diamonds or essence go, the useful question is which of those layers is currently furthest behind your stage - the [progression overview](/progression) has a diagnosis order for exactly that.
+
+This page is maintained by players who track these systems in-game; if a value here has drifted from the current patch, [edit it](/meta/contributing) so the next reader gets the right number.
