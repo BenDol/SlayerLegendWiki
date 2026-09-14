@@ -20,7 +20,7 @@ The community splits the 2,000-stage journey into three rough eras, and it's a u
 
 **Early game (stage 1 to the Ether promotion, ~stage 340).** Forgiving by design. Gold into ATK, promotions on time, skills equipped, and the game mostly plays itself - the real work is building habits and not wasting diamonds. The [Early Game Roadmap](/getting-started/early-game-roadmap) walks this whole stretch milestone by milestone, including the class unlock at stage 120 and the training diary at level 400.
 
-**Mid game (Ether through roughly stage 1300).** This is where progression becomes a craft. Each promotion band - Black Mythril, Demon Metal, Dragonos, Ragnablood, and onward - introduces or deepens a system (awakened latent power arrives at Dragonos, soul weapon engraving matures, skill mastery compounds), and the difference between efficient and casual play widens enormously. [Andy's Progression Guide](/andy/overview-introduction) covers this era promotion by promotion, which is exactly how it should be navigated.
+**Mid game (Ether through roughly stage 1300).** This is where progression becomes a craft. Each promotion band - Black Mythril, Demon Metal, Dragonos, Ragnablood, and onward - introduces or deepens a system (awakened latent power arrives at Dragonos, soul weapon engraving matures, skill mastery compounds), and the difference between efficient and casual play widens enormously. [Andy's Progression Guide](/andy/overview-introduction) sets out how a veteran approaches this era and maps each promotion band to the wiki page that covers it, which is exactly how it should be navigated: one promotion at a time.
 
 **Late game (Gigarock and beyond, stage 1300+).** The multipliers get absurd - the [promotion table](/character/promotions) runs up through Eisenhart, Diadust, and Eldenwood at x42,000,000 ATK and HP - and progress becomes a long-cycle rhythm of feeding every system at once. By this point you don't need an overview page; you need the reference tables and patience.
 
@@ -36,7 +36,7 @@ Progression touches nearly everything, so the deeper material lives with its sys
 - **[Stages](/stages)** - the full region list and how stage rewards scale.
 - **[Stats](/character/stats)** - the gold-fed foundation everything multiplies.
 - **[Early Game Roadmap](/getting-started/early-game-roadmap)** - milestone order from stage 1 to Ether (~stage 340).
-- **[Andy's Progression Guide](/andy/overview-introduction)** - the community's deep progression walkthrough from Ether through Gigarock (stage 1300+), written by a three-year veteran.
+- **[Andy's Progression Guide](/andy/overview-introduction)** - a three-year veteran's introduction to efficient play from Ether onward, with a band-by-band map of where the wiki covers each promotion up to Gigarock (stage 1300+).
 
 # <span class="text-gray-900 dark:text-gray-100">When You Hit a Wall</span>
 

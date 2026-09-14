@@ -1,94 +1,18 @@
 # robots.txt for Slayer Legend Wiki
+#
+# One rule set for every crawler. Google's parser applies only the single
+# most specific User-agent group to each crawler and never merges it with
+# the "*" group, so a dedicated "User-agent: Googlebot" block would replace
+# these rules for Google rather than add to them. Keep it to "*".
+#
+# Application screens (search, profiles, editor, history, 404 ...) are kept
+# out of search results with <meta name="robots" content="noindex"> on the
+# page itself, not with Disallow: a crawler can only honour noindex on a
+# URL it is allowed to fetch, and Google's guidance is explicit that
+# robots.txt is not the tool for keeping pages out of the index.
 
-# Allow all search engines to crawl the site
 User-agent: *
 Allow: /
-
-# Disallow admin/private areas (if any)
 Disallow: /api/
-Disallow: /.netlify/
-Disallow: /.github/
 
-# Disallow build artifacts
-Disallow: /dist/
-Disallow: /node_modules/
-
-# Thin, duplicate, or account-specific routes - no value in search results
-Disallow: /search
-Disallow: /admin
-Disallow: /profile
-Disallow: /donation-success
-Disallow: /404
-Disallow: /my-collections
-Disallow: /my-spirits
-Disallow: /my-edits
-Disallow: /dev-tools
-Disallow: /debug/
-
-# Editor and history views of wiki pages ($ anchors so page names like
-# "new-player-guide" or "editing-tips" are not accidentally blocked)
-Disallow: /*/edit$
-Disallow: /*/history$
-Disallow: /*/new$
-
-# Allow crawling of CSS, JS, and images for better indexing
-Allow: /*.css
-Allow: /*.js
-Allow: /*.png
-Allow: /*.jpg
-Allow: /*.jpeg
-Allow: /*.gif
-Allow: /*.svg
-Allow: /*.webp
-
-# Sitemap location
 Sitemap: https://slayerlegend.wiki/sitemap.xml
-
-# Crawl delay (optional - prevents aggressive crawling)
-# Crawl-delay: 1
-
-# Specific bot instructions
-# Google
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0
-
-# Google AdSense - contextual crawler that reads page content to pick relevant ads.
-# Must be allowed everywhere or ads fall back to generic/low-value targeting.
-User-agent: Mediapartners-Google
-Allow: /
-
-# Google Ads landing page quality crawlers
-User-agent: AdsBot-Google
-Allow: /
-
-User-agent: AdsBot-Google-Mobile
-Allow: /
-
-# Bing
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 0
-
-# Discord bot (for link previews)
-User-agent: Discordbot
-Allow: /
-
-# Twitter bot (for card previews)
-User-agent: Twitterbot
-Allow: /
-
-# Facebook bot (for link previews)
-User-agent: facebookexternalhit
-Allow: /
-
-# LinkedIn bot
-User-agent: LinkedInBot
-Allow: /
-
-# Block common bad bots (optional)
-# User-agent: AhrefsBot
-# Disallow: /
-
-# User-agent: SemrushBot
-# Disallow: /

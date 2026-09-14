@@ -89,7 +89,7 @@ function buildSearchIndex() {
       const pageId = fileName.replace('.md', '');
 
       // Generate URL
-      const url = `/${section}/${pageId}`;
+      const url = pageUrl(section, pageId);
 
       // Extract searchable text
       const textContent = extractTextContent(content);
@@ -124,10 +124,29 @@ function buildSearchIndex() {
   console.log(`  - Output: ${outputFile}`);
 }
 
-// Run the build
-try {
-  buildSearchIndex();
-} catch (err) {
-  console.error('Failed to build search index:', err);
-  process.exit(1);
+/**
+ * Route for a content page. A section's index.md IS the section route
+ * (/skills, rendered by SectionPage and prerendered under that URL), so the
+ * search index must not advertise a separate "/skills/index" alias - search
+ * results, canonicals, the sitemap and the prerenderer all agree on one URL.
+ *
+ * @param {string} section
+ * @param {string} pageId
+ * @returns {string}
+ */
+export function pageUrl(section, pageId) {
+  return pageId === 'index' ? `/${section}` : `/${section}/${pageId}`;
+}
+
+// Run only when executed directly (node scripts/buildSearchIndex.js); importing
+// the module (e.g. from tests) must not regenerate the index.
+const isDirectExecution =
+  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
+if (isDirectExecution) {
+  try {
+    buildSearchIndex();
+  } catch (err) {
+    console.error('Failed to build search index:', err);
+    process.exit(1);
+  }
 }

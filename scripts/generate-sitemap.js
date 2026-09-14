@@ -31,11 +31,14 @@ const SECTION_CONFIG = {
 // Static routes (tools, pages)
 // Using browser routing for proper SEO
 //
-// Deliberately excluded: /highscore, /changelog, /donate. These are
+// Deliberately excluded: /highscore, /changelog, /donate, and - until it
+// holds approved creators and video guides - /creators. These are
 // utility/dynamic screens with little publisher content (AdSense
 // "screens without publisher-content" candidates); they are prerendered
 // with a noindex meta tag and should not be advertised to crawlers.
-const STATIC_ROUTES = [
+// Re-add /creators here and flip `robots: index` in
+// src/content/tool-pages/creators.md once the page has real entries.
+export const STATIC_ROUTES = [
   { url: '/', priority: '1.0', changefreq: 'daily' },
   { url: '/skill-builder', priority: '0.9', changefreq: 'monthly' },
   { url: '/spirit-builder', priority: '0.9', changefreq: 'monthly' },
@@ -43,7 +46,6 @@ const STATIC_ROUTES = [
   { url: '/battle-loadouts', priority: '0.9', changefreq: 'monthly' },
   { url: '/soul-weapon-engraving', priority: '0.9', changefreq: 'monthly' },
   { url: '/skill-stone-builder', priority: '0.9', changefreq: 'monthly' },
-  { url: '/creators', priority: '0.7', changefreq: 'weekly' },
 ];
 
 /**

@@ -13,7 +13,7 @@ date: 2026-08-16
 
 # <span class="text-gray-900 dark:text-gray-100">The Combat Loop</span>
 
-Your Slayer walks right and kills what's in front of them. Each stage sends waves of monsters and ends with a boss challenge - beat the boss, advance to the next stage, repeat across 2,000 stages and 30+ regions (see the [stage list](/stages)). If a boss is too strong you stay on the current stage and keep farming it, which is not a failure state: everything the stage drops - gold, EXP, cubes, stones, equipment - keeps flowing while you grow. Pushing and farming are the two modes of the whole game.
+Your Slayer walks right and kills what's in front of them. Each stage sends waves of monsters and ends with a boss challenge - beat the boss, advance to the next stage, repeat across the game's 2,000 stages - the [stage pages](/stages) document every stage to 1,360 in full and the named chapters beyond it. If a boss is too strong you stay on the current stage and keep farming it, which is not a failure state: everything the stage drops - gold, EXP, cubes, stones, equipment - keeps flowing while you grow. Pushing and farming are the two modes of the whole game.
 
 # <span class="text-gray-900 dark:text-gray-100">Stats Are the Engine</span>
 

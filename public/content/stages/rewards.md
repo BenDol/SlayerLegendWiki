@@ -20,7 +20,7 @@ Every stage on the road carries two separate reward profiles.
 
 - <img src="/images/content/goods/Goods_Gold.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -4px 0 0 0;" data-inline="true" /> **Gold** - every kill, always
 - <img src="/images/content/goods/Goods_Exp.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -4px 0 0 0;" data-inline="true" /> **EXP** - every kill, always
-- <img src="/images/content/goods/EnchantCube 1_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -4px 0 0 0;" data-inline="true" /> **Enhancement Cubes** - on roughly a one-in-ten chance
+- <img src="/images/content/goods/EnchantCube%201_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -4px 0 0 0;" data-inline="true" /> **Enhancement Cubes** - on roughly a one-in-ten chance
 - <img src="/images/content/goods/Goods_AllStone.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -4px 0 0 0;" data-inline="true" /> **Attribute Stones** - on a small per-kill chance that grows with stage number
 - An **equipment drop** - a weapon or accessory, on a chance under one percent
 

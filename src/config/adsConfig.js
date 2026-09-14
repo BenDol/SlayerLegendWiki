@@ -79,8 +79,16 @@ export const DEFAULT_PLACEMENT_RULES = {
 };
 
 /**
- * Routes that must never show ads.
- * Editors/history (would corrupt the preview), thin pages, and payment flows.
+ * Routes that must never show ads - screens without publisher content
+ * (Publisher Policies: "screens without publisher-content", "used for
+ * navigation or other behavioral purposes", dead ends such as thank-you and
+ * error pages). AdsProvider withholds the AdSense loader on these routes and
+ * pauses ad requests when the app navigates onto one, so the rule also holds
+ * for Auto ads, which the dashboard could otherwise place on any screen the
+ * loader runs on.
+ *
+ * Editors/history (would corrupt the preview), account/utility screens,
+ * payment flows, and directories that are still empty.
  */
 export const AD_EXCLUDED_PATH_PATTERNS = [
   /\/edit\/?$/,
@@ -98,7 +106,33 @@ export const AD_EXCLUDED_PATH_PATTERNS = [
   /^\/debug/,
   /^\/404/,
   /^\/maintenance/,
+  // Account collections: the visitor's own saved builds, not publisher content.
+  /^\/my-[a-z-]+(\/|$)/,
+  // Shared-build viewer: a single user-generated build, no article.
+  /^\/build(\/|$)/,
+  // Contributor leaderboard and release notes: utility screens, noindex.
+  /^\/highscore(\/|$)/,
+  /^\/changelog(\/|$)/,
+  // Creator directory: empty until approved entries exist (see sitemap notes).
+  /^\/creators(\/|$)/,
 ];
+
+/**
+ * Pause or resume AdSense ad requests through the loader's documented queue
+ * flag (`adsbygoogle.pauseAdRequests`, the same switch consent flows use).
+ * Used when the app navigates onto an excluded route after the loader has
+ * already been injected on an eligible one.
+ *
+ * @param {object} win - window-like object carrying `adsbygoogle`
+ * @param {boolean} paused
+ * @returns {boolean} Whether the flag was applied
+ */
+export function setAdRequestsPaused(win, paused) {
+  if (!win) return false;
+  const queue = (win.adsbygoogle = win.adsbygoogle || []);
+  queue.pauseAdRequests = paused ? 1 : 0;
+  return true;
+}
 
 /** Default label shown above each unit (AdSense requires ads be identifiable as ads). */
 export const DEFAULT_AD_LABEL = 'Advertisement';

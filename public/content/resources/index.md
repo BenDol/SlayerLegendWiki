@@ -21,7 +21,7 @@ Slayer Legend runs on an economy of a dozen-plus currencies, and each one is a b
 |----------|----------|----------|
 | <img src="/images/content/goods/Goods_Gold.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" /> **Gold** | Leveling [combat stats](/character/stats) | Monster kills, idle rewards, gold ads |
 | <img src="/images/content/goods/Goods_Diamond.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" /> **Diamonds** | Summons (weapons, classes, spirits) | Quests, ads, login, achievements |
-| <img src="/images/content/goods/EnchantCube 1_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" /> **Enhance Cubes** | [Equipment](/equipment/enhancement), class, spirit upgrades | Stages, idle, Closed Mine |
+| <img src="/images/content/goods/EnchantCube%201_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" /> **Enhance Cubes** | [Equipment](/equipment/enhancement), class, spirit upgrades | Stages, idle, Closed Mine |
 | <img src="/images/content/goods/Goods_AllStone.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" /> **Attribute Stones** | [Companion](/companions/enhancement) skills & passives | Stages, idle, packs, events |
 | <img src="/images/content/goods/Goods_Emerald.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" /> **Emeralds** | Companion passives, spirit slots | Companion advancement battles |
 | <img src="/images/content/goods/Goods_Dice_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 26px; height: 26px; margin: -2px 0 0 0;" data-inline="true" /> **Dice** | Rolling [promotion options](/companions/promotion-option) | Stage progress, quests, events |
@@ -38,6 +38,16 @@ That's the everyday economy - the [Materials page](/resources/materials) catalog
 - **[Gold Farming Guide](/resources/gold)** - the full gold multiplier stack and how to maximize income.
 - **[Materials & Crafting](/resources/materials)** - the complete material catalog with sources and sinks.
 - **[Farming Strategies](/resources/farming)** - stage selection, buff stacking, offline versus active play, and the daily routine.
+
+# <span class="text-gray-900 dark:text-gray-100">Which Bottleneck Are You In?</span>
+
+The limiting currency changes as you progress, and recognising the phase saves a lot of misdirected effort. **Early on it is gold**, full stop - every combat stat levels with it, costs climb every stage, and nothing else you own matters until ATK is high enough to clear waves; spend it as it lands and read the [gold guide](/resources/gold) when the curve starts to bite. **Mid game moves the wall to cubes and attribute stones**: equipment enhancement and companion skills both eat them by the thousand, and both arrive as a per-stage rate, which is why pushing your highest stage matters more than any single farming trick. **Late game is about the scarce, gated currencies** - emeralds from advancement battles, dice from progress and events, light shards for class awakening, black mana for orbs - where the sources are fixed and the only lever is taking every battle and event the moment it is available.
+
+A useful habit: before farming anything, open the upgrade you actually want and read which currency it asks for. Farming the wrong resource for a week is the most common way to feel stuck in this game.
+
+# <span class="text-gray-900 dark:text-gray-100">The Daily-Limited Sources</span>
+
+A few sources reset every day and cannot be banked: the ten Glow Feathers from login and daily quests (your dungeon entries), the free ad buffs, and the training diary sessions. Missing a day does not set you back, but claiming them every day is the cheapest progression in the game, because they pay out at your *current* stage's rates - which only go up. The [Farming Strategies](/resources/farming) page builds a five-minute routine around exactly these.
 
 # <span class="text-gray-900 dark:text-gray-100">One Principle for All of It</span>
 

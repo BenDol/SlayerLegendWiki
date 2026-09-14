@@ -20,7 +20,7 @@ One concept carries across all of it and is worth learning immediately: most equ
 
 - **[Weapons](/equipment/weapons)** - the rarity ladder from Common to Immortal, how weapons drop and summon, and why they're your top diamond priority.
 - **[Accessories](/equipment/accessories)** - the second equipment slot, its rarity ladder, and when to invest in it.
-- **[Enhancement](/equipment/enhancement)** - leveling gear with<img src="/images/content/goods/EnchantCube 1_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhance Cubes**, the level 200 cap, and where cubes come from.
+- **[Enhancement](/equipment/enhancement)** - leveling gear with<img src="/images/content/goods/EnchantCube%201_1.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Enhance Cubes**, the level 200 cap, and where cubes come from.
 - **[Fusion](/equipment/fusion)** - the five-into-one combining system that climbs the rarity ladder.
 - **[Soul Weapons](/equipment/soul-weapons)** - 81 craftable weapons wielded alongside your main weapon, plus the engraving grid system.
 - **[Black Orbs](/equipment/black-orbs)** - late-game elemental equipment summoned with<img src="/images/content/goods/Goods_BlackMana.png" alt="" class="inline-image" style="display: inline-block; vertical-align: middle;width: 30px; height: 30px; margin: -2px 0 0 0;" data-inline="true" />**Black Mana**, and the awakening system attached to it.

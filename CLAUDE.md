@@ -339,6 +339,50 @@ npm run build:search          # always follow a content change
 - `build:stage-pages` refuses to write anything unless the configured blocks tile the whole named road, and preserves each page's existing `date:` when the regenerated content is identical - the sitemap's `lastmod` comes from that field.
 - The per-stage numbers themselves come from a community datamined spreadsheet whose figures stop being genuine past `lastVerifiedStage` (recorded in `stage-chapters.json`); rows beyond it are flagged `statsVerified: false` and are not tabulated.
 
+### Keeping the site AdSense-ready (crawler HTML vs. rendered app)
+
+Google's review and indexer judge the **JavaScript-rendered** page, while a plain fetch gets the
+prerendered HTML from `scripts/prerender.js`. The two must say the same thing. The rules that keep
+them aligned (background: `.claude/adsense-rejection-audit-2026-09-14.md` and
+`.claude/adsense-approval-plan-2026-09-14.md`):
+
+- **Tool copy lives in `src/content/tool-pages/<route>.md`** and is rendered twice from that one
+  file: by the prerenderer (crawler HTML) and by `src/components/ToolIntro.jsx` below the tool
+  (hydrated view). Add a `<ToolIntro route="..." />` to any new tool page. `tests/content-integrity.test.js`
+  treats every page under `src/pages/` that renders `ToolPageAd` as a tool page and fails if it
+  lacks a `ToolIntro` or its copy file, and scans the indexable tool copy for under-construction
+  wording like any other page.
+- **Section routes render their `index.md`** (framework `SectionPage.jsx`), so section index pages
+  are real content, not link lists. **Every configured section must have one** (the integrity test
+  fails otherwise): without it the section root is not prerendered and crawlers get the homepage
+  fallback. The search index stores that page under the section root (`/skills`, never
+  `/skills/index`), which is also what the sitemap and prerenderer use.
+- **Ads follow `AD_EXCLUDED_PATH_PATTERNS`** (`src/config/adsConfig.js`) for the loader and Auto
+  ads, not only for manual units. Add any new utility/account screen there.
+- **Content images** are referenced as `/images/content/...`; the prerenderer rewrites them to the CDN
+  and `functions/images/content/[[path]].js` redirects any request that still reaches the origin.
+  Never put a literal space in an image path (percent-encode it) - the integrity test enforces this.
+- **App screens are `noindex`, never robots-blocked.** `public/robots.txt` is a single `*` group;
+  editor/history/new routes get prerendered noindex stubs and the framework pages emit
+  `<meta name="robots" content="noindex">`. Do not add crawler-specific `User-agent` groups - Google
+  applies only the most specific group and ignores the rest.
+- **No under-construction wording on indexed pages** ("work in progress", "coming soon", "still being
+  migrated"); the integrity test fails on it.
+- **`/creators` stays out of the sitemap and `noindex`** until it lists approved creators.
+
+Verify a build or a deployment with the readiness harness (headless Chrome + curl, all sitemap URLs):
+
+```bash
+npm run build && npm run preview:audit      # serves dist on :8790 with functions (one terminal)
+npm run audit:adsense:local                 # local build
+npm run audit:adsense -- --title-runs=3     # production
+```
+
+It exits non-zero on any failed gate and writes `audit-report.json`. The preview uses port 8790
+because 8788 is taken twice over - `npm run dev` serves on it, and the dock reserves it on the
+maintainer's machine - and a 4 GB heap: `wrangler pages dev` leaks memory under the ~600 requests
+a full audit makes and dies with "JavaScript heap out of memory" on the default heap.
+
 ### Modifying Framework
 **DO NOT** edit `wiki-framework/` directly. Instead:
 1. Check if registries can solve your need

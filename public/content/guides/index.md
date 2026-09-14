@@ -1,7 +1,7 @@
 ---
 id: index
 title: Guides
-description: Strategy guides for Slayer Legend - Andy's full progression walkthrough, the wiki's system guides, video guides, and how to contribute your own.
+description: Strategy guides for Slayer Legend - Andy's progression guide, the wiki's system guides, where community video guides are collected, and how to contribute your own.
 tags: [guides, strategy, tips]
 category: Guides
 date: 2026-08-16
@@ -13,7 +13,7 @@ Reference pages tell you what a system *is*; guides tell you what to *do* with i
 
 ## <span class="text-gray-900 dark:text-gray-100">The Big One: Andy's Progression Guide</span>
 
-**[Andy's Progression Guide](/andy/overview-introduction)** is the wiki's flagship walkthrough - a full progression path written by a player with three years across two servers, aimed squarely at F2P players and light spenders. It starts where the early game stops being self-explanatory (the Ether promotion, around stage 340) and runs promotion-by-promotion through Black Mythril, Demon Metal, Dragonos, Ragnablood, and onward past stage 1300. If you're past the tutorial phase and wondering what efficient play looks like, start there.
+**[Andy's Progression Guide](/andy/overview-introduction)** is the wiki's veteran-player perspective on efficient play, written by a player with three years across two servers and aimed squarely at F2P players and light spenders. His introduction picks up where the early game stops being self-explanatory (the Ether promotion, around stage 340), sets out how to think about progression from there - multipliers over increments, diamonds sequenced before anything else - and maps each stage band to the wiki pages that cover it, from Black Mythril through Dragonos and Ragnablood to stage 1300 and beyond. If you're past the tutorial phase and wondering what efficient play looks like, start there.
 
 ## <span class="text-gray-900 dark:text-gray-100">Guides Elsewhere on the Wiki</span>
 
@@ -28,17 +28,17 @@ The strategy material woven through the wiki's sections, gathered in one list:
 
 ## <span class="text-gray-900 dark:text-gray-100">Which Guide Do You Need Right Now?</span>
 
-Nobody reads a guide section front to back, so here's the honest routing table. **Brand new to the game** - skip this section entirely for now and start with [Getting Started](/getting-started): first steps, core mechanics, then the roadmap. Come back when the game stops explaining itself. **Somewhere in the early game** (before the Ether promotion, roughly stage 340) - the [Early Game Roadmap](/getting-started/early-game-roadmap) is your guide; it covers the milestone order, the diamond priorities, and the daily habits, and everything else can wait. **Past Ether** - Andy's guide, no contest. It's structured promotion by promotion, so you can jump straight to the stage band you're standing in rather than reading from the top.
+Nobody reads a guide section front to back, so here's the honest routing table. **Brand new to the game** - skip this section entirely for now and start with [Getting Started](/getting-started): first steps, core mechanics, then the roadmap. Come back when the game stops explaining itself. **Somewhere in the early game** (before the Ether promotion, roughly stage 340) - the [Early Game Roadmap](/getting-started/early-game-roadmap) is your guide; it covers the milestone order, the diamond priorities, and the daily habits, and everything else can wait. **Past Ether** - read Andy's introduction for the mindset, then use its stage-band table to jump straight to the wiki pages for the band you're standing in - [Promotions](/character/promotions) for the rank battles, the [Stages](/stages) pages for the numbers - rather than reading anything from the top.
 
 And if you're not progressing so much as *troubleshooting*: stuck on a promotion boss usually means a multiplier problem, so check [Promotions](/character/promotions) and shift your [companion](/companions/companion-builds) levels toward survival; earning less gold than your stat costs demand means the [Gold Farming Guide](/resources/gold) and Miho's Gold Rush; running out of mana mid-rotation is the mana-recovery roll exception covered in [Companion Builds](/companions/companion-builds). Most "I'm stuck" moments in this game map to one of those three.
 
 ## <span class="text-gray-900 dark:text-gray-100">A Suggested Reading Order</span>
 
-For a player who wants the full curriculum rather than spot answers, this order builds each idea on the last: the [Early Game Roadmap](/getting-started/early-game-roadmap) first, because it teaches the game's core rhythm (multipliers over increments, dailies over grinding) on easy content. Then [Farming Strategies](/resources/farming), because farming is the engine underneath every other system and the four decisions it teaches - where to park, when to play actively, what loadout, the daily lap - never stop applying. Then the two allied-systems guides, [Companion Builds](/companions/companion-builds) and [Spirit Information](/spirits/information), which turn "I equipped whatever" into deliberate farming and bossing setups. And finally Andy's guide as the long companion for everything after stage 340. Read in that order, each guide assumes only what the previous ones taught. The reference sections - [character](/character), [equipment](/equipment), [skills](/skills) - aren't reading-order material; they're where you look things up when a guide mentions a system you haven't met.
+For a player who wants the full curriculum rather than spot answers, this order builds each idea on the last: the [Early Game Roadmap](/getting-started/early-game-roadmap) first, because it teaches the game's core rhythm (multipliers over increments, dailies over grinding) on easy content. Then [Farming Strategies](/resources/farming), because farming is the engine underneath every other system and the four decisions it teaches - where to park, when to play actively, what loadout, the daily lap - never stop applying. Then the two allied-systems guides, [Companion Builds](/companions/companion-builds) and [Spirit Information](/spirits/information), which turn "I equipped whatever" into deliberate farming and bossing setups. And finally Andy's introduction, which sets the mindset for everything after stage 340 and points at the page for each band. Read in that order, each guide assumes only what the previous ones taught. The reference sections - [character](/character), [equipment](/equipment), [skills](/skills) - aren't reading-order material; they're where you look things up when a guide mentions a system you haven't met.
 
 ## <span class="text-gray-900 dark:text-gray-100">Video Guides</span>
 
-The community also maintains **[video guides and content creators](/creators)** - build showcases, progression tutorials, and update coverage from players who stream and record the game. If you learn better watching someone play than reading tables, that's your page.
+The wiki also has a **[content creators page](/creators)** where community video guides and streamer channels are submitted and, once reviewed, listed with links back to their creators. Treat it as the place to *contribute* a video that taught you something, and the place to check when you learn better by watching someone play than by reading tables.
 
 ## <span class="text-gray-900 dark:text-gray-100">Write One Yourself</span>
 

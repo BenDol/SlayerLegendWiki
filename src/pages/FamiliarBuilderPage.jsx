@@ -2,6 +2,7 @@ import React from 'react';
 import FamiliarBuilder from '../components/FamiliarBuilder';
 import MetaTags from '../components/MetaTags';
 import ToolPageAd from '../components/ads/ToolPageAd';
+import ToolIntro from '../components/ToolIntro';
 
 /**
  * FamiliarBuilderPage
@@ -23,6 +24,7 @@ const FamiliarBuilderPage = () => {
         isModal={false}
         allowSavingBuilds={true}
       />
+      <ToolIntro route="familiar-builder" />
     </>
   );
 };

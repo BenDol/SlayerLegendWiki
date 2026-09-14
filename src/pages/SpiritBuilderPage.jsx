@@ -2,6 +2,7 @@ import React from 'react';
 import SpiritBuilder from '../components/SpiritBuilder';
 import MetaTags from '../components/MetaTags';
 import ToolPageAd from '../components/ads/ToolPageAd';
+import ToolIntro from '../components/ToolIntro';
 
 /**
  * SpiritBuilderPage Component
@@ -21,6 +22,7 @@ const SpiritBuilderPage = () => {
       />
       <ToolPageAd />
       <SpiritBuilder isModal={false} allowSavingBuilds={true} />
+      <ToolIntro route="spirit-builder" />
     </>
   );
 };

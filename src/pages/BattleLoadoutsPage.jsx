@@ -2,6 +2,7 @@ import React from 'react';
 import BattleLoadouts from '../components/BattleLoadouts';
 import MetaTags from '../components/MetaTags';
 import ToolPageAd from '../components/ads/ToolPageAd';
+import ToolIntro from '../components/ToolIntro';
 
 /**
  * Battle Loadouts Page
@@ -21,6 +22,7 @@ const BattleLoadoutsPage = () => {
       />
       <ToolPageAd />
       <BattleLoadouts />
+      <ToolIntro route="battle-loadouts" />
     </>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import SoulWeaponEngravingBuilder from '../components/SoulWeaponEngravingBuilder';
 import MetaTags from '../components/MetaTags';
 import ToolPageAd from '../components/ads/ToolPageAd';
+import ToolIntro from '../components/ToolIntro';
 
 /**
  * Page wrapper for Soul Weapon Engraving
@@ -19,6 +20,7 @@ const SoulWeaponEngravingBuilderPage = () => {
       <div className="container mx-auto">
         <ToolPageAd />
         <SoulWeaponEngravingBuilder />
+        <ToolIntro route="soul-weapon-engraving" />
       </div>
     </>
   );

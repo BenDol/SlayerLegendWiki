@@ -27,7 +27,9 @@ export default defineConfig({
       branches: 100,
       statements: 100
     },
-    include: ['tests/**/*.test.js'],
+    // Component tests are .test.jsx and opt into jsdom with a
+    // `// @vitest-environment jsdom` docblock; everything else runs in node.
+    include: ['tests/**/*.test.{js,jsx}'],
     // tests/integration/** calls live SendGrid/OpenAI/GitHub APIs and throws
     // in beforeAll() without real credentials, so it is not part of the
     // default run or the deploy gate. Run it deliberately with
@@ -36,6 +38,11 @@ export default defineConfig({
     setupFiles: ['./tests/setup.js'],
     testTimeout: 30000,
     hookTimeout: 30000
+  },
+  // JSX in .jsx files (source and tests) without pulling in the app's Vite
+  // plugin chain.
+  esbuild: {
+    jsx: 'automatic'
   },
   resolve: {
     alias: {

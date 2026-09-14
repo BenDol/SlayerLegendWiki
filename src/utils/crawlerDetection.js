@@ -25,6 +25,7 @@ const CRAWLER_PATTERNS = [
   'Google-InspectionTool',
   'AdsBot-Google',
   'Mediapartners-Google',
+  'Google-Display-Ads-Bot',
   'APIs-Google',
   'Storebot-Google',
 
@@ -77,6 +78,8 @@ const AD_CRAWLER_PATTERNS = [
   'Mediapartners-Google',
   'AdsBot-Google',
   'AdsBot-Google-Mobile',
+  // Verifies a site when it is added to AdSense (support.google.com/adsense/answer/99376).
+  'Google-Display-Ads-Bot',
   'Google-AdSense',
 ];
 

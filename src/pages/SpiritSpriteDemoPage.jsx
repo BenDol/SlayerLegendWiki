@@ -2,6 +2,10 @@ import { useState } from 'react';
 import SpiritSprite from '../components/SpiritSprite';
 import spiritData from '../../public/data/spirit-characters.json';
 import Button from '../../wiki-framework/src/components/common/Button';
+import ToolIntro from '../components/ToolIntro';
+// The wiki page for this route - the prerenderer emits it as the crawler
+// HTML for /spirits/viewer, so the hydrated view renders the same article.
+import spiritViewerCopy from '../../public/content/spirits/viewer.md?raw';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('SpiritSpriteDemoPage');
@@ -417,6 +421,8 @@ const SpiritSpriteDemoPage = () => {
           <li><strong>Disabled animation buttons</strong> indicate frame types not available for that evolution level</li>
         </ul>
       </div>
+
+      <ToolIntro route="spirits-viewer" source={spiritViewerCopy} heading="About the Spirit Viewer" />
     </div>
   );
 };
